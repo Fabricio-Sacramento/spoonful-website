@@ -1,30 +1,37 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import "../styles/Background.css";
 
 const Background = () => {
 
-  console.log("Background carregado!"); // ✅ Isso mostrará se o componente está sendo renderizado.
+  console.log("Background carregado!"); // Isso mostrará se o componente está sendo renderizado.
 
   const interactiveRef = useRef(null);
 
   useEffect(() => {
     const interBubble = interactiveRef.current;
     let curX = 0, curY = 0, tgX = 0, tgY = 0;
-
+  
     function move() {
       curX += (tgX - curX) / 20;
       curY += (tgY - curY) / 20;
-      interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+      if (interBubble) {
+        interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+      }
       requestAnimationFrame(move);
     }
-
-    window.addEventListener("mousemove", (event) => {
+  
+    const handleMouseMove = (event) => {
       tgX = event.clientX - window.innerWidth / 2;
       tgY = event.clientY - window.innerHeight / 2;
-    });
-
+    };
+  
+    window.addEventListener("mousemove", handleMouseMove);
     move();
-  }, []);
+  
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);  // <-- Este é o fechamento correto do useEffect
 
   return (
     <div className="gradient-bg">

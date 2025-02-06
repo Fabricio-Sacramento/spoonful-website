@@ -1,51 +1,51 @@
 import { useRef, useEffect } from "react";
 import * as THREE from "three";
-import { useThree, useLoader } from "@react-three/fiber";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
+import { useThree } from "@react-three/fiber";
+import { DynamicEnvMap } from "./DynamicEnvMap"; // 🔹 Novo Environment Map Dinâmico
 
 const Glass = () => {
   const glassRef = useRef();
-  const wireframeRef = useRef();
   const { scene } = useThree();
-
-  // 🔹 Carregar HDRI apenas para reflexos
-  const envMap = useLoader(RGBELoader, "/src/assets/hdri/studio_small_08_4k.hdr");
-  envMap.mapping = THREE.EquirectangularReflectionMapping;
 
   useEffect(() => {
     if (scene) {
-      scene.environment = envMap; // 🔹 Apenas afeta reflexos
+      scene.environment = DynamicEnvMap; // 🔹 Agora reflete dinamicamente o background
       scene.background = null; // 🔹 Mantém o fundo dinâmico visível
     }
-  }, [scene, envMap]);
+  }, [scene]);
 
   return (
     <>
-      {/* 🔹 Vidro Icosaédrico */}
+      {/* 🔹 Icosaedro de vidro */}
       <mesh ref={glassRef} position={[0, 0, 0]} rotation={[0, 0, 0]}>
         <icosahedronGeometry args={[1.5, 2]} />
         <meshPhysicalMaterial
-          attach="material" // 🔹 Garante que o material seja aplicado corretamente
-          color={"white"}
+          color="white"
           transparent
-          opacity={0.7}
-          roughness={0.05}
-          metalness={0}
-          transmission={1}
-          ior={1.5}
-          reflectivity={0.9}
-          envMap={envMap}
-          envMapIntensity={0.8}
-          clearcoat={1}
-          clearcoatRoughness={0}
-          side={THREE.DoubleSide}
+          opacity={0.15} // 🔹 Aumenta a transparência
+          roughness={0.3} // 🔹 Superfície lisa para refletir melhor a luz
+          metalness={0.3} // 🔹 Remove aparência metálica
+          transmission={0.9} // 🔹 Garante transparência realista
+          thickness={0.1} // 🔹 Define a espessura do vidro
+          ior={1.5} // 🔹 Índice de refração para efeito de distorção
+          reflectivity={0.9} // 🔹 Torna o material reflexivo
+          envMap={DynamicEnvMap} // 🔹 O reflexo vem do background dinâmico
+          envMapIntensity={0.3} // 🔹 Ajuste da intensidade do reflexo
+          clearcoat={1} // 🔹 Dá brilho extra nas bordas
+          clearcoatRoughness={0} // 🔹 Mantém um acabamento espelhado
+          side={THREE.DoubleSide} // 🔹 Reflexo interno e externo
         />
       </mesh>
 
-      {/* 🔹 Wireframe sobreposto para destacar as arestas */}
-      <mesh ref={wireframeRef} position={[0, 0, 0]}>
-        <icosahedronGeometry args={[1.55, 2]} />
-        <meshBasicMaterial attach="material" color={"white"} wireframe transparent opacity={0.2} />
+      {/* 🔹 Wireframe sutil para destacar as arestas */}
+      <mesh position={[0, 0, 0]}>
+        <icosahedronGeometry args={[1.5, 2]} />
+        <meshBasicMaterial 
+          color="white"
+          wireframe 
+          transparent
+          opacity={0.15} // 🔹 Mantém um wireframe sutil
+        />
       </mesh>
     </>
   );
