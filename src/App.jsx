@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import Background from './components/Background';
+import DynamicBackground from './components/DynamicBackground';
 import Glass from './components/Glass';
 import './styles/Background.css'; // Garante que o CSS do background está carregado
 
@@ -24,6 +25,12 @@ const App = () => {
         
         {/* Luz pontual para realçar brilhos */}
         <pointLight position={[-5, 5, 5]} intensity={1} />
+
+        {/* Background 3D dentro do Canvas
+        <EnvBackground /> */}
+
+        {/* Background dinâmico dentro do Canvas */}
+        <DynamicBackground />
         
         {/* Objeto 3D de vidro */}
         <Glass />
