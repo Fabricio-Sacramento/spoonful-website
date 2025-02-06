@@ -10,7 +10,7 @@ const Glass = () => {
   const { scene } = useThree();
 
   // 🔹 Carregar um HDRI para melhorar os reflexos SEM substituir o fundo
-  const envMap = useLoader(RGBELoader, "/hdri/studio_small_08_4k.hdr");
+  const envMap = useLoader(RGBELoader, "/src/assets/hdri/studio_small_08_4k.hdr");
   envMap.mapping = THREE.EquirectangularReflectionMapping;
 
   useEffect(() => {
