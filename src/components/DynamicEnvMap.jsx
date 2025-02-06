@@ -5,12 +5,19 @@ import { useThree, useFrame } from "@react-three/fiber";
 
 const DynamicEnvMap = ({ setEnvMap }) => {
   const { scene, gl } = useThree();
-  const [cubeRenderTarget] = useState(() => new THREE.WebGLCubeRenderTarget(256));
+  
+  // 🔹 Criando render target para capturar a cena em cubemap
+  const [cubeRenderTarget] = useState(() => {
+    const rt = new THREE.WebGLCubeRenderTarget(256);
+    rt.texture.encoding = THREE.sRGBEncoding; // 🔹 Define encoding para cores corretas
+    return rt;
+  });
+
   const cubeCamera = useRef(new THREE.CubeCamera(0.1, 100, cubeRenderTarget));
 
   useEffect(() => {
     if (setEnvMap) {
-      setEnvMap(cubeRenderTarget.texture);
+      setEnvMap(cubeRenderTarget.texture); // 🔹 Passa o environment map atualizado
     }
   }, [cubeRenderTarget, setEnvMap]);
 
