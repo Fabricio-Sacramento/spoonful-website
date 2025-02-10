@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import DynamicBackground from './components/DynamicBackground';
 import Glass from './components/Glass';
+import GlassCube from "./components/GlassCube";
 
 const App = () => {
   return (
@@ -9,7 +10,7 @@ const App = () => {
       <Canvas 
         camera={{ position: [0, 1, 5], fov: 50 }}
         shadows
-        frameloop="demand"
+        frameloop="always"
         style={{ width: '100vw', height: '100vh' }}
       >
         <ambientLight intensity={1} />
@@ -17,6 +18,7 @@ const App = () => {
         <pointLight position={[-5, 5, 5]} intensity={1} />
 
         <DynamicBackground />
+        <GlassCube position={[0, 0, 0]} />
         <Glass />
         <OrbitControls />
       </Canvas>

@@ -31,7 +31,7 @@ const Glass = () => {
           ior={1}
           reflectivity={1}
           envMap={envMap}
-          envMapIntensity={3}
+          envMapIntensity={1}
           clearcoat={1}
           clearcoatRoughness={0}
           side={THREE.DoubleSide}
@@ -40,7 +40,7 @@ const Glass = () => {
 
       <mesh position={[0, 0, 0]}>
         <icosahedronGeometry args={[1.5, 2]} />
-        <meshBasicMaterial color="white" transparent opacity={1} />
+        <meshBasicMaterial color="white" wireframe transparent opacity={0.15} />
       </mesh>
     </>
   );
