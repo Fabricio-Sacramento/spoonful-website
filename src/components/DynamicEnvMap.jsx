@@ -1,15 +1,14 @@
 import { useRef, useEffect, useState } from "react";
-import PropTypes from "prop-types"; // 🔹 Importa PropTypes
+import PropTypes from "prop-types";
 import * as THREE from "three";
 import { useThree, useFrame } from "@react-three/fiber";
 
 const DynamicEnvMap = ({ setEnvMap }) => {
   const { scene, gl } = useThree();
-  
-  // 🔹 Criando render target para capturar a cena em cubemap
+
   const [cubeRenderTarget] = useState(() => {
     const rt = new THREE.WebGLCubeRenderTarget(256);
-    rt.texture.encoding = THREE.sRGBEncoding; // 🔹 Define encoding para cores corretas
+    rt.texture.encoding = THREE.sRGBEncoding;
     return rt;
   });
 
@@ -17,22 +16,21 @@ const DynamicEnvMap = ({ setEnvMap }) => {
 
   useEffect(() => {
     if (setEnvMap) {
-      setEnvMap(cubeRenderTarget.texture); // 🔹 Passa o environment map atualizado
+      setEnvMap(cubeRenderTarget.texture);
     }
   }, [cubeRenderTarget, setEnvMap]);
 
   useFrame(() => {
     if (cubeCamera.current) {
-      cubeCamera.current.update(gl, scene); // 🔹 Atualiza o environment map em tempo real
+      cubeCamera.current.update(gl, scene);
     }
   });
 
   return <primitive object={cubeCamera.current} />;
 };
 
-// 🔹 Adiciona validação de props
 DynamicEnvMap.propTypes = {
-  setEnvMap: PropTypes.func.isRequired, // 🔹 Garante que é uma função obrigatória
+  setEnvMap: PropTypes.func.isRequired,
 };
 
 export default DynamicEnvMap;

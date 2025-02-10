@@ -1,4 +1,3 @@
-// DynamicBackground.jsx
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -23,7 +22,6 @@ const DynamicBackground = () => {
       varying vec2 vUv;
       void main() {
           vec2 uv = vUv;
-          // Exemplo simples: cores que oscilam com o tempo
           vec3 color = vec3(uv, 0.5 + 0.5 * sin(time));
           gl_FragColor = vec4(color, 1.0);
       }
@@ -37,7 +35,6 @@ const DynamicBackground = () => {
 
   return (
     <mesh ref={meshRef}>
-      {/* Uma esfera grande para envolver a cena */}
       <sphereGeometry args={[50, 64, 64]} />
       <primitive object={shaderMaterial} attach="material" />
     </mesh>
