@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import DynamicEnvMap from "./DynamicEnvMap";
+import WaterParticles from "./WaterParticles"; // 🔹 Novo componente de partículas
 
 const GlassCube = () => {
   const cubeRef = useRef();
@@ -54,6 +55,10 @@ const GlassCube = () => {
           side={THREE.DoubleSide}
         />
       </mesh>
+
+      {/* 🔹 Adicionamos o sistema de partículas dentro do cubo */}
+      <WaterParticles />
+
     </>
   );
 };
