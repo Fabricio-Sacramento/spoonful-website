@@ -37,11 +37,6 @@ const Glass = () => {
           side={THREE.DoubleSide}
         />
       </mesh>
-
-      <mesh position={[0, 0, 0]}>
-        <icosahedronGeometry args={[1.5, 2]} />
-        <meshBasicMaterial color="white" wireframe transparent opacity={0.15} />
-      </mesh>
     </>
   );
 };

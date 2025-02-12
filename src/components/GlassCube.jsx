@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import DynamicEnvMap from "./DynamicEnvMap";
-import WaterParticles from "./WaterParticles"; // 🔹 Importamos as partículas
+
 
 const GlassCube = () => {
   const groupRef = useRef(); // 🔹 Criamos um grupo para conter o cubo e as partículas
@@ -47,9 +47,6 @@ const GlassCube = () => {
             side={THREE.DoubleSide}
           />
         </mesh>
-
-        {/* 🔹 As partículas agora fazem parte do grupo e giram com o cubo */}
-        <WaterParticles />
       </group>
     </>
   );
