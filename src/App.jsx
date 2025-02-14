@@ -1,7 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Physics } from "@react-three/cannon";
-
 import DynamicBackground from "./components/DynamicBackground";
 import GlassCubePhysics from "./components/GlassCubePhysics";
 import FluidParticles from "./components/FluidParticles";
