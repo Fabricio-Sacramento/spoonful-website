@@ -6,40 +6,45 @@ import PropTypes from "prop-types";
 const GlassCubePhysics = ({ transformRef }) => {
   // Tamanho interno do cubo
   const innerSize = 1.5;
-  const thickness = 0.1;
+  const thickness = 0.2;
   const halfSize = innerSize / 2;
 
-  // Dados locais de cada parede
-  const walls = {
-    floor: {
-      localOffset: new THREE.Vector3(0, -halfSize, 0),
-      localRotation: new THREE.Euler(0, 0, 0),
-    },
-    ceiling: {
-      localOffset: new THREE.Vector3(0, halfSize, 0),
-      localRotation: new THREE.Euler(0, 0, 0),
-    },
-    left: {
-      localOffset: new THREE.Vector3(-halfSize, 0, 0),
-      // Removemos a rotação extra
-      localRotation: new THREE.Euler(0, 0, 0),
-    },
-    right: {
-      localOffset: new THREE.Vector3(halfSize, 0, 0),
-      // Removemos a rotação extra
-      localRotation: new THREE.Euler(0, 0, 0),
-    },
-    front: {
-      localOffset: new THREE.Vector3(0, 0, -halfSize),
-      localRotation: new THREE.Euler(0, 0, 0),
-    },
-    back: {
-      localOffset: new THREE.Vector3(0, 0, halfSize),
-      // Algumas pessoas rotacionam 180° em Y para “virar” a face,
-      // mas, se não precisar, pode deixar 0 também.
-      localRotation: new THREE.Euler(0, Math.PI, 0),
-    },
-  };
+  // Defina um pequeno ajuste para fechar os gaps (valor em unidades; ajuste conforme necessário)
+const offsetAdjustment = 0.01;
+
+const walls = {
+  floor: {
+    // Empurra levemente para baixo para fechar eventuais brechas
+    localOffset: new THREE.Vector3(0, -halfSize - offsetAdjustment, 0),
+    localRotation: new THREE.Euler(0, 0, 0),
+  },
+  ceiling: {
+    // Empurra levemente para cima
+    localOffset: new THREE.Vector3(0, halfSize + offsetAdjustment, 0),
+    localRotation: new THREE.Euler(0, 0, 0),
+  },
+  left: {
+    // Empurra para a esquerda (mais negativo) para garantir o fechamento na lateral
+    localOffset: new THREE.Vector3(-halfSize - offsetAdjustment, 0, 0),
+    localRotation: new THREE.Euler(0, 0, 0),
+  },
+  right: {
+    // Empurra para a direita (mais positivo)
+    localOffset: new THREE.Vector3(halfSize + offsetAdjustment, 0, 0),
+    localRotation: new THREE.Euler(0, 0, 0),
+  },
+  front: {
+    // Empurra para frente (mais negativo no eixo Z)
+    localOffset: new THREE.Vector3(0, 0, -halfSize - offsetAdjustment),
+    localRotation: new THREE.Euler(0, 0, 0),
+  },
+  back: {
+    // Empurra para trás (mais positivo no eixo Z)
+    localOffset: new THREE.Vector3(0, 0, halfSize + offsetAdjustment),
+    localRotation: new THREE.Euler(0, Math.PI, 0),
+  },
+};
+
   
 
   // useBox para cada parede
@@ -119,27 +124,27 @@ const GlassCubePhysics = ({ transformRef }) => {
     <>
       <mesh ref={floorRef}>
         <boxGeometry args={[innerSize, thickness, innerSize]} />
-        <meshStandardMaterial transparent />
+        <meshStandardMaterial transparent color="white" opacity={0.1}/>
       </mesh>
       <mesh ref={ceilingRef}>
         <boxGeometry args={[innerSize, thickness, innerSize]} />
-        <meshStandardMaterial transparent />
+        <meshStandardMaterial transparent color="white" opacity={0.1}/>
       </mesh>
       <mesh ref={leftRef}>
         <boxGeometry args={[thickness, innerSize, innerSize]} />
-        <meshStandardMaterial transparent />
+        <meshStandardMaterial transparent color="white" opacity={0.1}/>
       </mesh>
       <mesh ref={rightRef}>
         <boxGeometry args={[thickness, innerSize, innerSize]} />
-        <meshStandardMaterial transparent />
+        <meshStandardMaterial transparent color="white" opacity={0.1}/>
       </mesh>
       <mesh ref={frontRef}>
         <boxGeometry args={[innerSize, innerSize, thickness]} />
-        <meshStandardMaterial transparent />
+        <meshStandardMaterial transparent color="white" opacity={0.1}/>
       </mesh>
       <mesh ref={backRef}>
         <boxGeometry args={[innerSize, innerSize, thickness]} />
-        <meshStandardMaterial transparent />
+        <meshStandardMaterial transparent color="white" opacity={0.1}/>
       </mesh>
     </>
   );
