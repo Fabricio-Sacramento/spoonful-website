@@ -13,11 +13,12 @@ const GlobalRotationController = ({ children, sensitivity, transformRef, maxAngl
   const groupRef = transformRef || internalRef;
   const { size } = useThree();
 
+  // Guarda o quaternion alvo que desejamos alcançar
   const [targetQuaternion] = useState(() => new THREE.Quaternion());
 
   const onPointerMove = (event) => {
-    const normX = (event.clientX / size.width) * 2 - 1;  // -1 à direita, +1 à esquerda
-    const normY = (event.clientY / size.height) * 2 - 1; // -1 no topo, +1 na base
+    const normX = (event.clientX / size.width) * 2 - 1;  // -1 à esquerda, +1 à direita
+    const normY = (event.clientY / size.height) * 2 - 1;  // -1 no topo, +1 na base
 
     const targetAngleY = THREE.MathUtils.clamp(normX * maxAngleY, -maxAngleY, maxAngleY);
     const targetAngleX = THREE.MathUtils.clamp(normY * maxAngleX, -maxAngleX, maxAngleX);

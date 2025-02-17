@@ -18,14 +18,8 @@ const App = () => {
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
 
-      <Physics gravity={[0, -9.81, 0]} subSteps={4} iterations={20}>
-        {/* A rotação será determinada exclusivamente pela posição do mouse */}
-        <GlobalRotationController
-          transformRef={globalTransformRef}
-          sensitivity={0.1}
-          maxAngleX={Math.PI / 8}   // ~22.5° no eixo X
-          maxAngleY={Math.PI / 4}   // ~45° no eixo Y
-        >
+      <Physics gravity={[0, -9.81, 0]} subSteps={4} iterations={20} debug={false}>
+        <GlobalRotationController transformRef={globalTransformRef}>
           <DynamicBackground />
           <Glass />
           <CubeController transformRef={globalTransformRef} />
