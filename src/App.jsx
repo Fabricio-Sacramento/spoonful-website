@@ -1,35 +1,37 @@
-// App.jsx
-import { useRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Physics } from "@react-three/cannon";
-import DynamicBackground from "./components/DynamicBackground";
-import GlassCubePhysics from "./components/GlassCubePhysics";
-import FluidParticles from "./components/FluidParticles";
-import Glass from "./components/Glass";
-import CubeController from "./components/CubeController"; // Nosso controlador visual
+// src/App.jsx
+import { useRef } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Physics } from '@react-three/cannon';
+
+import GlobalRotationController from './components/GlobalRotationController';
+import CubeController from './components/CubeController';
+import GlassCubePhysics from './components/GlassCubePhysics';
+import Glass from './components/Glass';
+import DynamicBackground from './components/DynamicBackground';
+import FluidParticles from './components/FluidParticles';
 
 const App = () => {
-  // Ref compartilhado para a transformação do cubo
-  const cubeTransformRef = useRef();
+  const globalTransformRef = useRef();
 
   return (
-    <Canvas camera={{ position: [0, 1, 5], fov: 50 }} shadows>
+    <Canvas camera={{ position: [0, 1, 5], fov: 50 }}>
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
-      <pointLight position={[-5, 5, 5]} intensity={1} />
 
-      {/* Elementos visuais */}
-      <DynamicBackground />
-
-      {/* Passamos o ref para o CubeController */}
-      <CubeController transformRef={cubeTransformRef} />
-
-      <Glass />
-
-      <Physics gravity={[0, -9.81, 0]} debug={true}>
-        {/* Passamos o mesmo ref para sincronizar o cubo físico */}
-        <GlassCubePhysics transformRef={cubeTransformRef} />
-        <FluidParticles />
+      <Physics gravity={[0, -9.81, 0]} subSteps={4} iterations={20}>
+        {/* Ajuste sensitivity, maxAngleX, maxAngleY conforme desejado */}
+        <GlobalRotationController
+          transformRef={globalTransformRef}
+          sensitivity={0.1}
+          maxAngleX={Math.PI / 4}  // 45° no eixo X
+          maxAngleY={Math.PI / 2}  // 90° no eixo Y
+        >
+          <DynamicBackground />
+          <Glass />
+          <CubeController transformRef={globalTransformRef} />
+          <GlassCubePhysics transformRef={globalTransformRef} />
+          <FluidParticles />
+        </GlobalRotationController>
       </Physics>
     </Canvas>
   );

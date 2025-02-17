@@ -7,7 +7,7 @@ const GlassCube = () => {
   const [envMap, setEnvMap] = useState(null);
   
   // Defina o tamanho do cubo
-  const cubeSize = 1.49;
+  const cubeSize = 1.5;
 
   return (
     <>
