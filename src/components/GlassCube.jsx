@@ -1,12 +1,10 @@
-// GlassCube.jsx
+// src/components/GlassCube.jsx
 import { useState } from "react";
 import * as THREE from "three";
 import DynamicEnvMap from "./DynamicEnvMap";
 
 const GlassCube = () => {
   const [envMap, setEnvMap] = useState(null);
-  
-  // Defina o tamanho do cubo
   const cubeSize = 1.5;
 
   return (
@@ -14,7 +12,6 @@ const GlassCube = () => {
       <DynamicEnvMap setEnvMap={setEnvMap} />
 
       <mesh>
-        {/* Utilize o cubeSize para definir as dimensões */}
         <boxGeometry args={[cubeSize, cubeSize, cubeSize]} />
         <meshPhysicalMaterial 
           color="white"

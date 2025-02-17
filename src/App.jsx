@@ -14,17 +14,17 @@ const App = () => {
   const globalTransformRef = useRef();
 
   return (
-    <Canvas camera={{ position: [0, 1, 5], fov: 50 }}>
+    <Canvas camera={{ position: [0, 1, 5], fov: 50 }} shadows>
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
 
       <Physics gravity={[0, -9.81, 0]} subSteps={4} iterations={20}>
-        {/* Ajuste sensitivity, maxAngleX, maxAngleY conforme desejado */}
+        {/* A rotação será determinada exclusivamente pela posição do mouse */}
         <GlobalRotationController
           transformRef={globalTransformRef}
           sensitivity={0.1}
-          maxAngleX={Math.PI / 4}  // 45° no eixo X
-          maxAngleY={Math.PI / 2}  // 90° no eixo Y
+          maxAngleX={Math.PI / 8}   // ~22.5° no eixo X
+          maxAngleY={Math.PI / 4}   // ~45° no eixo Y
         >
           <DynamicBackground />
           <Glass />

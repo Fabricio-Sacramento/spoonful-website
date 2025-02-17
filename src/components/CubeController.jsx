@@ -4,11 +4,10 @@ import PropTypes from "prop-types";
 import GlassCube from "./GlassCube";
 
 const CubeController = ({ transformRef }) => {
-  // Use o ref recebido (ou crie um fallback)
+  // Apenas renderiza o GlassCube; a rotação será controlada externamente
   const localRef = useRef();
   const groupRef = transformRef || localRef;
 
-  // Removemos a rotação autônoma; esse componente apenas renderiza o GlassCube
   return (
     <group ref={groupRef}>
       <GlassCube />
