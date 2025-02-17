@@ -11,6 +11,7 @@ import DynamicBackground from './components/DynamicBackground';
 import FluidParticles from './components/FluidParticles';
 
 const App = () => {
+  // Cria um único ref que será compartilhado entre GlobalRotationController, CubeController e GlassCubePhysics
   const globalTransformRef = useRef();
 
   return (
@@ -19,7 +20,12 @@ const App = () => {
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
 
       <Physics gravity={[0, -9.81, 0]} subSteps={4} iterations={20} debug={false}>
-        <GlobalRotationController transformRef={globalTransformRef}>
+        <GlobalRotationController
+          transformRef={globalTransformRef}
+          sensitivity={0.1}
+          maxAngleX={Math.PI / 8}
+          maxAngleY={Math.PI / 4}
+        >
           <DynamicBackground />
           <Glass />
           <CubeController transformRef={globalTransformRef} />

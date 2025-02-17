@@ -1,3 +1,4 @@
+// src/components/GlassCubePhysics.jsx
 import { useBox } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
 import PropTypes from "prop-types";
@@ -7,10 +8,9 @@ const GlassCubePhysics = ({ transformRef }) => {
   const innerSize = 1.5; // mesmo tamanho do GlassCube
   const thickness = 0.2; // espessura das paredes
   const halfSize = innerSize / 2; // 0.75
-  //const halfThickness = thickness / 2; // 0.1
   const tempVector = new THREE.Vector3(); // reusável a cada frame
 
-  // Definimos offsets locais para cada parede (posição local em relação ao centro do cubo)
+  // Offsets locais para cada parede
   const floorOffset   = new THREE.Vector3(0, -halfSize, 0);
   const ceilingOffset = new THREE.Vector3(0,  halfSize, 0);
   const leftOffset    = new THREE.Vector3(-halfSize, 0, 0);
@@ -18,76 +18,65 @@ const GlassCubePhysics = ({ transformRef }) => {
   const frontOffset   = new THREE.Vector3(0, 0, -halfSize);
   const backOffset    = new THREE.Vector3(0, 0,  halfSize);
 
-  // PISO
-  const [floorRef, floorApi] = useBox(() => ({
+  // Em vez de [ref, api], ignoramos o ref usando [ , api]
+  const [, floorApi] = useBox(() => ({
     type: "Kinematic",
     mass: 0,
-    args: [innerSize, thickness, innerSize], // x=1.5, y=0.2, z=1.5
-    position: [0, -halfSize, 0], // posição inicial, mas será sobrescrita no useFrame
+    args: [innerSize, thickness, innerSize],
+    position: [0, -halfSize, 0],
   }));
 
-  // TETO
-  const [ceilingRef, ceilingApi] = useBox(() => ({
+  const [, ceilingApi] = useBox(() => ({
     type: "Kinematic",
     mass: 0,
     args: [innerSize, thickness, innerSize],
     position: [0, halfSize, 0],
   }));
 
-  // PAREDE ESQUERDA
-  const [leftRef, leftApi] = useBox(() => ({
+  const [, leftApi] = useBox(() => ({
     type: "Kinematic",
     mass: 0,
     args: [thickness, innerSize, innerSize],
     position: [-halfSize, 0, 0],
   }));
 
-  // PAREDE DIREITA
-  const [rightRef, rightApi] = useBox(() => ({
+  const [, rightApi] = useBox(() => ({
     type: "Kinematic",
     mass: 0,
     args: [thickness, innerSize, innerSize],
     position: [halfSize, 0, 0],
   }));
 
-  // PAREDE FRONTAL
-  const [frontRef, frontApi] = useBox(() => ({
+  const [, frontApi] = useBox(() => ({
     type: "Kinematic",
     mass: 0,
     args: [innerSize, innerSize, thickness],
     position: [0, 0, -halfSize],
   }));
 
-  // PAREDE TRASEIRA
-  const [backRef, backApi] = useBox(() => ({
+  const [, backApi] = useBox(() => ({
     type: "Kinematic",
     mass: 0,
     args: [innerSize, innerSize, thickness],
     position: [0, 0, halfSize],
   }));
 
-  // useFrame: a cada frame, rotacionamos o offset local de cada parede e somamos à posição global
+  // useFrame: a cada frame, aplicamos o offset local rotacionado para cada parede
   useFrame(() => {
     if (!transformRef?.current) return;
 
-    // Força atualização do parent
     transformRef.current.updateMatrixWorld(true);
 
-    // Pega posição e rotação globais
     const parentPos = transformRef.current.getWorldPosition(new THREE.Vector3());
     const parentQuat = transformRef.current.getWorldQuaternion(new THREE.Quaternion());
 
-    // Função auxiliar para atualizar uma parede
     const updateWall = (offset, api) => {
-      // offset local rotacionado
       tempVector.copy(offset).applyQuaternion(parentQuat);
       const worldPos = parentPos.clone().add(tempVector);
-
       api.position.set(worldPos.x, worldPos.y, worldPos.z);
       api.quaternion.set(parentQuat.x, parentQuat.y, parentQuat.z, parentQuat.w);
     };
 
-    // Atualizamos cada parede
     updateWall(floorOffset,   floorApi);
     updateWall(ceilingOffset, ceilingApi);
     updateWall(leftOffset,    leftApi);
@@ -96,40 +85,8 @@ const GlassCubePhysics = ({ transformRef }) => {
     updateWall(backOffset,    backApi);
   });
 
-  return (
-    <group>
-      {/* Renderizamos cada parede em wireframe para debug */}
-      <mesh ref={floorRef}>
-        <boxGeometry args={[innerSize, thickness, innerSize]} />
-        <meshBasicMaterial color="red" wireframe />
-      </mesh>
-
-      <mesh ref={ceilingRef}>
-        <boxGeometry args={[innerSize, thickness, innerSize]} />
-        <meshBasicMaterial color="red" wireframe />
-      </mesh>
-
-      <mesh ref={leftRef}>
-        <boxGeometry args={[thickness, innerSize, innerSize]} />
-        <meshBasicMaterial color="red" wireframe />
-      </mesh>
-
-      <mesh ref={rightRef}>
-        <boxGeometry args={[thickness, innerSize, innerSize]} />
-        <meshBasicMaterial color="red" wireframe />
-      </mesh>
-
-      <mesh ref={frontRef}>
-        <boxGeometry args={[innerSize, innerSize, thickness]} />
-        <meshBasicMaterial color="red" wireframe />
-      </mesh>
-
-      <mesh ref={backRef}>
-        <boxGeometry args={[innerSize, innerSize, thickness]} />
-        <meshBasicMaterial color="red" wireframe />
-      </mesh>
-    </group>
-  );
+  // Retornamos um <group /> vazio, pois não renderizamos nada
+  return <group />;
 };
 
 GlassCubePhysics.propTypes = {
