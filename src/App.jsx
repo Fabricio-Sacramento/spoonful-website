@@ -1,7 +1,6 @@
 // App.jsx
 import { useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import { Physics } from "@react-three/cannon";
 import DynamicBackground from "./components/DynamicBackground";
 import GlassCubePhysics from "./components/GlassCubePhysics";
@@ -32,8 +31,6 @@ const App = () => {
         <GlassCubePhysics transformRef={cubeTransformRef} />
         <FluidParticles />
       </Physics>
-
-      <OrbitControls />
     </Canvas>
   );
 };
