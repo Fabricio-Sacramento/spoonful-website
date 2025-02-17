@@ -2,110 +2,140 @@ import { useBox } from "@react-three/cannon";
 import { useFrame } from "@react-three/fiber";
 import PropTypes from "prop-types";
 import * as THREE from "three";
-import { useRef } from "react";
 
 const GlassCubePhysics = ({ transformRef }) => {
-  const innerSize = 1.5;  // Tamanho do cubo (igual ao GlassCube.jsx)
-  const thickness = 0.2;  // Espessura das paredes
-  const halfSize = innerSize / 2;  // 0.75
-  const tempVector = new THREE.Vector3();
-  const tempQuat = new THREE.Quaternion();
+  const innerSize = 1.5; // mesmo tamanho do GlassCube
+  const thickness = 0.2; // espessura das paredes
+  const halfSize = innerSize / 2; // 0.75
+  //const halfThickness = thickness / 2; // 0.1
+  const tempVector = new THREE.Vector3(); // reusável a cada frame
 
-  /**
-   * Definimos um array com a configuração de cada parede:
-   * - size: dimensões do corpo (useBox args)
-   * - localPos: posição local (em relação ao centro do cubo)
-   */
-  const wallsConfig = [
-    {
-      name: "floor",
-      size: [innerSize, thickness, innerSize],
-      localPos: [0, -halfSize, 0],
-    },
-    {
-      name: "ceiling",
-      size: [innerSize, thickness, innerSize],
-      localPos: [0, halfSize, 0],
-    },
-    {
-      name: "left",
-      size: [thickness, innerSize, innerSize],
-      localPos: [-halfSize, 0, 0],
-    },
-    {
-      name: "right",
-      size: [thickness, innerSize, innerSize],
-      localPos: [halfSize, 0, 0],
-    },
-    {
-      name: "front",
-      size: [innerSize, innerSize, thickness],
-      localPos: [0, 0, -halfSize],
-    },
-    {
-      name: "back",
-      size: [innerSize, innerSize, thickness],
-      localPos: [0, 0, halfSize],
-    },
-  ];
+  // Definimos offsets locais para cada parede (posição local em relação ao centro do cubo)
+  const floorOffset   = new THREE.Vector3(0, -halfSize, 0);
+  const ceilingOffset = new THREE.Vector3(0,  halfSize, 0);
+  const leftOffset    = new THREE.Vector3(-halfSize, 0, 0);
+  const rightOffset   = new THREE.Vector3( halfSize, 0, 0);
+  const frontOffset   = new THREE.Vector3(0, 0, -halfSize);
+  const backOffset    = new THREE.Vector3(0, 0,  halfSize);
 
-  /**
-   * Para cada parede, chamamos useBox, definindo a posição inicial = localPos.
-   * Retemos [ref, api] para cada.
-   */
-  const walls = wallsConfig.map((conf) => {
-    const [ref, api] = useBox(() => ({
-      type: "Kinematic",
-      mass: 0,
-      args: conf.size,
-      // A posição inicial é conf.localPos, mas esse valor é só “placeholder”.
-      // A cada frame, vamos recalcular e setar a posição real (global).
-      position: conf.localPos,
-    }));
-    return { ...conf, ref, api };
-  });
+  // PISO
+  const [floorRef, floorApi] = useBox(() => ({
+    type: "Kinematic",
+    mass: 0,
+    args: [innerSize, thickness, innerSize], // x=1.5, y=0.2, z=1.5
+    position: [0, -halfSize, 0], // posição inicial, mas será sobrescrita no useFrame
+  }));
 
-  // A cada frame, aplicamos a rotação/posição global do transformRef + o offset local
+  // TETO
+  const [ceilingRef, ceilingApi] = useBox(() => ({
+    type: "Kinematic",
+    mass: 0,
+    args: [innerSize, thickness, innerSize],
+    position: [0, halfSize, 0],
+  }));
+
+  // PAREDE ESQUERDA
+  const [leftRef, leftApi] = useBox(() => ({
+    type: "Kinematic",
+    mass: 0,
+    args: [thickness, innerSize, innerSize],
+    position: [-halfSize, 0, 0],
+  }));
+
+  // PAREDE DIREITA
+  const [rightRef, rightApi] = useBox(() => ({
+    type: "Kinematic",
+    mass: 0,
+    args: [thickness, innerSize, innerSize],
+    position: [halfSize, 0, 0],
+  }));
+
+  // PAREDE FRONTAL
+  const [frontRef, frontApi] = useBox(() => ({
+    type: "Kinematic",
+    mass: 0,
+    args: [innerSize, innerSize, thickness],
+    position: [0, 0, -halfSize],
+  }));
+
+  // PAREDE TRASEIRA
+  const [backRef, backApi] = useBox(() => ({
+    type: "Kinematic",
+    mass: 0,
+    args: [innerSize, innerSize, thickness],
+    position: [0, 0, halfSize],
+  }));
+
+  // useFrame: a cada frame, rotacionamos o offset local de cada parede e somamos à posição global
   useFrame(() => {
     if (!transformRef?.current) return;
 
-    // Força atualização da matriz
+    // Força atualização do parent
     transformRef.current.updateMatrixWorld(true);
 
-    // Pega posição e rotação globais do cubo
+    // Pega posição e rotação globais
     const parentPos = transformRef.current.getWorldPosition(new THREE.Vector3());
     const parentQuat = transformRef.current.getWorldQuaternion(new THREE.Quaternion());
 
-    // Para cada parede, calculamos a posição final = parentPos + (localPos rotacionado)
-    walls.forEach(({ localPos, api }) => {
-      // Rotaciona o offset local
-      tempVector.set(localPos[0], localPos[1], localPos[2]);
-      tempVector.applyQuaternion(parentQuat);
-
-      // Soma ao parentPos
+    // Função auxiliar para atualizar uma parede
+    const updateWall = (offset, api) => {
+      // offset local rotacionado
+      tempVector.copy(offset).applyQuaternion(parentQuat);
       const worldPos = parentPos.clone().add(tempVector);
 
-      // Ajusta no Cannon
       api.position.set(worldPos.x, worldPos.y, worldPos.z);
       api.quaternion.set(parentQuat.x, parentQuat.y, parentQuat.z, parentQuat.w);
-    });
+    };
+
+    // Atualizamos cada parede
+    updateWall(floorOffset,   floorApi);
+    updateWall(ceilingOffset, ceilingApi);
+    updateWall(leftOffset,    leftApi);
+    updateWall(rightOffset,   rightApi);
+    updateWall(frontOffset,   frontApi);
+    updateWall(backOffset,    backApi);
   });
 
-  // Renderizamos cada parede em wireframe para debug
   return (
     <group>
-      {walls.map(({ name, ref, size }, i) => (
-        <mesh key={name} ref={ref}>
-          <boxGeometry args={size} />
-          <meshBasicMaterial color="red" wireframe />
-        </mesh>
-      ))}
+      {/* Renderizamos cada parede em wireframe para debug */}
+      <mesh ref={floorRef}>
+        <boxGeometry args={[innerSize, thickness, innerSize]} />
+        <meshBasicMaterial color="red" wireframe />
+      </mesh>
+
+      <mesh ref={ceilingRef}>
+        <boxGeometry args={[innerSize, thickness, innerSize]} />
+        <meshBasicMaterial color="red" wireframe />
+      </mesh>
+
+      <mesh ref={leftRef}>
+        <boxGeometry args={[thickness, innerSize, innerSize]} />
+        <meshBasicMaterial color="red" wireframe />
+      </mesh>
+
+      <mesh ref={rightRef}>
+        <boxGeometry args={[thickness, innerSize, innerSize]} />
+        <meshBasicMaterial color="red" wireframe />
+      </mesh>
+
+      <mesh ref={frontRef}>
+        <boxGeometry args={[innerSize, innerSize, thickness]} />
+        <meshBasicMaterial color="red" wireframe />
+      </mesh>
+
+      <mesh ref={backRef}>
+        <boxGeometry args={[innerSize, innerSize, thickness]} />
+        <meshBasicMaterial color="red" wireframe />
+      </mesh>
     </group>
   );
 };
 
 GlassCubePhysics.propTypes = {
-  transformRef: PropTypes.shape({ current: PropTypes.any }),
+  transformRef: PropTypes.shape({
+    current: PropTypes.any,
+  }),
 };
 
 export default GlassCubePhysics;
