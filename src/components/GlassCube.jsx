@@ -5,7 +5,7 @@ import DynamicEnvMap from "./DynamicEnvMap";
 
 const GlassCube = () => {
   const [envMap, setEnvMap] = useState(null);
-  const cubeSize = 2.3;
+  const cubeSize = 2.5;
 
   return (
     <>
