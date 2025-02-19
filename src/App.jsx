@@ -19,18 +19,19 @@ const App = () => {
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
 
-      <Physics gravity={[0, -9.81, 0]} subSteps={4} iterations={20} debug={false}>
+      <Physics gravity={[0, 0, 0]} subSteps={4} iterations={50} debug={false}>
         <GlobalRotationController
           transformRef={globalTransformRef}
-          sensitivity={0.1}
-          maxAngleX={Math.PI / 8}
-          maxAngleY={Math.PI / 4}
+          
         >
           <DynamicBackground />
           <Glass />
           <CubeController transformRef={globalTransformRef} />
           <GlassCubePhysics transformRef={globalTransformRef} />
-          <FluidParticles />
+          <FluidParticles
+            numParticles={50}
+            globalTransformRef={globalTransformRef}
+          />
         </GlobalRotationController>
       </Physics>
     </Canvas>

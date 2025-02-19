@@ -2,7 +2,7 @@
 import PropTypes from "prop-types";
 import SingleParticle from "./SingleParticle";
 
-export default function FluidParticlesNoInstancing({ numParticles = 50, globalTransformRef }) {
+export default function FluidParticlesNoInstancing({ numParticles = 100, globalTransformRef }) {
   const spawnRange = 1.0;
 
   // Gera posições aleatórias para cada partícula dentro do volume definido

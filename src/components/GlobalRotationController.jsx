@@ -116,7 +116,7 @@ GlobalRotationController.defaultProps = {
   maxAngleX: Math.PI / 8,
   maxAngleY: Math.PI / 32,
   dragSensitivity: 0.005,
-  dampingFactor: 0.95,
+  dampingFactor: 0.15,
   inertialThreshold: 0.0001,
 };
 
