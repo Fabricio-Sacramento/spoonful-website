@@ -8,7 +8,7 @@ const DynamicEnvMap = ({ setEnvMap }) => {
 
   const [cubeRenderTarget] = useState(() => {
     const rt = new THREE.WebGLCubeRenderTarget(256);
-    rt.texture.encoding = THREE.sRGBEncoding;
+    rt.texture.colorSpace = THREE.SRGBColorSpace;
     return rt;
   });
 
