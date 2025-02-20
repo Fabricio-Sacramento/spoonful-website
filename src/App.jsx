@@ -1,32 +1,41 @@
-import { Canvas } from '@react-three/fiber';
-import Glass from './components/Glass';
-import DynamicBackground from './components/DynamicBackground';
-import GlassCube from './components/GlassCube';
-import ConceptualCore from './components/ConceptualCore';
-import { OrbitControls, Environment } from '@react-three/drei';
-
-const App = () => {
+import HeroSection from './components/HeroSection'
+import AboutUs from './components/AboutUs'
+import WhatWeDo from './components/WhatWeDo'
+import Work from './components/Work'
+import Statement from './components/Statement'
+import Clients from './components/Clients'
+import Contact from './components/Contact'
+export default function App() {
   return (
-    <Canvas camera={{ position: [0, 0, 5], fov: 50 }} shadows>
-      <ambientLight intensity={1} />
-      <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
+    <>
+      {/* Hero Section (3D Background via Canvas + Texto) */}
+      <section id="hero">
+        <HeroSection />
+      </section>
 
-      {/* Define o ambiente que será utilizado como envMap */}
-      <Environment preset="studio" background />
+      <section id="about-us">
+        <AboutUs />
+      </section>
 
-      {/* Fundo dinâmico */}
-      <DynamicBackground />
+      <section id="what-we-do">
+        <WhatWeDo />
+      </section>
 
-      {/* Elementos de vidro já existentes */}
-      <Glass />
-      <GlassCube />
+      <section id="work">
+        <Work />
+      </section>
 
-      {/* Novo objeto 3D conceitual */}
-      <ConceptualCore />
+      <section id="statement">
+        <Statement />
+      </section>
 
-      <OrbitControls />
-    </Canvas>
-  );
-};
+      <section id="clients">
+        <Clients />
+      </section>
 
-export default App;
+      <section id="contact">
+        <Contact />
+      </section>
+    </>
+  )
+}
