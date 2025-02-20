@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 const ConceptualCore = () => {
   // Carrega o modelo 3D (substitua o caminho pelo do seu modelo)
-  const gltf = useLoader(GLTFLoader, '/models/scene.gltf');
+  const gltf = useLoader(GLTFLoader, 'https://spoonful.com.br/models/scene.gltf');
   const coreRef = useRef();
   const { scene } = useThree();
 
