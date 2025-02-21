@@ -4,7 +4,7 @@ import '../styles/HeroSection.module.css'
 
 export default function HeroSection() {
   return (
-    <section id="hero">
+    <section className='flex-left' id="hero">
 
       <div className='text-column'>
         <h2 className='heading-small'>DESIGNING</h2>

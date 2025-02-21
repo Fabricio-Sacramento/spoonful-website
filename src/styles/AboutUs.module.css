@@ -1,0 +1,32 @@
+.container {
+    /* Layout geral */
+    display: flex;
+    width: 100%;              /* Largura fixa conforme especificado */
+    height: 100vh;           /* Altura fixa conforme especificado */
+    justify-content: center;
+    align-items: center;
+  
+    /* Fundo Neutrals Darker (#131313) */
+    background: var(--Neutrals-Darker, #131313);
+  }
+  
+  .textBlock {
+    width: 90%;          /* Espaço para o bloco de texto */
+  }
+  
+  /* Somente a palavra "THE" em negrito */
+  .the {
+    font-weight: 700;
+  }
+  
+  /* Texto do parágrafo descritivo */
+  .content {
+    margin-top: 1rem;          /* Espaçamento entre título e texto */
+    color: var(--Neutrals-Dark, #292929);
+    font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+    font-size: 92px;       /* ~18px */
+    line-height: 1 ;          /* Ajusta a altura de linha para legibilidade */
+    letter-spacing: 2px;
+    font-weight: 100;
+  }
+  
