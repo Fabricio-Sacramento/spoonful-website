@@ -55,7 +55,7 @@ section {
   font-weight: 900;
   font-size: 80px;
   line-height: 0.75;
-  letter-spacing: 0px;
+  letter-spacing: -3px;
   margin: 0;
   z-index: 1;
 }
