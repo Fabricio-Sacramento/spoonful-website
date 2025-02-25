@@ -45,24 +45,21 @@
 
 /* ----------------------------- */
 /* 2) RESET / BASE               */
-/* ----------------------------- 
+/* ----------------------------- */
 html {
   scroll-behavior: smooth;
 }
-*/
 
 /* Zera margens e prepara body para ocupar 100% da tela */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  /* height: 100%; */
-  /* overflow: hidden; */
 }
 
 /* O #root vai receber o canvas da cena 3D via React */
 #root {
-  /* position: absolute; */
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -75,105 +72,94 @@ canvas {
   display: block;
 }
 
+
 /* ----------------------------- */
 /* 3) ESTILOS GERAIS             */
 /* ----------------------------- */
-body {
-  font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  /* Substituímos #fff pela variável neutra clara */
-  color: var(--neutral-light);
-}
 
-/* Cada section ocupa a tela inteira (100vh),
-   mas se quiser seções menores, basta alterar. */
 section {
   width: 100%;
   height: 100vh;
   display: flex;
   position: relative;
-  /* Substituímos #333 pela variável neutra escura */
   background: var(--neutral-dark);
 }
 
+.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-32);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+
 /* ----------------------------- */
-/* 4) HEADINGS/TEXT              */
+/* 4) HERO SECTION              */
+/* ----------------------------- */
+
+#hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Camada de conteúdo sobreposta ao fundo */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  padding: var(--space-16);
+}
+
+
+/* ----------------------------- */
+/* 5) HEADINGS/TEXT              */
 /* ----------------------------- */
 .heading-large {
-  /* Substituímos #FFFFFF por uma variável
-     (poderia ser var(--neutral-light) ou cor primária). */
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 900;
-  font-size: 110px;
-  line-height: 0.5;
+  font-size: 120px;
+  line-height: 0.75;
   letter-spacing: -3px;
   margin: 0;
   z-index: 1;
-
-  /* Exemplo de espaçamento adicional na parte de baixo */
-  margin-bottom: var(--space-32);
 }
 
 .heading-medium {
-  color: var(--primary-yellow);
+  color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-weight: 900;
-  font-size: 40px;
-  line-height: normal;
-  letter-spacing: 0px;
-  margin: 0;
-  z-index: 1;
-
-  margin-bottom: var(--space-16);
+  font-weight: 100;
+  font-size: 90px;
+  line-height: 1;
+  letter-spacing: 2px;
 }
 
 .heading-small {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 100;
-  font-size: 20px;
-  line-height: 2.5;
+  font-size: 40px;
+  line-height: 1.5;
   letter-spacing: 0px;
   margin: 0;
   padding-left: 5px;
   z-index: 1;
 }
 
-/* ----------------------------- */
-/* 5) LAYOUT AUXILIAR            */
-/* ----------------------------- */
-.text-row {
-  display: flex;
-  justify-content: flex-start;  /* Alinha pela esquerda */
-  align-items: left;            /* Alinha os textos pela linha de base */
-  /* ou align-items: center; se preferir centralizar verticalmente */
 
-  /* Exemplo: espaço horizontal entre itens da linha */
-  gap: var(--space-24);
-}
 
-.text-column {
-  display: flex;
-  flex-direction: column;       /* Empilha itens na vertical */
-  align-items: flex-start;      /* Alinha pela esquerda */
-}
 
-/* ----------------------------- */
-/* 6) Classes utilitárias        */
-/* ----------------------------- */
-.flex-left {
-  justify-content: flex-start;
-  align-items: center; 
-}
 
-.flex-center {
-  justify-content: center;
-  align-items: center;
-}
-
-.flex-right {
-  justify-content: flex-end;
-  align-items: center;
-}
 
