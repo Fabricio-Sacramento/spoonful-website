@@ -1,73 +1,295 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fabricio Sacramento - Portfólio</title>
-    <link rel="stylesheet" type="text/css" href="/styles/style.css"> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fabricio Sacramento - Portfólio</title>
+  <link rel="stylesheet" type="text/css" href="/styles/style.css"> 
 </head>
 <body>
-    <!-- HERO Section (3D Interactive) -->
-
-<section id="hero">
+  <!-- HERO Section (3D Interactive) -->
+  <section id="hero">
     <!-- Background 3D Scene -->
     <div id="root"></div> <!-- O React renderiza a cena 3D aqui -->
     <div class="hero-content">
-        <h2 class="heading-small">DESIGNING</h2>
-        <h2 class="heading-large">BRANDS</h2>
-        <h2 class="heading-large">PRODUCTS</h2>
-        <h2 class="heading-large">EXPERIENCES</h2>
+      <h2 class="heading-small">DESIGNING</h2>
+      <h2 class="heading-large">BRANDS</h2>
+      <h2 class="heading-large">PRODUCTS</h2>
+      <h2 class="heading-large">EXPERIENCES</h2>
+    </div> 
+  </section>
+
+  <!-- ABOUT US Section -->
+  <section id="about-us">
+    <div class="container">
+      <p class="heading-medium">
+        We transform ground breaking concepts into compelling digital
+        experiences. Focusing on dynamic brand creation, innovative 
+        digital solutions, and captivating user interaction designs, 
+        we collaborate with you to shape <strong>the future of your brand</strong>.
+      </p>
     </div>
-    
-    <script type="module" src="/src/main.jsx"></script> 
-</section>
+  </section>
 
+  <!-- WHAT WE DO Section -->
+  <section class="what-we-do">
+    <div class="container-full what-we-do__container">
+      
+      <!-- C1: Coluna 1 -->
+      <div class="c1">
+        <ul class="c1__words">
+          <li data-target="frame-uiux">
+            <span data-text="UI/UX">UI/UX</span>
+          </li>
+          <li data-target="frame-branding">
+            <span data-text="BRAND">BRAND</span>
+            <span data-text="ING">ING</span>
+          </li>
+          <li data-target="frame-web">
+            <span data-text="WEB &">WEB &</span>
+            <span data-text="DIGITAL">DIGITAL</span>
+          </li>
+          <li data-target="frame-motion">
+            <span data-text="MOTION">MOTION</span>
+            <span data-text="& 3D">& 3D</span>
+          </li>
+          <li data-target="frame-strategy">
+            <span data-text="STRAT">STRAT</span>
+            <span data-text="EGY">EGY</span>
+          </li>
+          <li data-target="frame-graphic">
+            <span data-text="GRAP">GRAP</span>
+            <span data-text="HIC">HIC</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- C2: Coluna 2 -->
+      <div class="c2">
+        <div class="c2__frames">
+          
+          <!-- Frame UI/UX -->
+          <div class="frame frame-uiux">
+            <ul class="frame-list">
+              <li>
+                <span class="text" data-text="UX Research">UX Research</span>
+              </li>
+              <li>
+                <span class="text" data-text="UI Design">UI Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="Wireframing &amp; Prototyping">Wireframing &amp; Prototyping</span>
+              </li>
+              <li>
+                <span class="text" data-text="Usability Diagnosis">Usability Diagnosis</span>
+              </li>
+              <li>
+                <span class="text" data-text="User Testing">User Testing</span>
+              </li>
+              <li>
+                <span class="text" data-text="Accessibility Design">Accessibility Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="Interaction Design">Interaction Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="AI-Driven Experiences">AI-Driven Experiences</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Frame BRANDING -->
+          <div class="frame frame-branding">
+            <ul class="frame-list">
+              <li>
+                <span class="text" data-text="Brand Strategy">Brand Strategy</span>
+              </li>
+              <li>
+                <span class="text" data-text="Visual Identity">Visual Identity</span>
+              </li>
+              <li>
+                <span class="text" data-text="Logo Design">Logo Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="Guidelines &amp; Systems">Guidelines &amp; Systems</span>
+              </li>
+              <li>
+                <span class="text" data-text="Naming &amp; Tagline Development">Naming &amp; Tagline Development</span>
+              </li>
+              <li>
+                <span class="text" data-text="Brand Storytelling">Brand Storytelling</span>
+              </li>
+              <li>
+                <span class="text" data-text="Branding and Communication Diagnosis">Branding and Communication Diagnosis</span>
+              </li>
+              <li>
+                <span class="text" data-text="Brand Architecture">Brand Architecture</span>
+              </li>
+              <li>
+                <span class="text" data-text="Brand Portfolio">Brand Portfolio</span>
+              </li>
+              <li>
+                <span class="text" data-text="Brand Voice and Buyer Persona">Brand Voice and Buyer Persona</span>
+              </li>
+              <li>
+                <span class="text" data-text="Strategy and Planning">Strategy and Planning</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Frame WEB & DIGITAL -->
+          <div class="frame frame-web">
+            <ul class="frame-list">
+              <li>
+                <span class="text" data-text="Responsive Web Design">Responsive Web Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="Website Development">Website Development</span>
+              </li>
+              <li>
+                <span class="text" data-text="E-commerce Solutions">E-commerce Solutions</span>
+              </li>
+              <li>
+                <span class="text" data-text="Landing Pages">Landing Pages</span>
+              </li>
+              <li>
+                <span class="text" data-text="Custom Digital Experiences">Custom Digital Experiences</span>
+              </li>
+              <li>
+                <span class="text" data-text="Progressive Web Apps">Progressive Web Apps</span>
+              </li>
+              <li>
+                <span class="text" data-text="Social Media Campaigns">Social Media Campaigns</span>
+              </li>
+              <li>
+                <span class="text" data-text="Digital Marketing">Digital Marketing</span>
+              </li>
+              <li>
+                <span class="text" data-text="Email Marketing and Newsletters">Email Marketing and Newsletters</span>
+              </li>
+              <li>
+                <span class="text" data-text="Web Animations">Web Animations</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Frame MOTION & 3D -->
+          <div class="frame frame-motion">
+            <ul class="frame-list">
+              <li>
+                <span class="text" data-text="Motion Design for Interfaces">Motion Design for Interfaces</span>
+              </li>
+              <li>
+                <span class="text" data-text="Explainer Animations">Explainer Animations</span>
+              </li>
+              <li>
+                <span class="text" data-text="3D Modeling">3D Modeling</span>
+              </li>
+              <li>
+                <span class="text" data-text="Product Visualization">Product Visualization</span>
+              </li>
+              <li>
+                <span class="text" data-text="2D and 3D Animations">2D and 3D Animations</span>
+              </li>
+              <li>
+                <span class="text" data-text="Social Media Video Content">Social Media Video Content</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Frame STRATEGY -->
+          <div class="frame frame-strategy">
+            <ul class="frame-list">
+              <li>
+                <span class="text" data-text="Market Positioning">Market Positioning</span>
+              </li>
+              <li>
+                <span class="text" data-text="SEO Strategy">SEO Strategy</span>
+              </li>
+              <li>
+                <span class="text" data-text="Data-Driven Content Strategies">Data-Driven Content Strategies</span>
+              </li>
+              <li>
+                <span class="text" data-text="Analytics and Performance Tracking">Analytics and Performance Tracking</span>
+              </li>
+              <li>
+                <span class="text" data-text="Sales and Marketing Strategy">Sales and Marketing Strategy</span>
+              </li>
+              <li>
+                <span class="text" data-text="Cohesive Digital Environments">Cohesive Digital Environments</span>
+              </li>
+              <li>
+                <span class="text" data-text="Supporting the Customer Journey">Supporting the Customer Journey</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Frame GRAPHIC -->
+          <div class="frame frame-graphic">
+            <ul class="frame-list">
+              <li>
+                <span class="text" data-text="Marketing Materials">Marketing Materials</span>
+              </li>
+              <li>
+                <span class="text" data-text="Packaging Design">Packaging Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="Editorial Design (Digital &amp; Print)">Editorial Design (Digital &amp; Print)</span>
+              </li>
+              <li>
+                <span class="text" data-text="Branded Collateral">Branded Collateral</span>
+              </li>
+              <li>
+                <span class="text" data-text="Signage and Environmental Design">Signage and Environmental Design</span>
+              </li>
+              <li>
+                <span class="text" data-text="Business Presentations">Business Presentations</span>
+              </li>
+            </ul>
+          </div>
+          
+        </div><!-- .c2__frames -->
+      </div>
+      
+      <!-- Coluna 3 (C3) -->
+      <div class="c3">
+        <div id="three-container"></div>
+      </div>
+      
+    </div> <!-- .what-we-do__container -->
+  </section>
 
-    <!-- ABOUT US Section -->
-    <section id="about-us">
-        <div class="container">
-            <p class="heading-medium">
-                We transform ground breaking concepts into compelling digital
-                experiences. Focusing on dynamic brand creation, innovative 
-                digital solutions, and captivating user interaction designs, 
-                we collaborate with you to shape the future of your brand.
-            </p>
-        </div>
-    </section>
+  <!-- WORK Section -->
+  <section id="work">
+    <div class="container">
+      <h2 class="heading-large">Work</h2>
+    </div>
+  </section>
 
-    <!-- WHAT WE DO Section -->
-    <section id="what-we-do">
-        <div class="container">
-            <h2 class="heading-large">What we do</h2>
-        </div>
-    </section>
+  <!-- STATEMENT Section -->
+  <section id="statement">
+    <div class="container">
+      <h2 class="heading-large">Statement</h2>
+    </div>
+  </section>
 
-    <!-- WORK Section -->
-    <section id="work">
-        <div class="container">
-            <h2 class="heading-large">Work</h2>
-        </div>
-    </section>
+  <!-- CLIENTS Section -->
+  <section id="clients">
+    <div class="container">
+      <h2 class="heading-large">Clients</h2>
+    </div>
+  </section>
 
-    <!-- STATEMENT Section -->
-    <section id="statement">
-        <div class="container">
-            <h2 class="heading-large">Statement</h2>
-        </div>
-    </section>
+  <!-- CONTACT Section -->
+  <section id="contact">
+    <div class="container">
+      <h2 class="heading-large">Contact</h2>
+    </div>
+  </section>
 
-    <!-- CLIENTS Section -->
-    <section id="clients">
-        <div class="container">
-            <h2 class="heading-large">Clients</h2>
-        </div>
-    </section>
-
-    <!-- CONTACT Section -->
-    <section id="contact">
-        <div class="container">
-            <h2 class="heading-large">Contact</h2>
-        </div>
-    </section>
+  <script type="module" src="/src/main.jsx"></script>
+  <script type="module" src="/scripts/c3-animation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  <script type="module" src="/scripts/c2-animation.js"></script>
 </body>
 </html>

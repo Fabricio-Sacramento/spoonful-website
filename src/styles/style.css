@@ -4,7 +4,6 @@
 /* 1) DESIGN TOKENS (Variáveis)  */
 /* ----------------------------- */
 :root {
-  /* -- PALETA DE CORES -- */
   /* Primary Red */
   --primary-red: #F5163C;
   --primary-red-dark: #B8112D;
@@ -26,8 +25,7 @@
   --neutral-dark: #292929;
   --neutral-darker: #131313;
 
-  /* -- ESPAÇAMENTOS -- */
-  /* Para padding e/ou margin, conforme necessário */
+  /* Espaçamentos */
   --space-8: 8px;
   --space-16: 16px;
   --space-24: 24px;
@@ -36,10 +34,8 @@
   --space-128: 128px;
 }
 
-/* Ajusta o box-sizing para todos os elementos e pseudo-elementos */
-*,
-*::before,
-*::after {
+/* Box-sizing global */
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
@@ -50,14 +46,13 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Zera margens e prepara body para ocupar 100% da tela */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
 }
 
-/* O #root vai receber o canvas da cena 3D via React */
+/* Container do canvas 3D */
 #root {
   position: absolute;
   top: 0;
@@ -67,22 +62,19 @@ html, body {
   z-index: 0;
 }
 
-/* Força o <canvas> a ocupar todo o espaço dentro do #root */
 canvas {
   display: block;
 }
 
-
 /* ----------------------------- */
 /* 3) ESTILOS GERAIS             */
 /* ----------------------------- */
-
 section {
   width: 100%;
   height: 100vh;
   display: flex;
   position: relative;
-  background: var(--neutral-dark);
+  background: var(--neutral-darker);
 }
 
 .container {
@@ -95,12 +87,18 @@ section {
   justify-content: center;
 }
 
-
+.container-full {
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
 /* ----------------------------- */
 /* 4) HERO SECTION              */
 /* ----------------------------- */
-
 #hero {
   position: relative;
   width: 100%;
@@ -108,7 +106,6 @@ section {
   overflow: hidden;
 }
 
-/* Camada de conteúdo sobreposta ao fundo */
 .hero-content {
   position: relative;
   z-index: 1;
@@ -122,6 +119,238 @@ section {
   padding: var(--space-16);
 }
 
+/* =========================================
+   WHAT WE DO - Desktop Styles
+   ========================================= */
+.what-we-do {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  position: relative;
+  background: var(--neutral-dark);
+}
+
+.what-we-do__container {
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+/* Coluna 1 (C1) */
+.c1 {
+  width: 34%;
+  background: var(--neutral-darker);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.c1__words {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.c1__words li {
+  position: relative;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-weight: 900;
+  font-size: 110px;
+  line-height: 85px;
+  letter-spacing: 2px;
+  color: var(--neutral-normal);
+  text-align: left;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+/* Efeito right-to-left para C1 (igual ao existente) */
+.c1__words li::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--primary-yellow);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.4s ease-out;
+  white-space: pre;
+}
+
+.c1__words li span {
+  position: relative;
+  display: block;
+  color: var(--neutral-normal);
+}
+
+.c1__words li span::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--primary-yellow);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.4s ease-out;
+}
+
+.c1__words li:hover span::after,
+.c1__words li:hover::after {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Estado ativo na C1 */
+.c1__words li.active span {
+  color: var(--primary-yellow);
+  transition: color 0.3s ease-in-out;
+}
+
+.c1__words li.active::after {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Coluna 2 (C2) */
+.c2 {
+  width: 33%;
+  background: var(--neutral-darker);
+  position: relative;
+  overflow: hidden;
+}
+
+.c2__frames {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transition: transform 0.6s ease-out;
+}
+
+/* Estilo para cada frame */
+.frame {
+  position: relative;
+  overflow: hidden;
+  color: var(--neutral-normal);
+  transition: color 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16);
+}
+
+/* Estilização da lista interna dos frames */
+.frame-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+}
+
+/* Cada item dos frames – agora com uma única span (.text) */
+.frame-list li {
+  position: relative;
+  display: inline-block;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 35px;
+  letter-spacing: 0.5px;
+  color: var(--neutral-normal);
+}
+
+/* A span .text exibe o texto base e seu pseudo-elemento ::after controla a transição de cor */
+.text {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  line-height: inherit;
+  z-index: 1;
+}
+
+.text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--primary-yellow);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.6s ease-out;
+  z-index: 2;
+}
+
+/* Quando o frame é ativo, o pseudo-elemento expande para revelar o amarelo sem deslocamento */
+.frame.active .text::after {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Coluna 3 (C3) */
+.c3 {
+  width: 33%;
+  background: var(--neutral-darker);
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+#three-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* =========================================
+   WHAT WE DO - Mobile / Responsiveness
+   ========================================= */
+@media (max-width: 768px) {
+  .what-we-do {
+    height: auto;
+  }
+  .what-we-do__container {
+    flex-direction: column;
+    padding: var(--space-16);
+  }
+  .c1, .c2, .c3 {
+    width: 100%;
+    min-height: auto;
+  }
+  .c1__words li {
+    font-size: 48px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .c2 {
+    overflow: visible;
+    position: static;
+  }
+  .c2__frames {
+    position: static;
+  }
+  .frame {
+    margin-bottom: var(--space-16);
+    font-size: 18px;
+    line-height: 28px;
+  }
+  .c3 {
+    height: 300px;
+  }
+}
 
 /* ----------------------------- */
 /* 5) HEADINGS/TEXT              */
@@ -141,9 +370,10 @@ section {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 100;
-  font-size: 90px;
+  font-size: 100px;
   line-height: 1;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  font-style: italic;
 }
 
 .heading-small {
@@ -152,14 +382,8 @@ section {
   font-weight: 100;
   font-size: 40px;
   line-height: 1.5;
-  letter-spacing: 0px;
+  letter-spacing: 0;
   margin: 0;
   padding-left: 5px;
   z-index: 1;
 }
-
-
-
-
-
-
