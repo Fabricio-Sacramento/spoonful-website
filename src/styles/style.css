@@ -32,6 +32,9 @@
   --space-32: 32px;
   --space-64: 64px;
   --space-128: 128px;
+
+  /* Raio do carrossel 3D (ajuste conforme necessário) */
+  --carousel-radius: 300px;
 }
 
 /* Box-sizing global */
@@ -45,7 +48,6 @@
 html {
   scroll-behavior: smooth;
 }
-
 html, body {
   margin: 0;
   padding: 0;
@@ -61,7 +63,6 @@ html, body {
   height: 100vh;
   z-index: 0;
 }
-
 canvas {
   display: block;
 }
@@ -76,7 +77,6 @@ section {
   position: relative;
   background: var(--neutral-darker);
 }
-
 .container {
   width: 100%;
   margin: 0 auto;
@@ -86,14 +86,15 @@ section {
   flex-direction: column;
   justify-content: center;
 }
-
+/* Para a seção What We Do, usamos um container em linha */
 .container-full {
   width: 100%;
   margin: 0 auto;
   height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
 }
 
 /* ----------------------------- */
@@ -105,7 +106,6 @@ section {
   height: 100vh;
   overflow: hidden;
 }
-
 .hero-content {
   position: relative;
   z-index: 1;
@@ -115,7 +115,7 @@ section {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: left;
+  align-items: flex-start;
   padding: var(--space-16);
 }
 
@@ -126,10 +126,8 @@ section {
   width: 100%;
   height: 100vh;
   display: flex;
-  position: relative;
   background: var(--neutral-dark);
 }
-
 .what-we-do__container {
   width: 100%;
   margin: 0 auto;
@@ -137,6 +135,7 @@ section {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  flex-wrap: nowrap;
 }
 
 /* Coluna 1 (C1) */
@@ -146,8 +145,8 @@ section {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  height: 100%;
 }
-
 .c1__words {
   display: flex;
   flex-direction: column;
@@ -156,7 +155,6 @@ section {
   padding: 0;
   margin: 0;
 }
-
 .c1__words li {
   position: relative;
   font-family: "Neue Haas Grotesk Display Pro", sans-serif;
@@ -172,8 +170,6 @@ section {
   align-items: flex-start;
   gap: 0;
 }
-
-/* Efeito right-to-left para C1 (igual ao existente) */
 .c1__words li::after {
   content: attr(data-text);
   position: absolute;
@@ -186,13 +182,11 @@ section {
   transition: clip-path 0.4s ease-out;
   white-space: pre;
 }
-
 .c1__words li span {
   position: relative;
   display: block;
   color: var(--neutral-normal);
 }
-
 .c1__words li span::after {
   content: attr(data-text);
   position: absolute;
@@ -204,51 +198,48 @@ section {
   clip-path: inset(0 100% 0 0);
   transition: clip-path 0.4s ease-out;
 }
-
 .c1__words li:hover span::after,
 .c1__words li:hover::after {
   clip-path: inset(0 0 0 0);
 }
-
-/* Estado ativo na C1 */
 .c1__words li.active span {
   color: var(--primary-yellow);
   transition: color 0.3s ease-in-out;
 }
-
 .c1__words li.active::after {
   clip-path: inset(0 0 0 0);
 }
 
-/* Coluna 2 (C2) */
+/* Coluna 2 (C2) – Carrossel 3D */
 .c2 {
   width: 33%;
+  height: 100%;
   background: var(--neutral-darker);
   position: relative;
   overflow: hidden;
+  perspective: 1000px;
 }
-
 .c2__frames {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  transition: transform 0.6s ease-out;
+  top: 50%;
+  left: 50%;
+  width: 100%;  /* Ocupa toda a largura da coluna */
+  height: 100%; /* Ocupa toda a altura da coluna */
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%);
 }
-
-/* Estilo para cada frame */
 .frame {
-  position: relative;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
   overflow: hidden;
-  color: var(--neutral-normal);
-  transition: color 0.3s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-16);
+  backface-visibility: hidden;
 }
+/* A distribuição das faces (os transforms rotationX e translateZ) será feita via GSAP */
 
-/* Estilização da lista interna dos frames */
+/* Itens internos dos frames */
 .frame-list {
   list-style: none;
   padding: 0;
@@ -256,11 +247,10 @@ section {
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  align-items: center;
+  justify-content: center;
   height: 100%;
 }
-
-/* Cada item dos frames – agora com uma única span (.text) */
 .frame-list li {
   position: relative;
   display: inline-block;
@@ -271,8 +261,6 @@ section {
   letter-spacing: 0.5px;
   color: var(--neutral-normal);
 }
-
-/* A span .text exibe o texto base e seu pseudo-elemento ::after controla a transição de cor */
 .text {
   position: relative;
   display: inline-block;
@@ -280,7 +268,6 @@ section {
   line-height: inherit;
   z-index: 1;
 }
-
 .text::after {
   content: attr(data-text);
   position: absolute;
@@ -289,12 +276,11 @@ section {
   width: 100%;
   height: 100%;
   color: var(--primary-yellow);
+  /* Inicia ocultado pela direita para revelar de esquerda para direita */
   clip-path: inset(0 100% 0 0);
   transition: clip-path 0.6s ease-out;
   z-index: 2;
 }
-
-/* Quando o frame é ativo, o pseudo-elemento expande para revelar o amarelo sem deslocamento */
 .frame.active .text::after {
   clip-path: inset(0 0 0 0);
 }
@@ -302,12 +288,12 @@ section {
 /* Coluna 3 (C3) */
 .c3 {
   width: 33%;
+  height: 100%;
   background: var(--neutral-darker);
   margin: 0;
   padding: 0;
   position: relative;
 }
-
 #three-container {
   width: 100%;
   height: 100%;
@@ -325,10 +311,12 @@ section {
   .what-we-do__container {
     flex-direction: column;
     padding: var(--space-16);
+    height: auto;
   }
   .c1, .c2, .c3 {
     width: 100%;
     min-height: auto;
+    height: auto;
   }
   .c1__words li {
     font-size: 48px;
@@ -338,11 +326,13 @@ section {
   .c2 {
     overflow: visible;
     position: static;
+    perspective: none;
   }
   .c2__frames {
-    position: static;
+    transform: none;
   }
   .frame {
+    position: static;
     margin-bottom: var(--space-16);
     font-size: 18px;
     line-height: 28px;
@@ -365,7 +355,6 @@ section {
   margin: 0;
   z-index: 1;
 }
-
 .heading-medium {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
@@ -375,7 +364,6 @@ section {
   letter-spacing: 3px;
   font-style: italic;
 }
-
 .heading-small {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
