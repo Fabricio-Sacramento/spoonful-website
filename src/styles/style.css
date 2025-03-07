@@ -80,7 +80,6 @@ section {
 .container {
   width: 100%;
   margin: 0 auto;
-  padding: var(--space-32);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -112,12 +111,88 @@ section {
   text-align: left;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: var(--space-16);
 }
+
+/* --------------------------------- */
+/* About Us Section  */
+/* --------------------------------- */
+#about-us {
+  position: relative;
+  overflow: visible;
+  background: var(--neutral-darker);
+  width: 100%;
+  height: 100vh;
+}
+
+.about-us-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.about-us-container-absolute {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+}
+
+
+
+.about-us-container-absolute p,
+.about-us-container p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -63%);
+  width: 90%; /* ou outro valor que se adeque */
+  text-align: flex-start;
+}
+
+
+.text-back {
+  color: var(--neutral-dark);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 100;
+  font-size: 90px;
+  line-height: 1.1;
+  letter-spacing: 3px;
+  font-style: italic;
+  color: var(--neutral-dark);
+  z-index: 1;
+}
+
+.text-front {
+  color: var(--neutral-dark);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 100;
+  font-size: 90px;
+  line-height: 1.1;
+  letter-spacing: 3px;
+  font-style: italic;
+  color: var(--primary-yellow);
+  z-index: 2;
+}
+
+/* Divisão em linhas para animação */
+.text-front .line {
+  display: block;
+  overflow: hidden;
+}
+.text-back .line {
+  display: block;
+  overflow: hidden;
+}
+
+.text-front .line span {
+  display: block;
+  overflow: hidden;
+}
+.text-back .line span {
+  display: block;
+  overflow: hidden;
+}
+
+
 
 /* =========================================
    WHAT WE DO - Desktop Styles
@@ -170,23 +245,13 @@ section {
   align-items: flex-start;
   gap: 0;
 }
-.c1__words li::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  color: var(--primary-yellow);
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.4s ease-out;
-  white-space: pre;
-}
+
 .c1__words li span {
-  position: relative;
   display: block;
+  position: relative;
   color: var(--neutral-normal);
 }
+
 .c1__words li span::after {
   content: attr(data-text);
   position: absolute;
@@ -198,16 +263,29 @@ section {
   clip-path: inset(0 100% 0 0);
   transition: clip-path 0.4s ease-out;
 }
-.c1__words li:hover span::after,
+
+.c1__words li:hover span::after {
+  clip-path: inset(0 0 0 0);
+}
+.c1__words li.active span::after {
+  clip-path: inset(0 0 0 0);
+}
+.c1__words li.exit span::after {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.4s ease-out;
+}
+
 .c1__words li:hover::after {
   clip-path: inset(0 0 0 0);
 }
-.c1__words li.active span {
-  color: var(--primary-yellow);
-  transition: color 0.3s ease-in-out;
-}
+
 .c1__words li.active::after {
   clip-path: inset(0 0 0 0);
+}
+
+.c1__words li.exit::after {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.4s ease-in;
 }
 
 /* Coluna 2 (C2) – Carrossel 3D */
@@ -216,17 +294,18 @@ section {
   height: 100%;
   background: var(--neutral-darker);
   position: relative;
-  overflow: hidden;
-  perspective: 1000px;
+  perspective: 5000px;
+  overflow: visible;
 }
 .c2__frames {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100%;  /* Ocupa toda a largura da coluna */
-  height: 100%; /* Ocupa toda a altura da coluna */
+  width: 100%;
+  height: 100%;
   transform-style: preserve-3d;
   transform: translate(-50%, -50%);
+  overflow: visible;
 }
 .frame {
   position: absolute;
@@ -234,22 +313,22 @@ section {
   height: 100%;
   left: 0;
   top: 0;
-  overflow: hidden;
+  overflow: visible;
   backface-visibility: hidden;
 }
-/* A distribuição das faces (os transforms rotationX e translateZ) será feita via GSAP */
 
 /* Itens internos dos frames */
 .frame-list {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0 0 0 2rem;
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  height: 100%;
+  transform-origin: left center;
 }
 .frame-list li {
   position: relative;
@@ -276,7 +355,6 @@ section {
   width: 100%;
   height: 100%;
   color: var(--primary-yellow);
-  /* Inicia ocultado pela direita para revelar de esquerda para direita */
   clip-path: inset(0 100% 0 0);
   transition: clip-path 0.6s ease-out;
   z-index: 2;
@@ -301,9 +379,7 @@ section {
   position: relative;
 }
 
-/* =========================================
-   WHAT WE DO - Mobile / Responsiveness
-   ========================================= */
+/* Responsividade */
 @media (max-width: 768px) {
   .what-we-do {
     height: auto;
@@ -342,9 +418,7 @@ section {
   }
 }
 
-/* ----------------------------- */
-/* 5) HEADINGS/TEXT              */
-/* ----------------------------- */
+/* Headings */
 .heading-large {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
@@ -356,7 +430,7 @@ section {
   z-index: 1;
 }
 .heading-medium {
-  color: var(--neutral-light);
+  color: var(--neutral-dark);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 100;
   font-size: 100px;
@@ -375,3 +449,4 @@ section {
   padding-left: 5px;
   z-index: 1;
 }
+
