@@ -1,36 +1,45 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Splitting from 'splitting';
+import 'splitting/dist/splitting.css';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-window.addEventListener("load", () => {
-  const debug = false; // Altere para true para ver os markers
+document.addEventListener('DOMContentLoaded', () => {
+  // Inicializa o Splitting.js para dividir o texto
+  Splitting();
 
-  // Define o estado inicial: o texto amarelo começa 100% abaixo (fora de vista)
-  gsap.set(".text-front .line span", { x: "-100%" });
+  // Seleciona o elemento de texto na seção AboutUs
+  const textBack = document.querySelector('#about-us .text-back');
+  
+  if (textBack) {
+    const chars = textBack.querySelectorAll('.char');
 
-  // Pin na seção About Us com intervalo de scroll maior (ajuste end se precisar)
-  ScrollTrigger.create({
-    trigger: "#about-us",
-    start: "top top",
-    end: "+=200%",  // aumenta o tempo de animação
-    pin: true,
-    scrub: true,
-    markers: debug,
-  });
-
-  // Animação de revelação: move os spans de y:100% para y:0%
-  gsap.to(".text-front .line span", {
-    x: "0%",
-    ease: "power2.out",
-    stagger: 0.1,
-    duration: 0.6,
-    scrollTrigger: {
-      trigger: "#about-us",
-      start: "top top",
-      end: "+=200%",
-      scrub: true,
-      markers: debug,
-    }
-  });
+    gsap.fromTo(
+      chars,
+      {
+        'will-change': 'transform',
+        transformOrigin: '50% 100%',
+        scaleY: 0,
+      },
+      {
+        ease: 'power3.in',
+        opacity: 1,
+        scaleY: 1,
+        stagger: 0.05,
+        scrollTrigger: {
+          // Utiliza a própria seção AboutUs como gatilho
+          trigger: "#about-us",
+          // Inicia a animação quando a seção atingir o topo da viewport
+          start: "top top",
+          // Aumente o valor do end para garantir que toda a animação seja executada
+          end: "+=400%",
+          scrub: true,
+          // Fixa a seção AboutUs na viewport durante a animação
+          pin: true,
+          pinSpacing: true, // Remove o espaçamento adicional criado pelo pin, se desejado
+        },
+      }
+    );
+  }
 });
