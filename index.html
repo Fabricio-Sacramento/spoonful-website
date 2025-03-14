@@ -11,29 +11,39 @@
   <section id="hero">
     <!-- Background 3D Scene -->
     <div id="root"></div> <!-- O React renderiza a cena 3D aqui -->
+    
     <div class="container hero-content">
       <h2 class="heading-small">DESIGNING</h2>
       <h2 class="heading-large">BRANDS</h2>
       <h2 class="heading-large">PRODUCTS</h2>
       <h2 class="heading-large">EXPERIENCES</h2>
-    </div> 
+    </div>
+
+    <!-- Elemento overlay para transição -->
+    <div class="transition-overlay">
+      <div class="stripe"></div>
+      <div class="stripe"></div>
+      <div class="stripe"></div>
+      <div class="stripe"></div>
+      <div class="stripe"></div>
+    </div>
   </section>
 
-<!-- ABOUT US Section -->
-<section id="about-us">
-  <div class="about-us-container-absolute">
-    <!-- Texto de fundo (estático) -->
-    <p class="text-back heading-medium" data-splitting>
-      <span class="line"><span>We transform ground breaking concepts</span></span>
-      <span class="line"><span>into compelling digital experiences.</span></span>
-      <span class="line"><span>Focusing on dynamic brand creation,</span></span>
-      <span class="line"><span>innovative digital solutions, and</span></span>
-      <span class="line"><span>captivating user interaction designs,</span></span>
-      <span class="line"><span>we collaborate with you to shape</span></span>
-      <span class="line heading-medium-bold"><span>the future of your brand.</span></span>
-    </p>
-  </div>
-</section>
+  <!-- ABOUT US Section -->
+  <section id="about-us">
+    <div class="about-us-container-absolute">
+      <!-- Texto de fundo (estático) -->
+      <p class="text-back heading-medium" data-splitting>
+        <span class="line"><span>We transform ground breaking concepts</span></span>
+        <span class="line"><span>into compelling digital experiences.</span></span>
+        <span class="line"><span>Focusing on dynamic brand creation,</span></span>
+        <span class="line"><span>innovative digital solutions, and</span></span>
+        <span class="line"><span>captivating user interaction designs,</span></span>
+        <span class="line"><span>we collaborate with you to shape</span></span>
+        <span class="line heading-medium-bold"><span>the future of your brand.</span></span>
+      </p>
+    </div>
+  </section>
 
 
   <!-- WHAT WE DO Section -->
@@ -296,6 +306,6 @@
   <script type="module" src="/scripts/c3-animation.js"></script>
   <script type="module" src="/scripts/aboutus-animation.js"></script>
   <script type="module" src="/scripts/c2-animation.js"></script>
-
+  <script type="module" src="/src/components/hero-transition.js"></script>
 </body>
 </html>

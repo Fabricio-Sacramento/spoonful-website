@@ -104,6 +104,7 @@ section {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  z-index: 3; /* Garante que a Hero fique sobre a About Us */
 }
 .hero-content {
   position: relative;
@@ -112,6 +113,37 @@ section {
   width: 100%;
   height: 100%;
 }
+
+/* ----------------------------------------
+   Transition Overlay e Stripes para transição
+---------------------------------------- */
+.transition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4; /* Fica acima do conteúdo da Hero */
+  pointer-events: none;
+}
+
+/* Cada stripe ocupa 20% da largura (100% / 5) e cobre toda a altura */
+.transition-overlay .stripe {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(100% / 5);
+  background: var(--neutral-darker); /* Mesma cor definida na paleta */
+  transform: scaleY(1);
+  transform-origin: top;
+}
+
+/* Posiciona cada stripe horizontalmente */
+.transition-overlay .stripe:nth-child(1) { left: 0%; }
+.transition-overlay .stripe:nth-child(2) { left: 20%; }
+.transition-overlay .stripe:nth-child(3) { left: 40%; }
+.transition-overlay .stripe:nth-child(4) { left: 60%; }
+.transition-overlay .stripe:nth-child(5) { left: 80%; }
 
 /* --------------------------------- */
 /* About Us Section  */
@@ -122,6 +154,7 @@ section {
   background: var(--neutral-darker);
   width: 100%;
   height: 100vh;
+  z-index: 1; /* Fica atrás da Hero durante a transição */
 }
 
 .about-us-container {
@@ -153,11 +186,7 @@ section {
 /* Cada caractere é exibido como inline-block para que o GSAP possa animá-los individualmente sem comprometer a quebra de linha */
 .text-back .char {
   display: inline-block;
-  /* Ajuste adicional se necessário, por exemplo, margin ou padding */
 }
-
-
-
 
 /* =========================================
    WHAT WE DO - Desktop Styles
@@ -423,4 +452,3 @@ section {
   padding-left: 5px;
   z-index: 1;
 }
-
