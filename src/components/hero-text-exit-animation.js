@@ -5,36 +5,35 @@ import Splitting from 'splitting';
 gsap.registerPlugin(ScrollTrigger);
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Se o Splitting já foi executado na animação de entrada, essa chamada não prejudica,
-  // mas se preferir, pode omitir ou garantir que seja executado apenas uma vez.
+  // Executa o Splitting (se já não foi executado na animação de entrada, isso não prejudica)
   Splitting();
 
   // Seleciona todos os <h2> dentro do container hero-content
   const headings = document.querySelectorAll('.hero-content h2');
 
-  // Cria uma timeline que será controlada pelo scroll para reverter a animação
+  // Cria a timeline para a animação de saída, com um scrollTrigger ajustado para uma duração maior
   const exitTl = gsap.timeline({
     scrollTrigger: {
       trigger: "#hero",
-      start: "top top",    // Ajuste conforme necessário para o início do scroll
-      end: "bottom top",   // Ajuste para determinar a duração do efeito no scroll
-      scrub: true          // Faz a animação acompanhar o scroll
+      start: "top top",
+      end: "+=200%", // Aumenta a distância de scroll para que a animação de saída tenha espaço para rodar
+      scrub: true,
+      markers: true // Apenas para debug; remova ou comente quando estiver satisfeito
     }
   });
 
-  // Para cada heading, anima seus caracteres revertendo a transformação
+  // Para cada heading, anima seus caracteres revertendo o efeito de entrada
   headings.forEach((heading, index) => {
-    // Seleciona os caracteres criados pelo Splitting.js
+    // Seleciona os caracteres gerados pelo Splitting.js
     const chars = heading.querySelectorAll('.char');
 
-    // Define a perspectiva, se necessário (mesma usada na animação de entrada)
+    // Define a perspectiva 3D para o contêiner dos caracteres
     chars.forEach(char => gsap.set(char.parentNode, { perspective: 1000 }));
 
-    // Adiciona à timeline uma animação para cada heading
+    // Adiciona à timeline a animação que reverte o estado dos caracteres
     exitTl.to(
       chars,
       {
-        // Reverte para o estado inicial: invisível, com rotaçãoX: -90 e deslocamento em z
         opacity: 0,
         rotationX: -90,
         z: -200,
@@ -42,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stagger: 0.05,
         duration: 1
       },
-      index * 0.2  // Mantém o delay incremental entre headings
+      index * 0.2 // Mantém o delay incremental entre headings
     );
   });
 });
