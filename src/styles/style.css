@@ -52,6 +52,8 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
+  height: 100%;
+  background: var(--neutral-darker);
 }
 
 /* Container do canvas 3D */
@@ -80,7 +82,7 @@ section {
 .container {
   width: 100%;
   margin: 0 auto;
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -100,13 +102,20 @@ section {
 /* 4) HERO SECTION              */
 /* ----------------------------- */
 #hero {
-  position: relative;
+  top: 0;
+  left: 0;
+  position: absolute;
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  z-index: 3; /* Garante que a Hero fique sobre a About Us */
+  z-index: 3;
+  background: transparent !important;
+  /* Aplica o clipPath definido no SVG */
+  clip-path: url(#heroClip);
 }
 .hero-content {
+  margin: 0;
+  padding: 0;
   position: relative;
   z-index: 1;
   text-align: left;
@@ -114,79 +123,35 @@ section {
   height: 100%;
 }
 
-/* ----------------------------------------
-   Transition Overlay e Stripes para transição
----------------------------------------- */
-.transition-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 4; /* Fica acima do conteúdo da Hero */
-  pointer-events: none;
-}
-
-/* Cada stripe ocupa 20% da largura (100% / 5) e cobre toda a altura */
-.transition-overlay .stripe {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: calc(100% / 5);
-  background: var(--neutral-darker); /* Mesma cor definida na paleta */
-  transform: scaleY(1);
-  transform-origin: top;
-}
-
-/* Posiciona cada stripe horizontalmente */
-.transition-overlay .stripe:nth-child(1) { left: 0%; }
-.transition-overlay .stripe:nth-child(2) { left: 20%; }
-.transition-overlay .stripe:nth-child(3) { left: 40%; }
-.transition-overlay .stripe:nth-child(4) { left: 60%; }
-.transition-overlay .stripe:nth-child(5) { left: 80%; }
-
 /* --------------------------------- */
-/* About Us Section  */
+/* ABOUT US Section                */
 /* --------------------------------- */
 #about-us {
   position: relative;
   overflow: visible;
-  background: var(--neutral-darker);
-  width: 100%;
-  height: 100vh;
-  z-index: 1; /* Fica atrás da Hero durante a transição */
+  background: url('../assets/images/flakes-bkgd.jpg') no-repeat center center;
+  background-size: cover;
+  z-index: 1;
 }
-
-.about-us-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-}
-
 .about-us-container-absolute {
   position: absolute;
   width: 100%;
   height: 100vh;
   display: flex;
-  justify-content: center; /* Centraliza horizontalmente */
-  align-items: center;     /* Centraliza verticalmente */
+  justify-content: center;
+  align-items: center;
 }
-
-/* Garante que o container de texto permita a quebra natural */
 .text-back {
   white-space: normal;
 }
-
-/* Cada linha deve ser um bloco para que a quebra ocorra conforme a largura */
 .text-back .line {
   display: block;
-  overflow: hidden; /* Opcional, ajuda com o efeito de animação */
+  overflow: hidden;
 }
-
-/* Cada caractere é exibido como inline-block para que o GSAP possa animá-los individualmente sem comprometer a quebra de linha */
 .text-back .char {
   display: inline-block;
 }
+
 
 /* =========================================
    WHAT WE DO - Desktop Styles
