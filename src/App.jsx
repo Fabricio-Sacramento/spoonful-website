@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import Glass from './components/Glass';
 import DynamicBackground from './components/DynamicBackground';
 import GlassCube from './components/GlassCube';
-import ConceptualCore from './components/ConceptualCore';
+//import ConceptualCore from './components/ConceptualCore';
 //import { OrbitControls, Environment } from '@react-three/drei';
 
 const App = () => {
@@ -18,8 +18,8 @@ const App = () => {
       <Glass />
       <GlassCube />
 
-      {/* Novo objeto 3D conceitual */}
-      <ConceptualCore />
+      {/* Novo objeto 3D conceitual 
+      <ConceptualCore /> */}
 
       {/* <OrbitControls /> */}
     </Canvas>
