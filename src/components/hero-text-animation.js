@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
         z: 0,
         ease: 'power1.out',
         stagger: 0.05,
-        duration: 1
+        duration: 0.5
       },
-      index * 0.2
+      index * 0.05
     );
   });
 
