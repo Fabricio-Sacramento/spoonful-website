@@ -23,12 +23,12 @@ function startWhatWeDoAnimation() {
   const dx = sectionCenterX - naturalCenterX;
   const dy = sectionCenterY - naturalCenterY;
 
-  // ⛔ Garante que c1 inicia invisível (sem piscar)
+  // Garante que c1 inicia invisível para evitar o "piscar"
   gsap.set(c1, { opacity: 0 });
 
   const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
-  // Estado inicial da seção e colunas
+  // Estado inicial da seção e das colunas
   tl.set(section, { opacity: 0, y: 100 });
   tl.set([c2, c3], { opacity: 0 });
 
@@ -52,6 +52,7 @@ function startWhatWeDoAnimation() {
   tl.fromTo(c2Frames, { rotationX: 0 }, { rotationX: 360, duration: 1 }, "<");
 
   // --- C1 ---
+  // Adiciona data-splitting se não existir e aplica o Splitting
   c1Spans.forEach(span => {
     if (!span.hasAttribute("data-splitting")) {
       span.setAttribute("data-splitting", "chars");
@@ -59,12 +60,16 @@ function startWhatWeDoAnimation() {
   });
   Splitting({ target: ".c1__words li span" });
 
-  // ✅ Revela c1 no momento certo (sem fade)
+  // Seleciona os caracteres gerados e os inicializa com opacidade 0
+  const chars = document.querySelectorAll(".c1__words li .char");
+  gsap.set(chars, { opacity: 0 });
+
+  // Revela c1 no momento certo (sem fade adicional)
   tl.set(c1, { opacity: 1 });
   tl.to({}, { duration: 0.1 });
 
+  // Anima os caracteres de entrada
   tl.add(() => {
-    const chars = document.querySelectorAll(".c1__words li .char");
     if (chars.length) {
       gsap.fromTo(
         chars,
@@ -86,7 +91,7 @@ function startWhatWeDoAnimation() {
     }
   });
 
-  // 📌 Pinagem com refresh no onEnter para garantir centralização
+  // Pinagem com refresh no onEnter para garantir centralização
   ScrollTrigger.create({
     trigger: section,
     start: "top top",
@@ -101,7 +106,7 @@ function startWhatWeDoAnimation() {
   });
 }
 
-// 🚀 Sentinel disparando animação
+// Sentinel disparando animação
 document.addEventListener("DOMContentLoaded", () => {
   ScrollTrigger.create({
     trigger: ".trigger-end-about",
