@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trigger: "#about-us",
         start: "top top",
         end: "+=285%",
-        scrub: true,
+        scrub: 0.5,
         pin: true,
         pinSpacing: true,
       }
