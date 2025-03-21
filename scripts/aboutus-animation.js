@@ -9,13 +9,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inicializa o Splitting.js para dividir o texto
   Splitting();
 
+  // Define a variável de delay (em segundos)
+  const delayAnimation = 1; // ajuste conforme necessário
+
   // Seleciona o elemento de texto na seção AboutUs
   const textBack = document.querySelector('#about-us .text-back');
   
   if (textBack) {
     const chars = textBack.querySelectorAll('.char');
+    
+    // Cria uma timeline com o ScrollTrigger
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#about-us",
+        start: "top top",
+        end: "+=400%",
+        scrub: true,
+        pin: true,
+        pinSpacing: true,
+      }
+    });
 
-    gsap.fromTo(
+    // Insere um tween vazio para simular o delay
+    tl.to({}, { duration: delayAnimation });
+
+    // Adiciona a animação dos caracteres
+    tl.fromTo(
       chars,
       {
         'will-change': 'transform',
@@ -27,18 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         opacity: 1,
         scaleY: 1,
         stagger: 0.05,
-        scrollTrigger: {
-          // Utiliza a própria seção AboutUs como gatilho
-          trigger: "#about-us",
-          // Inicia a animação quando a seção atingir o topo da viewport
-          start: "top top",
-          // Aumente o valor do end para garantir que toda a animação seja executada
-          end: "+=400%",
-          scrub: true,
-          // Fixa a seção AboutUs na viewport durante a animação
-          pin: true,
-          pinSpacing: true, // Remove o espaçamento adicional criado pelo pin, se desejado
-        },
       }
     );
   }
