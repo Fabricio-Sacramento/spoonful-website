@@ -161,7 +161,7 @@ section {
 }
 
 .spacer {
-  height: 50vh; /* Ajuste a altura conforme necessário */
+  height: 25vh; /* Ajuste a altura conforme necessário */
   width: 100%;
   display: block;
 }
@@ -239,6 +239,9 @@ section {
   height: 100vh;
   display: flex;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(100px); /* ou translateY(100vh) se quiser mais drástico */
+  transition: none !important;
 }
 .what-we-do__container {
   width: 100%;
@@ -254,11 +257,12 @@ section {
 /* Coluna 1 (C1) */
 .c1 {
   width: 34%;
-  /* background: var(--neutral-darker); */
   display: flex;
   flex-direction: column;
   justify-content: center;
   height: 100%;
+  visibility: hidden;
+  opacity: 0;
 }
 .c1__words {
   display: flex;
