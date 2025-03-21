@@ -3,7 +3,7 @@ import Glass from './components/Glass';
 import DynamicBackground from './components/DynamicBackground';
 import GlassCube from './components/GlassCube';
 //import ConceptualCore from './components/ConceptualCore';
-//import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 
 const App = () => {
   return (
@@ -21,7 +21,7 @@ const App = () => {
       {/* Novo objeto 3D conceitual 
       <ConceptualCore /> */}
 
-      {/* <OrbitControls /> */}
+      <OrbitControls />
     </Canvas>
   );
 };

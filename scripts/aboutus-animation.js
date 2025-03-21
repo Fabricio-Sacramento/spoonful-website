@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Splitting();
 
   // Define a variável de delay (em segundos)
-  const delayAnimation = 1; // ajuste conforme necessário
+  const delayAnimation = 2; // ajuste conforme necessário
 
   // Seleciona o elemento de texto na seção AboutUs
   const textBack = document.querySelector('#about-us .text-back');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
       scrollTrigger: {
         trigger: "#about-us",
         start: "top top",
-        end: "+=400%",
+        end: "+=285%",
         scrub: true,
         pin: true,
         pinSpacing: true,

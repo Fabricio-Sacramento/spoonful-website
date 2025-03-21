@@ -34,7 +34,7 @@
   --space-128: 128px;
 
   /* Raio do carrossel 3D (ajuste conforme necessário) */
-  --carousel-radius: 300px;
+  --carousel-radius: 400px;
 }
 
 /* Box-sizing global */
@@ -158,6 +158,13 @@ section {
   justify-content: space-between;
   align-items: stretch;
 }
+
+.spacer {
+  height: 50vh; /* Ajuste a altura conforme necessário */
+  width: 100%;
+  display: block;
+}
+
 
 /* ----------------------------- */
 /* 4) HERO SECTION              */
