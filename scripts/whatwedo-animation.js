@@ -97,7 +97,7 @@ function startWhatWeDoAnimation() {
     start: "top top",
     end: "+=" + (tl.duration() * window.innerHeight),
     pin: true,
-    scrub: false,
+    scrub: 1,
     anticipatePin: 1,
     pinSpacing: true,
     onEnter: () => {
