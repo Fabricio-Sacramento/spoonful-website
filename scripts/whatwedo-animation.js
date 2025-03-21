@@ -23,13 +23,16 @@ function startWhatWeDoAnimation() {
   const dx = sectionCenterX - naturalCenterX;
   const dy = sectionCenterY - naturalCenterY;
 
+  // ⛔ Garante que c1 inicia invisível (sem piscar)
+  gsap.set(c1, { opacity: 0 });
+
   const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
-  // Oculta toda a seção e colunas exceto c1 (já oculta via CSS)
+  // Estado inicial da seção e colunas
   tl.set(section, { opacity: 0, y: 100 });
   tl.set([c2, c3], { opacity: 0 });
 
-  // Fade in da seção
+  // Entrada da seção
   tl.to(section, { opacity: 1, y: 0, duration: 1 });
 
   // --- C3 ---
@@ -56,8 +59,8 @@ function startWhatWeDoAnimation() {
   });
   Splitting({ target: ".c1__words li span" });
 
-  // ✅ Libera visibilidade da c1 sem causar fade (remove inline CSS)
-  tl.set(c1, { clearProps: "all" });
+  // ✅ Revela c1 no momento certo (sem fade)
+  tl.set(c1, { opacity: 1 });
   tl.to({}, { duration: 0.1 });
 
   tl.add(() => {
@@ -83,7 +86,7 @@ function startWhatWeDoAnimation() {
     }
   });
 
-  // 📌 ScrollTrigger com pinagem da seção durante a animação
+  // 📌 Pinagem com refresh no onEnter para garantir centralização
   ScrollTrigger.create({
     trigger: section,
     start: "top top",
@@ -91,14 +94,14 @@ function startWhatWeDoAnimation() {
     pin: true,
     scrub: false,
     anticipatePin: 1,
-    pinSpacing: true
+    pinSpacing: true,
+    onEnter: () => {
+      ScrollTrigger.refresh();
+    }
   });
-
-  // 🔄 Garante centralização correta após pin
-  ScrollTrigger.refresh();
 }
 
-// 🚀 Sentinel para disparar animação
+// 🚀 Sentinel disparando animação
 document.addEventListener("DOMContentLoaded", () => {
   ScrollTrigger.create({
     trigger: ".trigger-end-about",

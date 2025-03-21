@@ -261,8 +261,6 @@ section {
   flex-direction: column;
   justify-content: center;
   height: 100%;
-  visibility: hidden;
-  opacity: 0;
 }
 .c1__words {
   display: flex;
