@@ -449,12 +449,15 @@ section {
   .c2__frames {
     transform: none;
   }
+  /*
   .frame {
     position: static;
     margin-bottom: var(--space-16);
-    font-size: 18px;
+    font-size: 32px;
     line-height: 28px;
   }
+  */
+
   .c3 {
     height: 300px;
   }
