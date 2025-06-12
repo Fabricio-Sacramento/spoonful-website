@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import Glass from './components/Glass';
 import DynamicBackground from './components/DynamicBackground';
-import GlassCube from './components/GlassCube';
+//import GlassCube from './components/GlassCube';
 //import ConceptualCore from './components/ConceptualCore';
 import { OrbitControls } from '@react-three/drei';
 
@@ -16,7 +16,9 @@ const App = () => {
 
       {/* Elementos de vidro já existentes */}
       <Glass />
+      {/*}
       <GlassCube />
+      */}  
 
       {/* Novo objeto 3D conceitual 
       <ConceptualCore /> */}
