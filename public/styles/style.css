@@ -63,7 +63,7 @@ body {
   color: white;
   position: relative; /* Garante que o pseudo-elemento seja posicionado corretamente */
 }
-
+/*
 body::after {
   content: "";
   position: fixed;
@@ -78,8 +78,9 @@ body::after {
   animation: noise 12s steps(20) infinite;
   transition: opacity 0.4s ease;
   will-change: transform;
-  z-index: -1; /* Ajuste o z-index para garantir que o noise fique atrás do conteúdo */
+  z-index: -1; /* Ajuste o z-index para garantir que o noise fique atrás do conteúdo 
 }
+*/
 
 @keyframes noise {
   0% {
