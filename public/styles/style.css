@@ -241,7 +241,7 @@ section {
 #what-we-do {
   position: relative;
   overflow: hidden;
-  background-color: var(--primary-yellow);
+  background-color: var(--neutral-normal);
 }
 
 /* =========================================
