@@ -238,11 +238,19 @@ section {
 /* =========================================
    WHAT WE DO - Desktop Styles
    ========================================= */
+
+
 #what-we-do {
+  background-color: var(--primarygreen);
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
   position: relative;
-  overflow: hidden;
-  background-color: var(--neutral-normal);
+  margin: 0;
+  padding: 0;
 }
+
+
 
 /* =========================================
    WORK - Desktop Styles
@@ -253,8 +261,11 @@ section {
   background-color: var(--primary-blue);
 }
 
+/* =========================================
+   Headings
+   ========================================= */
 
-/* Headings */
+   
 .heading-large {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;

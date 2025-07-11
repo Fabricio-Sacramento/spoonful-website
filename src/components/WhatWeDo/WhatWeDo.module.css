@@ -1,0 +1,68 @@
+/* src/components/WhatWeDo.module.css */
+
+.WHAT-WE-DO-DESKTOP {
+  align-items: flex-start;
+  background-color: var(--primarygreen);
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+.WHAT-WE-DO-DESKTOP .container {
+  align-items: flex-start;
+  align-self: stretch;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.WHAT-WE-DO-DESKTOP .row {
+  align-items: center;
+  align-self: stretch;
+  border-bottom: 2px solid var(--neutralsnormal);
+  display: flex;
+  flex: 1;
+  gap: 24px;
+  padding: 0 32px 0 16px;
+  width: 100%;
+  position: relative;
+}
+
+.WHAT-WE-DO-DESKTOP .title {
+  color: var(--neutralsnormal);
+  font-family: var(--h1-desktop-large-font-family);
+  font-size: var(--h1-desktop-large-font-size);
+  font-style: var(--h1-desktop-large-font-style);
+  font-weight: var(--h1-desktop-large-font-weight);
+  letter-spacing: var(--h1-desktop-large-letter-spacing);
+  line-height: var(--h1-desktop-large-line-height);
+  white-space: nowrap;
+  width: fit-content;
+  position: relative;
+}
+
+.WHAT-WE-DO-DESKTOP .description {
+  color: var(--neutralsnormal);
+  flex: 1;
+  font-family: var(--heading-text-desktop-h4-desktop-font-family);
+  font-size: var(--heading-text-desktop-h4-desktop-font-size);
+  font-style: var(--heading-text-desktop-h4-desktop-font-style);
+  font-weight: var(--heading-text-desktop-h4-desktop-font-weight);
+  letter-spacing: var(--heading-text-desktop-h4-desktop-letter-spacing);
+  line-height: var(--heading-text-desktop-h4-desktop-line-height);
+  position: relative;
+}
+
+.WHAT-WE-DO-DESKTOP .text-wrapper {
+  color: var(--neutralsnormal);
+  font-family: "Neue Haas Grotesk Display Pro-95Black", Helvetica;
+  font-size: 124px;
+  font-weight: 900;
+  letter-spacing: 2.48px;
+  line-height: normal;
+  white-space: nowrap;
+  width: fit-content;
+  position: relative;
+}
