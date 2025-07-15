@@ -11,13 +11,12 @@ import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
 export default function WorkSection() {
-  const container = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin);
-
-    // captura o elemento uma única vez
-    const el = container.current;
+    const el = containerRef.current;
+    if (!el) return;
 
     const ctx = gsap.context(() => {
       const slides = gsap.utils.toArray('.work-slide');
@@ -25,7 +24,7 @@ export default function WorkSection() {
       const viewportWidth = window.innerWidth;
       const scrollDistance = totalWidth - viewportWidth;
 
-      // 1) Scroll vertical → horizontal
+      // Scroll vertical → horizontal
       gsap.to(el, {
         x: -scrollDistance,
         ease: 'none',
@@ -39,7 +38,7 @@ export default function WorkSection() {
         },
       });
 
-      // 2) Drag + inertia + snapping
+      // Drag + inertia + snap
       Draggable.create(el, {
         type: 'x',
         bounds: { minX: -scrollDistance, maxX: 0 },
@@ -52,42 +51,50 @@ export default function WorkSection() {
             , points[0]);
           },
         },
-        onDrag:         () => ScrollTrigger.update(),
-        onThrowUpdate:  () => ScrollTrigger.update(),
-        onDragStart()   { gsap.set(el, { skewX: 0 }); },
-        onDragEnd()     { gsap.to(el, { skewX: 0, duration: 0.5, ease: 'power3.out' }); },
-        onThrowComplete() { gsap.to(el, { skewX: 0, duration: 0.5, ease: 'power3.out' }); },
+        onDrag:        () => ScrollTrigger.update(),
+        onThrowUpdate: () => ScrollTrigger.update(),
       });
 
-      // 3) Skew dinâmico durante drag/inertia
+      // Skew dinâmico
       gsap.ticker.add(() => {
-        const vx = el._gsap.velocityX || 0;
+        const vx = el._gsap?.velocityX || 0;
         const skew = gsap.utils.clamp(-15, 15, vx * 0.2);
         gsap.set(el, { skewX: skew });
       });
-    }, container);
+
+    }, containerRef);
 
     return () => {
-      // reverte todas as animações/tweens criadas no contexto
       ctx.revert();
-
-      // mata somente os ScrollTriggers deste container
       ScrollTrigger.getAll()
         .filter(st => st.trigger === el)
         .forEach(st => st.kill());
     };
   }, []);
 
+  // **DEBUG**
+  console.log('📦 portfolio:', portfolio);
+
   return (
-    <div ref={container} className="work-container">
-      <div className="work-slide">
-        <WorkIntro />
-      </div>
-      {portfolio.map(item => (
-        <div key={item.id} className="work-slide">
-          <PortfolioSlide {...item} />
+    <section id="work" className="work-section overflow-hidden">
+      <div ref={containerRef} className="work-container">
+        {/* Slide de título */}
+        <div className="work-slide">
+          <WorkIntro />
         </div>
-      ))}
-    </div>
+
+        {/* Slides do portfólio */}
+        {portfolio.map(item => (
+          <div key={item.id} className="work-slide">
+            <PortfolioSlide
+              title={item.title}
+              subtitle={item.subtitle}
+              labels={item.categories}    /* uso de categories */
+              image={item.imageUrl}       /* uso de imageUrl */
+            />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
