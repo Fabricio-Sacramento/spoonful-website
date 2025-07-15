@@ -49,15 +49,12 @@
 /* 2) RESET / BASE               */
 /* ----------------------------- */
 
-html {
-  scroll-behavior: smooth;
-}
-
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100vh;
+  scroll-behavior: smooth;
   /* background: var(--neutral-darker); */
 }
 
@@ -174,6 +171,12 @@ section {
   display: block;
 }
 
+.flex           { display: flex !important; }
+.w-max          { width: max-content !important; }
+.h-screen       { height: 100vh !important; }
+.overflow-hidden{ overflow: hidden !important; }
+
+
 
 
 /* ----------------------------- */
@@ -207,10 +210,6 @@ section {
 #about-us {
   position: relative;
   overflow: visible;
-  /*
-  background: url('../assets/images/New-Flakes-02.jpg') no-repeat center center;
-  background-size: cover;
-  */
   z-index: 1;
   background-color: var(--primary-red);
 }
@@ -355,6 +354,23 @@ section {
   overflow: hidden;
   background-color: var(--primary-blue);
 }
+
+#work-root {
+  position: relative;
+  overflow: hidden;
+}
+
+.work-container {
+  display: flex;
+  width: max-content;
+  height: 100vh;
+  overflow: hidden;
+}
+.work-slide {
+  flex: 0 0 100vw;
+  height: 100vh;
+}
+
 
 
 /* Headings */
