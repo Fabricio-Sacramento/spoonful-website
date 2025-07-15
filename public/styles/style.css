@@ -4,6 +4,9 @@
 /* 1) DESIGN TOKENS (Variáveis)  */
 /* ----------------------------- */
 :root {
+  /* Primary Green */
+  --primary-green: #19EF99;
+
   /* Primary Red */
   --primary-red: #F5163C;
   --primary-red-dark: #B8112D;
