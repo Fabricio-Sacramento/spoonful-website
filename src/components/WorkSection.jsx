@@ -1,100 +1,101 @@
 // src/components/WorkSection.jsx
 
 import { useRef, useEffect } from 'react';
-import WorkIntro from './WorkIntro';
-import PortfolioSlide from './PortfolioSlide';
-import { portfolio } from '../data/portfolio';
-
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
+import WorkIntro from './WorkIntro';
+import PortfolioSlide from './PortfolioSlide';
+import { portfolio } from '../data/portfolio';
+
+// registra plugins GSAP
+gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin);
+
 export default function WorkSection() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin);
-    const el = containerRef.current;
-    if (!el) return;
+    const container = containerRef.current;
+    if (!container) return;
 
+    // Seleciona cada slide para cálculos de snap
+    const slides = gsap.utils.toArray(container.querySelectorAll('.work-slide'));
+    const totalWidth = container.scrollWidth;
+    const viewportWidth = window.innerWidth;
+    const scrollDistance = totalWidth - viewportWidth;
+
+    // Contexto GSAP para escopo seguro
     const ctx = gsap.context(() => {
-      const slides = gsap.utils.toArray('.work-slide');
-      const totalWidth = el.scrollWidth;
-      const viewportWidth = window.innerWidth;
-      const scrollDistance = totalWidth - viewportWidth;
-
-      // Scroll vertical → horizontal
-      gsap.to(el, {
-        x: -scrollDistance,
-        ease: 'none',
+      // Timeline de scroll → horizontal + pin
+      const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: el,
+          trigger: '#work',           // pin no elemento <section id="work">
           start: 'top top',
           end: () => `+=${scrollDistance}`,
-          scrub: 1,
+          scrub: true,
           pin: true,
-          anticipatePin: 1,
-        },
+          anticipatePin: 1
+        }
       });
 
-      // Drag + inertia + snap
-      Draggable.create(el, {
+      tl.to(container, { x: -scrollDistance, ease: 'none' });
+
+      // Draggable + inertia + snap
+      Draggable.create(container, {
         type: 'x',
         bounds: { minX: -scrollDistance, maxX: 0 },
         inertia: true,
         snap: {
           x: rawX => {
-            const points = slides.map((_, i) => -i * viewportWidth);
-            return points.reduce((prev, curr) =>
-              Math.abs(curr - rawX) < Math.abs(prev - rawX) ? curr : prev
-            , points[0]);
+            const offsets = slides.map((_, i) =>
+              -slides.slice(0, i).reduce((sum, el) => sum + el.offsetWidth, 0)
+            );
+            return offsets.reduce((closest, curr) =>
+              Math.abs(curr - rawX) < Math.abs(closest - rawX) ? curr : closest
+            , offsets[0]);
           },
+          duration: 0.5
         },
         onDrag:        () => ScrollTrigger.update(),
-        onThrowUpdate: () => ScrollTrigger.update(),
+        onThrowUpdate: () => ScrollTrigger.update()
       });
 
-      // Skew dinâmico
+      // Skew dinâmico com base na velocidade
       gsap.ticker.add(() => {
-        const vx = el._gsap?.velocityX || 0;
+        const vx = container._gsap?.velocityX || 0;
         const skew = gsap.utils.clamp(-15, 15, vx * 0.2);
-        gsap.set(el, { skewX: skew });
+        gsap.set(container, { skewX: skew });
       });
 
-    }, containerRef);
+    }, container);
 
+    // Cleanup ao desmontar
     return () => {
       ctx.revert();
-      ScrollTrigger.getAll()
-        .filter(st => st.trigger === el)
-        .forEach(st => st.kill());
+      ScrollTrigger.getAll().forEach(st => st.kill());
     };
   }, []);
 
-  // **DEBUG**
-  console.log('📦 portfolio:', portfolio);
-
   return (
-    <section id="work" className="work-section overflow-hidden">
-      <div ref={containerRef} className="work-container">
-        {/* Slide de título */}
-        <div className="work-slide">
-          <WorkIntro />
-        </div>
-
-        {/* Slides do portfólio */}
-        {portfolio.map(item => (
-          <div key={item.id} className="work-slide">
-            <PortfolioSlide
-              title={item.title}
-              subtitle={item.subtitle}
-              labels={item.categories}    /* uso de categories */
-              image={item.imageUrl}       /* uso de imageUrl */
-            />
-          </div>
-        ))}
+    <div ref={containerRef} className="work-container">
+      {/* Slide de título */}
+      <div className="work-slide">
+        <WorkIntro />
       </div>
-    </section>
+
+      {/* Slides do portfólio */}
+      {portfolio.map(item => (
+        <div key={item.id} className="work-slide">
+          <PortfolioSlide
+            title={item.title}
+            subtitle={item.subtitle}
+            labels={item.categories}
+            image={item.imageUrl}
+          />
+        </div>
+      ))}
+    </div>
   );
 }
