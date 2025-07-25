@@ -51,10 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!entryComplete) return; // Se a animação de entrada não terminou, não atualiza
     const scrollTop = window.scrollY;
     const heroHeight = window.innerHeight; // Usamos a altura da viewport como referência
-    const progress = Math.min(scrollTop / heroHeight, 1);
-    // Atualiza o progresso de forma invertida:
-    // No topo (scroll = 0): progress = 0 → tl.progress(1) (estado final, texto visível)
-    // Ao rolar uma viewport inteira (scroll = heroHeight): progress = 1 → tl.progress(0) (estado inicial)
+    const offsetStart = heroHeight * 0.1;
+    const raw = Math.max(0, scrollTop - offsetStart);
+    const progress = Math.min(raw / (heroHeight - offsetStart), 1);
     tl.progress(1 - progress);
   });
 });

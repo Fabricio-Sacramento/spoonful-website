@@ -367,7 +367,6 @@ section {
 .work-container {
   display: flex;
   height: 100%;
-  /* width será automática: soma de todos os .work-slide */
 }
 .work-slide {
   flex: 0 0 100vw;   /* largura fixa igual à viewport */
