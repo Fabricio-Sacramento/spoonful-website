@@ -90,7 +90,7 @@ function initScrollAnimation() {
       {
         attr: { y: 0.5, height: 0 },
         ease: 'power2.inOut',
-        stagger: 0.08,
+        stagger: 0.09,
         duration: 1
       },
       0
