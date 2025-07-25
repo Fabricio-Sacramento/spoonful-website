@@ -20,8 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
       end: "bottom top",
       scrub: true,
       pin: true,
-      pinSpacing: true,
-      // markers: true, // para depuração
+      pinSpacing: false,
     }
   });
 

@@ -1,59 +1,68 @@
+// src/scripts/hero-text-animation.js
 import Splitting from 'splitting';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero Text Animation: entrada e saída sincronizadas com scroll
+// ------------------------------------------------------------
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Inicializa o Splitting.js para dividir os textos em caracteres
+  // Inicializa Splitting.js para fragmentar o texto em caracteres
   Splitting();
 
-  // Seleciona todos os <h2> dentro do container hero-content
+  // Seleciona todos os <h2> na Hero
   const headings = document.querySelectorAll('.hero-content h2');
-  
-  // Cria a timeline para a animação de entrada com delay de 1 segundo
-  const tl = gsap.timeline({ delay: 1 });
-  let entryComplete = false; // Flag para indicar que a animação de entrada foi concluída
+  let entryComplete = false;
 
-  headings.forEach((heading, index) => {
-    // Seleciona os caracteres gerados pelo Splitting.js
+  // Timeline de entrada dos caracteres
+  const entryTl = gsap.timeline({ delay: 1 });
+  headings.forEach((heading, idx) => {
     const chars = heading.querySelectorAll('.char');
-    
-    // Define a perspectiva 3D para o contêiner de cada caractere
     chars.forEach(char => gsap.set(char.parentNode, { perspective: 1000 }));
-    
-    // Adiciona à timeline a animação de entrada para cada heading com delay incremental
-    tl.fromTo(
+    entryTl.fromTo(
       chars,
-      {
-        opacity: 0,
-        rotationX: -90,
-        z: -200,
-        transformOrigin: '50% 0%'
-      },
-      {
-        opacity: 1,
-        rotationX: 0,
-        z: 0,
-        ease: 'power1.out',
-        stagger: 0.05,
-        duration: 0.5
-      },
-      index * 0.05
+      { opacity: 0, rotationX: -90, z: -200, transformOrigin: '50% 0%' },
+      { opacity: 1, rotationX: 0, z: 0, ease: 'power1.out', stagger: 0.05, duration: 0.5 },
+      idx * 0.05
     );
   });
 
-  // Ao concluir a animação de entrada, pausa a timeline e ativa a flag
-  tl.eventCallback("onComplete", () => {
-    tl.pause();
+  entryTl.eventCallback('onComplete', () => {
     entryComplete = true;
+    window.dispatchEvent(new CustomEvent('heroEntryComplete'));
   });
 
-  // Listener de scroll para atualizar o progresso da timeline somente após a entrada
+  // Timeline de saída via ScrollTrigger
+  const exitTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#hero',
+      start: 'top top',
+      end: '+=150%',
+      scrub: true,
+      // markers: true, // descomente para debug
+    }
+  });
+
+  headings.forEach((heading, idx) => {
+    const chars = heading.querySelectorAll('.char');
+    chars.forEach(char => gsap.set(char.parentNode, { perspective: 1000 }));
+    exitTl.to(
+      chars,
+      { opacity: 0, rotationX: -90, z: -200, ease: 'power1.out', stagger: 0.05, duration: 1 },
+      idx * 0.2
+    );
+  });
+
+  // Opcional: controlar saída inversa manualmente após entrada (fallback)
   window.addEventListener('scroll', () => {
-    if (!entryComplete) return; // Se a animação de entrada não terminou, não atualiza
-    const scrollTop = window.scrollY;
-    const heroHeight = window.innerHeight; // Usamos a altura da viewport como referência
-    const offsetStart = heroHeight * 0.1;
-    const raw = Math.max(0, scrollTop - offsetStart);
-    const progress = Math.min(raw / (heroHeight - offsetStart), 1);
-    tl.progress(1 - progress);
+    if (!entryComplete) return;
+    const scrollY = window.scrollY;
+    const vh = window.innerHeight;
+    const startOffset = vh * 0.1;
+    const raw = Math.max(0, scrollY - startOffset);
+    const prog = Math.min(raw / (vh - startOffset), 1);
+    entryTl.progress(1 - prog);
   });
 });

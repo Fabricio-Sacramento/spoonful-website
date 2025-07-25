@@ -15,10 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const exitTl = gsap.timeline({
     scrollTrigger: {
       trigger: "#hero",
-      start: "bottom bottom",
-      end: "+=100%", // Aumenta a distância de scroll para que a animação de saída tenha espaço para rodar
+      start: "top+=50px top",
+      end: "+=150%", // Aumenta a distância de scroll para que a animação de saída tenha espaço para rodar
       scrub: true,
-      markers: true // Apenas para debug; remova ou comente quando estiver satisfeito
     }
   });
 
