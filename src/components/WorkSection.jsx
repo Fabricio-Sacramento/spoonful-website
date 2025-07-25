@@ -36,7 +36,7 @@ export default function WorkSection() {
           trigger: root,
           // scroller: root,    ← removido para usar o window como scroll container
           start: 'top top',
-          end: () => `300%`,
+          end: () => `+=${scrollDistance}`,
           scrub: true,
           pin: true,
           pinSpacing: false,
