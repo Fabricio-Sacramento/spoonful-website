@@ -7,12 +7,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Fragmenta todos os textos em caracteres quando o DOM estiver pronto
+// 1) Fragmenta todos os textos em caracteres quando o DOM estiver pronto
 window.addEventListener('DOMContentLoaded', () => {
   Splitting();
 });
 
-// Depois do load, dispara a entrada do Hero e inicializa a animação de scroll
+// 2) Depois do load, dispara a entrada do Hero e inicializa a animação de scroll
 window.addEventListener('load', () => {
   setTimeout(heroEntryAnimation, 200);
   setTimeout(initScrollAnimation, 200);
@@ -23,10 +23,10 @@ window.addEventListener('load', () => {
  */
 function heroEntryAnimation() {
   const headings = document.querySelectorAll('.hero-content h2');
-
   const entryTl = gsap.timeline();
   headings.forEach((heading, i) => {
     const chars = heading.querySelectorAll('.char');
+    // adiciona perspectiva para o parent de cada char
     chars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
     entryTl.fromTo(
       chars,
@@ -55,6 +55,7 @@ function initScrollAnimation() {
   const clipRects = document.querySelectorAll('#heroClip rect');
   const aboutChars = document.querySelectorAll('#about-us .text-back .char');
 
+  // garantia de perspectiva
   heroChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
   aboutChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
 
@@ -69,7 +70,7 @@ function initScrollAnimation() {
       anticipatePin: 1
     }
   })
-    // 1) Exit do Hero Text, flap + fade, pivot no bottom-right
+    // 1) Exit do Hero Text, flap + fade, pivot bottom-right
     .to(
       heroChars,
       {
@@ -83,8 +84,7 @@ function initScrollAnimation() {
       },
       0
     )
-
-    // 2) Hero Transition: tiras abrem da esquerda → direita (stagger padrão)
+    // 2) Hero Transition: tiras abrem da esquerda → direita
     .to(
       clipRects,
       {
@@ -95,10 +95,8 @@ function initScrollAnimation() {
       },
       0
     )
-
     // 3) Pequeno delay
     .to({}, { duration: 1 }, 0)
-
     // 4) Entrada do texto de background do About Us
     .fromTo(
       aboutChars,

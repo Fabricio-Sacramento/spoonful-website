@@ -177,8 +177,6 @@ section {
 .overflow-hidden{ overflow: hidden !important; }
 
 
-
-
 /* ----------------------------- */
 /* 4) HERO SECTION              */
 /* ----------------------------- */
@@ -204,7 +202,7 @@ section {
 }
 
 /* --------------------------------- */
-/* ABOUT US Section                */
+/* ABOUT US Section                 */
 /* --------------------------------- */
 #about-us {
   top: 0;
@@ -238,7 +236,6 @@ section {
   width: 100%;
   background: transparent;
 }
-
 
 
 /* =========================================
