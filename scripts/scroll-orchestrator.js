@@ -7,12 +7,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 1) Fragmenta todos os textos em caracteres quando o DOM estiver pronto
+// Fragmenta todos os textos em caracteres quando o DOM estiver pronto
 window.addEventListener('DOMContentLoaded', () => {
   Splitting();
 });
 
-// 2) Depois do load, dispara a entrada do Hero e inicializa a animação de scroll
+// Depois do load, dispara a entrada do Hero e inicializa a animação de scroll
 window.addEventListener('load', () => {
   setTimeout(heroEntryAnimation, 200);
   setTimeout(initScrollAnimation, 200);
@@ -23,10 +23,10 @@ window.addEventListener('load', () => {
  */
 function heroEntryAnimation() {
   const headings = document.querySelectorAll('.hero-content h2');
+
   const entryTl = gsap.timeline();
   headings.forEach((heading, i) => {
     const chars = heading.querySelectorAll('.char');
-    // adiciona perspectiva para o parent de cada char
     chars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
     entryTl.fromTo(
       chars,
@@ -55,24 +55,21 @@ function initScrollAnimation() {
   const clipRects = document.querySelectorAll('#heroClip rect');
   const aboutChars = document.querySelectorAll('#about-us .text-back .char');
 
-  // garantia de perspectiva
   heroChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
   aboutChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
 
   gsap.timeline({
     scrollTrigger: {
-      trigger: '#hero',
+      trigger: document.body,
       start: 'top top',
-      endTrigger: '#about-us',          // escolhe quando o pin termina
-      end: 'bottom top',
+      end: () => `+=${window.innerHeight * 1.5}`,
       scrub: 0.5,
       pin: true,
       pinSpacing: false,
-      anticipatePin: 1,
-      markers: true, // para debug
+      anticipatePin: 1
     }
   })
-    // 1) Exit do Hero Text, flap + fade, pivot bottom-right
+    // 1) Exit do Hero Text, flap + fade, pivot no bottom-right
     .to(
       heroChars,
       {
@@ -86,7 +83,8 @@ function initScrollAnimation() {
       },
       0
     )
-    // 2) Hero Transition: tiras abrem da esquerda → direita
+
+    // 2) Hero Transition: tiras abrem da esquerda → direita (stagger padrão)
     .to(
       clipRects,
       {
@@ -97,8 +95,10 @@ function initScrollAnimation() {
       },
       0
     )
+
     // 3) Pequeno delay
     .to({}, { duration: 1 }, 0)
+
     // 4) Entrada do texto de background do About Us
     .fromTo(
       aboutChars,

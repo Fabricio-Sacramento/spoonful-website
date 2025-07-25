@@ -1,4 +1,5 @@
 // src/components/WorkSection.jsx
+
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -17,29 +18,27 @@ export default function WorkSection() {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const root = el.parentNode; // container pai, normalmente <div id="work-root">
+    const section = el.parentNode;
 
-    // coleta todos os slides e calcula dimensões
     const slides = gsap.utils.toArray(el.querySelectorAll('.work-slide'));
-    if (slides.length < 2) return;
     const totalWidth = el.scrollWidth;
-    const scrollDistance = totalWidth - window.innerWidth;
+    const viewportWidth = window.innerWidth;
+    const scrollDistance = totalWidth - viewportWidth;
+
     const offsets = slides.map((_, i) =>
       -slides.slice(0, i).reduce((sum, slide) => sum + slide.offsetWidth, 0)
     );
 
-    // cria contexto para scoping das animações
     const ctx = gsap.context(() => {
-      // ─── Pin horizontal da seção WORK ───────────────────────────────
+      // Pin horizontal da seção WORK
       gsap.timeline({
         scrollTrigger: {
-          trigger: root,
-           start: 'top top',
-          end: () => `300%`,
-          markers: true,
-          pin: true,
-          pinSpacing: false,
+          trigger: section,
+          start: 'top top',
+          end: () => `+=${scrollDistance}`,
           scrub: true,
+          pin: true,
+          pinSpacing: true,     // placeholder ON
           anticipatePin: 1,
           onUpdate(self) {
             const skew = gsap.utils.clamp(-15, 15, self.getVelocity() * 0.2);
@@ -49,34 +48,34 @@ export default function WorkSection() {
       })
       .to(el, { x: -scrollDistance, ease: 'none' });
 
-      // ─── Drag + inertia + snap ───────────────────────────────────────
+      // Drag + inertia + snap
       Draggable.create(el, {
         type: 'x',
         bounds: { minX: -scrollDistance, maxX: 0 },
         inertia: true,
         snap: {
           x(rawX) {
-            return offsets.reduce(
-              (closest, curr) =>
-                Math.abs(curr - rawX) < Math.abs(closest - rawX) ? curr : closest,
-              offsets[0]
-            );
-          }
+            return offsets.reduce((closest, curr) =>
+              Math.abs(curr - rawX) < Math.abs(closest - rawX) ? curr : closest
+            , offsets[0]);
+          },
+          duration: 0.5
         },
         onDrag() {
           const v = this.getVelocity();
-          gsap.set(el, { skewX: gsap.utils.clamp(-15, 15, v * 0.2) });
+          const skew = gsap.utils.clamp(-15, 15, v * 0.2);
+          gsap.set(el, { skewX: skew });
           ScrollTrigger.update();
         },
         onThrowUpdate() {
           const v = this.getVelocity();
-          gsap.set(el, { skewX: gsap.utils.clamp(-15, 15, v * 0.2) });
+          const skew = gsap.utils.clamp(-15, 15, v * 0.2);
+          gsap.set(el, { skewX: skew });
           ScrollTrigger.update();
         }
       });
     }, containerRef);
 
-    // cleanup ao desmontar
     return () => {
       ctx.revert();
       ScrollTrigger.getAll().forEach(st => st.kill());
@@ -86,9 +85,7 @@ export default function WorkSection() {
 
   return (
     <div ref={containerRef} className="work-container">
-      <div className="work-slide">
-        <WorkIntro />
-      </div>
+      <div className="work-slide"><WorkIntro /></div>
       {portfolio.map(item => (
         <div key={item.id} className="work-slide">
           <PortfolioSlide
