@@ -191,13 +191,15 @@ section {
   overflow: hidden;
   z-index: 3;
   background: transparent !important;
+  /*
   clip-path: url(#heroClip);
+  */
 }
 .hero-content {
   margin: 0;
   padding: 0;
   position: relative;
-  z-index: 1;
+  z-index: 3;
   text-align: left;
   width: 100%;
   height: 100%;
