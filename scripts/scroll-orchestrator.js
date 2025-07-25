@@ -3,78 +3,86 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
-// 1) Fragmenta texto e inicia quando o DOM estiver pronto
+// 1) Split text e animação de entrada do Hero
 document.addEventListener('DOMContentLoaded', () => {
-  Splitting();             // usa o Splitting UMD
+  Splitting(); 
+  gsap.from('.hero-content .char', {
+    opacity: 0,
+    y: 50,
+    rotationX: -90,
+    transformOrigin: '50% 0%',
+    ease: 'power2.out',
+    duration: 0.8,
+    stagger: 0.02
+  });
   initScrollOrchestration();
 });
 
-// 2) Após carregar tudo, faz um refresh dos ScrollTriggers
+// 2) Refresh ao carregar tudo
 window.addEventListener('load', () => {
   ScrollTrigger.refresh();
 });
 
 function initScrollOrchestration() {
   ScrollTrigger.matchMedia({
-    "(min-width: 768px)": () => {
-      initHeroEntry();
-      initMainScrollTimeline();
-    },
-    "(max-width: 767px)": () => {
-      const hero = document.querySelector(".hero-content");
-      if (hero) {
-        gsap.from(hero, { opacity: 0, duration: 0.8, ease: "power1.out" });
-      }
+    '(min-width: 768px)': () => initHeroScrollTimeline(),
+    '(max-width: 767px)': () => {
+      // animação simplificada no mobile
+      gsap.from('.hero-content', { opacity: 1, duration: 0.5 });
     }
   });
 }
 
-let heroEntryTl;
-function initHeroEntry() {
-  const headings = document.querySelectorAll(".hero-content h2");
-  if (!headings.length) return;
+function initHeroScrollTimeline() {
+  const heroChars = document.querySelectorAll('.hero-content .char');
+  const clipRects  = document.querySelectorAll('#heroClip rect');
+  const aboutChars = document.querySelectorAll('#about-us .char');
 
-  heroEntryTl = gsap.timeline({ delay: 1 });
-  headings.forEach((heading, i) => {
-    const chars = heading.querySelectorAll(".char");
-    heroEntryTl.fromTo(
-      chars,
-      { opacity: 0, rotationX: -90, z: -200, transformOrigin: "50% 0%" },
-      { opacity: 1, rotationX: 0, z: 0, ease: "power1.out", stagger: 0.05, duration: 0.5 },
-      i * 0.05
-    );
-  });
-}
-
-function initMainScrollTimeline() {
-  const heroChars = document.querySelectorAll(".hero-content .char");
-  const clipRects  = document.querySelectorAll("#heroClip rect");
-  const aboutChars = document.querySelectorAll("#about-us .text-back .char");
   if (!heroChars.length || !clipRects.length || !aboutChars.length) return;
 
+  // timeline pinada ao #hero, dura 200% da viewport (ajuste se precisar)
   const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: "#hero",
-      start: "top top",
-      end: () => `+=${window.innerHeight * 1.5}`,
-      scrub: 0.5,
+      trigger: '#hero',
+      start: 'top top',
+      end: () => `+=${window.innerHeight * 2}`, 
+      scrub: true,
       pin: true,
-      markers: true,
-      pinSpacing: true,
-      anticipatePin: 1
+      pinSpacing: false,
+      anticipatePin: 1,
+      markers: false // true para debug visual
     }
   });
 
-  tl.to(heroChars, { opacity: 0, rotationX: -90, z: -200, ease: "power1.out", stagger: 0.05, duration: 1 }, 0)
-    .to(clipRects, { attr: { y: 0.5, height: 0 }, ease: "power2.inOut", stagger: 0.08, duration: 1 }, 0)
-    .to({}, { duration: 1 }, 0)
-    .fromTo(aboutChars,
-      { scaleY: 0, opacity: 0, transformOrigin: "50% 100%" },
-      { scaleY: 1, opacity: 1, ease: "power3.in", stagger: 0.05 },
-      "<"
-    );
+  // 1) hero-text-exit-animation
+  tl.addLabel('exit', 0)
+    .to(heroChars, {
+      opacity: 0,
+      y: -50,
+      ease: 'power2.in',
+      stagger: 0.02
+    }, 'exit');
 
-  if (heroEntryTl) {
-    tl.add(heroEntryTl, 0);
-  }
+  // 2) hero-transition (clip-path reveal)
+  tl.addLabel('trans', 'exit+=0.5')
+    .to(clipRects, {
+      attr: { y: 0.5, height: 0 },
+      ease: 'power2.inOut',
+      stagger: 0.1,
+      duration: 0.8
+    }, 'trans');
+
+  // 3) about-us-animation
+  tl.addLabel('about', 'trans+=0.5')
+    .fromTo(aboutChars, 
+      { opacity: 0, y: 30 }, 
+      {
+        opacity: 1,
+        y: 0,
+        ease: 'power2.out',
+        stagger: 0.03,
+        duration: 0.6
+      },
+      'about'
+    );
 }
