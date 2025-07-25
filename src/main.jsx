@@ -17,3 +17,4 @@ ReactDOM.createRoot(document.getElementById('work-root')).render(
     <WorkSection />
   </React.StrictMode>
 );
+

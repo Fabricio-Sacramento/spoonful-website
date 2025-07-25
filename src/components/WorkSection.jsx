@@ -10,82 +10,82 @@ import WorkIntro from './WorkIntro';
 import PortfolioSlide from './PortfolioSlide';
 import { portfolio } from '../data/portfolio';
 
-// registra plugins GSAP
 gsap.registerPlugin(ScrollTrigger, Draggable, InertiaPlugin);
 
 export default function WorkSection() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const section = el.parentNode;
 
-    // Seleciona cada slide para cálculos de snap
-    const slides = gsap.utils.toArray(container.querySelectorAll('.work-slide'));
-    const totalWidth = container.scrollWidth;
+    const slides = gsap.utils.toArray(el.querySelectorAll('.work-slide'));
+    const totalWidth = el.scrollWidth;
     const viewportWidth = window.innerWidth;
     const scrollDistance = totalWidth - viewportWidth;
 
-    // Contexto GSAP para escopo seguro
+    const offsets = slides.map((_, i) =>
+      -slides.slice(0, i).reduce((sum, slide) => sum + slide.offsetWidth, 0)
+    );
+
     const ctx = gsap.context(() => {
-      // Timeline de scroll → horizontal + pin
-      const tl = gsap.timeline({
+      // Pin horizontal da seção WORK
+      gsap.timeline({
         scrollTrigger: {
-          trigger: '#work',           // pin no elemento <section id="work">
+          trigger: section,
           start: 'top top',
           end: () => `+=${scrollDistance}`,
           scrub: true,
           pin: true,
-          anticipatePin: 1
+          pinSpacing: true,     // placeholder ON
+          anticipatePin: 1,
+          onUpdate(self) {
+            const skew = gsap.utils.clamp(-15, 15, self.getVelocity() * 0.2);
+            gsap.set(el, { skewX: skew });
+          }
         }
-      });
+      })
+      .to(el, { x: -scrollDistance, ease: 'none' });
 
-      tl.to(container, { x: -scrollDistance, ease: 'none' });
-
-      // Draggable + inertia + snap
-      Draggable.create(container, {
+      // Drag + inertia + snap
+      Draggable.create(el, {
         type: 'x',
         bounds: { minX: -scrollDistance, maxX: 0 },
         inertia: true,
         snap: {
-          x: rawX => {
-            const offsets = slides.map((_, i) =>
-              -slides.slice(0, i).reduce((sum, el) => sum + el.offsetWidth, 0)
-            );
+          x(rawX) {
             return offsets.reduce((closest, curr) =>
               Math.abs(curr - rawX) < Math.abs(closest - rawX) ? curr : closest
             , offsets[0]);
           },
           duration: 0.5
         },
-        onDrag:        () => ScrollTrigger.update(),
-        onThrowUpdate: () => ScrollTrigger.update()
+        onDrag() {
+          const v = this.getVelocity();
+          const skew = gsap.utils.clamp(-15, 15, v * 0.2);
+          gsap.set(el, { skewX: skew });
+          ScrollTrigger.update();
+        },
+        onThrowUpdate() {
+          const v = this.getVelocity();
+          const skew = gsap.utils.clamp(-15, 15, v * 0.2);
+          gsap.set(el, { skewX: skew });
+          ScrollTrigger.update();
+        }
       });
+    }, containerRef);
 
-      // Skew dinâmico com base na velocidade
-      gsap.ticker.add(() => {
-        const vx = container._gsap?.velocityX || 0;
-        const skew = gsap.utils.clamp(-15, 15, vx * 0.2);
-        gsap.set(container, { skewX: skew });
-      });
-
-    }, container);
-
-    // Cleanup ao desmontar
     return () => {
       ctx.revert();
       ScrollTrigger.getAll().forEach(st => st.kill());
+      Draggable.get(el)?.forEach(d => d.kill && d.kill());
     };
   }, []);
 
   return (
     <div ref={containerRef} className="work-container">
-      {/* Slide de título */}
-      <div className="work-slide">
-        <WorkIntro />
-      </div>
-
-      {/* Slides do portfólio */}
+      <div className="work-slide"><WorkIntro /></div>
       {portfolio.map(item => (
         <div key={item.id} className="work-slide">
           <PortfolioSlide
@@ -93,6 +93,7 @@ export default function WorkSection() {
             subtitle={item.subtitle}
             labels={item.categories}
             image={item.imageUrl}
+            link={item.link}
           />
         </div>
       ))}

@@ -15,7 +15,7 @@ export const portfolio = [
   {
     id: 1,
     categories: ['UIUX', 'WEBSITE', 'E-COMMERCE', 'DIGITAL STRATEGY'],
-    title: 'Loja Virtual Alpha',
+    title: 'myHABITAT App',
     subtitle: 'Plataforma de e-commerce com foco em conversão',
     imageUrl: '/assets/projects/alpha.jpg',
     link: '/projects/alpha'
@@ -23,7 +23,7 @@ export const portfolio = [
   {
     id: 2,
     categories: ['WEBSITE', 'BRANDING'],
-    title: 'Branding Beta',
+    title: 'Hysteria',
     subtitle: 'Reformulação completa de identidade visual',
     imageUrl: '/assets/projects/beta.jpg',
     link: '/projects/beta'
@@ -31,7 +31,7 @@ export const portfolio = [
   {
     id: 3,
     categories: ['UIUX', 'MOBILE APP'],
-    title: 'App Gamma',
+    title: 'Urban Woof',
     subtitle: 'Aplicativo mobile para gerenciamento de tarefas',
     imageUrl: '/assets/projects/gamma.jpg',
     link: '/projects/gamma'
@@ -39,7 +39,7 @@ export const portfolio = [
   {
     id: 4,
     categories: ['DIGITAL STRATEGY', 'MARKETING'],
-    title: 'Campanha Delta',
+    title: 'Humaitá Digital',
     subtitle: 'Estratégia digital integrada para lançamento de produto',
     imageUrl: '/assets/projects/delta.jpg',
     link: '/projects/delta'
@@ -47,7 +47,7 @@ export const portfolio = [
   {
     id: 5,
     categories: ['WEBSITE', 'ANIMAÇÃO'],
-    title: 'Site Epsilon',
+    title: 'Tangente Skateparks',
     subtitle: 'Website corporativo com animações customizadas',
     imageUrl: '/assets/projects/epsilon.jpg',
     link: '/projects/epsilon'
