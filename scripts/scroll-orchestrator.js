@@ -1,96 +1,109 @@
-/* global Splitting */
+// src/scroll-orchestrator.js
+
+import Splitting from 'splitting';
+import 'splitting/dist/splitting.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// 1) Fragmenta texto e animação de entrada do Hero
-document.addEventListener('DOMContentLoaded', () => {
-  Splitting(); 
-  initHeroEntry();
-  initScrollOrchestration();
+// 1) Fragmenta todos os textos em caracteres quando o DOM estiver pronto
+window.addEventListener('DOMContentLoaded', () => {
+  Splitting();
 });
 
-// 2) Após tudo carregar, refresh nos ScrollTriggers
+// 2) Depois do load, dispara a entrada do Hero e inicializa a animação de scroll
 window.addEventListener('load', () => {
-  ScrollTrigger.refresh();
+  setTimeout(heroEntryAnimation, 200);
+  setTimeout(initScrollAnimation, 200);
 });
 
-function initHeroEntry() {
+/**
+ * Entrada do texto do Hero: letters flip-in.
+ */
+function heroEntryAnimation() {
   const headings = document.querySelectorAll('.hero-content h2');
-  if (!headings.length) return;
-
-  const heroEntryTl = gsap.timeline({ delay: 1 });
-  headings.forEach((h, i) => {
-    const chars = h.querySelectorAll('.char');
-    heroEntryTl.fromTo(
+  const entryTl = gsap.timeline();
+  headings.forEach((heading, i) => {
+    const chars = heading.querySelectorAll('.char');
+    // adiciona perspectiva para o parent de cada char
+    chars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
+    entryTl.fromTo(
       chars,
       { opacity: 0, rotationX: -90, z: -200, transformOrigin: '50% 0%' },
-      { opacity: 1, rotationX: 0, z: 0, ease: 'power2.out', duration: 0.5, stagger: 0.05 },
+      {
+        opacity: 1,
+        rotationX: 0,
+        z: 0,
+        ease: 'power1.out',
+        stagger: 0.05,
+        duration: 0.5
+      },
       i * 0.05
     );
   });
-  return heroEntryTl;
 }
 
-function initScrollOrchestration() {
-  ScrollTrigger.matchMedia({
-    '(min-width: 768px)': () => initHeroScrollTimeline(),
-    '(max-width: 767px)': () => {
-      // animação simplificada no mobile
-      gsap.from('.hero-content', { opacity: 1, duration: 0.5 });
-    }
-  });
-}
-
-function initHeroScrollTimeline() {
+/**
+ * Timeline atrelada ao scroll:
+ * 1) Exit do Hero Text vindo do canto inferior direito
+ * 2) Hero Transition (clip‐path) da esquerda para a direita
+ * 3) Entrada do texto de background do About Us
+ */
+function initScrollAnimation() {
   const heroChars = document.querySelectorAll('.hero-content .char');
-  const clipRects  = document.querySelectorAll('#heroClip rect');
+  const clipRects = document.querySelectorAll('#heroClip rect');
   const aboutChars = document.querySelectorAll('#about-us .text-back .char');
-  if (!heroChars.length || !clipRects.length || !aboutChars.length) return;
 
-  // timeline pinada no #hero
+  // garantia de perspectiva
+  heroChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
+  aboutChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
+
   gsap.timeline({
     scrollTrigger: {
       trigger: '#hero',
       start: 'top top',
-      end: () => `+=${window.innerHeight * 2}`, // 200% da altura da viewport
-      scrub: true,
+      endTrigger: '#about-us',          // escolhe quando o pin termina
+      end: 'bottom top',
+      scrub: 0.5,
       pin: true,
       pinSpacing: false,
-      anticipatePin: 1
+      anticipatePin: 1,
+      markers: true, // para debug
     }
   })
-  // 1) hero-text-exit-animation
-  .addLabel('exit', 0)
-  .to(heroChars, {
-    opacity: 0,
-    y: -50,
-    ease: 'power2.in',
-    stagger: 0.02,
-    duration: 0.5
-  }, 'exit')
-
-  // 2) hero-transition (clip-path)
-  .addLabel('trans', 'exit+=0.5')
-  .to(clipRects, {
-    attr: { y: 0.5, height: 0 },
-    ease: 'power2.inOut',
-    stagger: 0.1,
-    duration: 0.8
-  }, 'trans')
-
-  // 3) about-us-animation (entrada do texto)
-  .addLabel('about', 'trans+=0.5')
-  .fromTo(aboutChars,
-    { opacity: 0, y: 30 },
-    {
-      opacity: 1,
-      y: 0,
-      ease: 'power2.out',
-      stagger: 0.03,
-      duration: 0.6
-    },
-    'about'
-  );
+    // 1) Exit do Hero Text, flap + fade, pivot bottom-right
+    .to(
+      heroChars,
+      {
+        opacity: 0,
+        rotationX: -90,
+        z: -200,
+        transformOrigin: '100% 100%',
+        ease: 'power1.out',
+        stagger: { each: 0.05, from: 'end' },
+        duration: 1
+      },
+      0
+    )
+    // 2) Hero Transition: tiras abrem da esquerda → direita
+    .to(
+      clipRects,
+      {
+        attr: { y: 0.5, height: 0 },
+        ease: 'power2.inOut',
+        stagger: 0.09,
+        duration: 1
+      },
+      0
+    )
+    // 3) Pequeno delay
+    .to({}, { duration: 1 }, 0)
+    // 4) Entrada do texto de background do About Us
+    .fromTo(
+      aboutChars,
+      { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
+      { scaleY: 1, opacity: 1, ease: 'power3.in', stagger: 0.05 },
+      0
+    );
 }

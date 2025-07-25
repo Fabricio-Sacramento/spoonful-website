@@ -34,12 +34,12 @@ export default function WorkSection() {
       gsap.timeline({
         scrollTrigger: {
           trigger: root,
-          // scroller: root,    ← removido para usar o window como scroll container
-          start: 'top top',
-          end: () => `+=${scrollDistance}`,
-          scrub: true,
+           start: 'top top',
+          end: () => `300%`,
+          markers: true,
           pin: true,
           pinSpacing: false,
+          scrub: true,
           anticipatePin: 1,
           onUpdate(self) {
             const skew = gsap.utils.clamp(-15, 15, self.getVelocity() * 0.2);
