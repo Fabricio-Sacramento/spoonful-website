@@ -30,6 +30,10 @@ export default function WorkSection() {
     // ✅ NOVO: altura da seção definida dinamicamente para scroll
     if (section) {
       section.style.height = `${window.innerHeight + scrollDistance}px`;
+
+      if (!section) {
+        console.warn('Section #work não encontrada');
+      }
     }
 
     const offsets = slides.map((_, i) =>
@@ -84,11 +88,10 @@ export default function WorkSection() {
     }, containerRef);
 
     return () => {
-      ctx.revert();
-      // 🧹 Removido cleanup global. Você pode manter esta linha abaixo apenas se necessário
-      Draggable.get(el)?.forEach(d => d.kill && d.kill());
-    };
-  }, []);
+    ctx.revert(); // ✅ Reversão segura
+    Draggable.get(el)?.forEach(d => d.kill && d.kill()); // ✅ Draggables locais
+  };
+}, []);
 
   return (
     <div ref={containerRef} className="work-container">
