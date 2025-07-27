@@ -18,6 +18,8 @@ export default function WorkSection() {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+
+    // 🟡 ALTERADO: usamos closest para garantir o section correto
     const section = el.closest('#work');
 
     const slides = gsap.utils.toArray(el.querySelectorAll('.work-slide'));
@@ -25,7 +27,7 @@ export default function WorkSection() {
     const viewportWidth = window.innerWidth;
     const scrollDistance = totalWidth - viewportWidth;
 
-    // ✅ Define altura vertical necessária para suportar scroll horizontal
+    // ✅ NOVO: altura da seção definida dinamicamente para scroll
     if (section) {
       section.style.height = `${window.innerHeight + scrollDistance}px`;
     }
@@ -35,7 +37,7 @@ export default function WorkSection() {
     );
 
     const ctx = gsap.context(() => {
-      // Pin horizontal da seção WORK
+      // 🎯 ScrollTrigger com pinagem da seção work
       gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -53,7 +55,7 @@ export default function WorkSection() {
       })
       .to(el, { x: -scrollDistance, ease: 'none' });
 
-      // Drag + inertia + snap
+      // 🔁 Draggable com inércia e snap por slide
       Draggable.create(el, {
         type: 'x',
         bounds: { minX: -scrollDistance, maxX: 0 },
@@ -83,7 +85,7 @@ export default function WorkSection() {
 
     return () => {
       ctx.revert();
-      ScrollTrigger.getAll().forEach(st => st.kill());
+      // 🧹 Removido cleanup global. Você pode manter esta linha abaixo apenas se necessário
       Draggable.get(el)?.forEach(d => d.kill && d.kill());
     };
   }, []);
