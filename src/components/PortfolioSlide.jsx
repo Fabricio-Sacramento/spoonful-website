@@ -1,11 +1,10 @@
 // src/components/PortfolioSlide.jsx
 
-//import React from 'react';
 import PropTypes from 'prop-types';
 
 export default function PortfolioSlide({ title, subtitle, labels, image }) {
   return (
-    <div className="portfolio-slide">
+    <div className="work-slide portfolio-slide">
       <div className="slide-s1">
         <div className="slide-top">
           {labels.map(label => (
