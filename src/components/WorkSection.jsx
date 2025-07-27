@@ -16,80 +16,74 @@ export default function WorkSection() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+  const el = containerRef.current;
+  if (!el) return;
 
-    // 🟡 ALTERADO: usamos closest para garantir o section correto
-    const section = el.closest('#work');
+  const section = el.closest('#work');
+  if (!section) {
+    console.warn('Section #work não encontrada');
+    return;
+  }
 
-    const slides = gsap.utils.toArray(el.querySelectorAll('.work-slide'));
-    const totalWidth = el.scrollWidth;
-    const viewportWidth = window.innerWidth;
-    const scrollDistance = totalWidth - viewportWidth;
+  const slides = gsap.utils.toArray(el.querySelectorAll('.work-slide'));
+  const totalWidth = el.scrollWidth;
+  const viewportWidth = window.innerWidth;
+  const scrollDistance = totalWidth - viewportWidth;
 
-    // ✅ NOVO: altura da seção definida dinamicamente para scroll
-    if (section) {
-      section.style.height = `${window.innerHeight + scrollDistance}px`;
+  section.style.height = `${window.innerHeight + scrollDistance}px`;
+  ScrollTrigger.refresh();
 
-      if (!section) {
-        console.warn('Section #work não encontrada');
+  const offsets = slides.map((_, i) =>
+    -slides.slice(0, i).reduce((sum, slide) => sum + slide.offsetWidth, 0)
+  );
+
+  const ctx = gsap.context(() => {
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${scrollDistance}`,
+        scrub: true,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        onUpdate(self) {
+          const skew = gsap.utils.clamp(-15, 15, self.getVelocity() * 0.2);
+          gsap.set(el, { skewX: skew });
+        }
       }
-    }
+    }).to(el, { x: -scrollDistance, ease: 'none' });
 
-    const offsets = slides.map((_, i) =>
-      -slides.slice(0, i).reduce((sum, slide) => sum + slide.offsetWidth, 0)
-    );
-
-    const ctx = gsap.context(() => {
-      // 🎯 ScrollTrigger com pinagem da seção work
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: () => `+=${scrollDistance}`,
-          scrub: true,
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          onUpdate(self) {
-            const skew = gsap.utils.clamp(-15, 15, self.getVelocity() * 0.2);
-            gsap.set(el, { skewX: skew });
-          }
-        }
-      })
-      .to(el, { x: -scrollDistance, ease: 'none' });
-
-      // 🔁 Draggable com inércia e snap por slide
-      Draggable.create(el, {
-        type: 'x',
-        bounds: { minX: -scrollDistance, maxX: 0 },
-        inertia: true,
-        snap: {
-          x(rawX) {
-            return offsets.reduce((closest, curr) =>
-              Math.abs(curr - rawX) < Math.abs(closest - rawX) ? curr : closest
-            , offsets[0]);
-          },
-          duration: 0.5
+    Draggable.create(el, {
+      type: 'x',
+      bounds: { minX: -scrollDistance, maxX: 0 },
+      inertia: true,
+      snap: {
+        x(rawX) {
+          return offsets.reduce((closest, curr) =>
+            Math.abs(curr - rawX) < Math.abs(closest - rawX) ? curr : closest
+          , offsets[0]);
         },
-        onDrag() {
-          const v = this.getVelocity();
-          const skew = gsap.utils.clamp(-15, 15, v * 0.2);
-          gsap.set(el, { skewX: skew });
-          ScrollTrigger.update();
-        },
-        onThrowUpdate() {
-          const v = this.getVelocity();
-          const skew = gsap.utils.clamp(-15, 15, v * 0.2);
-          gsap.set(el, { skewX: skew });
-          ScrollTrigger.update();
-        }
-      });
-    }, containerRef);
+        duration: 0.5
+      },
+      onDrag() {
+        const v = this.getVelocity();
+        const skew = gsap.utils.clamp(-15, 15, v * 0.2);
+        gsap.set(el, { skewX: skew });
+        ScrollTrigger.update();
+      },
+      onThrowUpdate() {
+        const v = this.getVelocity();
+        const skew = gsap.utils.clamp(-15, 15, v * 0.2);
+        gsap.set(el, { skewX: skew });
+        ScrollTrigger.update();
+      }
+    });
+  }, containerRef);
 
-    return () => {
-    ctx.revert(); // ✅ Reversão segura
-    Draggable.get(el)?.forEach(d => d.kill && d.kill()); // ✅ Draggables locais
+  return () => {
+    ctx.revert();
+    Draggable.get(el)?.forEach(d => d.kill && d.kill());
   };
 }, []);
 

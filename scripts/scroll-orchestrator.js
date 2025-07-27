@@ -7,26 +7,45 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Fragmenta todos os textos em caracteres quando o DOM estiver pronto
-window.addEventListener('DOMContentLoaded', () => {
-  Splitting();
-});
+// (Opcional) expõe para o console em desenvolvimento
+window.ScrollTrigger = ScrollTrigger;
 
-// Depois do load, dispara a entrada do Hero e inicializa a animação de scroll
-window.addEventListener('load', () => {
-  setTimeout(heroEntryAnimation, 200);
-  setTimeout(initScrollAnimation, 200);
+/**
+ * 1) Fragmenta textos assim que o DOM estiver pronto:
+ *    - Splitting() padrão para elementos com `data-splitting` (ex.: About Us)
+ *    - Splitting específico para os H2 do Hero
+ */
+window.addEventListener('DOMContentLoaded', () => {
+  Splitting(); // fragmenta qualquer elemento marcado
+  gsap.utils.toArray('.hero-content h2').forEach(el => {
+    Splitting({ target: el });
+  });
 });
 
 /**
- * Entrada do texto do Hero: letters flip-in.
+ * 2) Ao carregar totalmente a janela, dispara entrada do Hero
+ *    e inicializa os pins
+ */
+window.addEventListener('load', () => {
+  heroEntryAnimation();
+  requestAnimationFrame(() => {
+    initHeroPin();
+    initAboutUsPin();
+    ScrollTrigger.refresh();
+  });
+});
+
+/**
+ * Flip-in por caractere do texto do Hero
  */
 function heroEntryAnimation() {
-  const headings = document.querySelectorAll('.hero-content h2');
-
+  const headings = gsap.utils.toArray('.hero-content h2');
   const entryTl = gsap.timeline();
+
   headings.forEach((heading, i) => {
-    const chars = heading.querySelectorAll('.char');
+    const chars = gsap.utils.toArray(heading.querySelectorAll('.char'));
+    if (!chars.length) return;
+
     chars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
     entryTl.fromTo(
       chars,
@@ -45,65 +64,78 @@ function heroEntryAnimation() {
 }
 
 /**
- * Timeline atrelada ao scroll:
- * 1) Exit do Hero Text vindo do canto inferior direito
- * 2) Hero Transition (clip‐path) da esquerda para a direita
- * 3) Entrada do texto de background do About Us
+ * Pin e animação de saída do Hero
  */
-function initScrollAnimation() {
-  const heroChars = document.querySelectorAll('.hero-content .char');
-  const clipRects = document.querySelectorAll('#heroClip rect');
-  const aboutChars = document.querySelectorAll('#about-us .text-back .char');
-
-  heroChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
-  aboutChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
+function initHeroPin() {
+  const chars     = gsap.utils.toArray('.hero-content .char');
+  const clipRects = gsap.utils.toArray('#heroClip rect');
 
   gsap.timeline({
     scrollTrigger: {
-      trigger: document.body,
-      start: 'top top',
-      end: () => `+=${window.innerHeight * 1.5}`,
-      scrub: 0.5,
-      pin: true,
+      trigger: '#hero',
+      start:   'top top',
+      end:     'bottom top',
+      scrub:   0.5,
+      pin:     true,
       pinSpacing: false,
-      anticipatePin: 1
+      anticipatePin: 1,
+      // ⬇️ Quando rolar acima de 'start', reseta o estado dos chars
+      onLeaveBack() {
+        gsap.set(chars, {
+          opacity: 1,
+          rotationX:  0,
+          z:          0
+        });
+      }
     }
   })
-    // 1) Exit do Hero Text, flap + fade, pivot no bottom-right
-    .to(
-      heroChars,
-      {
-        opacity: 0,
-        rotationX: -90,
-        z: -200,
-        transformOrigin: '100% 100%',
-        ease: 'power1.out',
-        stagger: { each: 0.05, from: 'end' },
-        duration: 1
-      },
-      0
-    )
+  // 1) Fade-out+flip do texto do Hero
+  .to(chars, {
+    opacity: 0,
+    rotationX: -90,
+    z:        -200,
+    transformOrigin: '100% 100%',
+    ease:     'power1.out',
+    stagger:  { each: 0.05, from: 'end' },
+    duration: 1
+  }, 0)
+  // 2) Clip‐path do Hero
+  .to(clipRects, {
+    attr:    { y: 0.5, height: 0 },
+    ease:    'power2.inOut',
+    stagger: 0.09,
+    duration: 1
+  }, 0)
+  // 3) Pequeno delay antes de soltar o pin
+  .to({}, { duration: 0.5 });
+}
 
-    // 2) Hero Transition: tiras abrem da esquerda → direita (stagger padrão)
-    .to(
-      clipRects,
-      {
-        attr: { y: 0.5, height: 0 },
-        ease: 'power2.inOut',
-        stagger: 0.09,
-        duration: 1
-      },
-      0
-    )
 
-    // 3) Pequeno delay
-    .to({}, { duration: 1 }, 0)
 
-    // 4) Entrada do texto de background do About Us
-    .fromTo(
-      aboutChars,
-      { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
-      { scaleY: 1, opacity: 1, ease: 'power3.in', stagger: 0.05 },
-      0
-    );
+/**
+ * Pin da seção About Us, soltando quando #what-we-do chegar ao topo
+ */
+function initAboutUsPin() {
+  const aboutChars = gsap.utils.toArray('#about-us .char');
+  if (!aboutChars.length) return;
+
+  aboutChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
+
+  ScrollTrigger.create({
+    trigger: '#about-us',
+    start: 'top top',
+    endTrigger: '#what-we-do',
+    end: 'top top',
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1
+    // markers: true
+  });
+
+  // animação do texto de fundo do About Us
+  gsap.fromTo(
+    aboutChars,
+    { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
+    { scaleY: 1, opacity: 1, ease: 'power3.in', stagger: 0.05 }
+  );
 }
