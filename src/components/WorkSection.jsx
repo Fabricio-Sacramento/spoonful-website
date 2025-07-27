@@ -18,12 +18,17 @@ export default function WorkSection() {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const section = el.parentNode;
+    const section = el.closest('#work');
 
     const slides = gsap.utils.toArray(el.querySelectorAll('.work-slide'));
     const totalWidth = el.scrollWidth;
     const viewportWidth = window.innerWidth;
     const scrollDistance = totalWidth - viewportWidth;
+
+    // ✅ Define altura vertical necessária para suportar scroll horizontal
+    if (section) {
+      section.style.height = `${window.innerHeight + scrollDistance}px`;
+    }
 
     const offsets = slides.map((_, i) =>
       -slides.slice(0, i).reduce((sum, slide) => sum + slide.offsetWidth, 0)
@@ -38,7 +43,7 @@ export default function WorkSection() {
           end: () => `+=${scrollDistance}`,
           scrub: true,
           pin: true,
-          pinSpacing: true,     // placeholder ON
+          pinSpacing: true,
           anticipatePin: 1,
           onUpdate(self) {
             const skew = gsap.utils.clamp(-15, 15, self.getVelocity() * 0.2);
