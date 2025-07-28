@@ -7,40 +7,38 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ===========================
-// Inicialização ao carregar
-// ===========================
 window.addEventListener('load', () => {
   setupHero();
   setupAboutUs();
-  // Recalibra todos os ScrollTriggers
   ScrollTrigger.refresh();
 });
 
 // ===========================
-// Configurações da seção Hero
+// Seção Hero
 // ===========================
 function setupHero() {
-  // 1) Split apenas nos <h2> do Hero
-  const heroResults = Splitting({ target: '.hero-content h2', by: 'chars' });
-  // Cada resultado tem .chars = array de <span class="char">
+  // 1) Split só nos <h2> do Hero
+  const heroResults       = Splitting({ target: '.hero-content h2', by: 'chars' });
   const heroCharsByHeading = heroResults.map(r => r.chars);
+  const allChars           = heroCharsByHeading.flat();
+  const clipRects          = gsap.utils.toArray('clipPath#heroClip rect');
 
-  // 2) Ajuste de perspectiva para cada char
-  heroCharsByHeading.flat().forEach(c =>
-    gsap.set(c.parentNode, { perspective: 1000 })
-  );
+  // 2) Perspectiva e backface no container e no próprio char
+  allChars.forEach(c => {
+    gsap.set(c.parentNode, { perspective: 1000 });
+    gsap.set(c, { transformStyle: 'preserve-3d', backfaceVisibility: 'visible' });
+  });
 
-  // 3) Animação de entrada
+  // 3) Animação de entrada (fade + flip de cima pra baixo)
   heroEntryAnimation(heroCharsByHeading);
 
-  // 4) Pin + scroll‑triggered
-  initHeroPin(heroCharsByHeading);
+  // 4) Pin + animação de saída (flip de baixo pra cima) com delay
+  initHeroPin(heroCharsByHeading, clipRects);
 }
 
-function heroEntryAnimation(heroCharsByHeading) {
+function heroEntryAnimation(charsByHeading) {
   const tl = gsap.timeline();
-  heroCharsByHeading.forEach((chars, i) => {
+  charsByHeading.forEach((chars, i) => {
     tl.fromTo(
       chars,
       { opacity: 0, rotationX: -90, z: -200, transformOrigin: '50% 0%' },
@@ -57,11 +55,10 @@ function heroEntryAnimation(heroCharsByHeading) {
   });
 }
 
-function initHeroPin(heroCharsByHeading) {
-  const allChars = heroCharsByHeading.flat();
-  const clipRects = gsap.utils.toArray('clipPath#heroClip rect');
+function initHeroPin(charsByHeading, clipRects) {
+  const allChars = charsByHeading.flat();
 
-  gsap.timeline({
+  const tl = gsap.timeline({
     scrollTrigger: {
       trigger: '#hero',
       start: 'top top',
@@ -70,9 +67,15 @@ function initHeroPin(heroCharsByHeading) {
       pin: true,
       pinSpacing: false
     }
-  })
-    // anima os chars “saindo”
-    .to(allChars, {
+  });
+
+  // ——— Delay de 20% do scroll antes de qualquer saída ———
+  tl.to({}, { duration: 0.2 });
+
+  // ——— Flip de saída após o delay ———
+  tl.to(
+    allChars,
+    {
       opacity: 0,
       rotationX: 90,
       z: -200,
@@ -80,30 +83,32 @@ function initHeroPin(heroCharsByHeading) {
       ease: 'power1.in',
       stagger: 0.02,
       duration: 0.3
-    }, 0)
-    // anima o clipPath (se existir)
-    .to(clipRects, {
+    },
+    0.2
+  );
+
+  // ——— ClipPath reduzido alinhado ao mesmo delay ———
+  tl.to(
+    clipRects,
+    {
       attr: { y: 0.5, height: 0 },
       ease: 'power2.inOut',
       stagger: 0.05,
       duration: 0.8
-    }, 0);
+    },
+    0.2
+  );
 }
 
 // ================================
-// Configurações da seção About Us
+// Seção About Us (sem alterações)
 // ================================
 function setupAboutUs() {
-  // 1) Split apenas no .text-back
   const aboutResults = Splitting({ target: '#about-us .text-back', by: 'chars' });
-  const aboutChars = aboutResults.flatMap(r => r.chars);
+  const aboutChars   = aboutResults.flatMap(r => r.chars);
 
-  // 2) Perspectiva em cada char
-  aboutChars.forEach(c =>
-    gsap.set(c.parentNode, { perspective: 1000 })
-  );
+  aboutChars.forEach(c => gsap.set(c.parentNode, { perspective: 1000 }));
 
-  // 3) Pin + animação com scrub
   initAboutUsPin(aboutChars);
 }
 
@@ -118,9 +123,16 @@ function initAboutUsPin(aboutChars) {
       pinSpacing: true
     }
   })
+    .to({}, { duration: 0.2 }) // same small delay
     .fromTo(
       aboutChars,
       { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
-      { scaleY: 1, opacity: 1, ease: 'power3.in', stagger: 0.03, duration: 0.5 }
+      {
+        scaleY: 1,
+        opacity: 1,
+        ease: 'power3.in',
+        stagger: 0.03,
+        duration: 0.5
+      }
     );
 }
