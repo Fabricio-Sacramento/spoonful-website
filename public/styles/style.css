@@ -209,6 +209,8 @@ section {
   left: 0;
   position: relative;
   overflow: visible;
+  min-height: 100vh;
+  height: auto;
   z-index: 2;
   background-color: var(--primary-red);
 }
