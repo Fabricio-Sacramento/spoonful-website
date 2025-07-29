@@ -65,7 +65,7 @@ function initHeroPin(charsByHeading, clipRects) {
       end: 'bottom top',
       scrub: true,
       pin: true,
-      pinSpacing: false
+      pinSpacing: true
     }
   });
 
@@ -116,11 +116,11 @@ function initAboutUsPin(aboutChars) {
   gsap.timeline({
     scrollTrigger: {
       trigger: '#about-us',
-      start: 'top top',
+      start: 'top top+=100%',
       end: 'bottom top',
       scrub: true,
       pin: true,
-      pinSpacing: true
+      pinSpacing: false
     }
   })
     .to({}, { duration: 0.2 }) // same small delay
