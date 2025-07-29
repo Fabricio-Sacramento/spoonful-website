@@ -20,29 +20,32 @@
       </clipPath>
     </defs>
   </svg>
-
+  <!-- HERO + About Us Wrapper -->
+  <div class="intro-wrapper">
+    
   <!-- HERO Section -->
-<section id="hero">
-  <!-- Background 3D Scene -->
-  <div id="root"></div>
-  <div class="container hero-content">
-    <h2 class="heading-small" data-splitting>DESIGNING</h2>
-    <h2 class="heading-large" data-splitting>BRANDS</h2>
-    <h2 class="heading-large" data-splitting>PRODUCTS</h2>
-    <h2 class="heading-large" data-splitting>EXPERIENCES</h2>
-  </div>
-</section>
+    <section id="hero">
+      <!-- Background 3D Scene -->
+      <div id="root"></div>
+      <div class="container hero-content">
+        <h2 class="heading-small" data-splitting>DESIGNING</h2>
+        <h2 class="heading-large" data-splitting>BRANDS</h2>
+        <h2 class="heading-large" data-splitting>PRODUCTS</h2>
+        <h2 class="heading-large" data-splitting>EXPERIENCES</h2>
+      </div>
+    </section>
 
-<!-- ABOUT US Section (posicionada atrás do Hero) -->
-<section id="about-us">
-  <div class="about-us-container-absolute">
-    <p class="text-back heading-medium-bold" data-splitting>
-      <span class="line"><span>We drive conversion and engagement,</span></span>
-      <span class="line"><span>creating strategic value and lasting impact</span></span>
-      <span class="line"><span>through design and technology.</span></span>
-    </p>
-  </div>
-</section>
+    <!-- ABOUT US Section (posicionada atrás do Hero) -->
+    <section id="about-us">
+      <div class="about-us-container-absolute">
+        <p class="text-back heading-medium-bold" data-splitting>
+          <span class="line"><span>We drive conversion and engagement,</span></span>
+          <span class="line"><span>creating strategic value and lasting impact</span></span>
+          <span class="line"><span>through design and technology.</span></span>
+        </p>
+      </div>
+    </section>
+  </div>  
 
   <!-- WHAT WE DO Section -->
   <section id="what-we-do">
@@ -78,7 +81,9 @@
 
   <!-- WORK Section -->
   <section id="work">
-    <div id="work-root"></div>
+    <div class="container">
+      <h2 class="heading-large">Work</h2>
+    </div>
   </section>
 
   <!-- STATEMENT Section -->
@@ -104,9 +109,5 @@
 
   <!-- Bundle React/Vite -->
   <script type="module" src="/src/main.jsx"></script>
-  <!-- Splitting.js UMD -->
-  <script src="https://unpkg.com/splitting/dist/splitting.min.js"></script>
-  <!-- Orquestrador único de ScrollTriggers -->
-  <script type="module" src="/scripts/scroll-orchestrator.js"></script>
 </body>
 </html>
