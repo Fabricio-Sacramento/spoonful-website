@@ -7,6 +7,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ————— Ajuste aqui o delay antes da saída do Hero —————
+const HERO_EXIT_DELAY = 0.3; // em segundos
+
 // Variáveis para armazenar Splitting e elementos
 let heroCharsByLine = [];
 let heroAllChars = [];
@@ -26,7 +29,6 @@ function prepareSplitting() {
   const aboutSplits = Splitting({ target: '#about-us .text-back', by: 'chars' });
   aboutChars = aboutSplits.flatMap(r => r.chars);
 
-  // Perspectiva no Hero
   heroAllChars.forEach(char => {
     gsap.set(char.parentNode, { perspective: 1000 });
     gsap.set(char, {
@@ -34,9 +36,7 @@ function prepareSplitting() {
       backfaceVisibility: 'visible'
     });
   });
-
-  // Perspectiva no About Us
-  aboutChars.forEach(char => 
+  aboutChars.forEach(char =>
     gsap.set(char.parentNode, { perspective: 1000 })
   );
 }
@@ -71,66 +71,68 @@ function animateHeroEntry() {
 function initHeroAboutTimeline() {
   const wrapper = document.querySelector('.intro-wrapper');
 
-  gsap.timeline({
+  const masterTl = gsap.timeline({
     scrollTrigger: {
       trigger: wrapper,
       start: 'top top',
-      end: 'bottom top',      // aguarda o final do wrapper (já ampliado) chegar ao topo
+      end: 'bottom top',
       scrub: true,
       pin: true,
       pinSpacing: false,
       anticipatePin: 1,
       onLeave: () => {
-        // só some depois que o scroll efetivamente passar do fim ampliado
         gsap.set(wrapper, { autoAlpha: 0, display: 'none' });
       },
       onEnterBack: () => {
         gsap.set(wrapper, { autoAlpha: 1, display: 'block' });
       }
     }
-  })
-    .addLabel('heroExit')
+  });
 
-    // saída do Hero
-    .to(
-      heroAllChars,
-      {
-        opacity: 0,
-        rotationX: 90,
-        z: -200,
-        transformOrigin: '50% 100%',
-        ease: 'power1.in',
-        stagger: 0.02,
-        duration: 0.3
-      },
-      'heroExit'
-    )
+  // Delay antes de disparar o heroExit
+  masterTl.to({}, { duration: HERO_EXIT_DELAY });
+  masterTl.addLabel('heroExit');
 
-    // clip‑path do Hero
-    .to(
-      clipRects,
-      {
-        attr: { y: 0.5, height: 0 },
-        ease: 'power2.inOut',
-        stagger: 0.05,
-        duration: 0.8
-      },
-      'heroExit+=0.1'
-    )
+  // 3.1) Saída do Hero
+  masterTl.to(
+    heroAllChars,
+    {
+      opacity: 0,
+      rotationX: 90,
+      z: -200,
+      transformOrigin: '50% 100%',
+      ease: 'power1.in',
+      stagger: 0.02,
+      duration: 0.3
+    },
+    'heroExit'
+  );
 
-    // entrada do About Us
-    .fromTo(
-      aboutChars,
-      { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
-      {
-        scaleY: 1,
-        opacity: 1,
-        ease: 'power3.in',
-        stagger: 0.03,
-        duration: 0.5
-      },
-      'heroExit+=0.2'
-    );
+  // 3.2) Clip‑path do Hero
+  masterTl.to(
+    clipRects,
+    {
+      attr: { y: 0.5, height: 0 },
+      ease: 'power2.inOut',
+      stagger: 0.05,
+      duration: 0.8
+    },
+    'heroExit+=0.1'
+  );
+
+  // 3.3) Entrada do About Us
+  masterTl.fromTo(
+    aboutChars,
+    { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
+    {
+      scaleY: 1,
+      opacity: 1,
+      ease: 'power3.in',
+      stagger: 0.03,
+      duration: 0.5
+    },
+    'heroExit+=0.2'
+  );
 }
 
 // -----------------------------
@@ -147,8 +149,7 @@ window.addEventListener('load', () => {
   const wrapper = document.querySelector('.intro-wrapper');
   const viewport = window.innerHeight;
 
-  // Aumenta a altura total do wrapper para "atrasar" o fim do pin
-  // Aqui adicionamos +20% de viewport como buffer para a animação do About Us
+  // Buffer extra para manter o pin ativo enquanto dura a animação do About Us
   const extraDelay = viewport * 0.8;
   wrapper.style.height = `${viewport * 2 + extraDelay}px`;
 
