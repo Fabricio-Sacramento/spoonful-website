@@ -211,12 +211,12 @@ section {
 /* 4) HERO SECTION              */
 /* ----------------------------- */
 #hero {
-  top: 0 !important;
+  top: 0;
   left: 0;
   position: relative;
   overflow: hidden;
-  z-index: 2 !important;
-  background: transparent !important;
+  z-index: 2;
+  background: transparent;
   clip-path: url(#heroClip);
 }
 .hero-content {
@@ -408,13 +408,13 @@ section {
   z-index: 1;
 }
 .heading-medium {
-  color: var(--primary-yellow);
+  color: var(--primary-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-weight: 100;
-  font-size: 90px;
+  font-weight: 900;
+  font-size: 80px;
   line-height: 1.1;
-  letter-spacing: 3px;
-  font-style: italic;
+  letter-spacing: 1px;
+  /* font-style: italic; */
 }
 .heading-medium-bold {
   color: var(--neutral-light);
