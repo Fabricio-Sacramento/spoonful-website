@@ -360,7 +360,7 @@ window.addEventListener('load', () => {
   }
   
   const viewport = window.innerHeight;
-  wrapper.style.height = `${viewport * 2}px`;
+  wrapper.style.height = `${viewport}px`;
   
   // Inicia animação de entrada do Hero
   animateHeroEntry();
@@ -380,7 +380,7 @@ window.addEventListener('load', () => {
   const handleResize = debounce(() => {
     console.log('Handling resize...');
     const newViewport = window.innerHeight;
-    wrapper.style.height = `${newViewport * 2}px`;
+    wrapper.style.height = `${newViewport}px`;
     gsap.delayedCall(0.1, refreshScrollTriggers);
   }, 300);
   

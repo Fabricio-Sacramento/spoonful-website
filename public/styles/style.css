@@ -194,7 +194,7 @@ section {
 .intro-wrapper {
   position: relative;
   width: 100%;
-  height: 200vh;           /* soma 100vh + 100vh dos filhos */
+  height: 100vh;           /* soma 100vh + 100vh dos filhos */
   overflow: hidden;       /* esconde tudo que sair da viewport */
   background-color: var(--primary-red); /* cor do fundo até About Us aparecer */
 }
