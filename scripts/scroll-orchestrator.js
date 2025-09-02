@@ -260,10 +260,10 @@ function setupWorkSectionHorizontal() {
   const track = work.querySelector(".work-track");
   if (!track) return;
 
-  // Improved distance calculation using work.offsetWidth
+  // Improved distance calculation
   const getScrollDistance = () => {
     const fullWidth = track.scrollWidth;
-    const containerWidth = work.offsetWidth; // Usando work.offsetWidth em vez de window.innerWidth
+    const containerWidth = work.offsetWidth;
     const distance = fullWidth - containerWidth;
     
     console.log('Work scroll dimensions:', {
@@ -283,7 +283,7 @@ function setupWorkSectionHorizontal() {
     gsap.set(track, { x: 0 });
     gsap.set(work, { height: '100svh' });
 
-    // ScrollTrigger direto sem timeline
+    // Main ScrollTrigger setup
     const st = ScrollTrigger.create({
       trigger: work,
       start: "top top",
@@ -292,34 +292,27 @@ function setupWorkSectionHorizontal() {
       anticipatePin: 1,
       scrub: 1,
       invalidateOnRefresh: true,
+      markers: true,
       onUpdate: (self) => {
-        // Atualização direta da posição via gsap.set
         const progress = self.progress;
         gsap.set(track, { 
           x: -getScrollDistance() * progress 
         });
-        console.log('Scroll progress:', progress);
       }
     });
 
-    // Refresh automático após carregamento de imagens
+    // Wait for images and refresh
     Promise.all(
       Array.from(track.querySelectorAll('img'))
         .filter(img => !img.complete)
         .map(img => new Promise(resolve => {
-          img.onload = img.onerror = () => {
-            console.log('Image loaded:', img.src);
-            resolve();
-          };
+          img.onload = resolve;
+          img.onerror = resolve;
         }))
     ).then(() => {
-      gsap.delayedCall(0.1, () => {
-        st.refresh();
-        console.log('Images loaded, ScrollTrigger refreshed');
-      });
+      st.refresh();
+      console.log('Images loaded, ScrollTrigger refreshed');
     });
-
-    return () => st.kill();
   });
 
   mm.add("(max-width: 1023px)", () => {
@@ -407,19 +400,20 @@ window.addEventListener('load', () => {
   
   // Refresh após fontes/imagens carregarem
   const refresh = () => {
-    ScrollTrigger.refresh(true);
+    ScrollTrigger.refresh();
     console.log('ScrollTriggers refreshed');
   };
   
-  // Refresh após um pequeno delay para garantir que tudo está carregado
-  gsap.delayedCall(0.1, refresh);
+  // Múltiplos pontos de refresh para garantir
+  window.addEventListener("load", refresh);
+  gsap.delayedCall(0.6, refresh);
   
   // Listener para resize
   const handleResize = debounce(() => {
     console.log('Handling resize...');
     const newViewport = window.innerHeight;
     wrapper.style.height = `${newViewport}px`;
-    gsap.delayedCall(0.1, refresh);
+    gsap.delayedCall(0.1, refreshScrollTriggers);
   }, 300);
   
   window.addEventListener('resize', handleResize);

@@ -381,9 +381,85 @@ section {
 #work {
   position: relative;
   width: 100vw;
+  height: 100svh;
   overflow: hidden;
   background-color: var(--primary-red);
-  z-index: 1;
+  /* z-index removido para não pular por cima do pin anterior */
+}
+
+/* trilho horizontal */
+.work-track {
+  display: inline-flex;
+  will-change: transform;
+  gap: var(--space-64);
+  padding: var(--space-64);
+  height: 100%;
+  align-items: center;
+}
+
+.work-card {
+  flex: 0 0 auto;
+  width: min(800px, 80vw);
+  height: min(600px, 70vh);
+  background: var(--neutral-darker);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  will-change: transform;
+}
+
+.work-card__media {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.work-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.work-card:hover .work-card__media img {
+  transform: scale(1.05);
+}
+
+.work-card__content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-32);
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  color: var(--neutral-light);
+}
+
+.work-card__content h3 {
+  margin: 0 0 var(--space-8);
+  font-size: 2.5rem;
+}
+
+.work-card__description {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Mobile Layout */
+@media (max-width: 1023px) {
+  .work-track {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+    padding: var(--space-32);
+  }
+
+  .work-card {
+    width: 100%;
+    height: min(400px, 50vh);
+  }
 }
 
 
