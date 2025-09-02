@@ -257,51 +257,76 @@ function setupWorkSectionHorizontal() {
   const work = document.querySelector("#work");
   if (!work) return;
 
-  // Estrutura esperada:
-  // <section id="work">
-  //   <div class="work-track">
-  //     <article class="work-card">…</article>
-  //     …
-  //   </div>
-  // </section>
   const track = work.querySelector(".work-track");
   if (!track) return;
 
-  // Calcula a distância horizontal a percorrer (largura total - viewport)
-  const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+  // Improved distance calculation using work.offsetWidth
+  const getScrollDistance = () => {
+    const fullWidth = track.scrollWidth;
+    const containerWidth = work.offsetWidth; // Usando work.offsetWidth em vez de window.innerWidth
+    const distance = fullWidth - containerWidth;
+    
+    console.log('Work scroll dimensions:', {
+      fullWidth,
+      containerWidth,
+      distance,
+      trackPadding: window.getComputedStyle(track).paddingRight
+    });
+    
+    return Math.max(0, distance);
+  };
 
-  console.log('Setting up Work section horizontal scroll:', {
-    track: track ? 'found' : 'missing',
-    initialWidth: track?.scrollWidth
-  });
-
-  // Desktop: horizontal pinado. Mobile: fallback vertical.
   const mm = gsap.matchMedia();
 
   mm.add("(min-width: 1024px)", () => {
-    // garante que o trilho começa na posição correta
+    // Initial state
     gsap.set(track, { x: 0 });
+    gsap.set(work, { height: '100svh' });
 
-    gsap.to(track, {
-      x: () => -distance(),
-      ease: "none",
-      scrollTrigger: {
-        trigger: work,
-        start: "top top",
-        end: () => `+=${distance()}`, // duração proporcional ao conteúdo
-        scrub: true,
-        pin: true,
-        anticipatePin: 1,   // ajuda na transição a partir de What We Do
-        invalidateOnRefresh: true,
-        onUpdate: self => console.log(`Work scroll progress: ${self.progress.toFixed(2)}`)
-        // markers: true  // descomente para debug
+    // ScrollTrigger direto sem timeline
+    const st = ScrollTrigger.create({
+      trigger: work,
+      start: "top top",
+      end: () => `+=${getScrollDistance()}`,
+      pin: true,
+      anticipatePin: 1,
+      scrub: 1,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        // Atualização direta da posição via gsap.set
+        const progress = self.progress;
+        gsap.set(track, { 
+          x: -getScrollDistance() * progress 
+        });
+        console.log('Scroll progress:', progress);
       }
     });
+
+    // Refresh automático após carregamento de imagens
+    Promise.all(
+      Array.from(track.querySelectorAll('img'))
+        .filter(img => !img.complete)
+        .map(img => new Promise(resolve => {
+          img.onload = img.onerror = () => {
+            console.log('Image loaded:', img.src);
+            resolve();
+          };
+        }))
+    ).then(() => {
+      gsap.delayedCall(0.1, () => {
+        st.refresh();
+        console.log('Images loaded, ScrollTrigger refreshed');
+      });
+    });
+
+    return () => st.kill();
   });
 
   mm.add("(max-width: 1023px)", () => {
-    // Limpa qualquer transform no mobile
-    gsap.set(track, { clearProps: "all" });
+    gsap.set([work, track], { clearProps: "all" });
+    ScrollTrigger.getAll()
+      .filter(st => st.vars.trigger === work)
+      .forEach(st => st.kill());
   });
 }
 
@@ -382,20 +407,19 @@ window.addEventListener('load', () => {
   
   // Refresh após fontes/imagens carregarem
   const refresh = () => {
-    ScrollTrigger.refresh();
+    ScrollTrigger.refresh(true);
     console.log('ScrollTriggers refreshed');
   };
   
-  // Múltiplos pontos de refresh para garantir
-  window.addEventListener("load", refresh);
-  gsap.delayedCall(0.6, refresh);
+  // Refresh após um pequeno delay para garantir que tudo está carregado
+  gsap.delayedCall(0.1, refresh);
   
   // Listener para resize
   const handleResize = debounce(() => {
     console.log('Handling resize...');
     const newViewport = window.innerHeight;
     wrapper.style.height = `${newViewport}px`;
-    gsap.delayedCall(0.1, refreshScrollTriggers);
+    gsap.delayedCall(0.1, refresh);
   }, 300);
   
   window.addEventListener('resize', handleResize);
