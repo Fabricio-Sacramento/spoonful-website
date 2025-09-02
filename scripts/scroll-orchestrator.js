@@ -218,6 +218,7 @@ function setupWhatWeDoSection() {
     end: 'bottom bottom',
     pin: true,
     pinSpacing: false,
+    anticipatePin: 1, // suaviza a troca de pins p/ a próxima seção (Work)
     onEnter: () => {
       console.log('What We Do section entering viewport');
       
@@ -252,31 +253,55 @@ function setupWhatWeDoSection() {
 // -----------------------------
 // 5) Outras seções
 // -----------------------------
-function setupWorkSection() {
-  const section = document.querySelector('#work');
-  if (!section) return;
-  
-  ScrollTrigger.create({
-    trigger: section,
-    start: 'top 80%',
-    once: true,
-    onEnter: () => {
-      const heading = section.querySelector('.heading-large');
-      if (heading) {
-        gsap.fromTo(heading, 
-          {
-            y: 50,
-            opacity: 0
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            ease: 'power3.out'
-          }
-        );
+function setupWorkSectionHorizontal() {
+  const work = document.querySelector("#work");
+  if (!work) return;
+
+  // Estrutura esperada:
+  // <section id="work">
+  //   <div class="work-track">
+  //     <article class="work-card">…</article>
+  //     …
+  //   </div>
+  // </section>
+  const track = work.querySelector(".work-track");
+  if (!track) return;
+
+  // Calcula a distância horizontal a percorrer (largura total - viewport)
+  const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+
+  console.log('Setting up Work section horizontal scroll:', {
+    track: track ? 'found' : 'missing',
+    initialWidth: track?.scrollWidth
+  });
+
+  // Desktop: horizontal pinado. Mobile: fallback vertical.
+  const mm = gsap.matchMedia();
+
+  mm.add("(min-width: 1024px)", () => {
+    // garante que o trilho começa na posição correta
+    gsap.set(track, { x: 0 });
+
+    gsap.to(track, {
+      x: () => -distance(),
+      ease: "none",
+      scrollTrigger: {
+        trigger: work,
+        start: "top top",
+        end: () => `+=${distance()}`, // duração proporcional ao conteúdo
+        scrub: true,
+        pin: true,
+        anticipatePin: 1,   // ajuda na transição a partir de What We Do
+        invalidateOnRefresh: true,
+        onUpdate: self => console.log(`Work scroll progress: ${self.progress.toFixed(2)}`)
+        // markers: true  // descomente para debug
       }
-    }
+    });
+  });
+
+  mm.add("(max-width: 1023px)", () => {
+    // Limpa qualquer transform no mobile
+    gsap.set(track, { clearProps: "all" });
   });
 }
 
@@ -352,14 +377,18 @@ window.addEventListener('load', () => {
   
   // Setup outras seções (independente do Hero)
   setupWhatWeDoSection();
-  setupWorkSection();
+  setupWorkSectionHorizontal();  // Nova função de scroll horizontal
   setupTestimonialsSection();
   
-  // Refresh inicial após tudo carregar
-  gsap.delayedCall(0.5, () => {
+  // Refresh após fontes/imagens carregarem
+  const refresh = () => {
     ScrollTrigger.refresh();
-    console.log('Initial setup complete');
-  });
+    console.log('ScrollTriggers refreshed');
+  };
+  
+  // Múltiplos pontos de refresh para garantir
+  window.addEventListener("load", refresh);
+  gsap.delayedCall(0.6, refresh);
   
   // Listener para resize
   const handleResize = debounce(() => {
