@@ -198,10 +198,11 @@ function initHeroAboutTimeline() {
 // -----------------------------
 function setupWhatWeDoSection() {
   const section = document.querySelector('#what-we-do');
+  const wrapper = document.querySelector('.what-we-do__wrapper');
   const rows = gsap.utils.toArray('.what-we-do__row');
   
-  if (!section) {
-    console.log('What We Do section not found');
+  if (!section || !wrapper) {
+    console.log('What We Do section elements not found');
     return;
   }
   
@@ -210,11 +211,13 @@ function setupWhatWeDoSection() {
   // Inicialmente escondido
   gsap.set(section, { autoAlpha: 0 });
   
-  // ScrollTrigger para entrada da seção
+  // ScrollTrigger para controlar a seção inteira
   ScrollTrigger.create({
     trigger: section,
-    start: 'top 80%',
-    once: true,
+    start: 'top top',
+    end: 'bottom bottom',
+    pin: true,
+    pinSpacing: false,
     onEnter: () => {
       console.log('What We Do section entering viewport');
       
@@ -225,7 +228,7 @@ function setupWhatWeDoSection() {
         ease: 'power2.out'
       });
       
-      // Animação das rows se existirem
+      // Animação das rows
       if (rows.length > 0) {
         gsap.fromTo(rows, 
           {
@@ -244,24 +247,17 @@ function setupWhatWeDoSection() {
       }
     }
   });
-  
-  // Parallax suave para as rows
-  if (rows.length > 0) {
-    rows.forEach((row, i) => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1,
-        onUpdate: (self) => {
-          const speed = 1 + (i * 0.05);
-          gsap.set(row, {
-            y: -self.progress * 20 * speed
-          });
-        }
-      });
+
+  // Smooth scroll interno
+  wrapper.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const delta = e.deltaY;
+    gsap.to(wrapper, {
+      scrollTop: wrapper.scrollTop + delta,
+      duration: 0.5,
+      ease: 'power2.out'
     });
-  }
+  });
 }
 
 // -----------------------------
