@@ -7,14 +7,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ————— Ajuste aqui o delay antes da saída do Hero —————
-const HERO_EXIT_DELAY = 0.3; // em segundos
-
 // Variáveis para armazenar Splitting e elementos
 let heroCharsByLine = [];
 let heroAllChars = [];
 let clipRects = [];
 let aboutChars = [];
+let isHeroAnimationComplete = false;
 
 // -----------------------------
 // 1) Preparação: Splitting e gsap.set
@@ -29,22 +27,35 @@ function prepareSplitting() {
   const aboutSplits = Splitting({ target: '#about-us .text-back', by: 'chars' });
   aboutChars = aboutSplits.flatMap(r => r.chars);
 
+  // Perspectiva no Hero
   heroAllChars.forEach(char => {
-    gsap.set(char.parentNode, { perspective: 1000 });
+    gsap.set(char.parentNode, { 
+      perspective: 1000,
+      transformStyle: 'preserve-3d'
+    });
     gsap.set(char, {
       transformStyle: 'preserve-3d',
       backfaceVisibility: 'visible'
     });
   });
-  aboutChars.forEach(char =>
+
+  // Perspectiva no About Us
+  aboutChars.forEach(char => 
     gsap.set(char.parentNode, { perspective: 1000 })
   );
+
+  console.log('Splitting prepared:', {
+    heroChars: heroAllChars.length,
+    aboutChars: aboutChars.length,
+    clipRects: clipRects.length
+  });
 }
 
 // -----------------------------
 // 2) Animação de entrada do Hero ao carregar a página
 // -----------------------------
 function animateHeroEntry() {
+  // Estado inicial dos caracteres
   gsap.set(heroAllChars, {
     opacity: 0,
     rotationX: -90,
@@ -52,118 +63,346 @@ function animateHeroEntry() {
     transformOrigin: '50% 0%'
   });
 
+  // Timeline de entrada
+  const entryTl = gsap.timeline({
+    onComplete: () => {
+      isHeroAnimationComplete = true;
+      console.log('Hero entry animation complete');
+      // Inicia as animações de scroll após um pequeno delay
+      gsap.delayedCall(0.1, initHeroAboutTimeline);
+    }
+  });
+
   heroCharsByLine.forEach((chars, i) => {
-    gsap.to(chars, {
+    entryTl.to(chars, {
       opacity: 1,
       rotationX: 0,
       z: 0,
-      ease: 'power1.out',
+      ease: 'power2.out',
       stagger: 0.05,
-      duration: 0.5,
-      delay: 0.5 + i * 0.1
-    });
+      duration: 0.6,
+      delay: i * 0.1
+    }, i === 0 ? 0.5 : '<0.1');
   });
+
+  return entryTl;
 }
 
 // -----------------------------
 // 3) Timeline unificada para Hero + About Us atrelada ao scroll
 // -----------------------------
 function initHeroAboutTimeline() {
-  const wrapper = document.querySelector('.intro-wrapper');
+  if (!isHeroAnimationComplete) {
+    console.log('Waiting for hero animation to complete...');
+    return;
+  }
 
-  const masterTl = gsap.timeline({
+  const wrapper = document.querySelector('.intro-wrapper');
+  const whatWeDo = document.querySelector('#what-we-do');
+  
+  if (!wrapper || !whatWeDo) {
+    console.error('Required elements not found:', { wrapper: !!wrapper, whatWeDo: !!whatWeDo });
+    return;
+  }
+  
+  // Garante que What We Do está oculto inicialmente
+  gsap.set(whatWeDo, { autoAlpha: 0 });
+  
+  // Estados iniciais para About Us (escondido)
+  gsap.set(aboutChars, {
+    scaleY: 0,
+    opacity: 0,
+    transformOrigin: '50% 100%'
+  });
+  
+  console.log('Creating hero/about timeline...');
+  
+  // Timeline principal do Hero + About
+  const mainTl = gsap.timeline({
     scrollTrigger: {
       trigger: wrapper,
       start: 'top top',
       end: 'bottom top',
-      scrub: true,
+      scrub: 1,
       pin: true,
-      pinSpacing: false,
+      pinSpacing: true,
       anticipatePin: 1,
-      onLeave: () => {
-        gsap.set(wrapper, { autoAlpha: 0, display: 'none' });
-      },
-      onEnterBack: () => {
-        gsap.set(wrapper, { autoAlpha: 1, display: 'block' });
+      invalidateOnRefresh: true,
+      // markers: true, // Descomente para debug
+      onComplete: () => {
+        console.log('Hero/About timeline complete - showing What We Do');
+        gsap.set(whatWeDo, { autoAlpha: 1 });
       }
     }
   });
 
-  // Delay antes de disparar o heroExit
-  masterTl.to({}, { duration: HERO_EXIT_DELAY });
-  masterTl.addLabel('heroExit');
+  mainTl
+    .addLabel('start')
+    .addLabel('heroExit', 0.3) // Hero começa a sair em 30% do scroll
+    .addLabel('aboutEnter', 0.5) // About entra em 50% do scroll
+    
+    // ===== SAÍDA DO HERO =====
+    .to(
+      heroAllChars,
+      {
+        opacity: 0,
+        rotationX: 90,
+        z: -200,
+        transformOrigin: '50% 100%',
+        ease: 'power2.inOut',
+        stagger: {
+          each: 0.015,
+          from: 'start'
+        },
+        duration: 0.4
+      },
+      'heroExit'
+    )
+    
+    // Clip-path do Hero
+    .to(
+      clipRects,
+      {
+        attr: { y: 0.5, height: 0 },
+        ease: 'power2.inOut',
+        stagger: 0.04,
+        duration: 0.5
+      },
+      'heroExit+=0.1'
+    )
+    
+    // ===== ENTRADA DO ABOUT US =====
+    .to(
+      aboutChars,
+      {
+        scaleY: 1,
+        opacity: 1,
+        ease: 'power3.out',
+        stagger: {
+          each: 0.02,
+          from: 'start'
+        },
+        duration: 0.5
+      },
+      'aboutEnter'
+    )
+    
+    // Pausa para leitura do About Us
+    .to({}, { duration: 0.3 }, '+=0');
 
-  // 3.1) Saída do Hero
-  masterTl.to(
-    heroAllChars,
-    {
-      opacity: 0,
-      rotationX: 90,
-      z: -200,
-      transformOrigin: '50% 100%',
-      ease: 'power1.in',
-      stagger: 0.02,
-      duration: 0.3
-    },
-    'heroExit'
-  );
-
-  // 3.2) Clip‑path do Hero
-  masterTl.to(
-    clipRects,
-    {
-      attr: { y: 0.5, height: 0 },
-      ease: 'power2.inOut',
-      stagger: 0.05,
-      duration: 0.8
-    },
-    'heroExit+=0.1'
-  );
-
-  // 3.3) Entrada do About Us
-  masterTl.fromTo(
-    aboutChars,
-    { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
-    {
-      scaleY: 1,
-      opacity: 1,
-      ease: 'power3.in',
-      stagger: 0.03,
-      duration: 0.5
-    },
-    'heroExit+=0.2'
-  );
+  console.log('Hero/About timeline created successfully');
 }
 
 // -----------------------------
-// 4) Inicialização dos eventos
+// 4) Setup da seção What We Do
 // -----------------------------
-// 4.1) DOMContentLoaded: Splitting + entrada do Hero
+function setupWhatWeDoSection() {
+  const section = document.querySelector('#what-we-do');
+  const rows = gsap.utils.toArray('.what-we-do__row');
+  
+  if (!section) {
+    console.log('What We Do section not found');
+    return;
+  }
+  
+  console.log('Setting up What We Do section...');
+  
+  // Inicialmente escondido
+  gsap.set(section, { autoAlpha: 0 });
+  
+  // ScrollTrigger para entrada da seção
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top 80%',
+    once: true,
+    onEnter: () => {
+      console.log('What We Do section entering viewport');
+      
+      // Fade in da seção
+      gsap.to(section, {
+        autoAlpha: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      });
+      
+      // Animação das rows se existirem
+      if (rows.length > 0) {
+        gsap.fromTo(rows, 
+          {
+            y: 50,
+            opacity: 0
+          },
+          {
+            y: 0,
+            opacity: 1,
+            stagger: 0.15,
+            duration: 0.8,
+            ease: 'power3.out',
+            delay: 0.2
+          }
+        );
+      }
+    }
+  });
+  
+  // Parallax suave para as rows
+  if (rows.length > 0) {
+    rows.forEach((row, i) => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1,
+        onUpdate: (self) => {
+          const speed = 1 + (i * 0.05);
+          gsap.set(row, {
+            y: -self.progress * 20 * speed
+          });
+        }
+      });
+    });
+  }
+}
+
+// -----------------------------
+// 5) Outras seções
+// -----------------------------
+function setupWorkSection() {
+  const section = document.querySelector('#work');
+  if (!section) return;
+  
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top 80%',
+    once: true,
+    onEnter: () => {
+      const heading = section.querySelector('.heading-large');
+      if (heading) {
+        gsap.fromTo(heading, 
+          {
+            y: 50,
+            opacity: 0
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: 'power3.out'
+          }
+        );
+      }
+    }
+  });
+}
+
+function setupTestimonialsSection() {
+  const section = document.querySelector('#testimonials');
+  if (!section) return;
+  
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top 80%',
+    once: true,
+    onEnter: () => {
+      console.log('Testimonials section ready');
+    }
+  });
+}
+
+// -----------------------------
+// 6) Utilitários
+// -----------------------------
+function refreshScrollTriggers() {
+  console.log('Refreshing ScrollTriggers...');
+  ScrollTrigger.refresh(true);
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function resetAnimations() {
+  console.log('Resetting animations...');
+  isHeroAnimationComplete = false;
+  ScrollTrigger.getAll().forEach(st => st.kill());
+  
+  if (heroAllChars.length > 0) {
+    gsap.set(heroAllChars, { clearProps: 'all' });
+  }
+  if (aboutChars.length > 0) {
+    gsap.set(aboutChars, { clearProps: 'all' });
+  }
+}
+
+// -----------------------------
+// 7) Inicialização
+// -----------------------------
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded - preparing splitting...');
   prepareSplitting();
-  animateHeroEntry();
 });
 
-// 4.2) Load completo: ajusta altura do wrapper e dispara timelines
 window.addEventListener('load', () => {
+  console.log('Window loaded - starting animations...');
+  
   const wrapper = document.querySelector('.intro-wrapper');
+  if (!wrapper) {
+    console.error('Intro wrapper not found!');
+    return;
+  }
+  
   const viewport = window.innerHeight;
-
-  // Buffer extra para manter o pin ativo enquanto dura a animação do About Us
-  const extraDelay = viewport * 0.8;
-  wrapper.style.height = `${viewport * 2 + extraDelay}px`;
-
-  initHeroAboutTimeline();
-  setupWorkSection();
+  wrapper.style.height = `${viewport * 2}px`;
+  
+  // Inicia animação de entrada do Hero
+  animateHeroEntry();
+  
+  // Setup outras seções (independente do Hero)
   setupWhatWeDoSection();
+  setupWorkSection();
   setupTestimonialsSection();
-
-  ScrollTrigger.refresh();
+  
+  // Refresh inicial após tudo carregar
+  gsap.delayedCall(0.5, () => {
+    ScrollTrigger.refresh();
+    console.log('Initial setup complete');
+  });
+  
+  // Listener para resize
+  const handleResize = debounce(() => {
+    console.log('Handling resize...');
+    const newViewport = window.innerHeight;
+    wrapper.style.height = `${newViewport * 2}px`;
+    gsap.delayedCall(0.1, refreshScrollTriggers);
+  }, 300);
+  
+  window.addEventListener('resize', handleResize);
 });
 
-// =====================
-// Stubs das outras seções
-// =====================
-function setupWorkSection() {}
-function setupWhatWeDoSection() {}
-function setupTestimonialsSection() {}
+// -----------------------------
+// 8) Debug
+// -----------------------------
+if (window.location.hash === '#debug') {
+  ScrollTrigger.defaults({ markers: true });
+  console.log('🐛 Debug mode ativo');
+  
+  window.debugScrollOrchestrator = {
+    heroChars: () => heroAllChars,
+    aboutChars: () => aboutChars,
+    isComplete: () => isHeroAnimationComplete,
+    refresh: refreshScrollTriggers,
+    reset: resetAnimations,
+    timeline: () => ScrollTrigger.getAll()
+  };
+}
+
+// Export
+export { refreshScrollTriggers, resetAnimations };
