@@ -247,17 +247,6 @@ function setupWhatWeDoSection() {
       }
     }
   });
-
-  // Smooth scroll interno
-  wrapper.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const delta = e.deltaY;
-    gsap.to(wrapper, {
-      scrollTop: wrapper.scrollTop + delta,
-      duration: 0.5,
-      ease: 'power2.out'
-    });
-  });
 }
 
 // -----------------------------
