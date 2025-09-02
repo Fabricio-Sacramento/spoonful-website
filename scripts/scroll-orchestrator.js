@@ -254,100 +254,121 @@ function setupWhatWeDoSection() {
 // 5) Outras seções
 // -----------------------------
 function setupWorkSectionHorizontal() {
-  const work = document.querySelector("#work");
-  if (!work) return;
+    const work = document.querySelector("#work");
+    if (!work) return;
 
-  const track = work.querySelector(".work-track");
-  if (!track) return;
+    const track = work.querySelector(".work-track");
+    if (!track) return;
 
-  // Ensure correct overflow settings
-  gsap.set(work, { 
-    overflow: 'hidden',
-    height: '100vh'
-  });
-
-  // Improved distance calculation
-  const getScrollDistance = () => {
-    const fullWidth = track.scrollWidth;
-    const containerWidth = work.offsetWidth;
-    const distance = fullWidth - containerWidth;
-    
-    console.log('Work scroll dimensions:', {
-      fullWidth,
-      containerWidth,
-      distance,
-      trackPadding: window.getComputedStyle(track).paddingRight
-    });
-    
-    return Math.max(0, distance);
-  };
-
-  const mm = gsap.matchMedia();
-
-  mm.add("(min-width: 1024px)", () => {
-    // Initial state
-    gsap.set(track, { 
-      x: 0,
-      willChange: 'transform' // Optimization for performance
-    });
-
-    // Main ScrollTrigger setup with improved pin handling
-    const st = ScrollTrigger.create({
-      trigger: work,
-      pin: true,
-      start: "top top",
-      end: () => `+=${getScrollDistance()}`,
-      scrub: 1,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      markers: true,
-      onUpdate: self => {
-        const progress = self.progress;
-        gsap.set(track, { 
-          x: -getScrollDistance() * progress 
+    const getDistance = () => {
+        const fullWidth = track.scrollWidth;
+        const containerWidth = work.offsetWidth;
+        const distance = fullWidth - containerWidth;
+        
+        console.log('Work section measurements:', {
+            fullWidth,
+            containerWidth,
+            distance,
+            viewport: window.innerHeight
         });
         
-        // Log for debugging pin state
-        console.log(`ScrollTrigger progress: ${progress.toFixed(2)}`);
-      },
-      onLeave: () => console.log('Pin released - section can scroll vertically'),
-      onEnterBack: () => console.log('Pin reactivated')
-    });
+        return distance;
+    };
 
-    // Enhanced image loading handling
-    const imagePromises = Array.from(track.querySelectorAll('img'))
-      .filter(img => !img.complete)
-      .map(img => new Promise(resolve => {
-        const handler = () => {
-          console.log(`Image loaded: ${img.src}`);
-          resolve();
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 1024px)", () => {
+        // Reset and prepare section
+        gsap.set(work, { 
+            overflow: "hidden",
+            height: "100vh"
+        });
+        gsap.set(track, { 
+            x: 0,
+            willChange: "transform"
+        });
+
+        // Create the horizontal animation
+        const horizontalAnimation = gsap.to(track, {
+            x: () => -getDistance(),
+            ease: "none",
+            paused: true
+        });
+
+        // Create ScrollTrigger with the animation
+        const st = ScrollTrigger.create({
+            trigger: work,
+            start: "top top",
+            end: () => `+=${getDistance()}`,
+            pin: true,
+            anticipatePin: 1,
+            scrub: true,
+            animation: horizontalAnimation,
+            invalidateOnRefresh: true,
+            // markers: true, // Uncomment for debugging
+            onEnter: () => {
+                console.log("Work section entered - pin activated");
+                gsap.to(work, { 
+                    duration: 0.3,
+                    opacity: 1,
+                    ease: "power2.out" 
+                });
+            },
+            onLeave: () => console.log("Work section left - pin released"),
+            onEnterBack: () => console.log("Work section re-entered"),
+            onLeaveBack: () => console.log("Work section left backwards"),
+            onUpdate: self => {
+                // Only log every 0.1 progress for debugging
+                if (Math.round(self.progress * 10) % 1 === 0) {
+                    console.log(`Scroll Progress: ${(self.progress * 100).toFixed(1)}%`);
+                }
+            }
+        });
+
+        // Handle image loading
+        Promise.all(
+            Array.from(track.querySelectorAll('img'))
+                .filter(img => !img.complete)
+                .map(img => new Promise(resolve => {
+                    const handler = () => {
+                        console.log(`Image loaded: ${img.src}`);
+                        resolve();
+                    };
+                    img.addEventListener('load', handler, { once: true });
+                    img.addEventListener('error', handler, { once: true });
+                }))
+        ).then(() => {
+            console.log('All images loaded, refreshing ScrollTrigger');
+            st.refresh();
+        });
+
+        // Handle window resize
+        const resizeHandler = debounce(() => {
+            const newDistance = getDistance();
+            console.log('Window resized, new distance:', newDistance);
+            st.refresh();
+        }, 250);
+
+        window.addEventListener('resize', resizeHandler);
+
+        // Cleanup function
+        return () => {
+            window.removeEventListener('resize', resizeHandler);
+            st.kill();
         };
-        img.addEventListener('load', handler);
-        img.addEventListener('error', handler);
-      }));
-
-    Promise.all(imagePromises).then(() => {
-      st.refresh();
-      console.log('All images loaded, ScrollTrigger refreshed');
     });
 
-    // Refresh on window resize (debounced)
-    window.addEventListener('resize', debounce(() => {
-      st.refresh();
-      console.log('ScrollTrigger refreshed after resize');
-    }, 250));
-  });
-
-  mm.add("(max-width: 1023px)", () => {
-    gsap.set([work, track], { 
-      clearProps: "all",
-      overflow: 'visible' // Ensure normal scroll on mobile
+    mm.add("(max-width: 1023px)", () => {
+        // Mobile cleanup
+        gsap.set([work, track], { 
+            clearProps: "all",
+            overflow: "visible" 
+        });
+        
+        ScrollTrigger.getAll()
+            .filter(st => st.vars.trigger === work)
+            .forEach(st => st.kill());
     });
-    
-    ScrollTrigger.getAll()
-      .filter(st => st.vars.trigger === work)
-      .forEach(st => st.kill());
-  });
 }
 
 function setupTestimonialsSection() {
