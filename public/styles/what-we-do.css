@@ -6,9 +6,9 @@
   max-height: 100vh;
   overflow: hidden;
   z-index: 1;
-  /* 🔧 CORREÇÃO: Garante estado inicial oculto */
-  opacity: 0;
-  visibility: hidden;
+  /* 🔧 CORREÇÃO: Remove o estado inicial oculto - será controlado pelo JS */
+  opacity: 1;
+  visibility: visible;
 }
 
 .container-full {
@@ -64,7 +64,9 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
-  /* 🔧 CORREÇÃO: Remove estado inicial - será controlado pelo JS */
+  /* 🔧 CORREÇÃO: Estado inicial será controlado pelo JavaScript */
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* 🔧 CORREÇÃO: Hover effects mais suaves */
@@ -101,6 +103,27 @@
   color: var(--neutral-light);
 }
 
+.what-we-do__title {
+  color: var(--neutral-normal);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 7.75rem;
+  font-weight: 900;
+  letter-spacing: 0.155rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.what-we-do__description {
+  color: var(--neutral-normal);
+  flex: 1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.05rem;
+  text-transform: capitalize;
+  margin: 0;
+}
+
 /* 🔧 CORREÇÃO: Media queries para responsivo */
 @media (max-width: 834px) {
   .what-we-do__row {
@@ -108,11 +131,21 @@
     padding: var(--space-24) var(--space-16);
     min-height: calc(100vh / 6);
   }
+  
+  .what-we-do__title {
+    font-size: 4.75rem;
+    letter-spacing: 0.095rem;
+  }
 }
 
 @media (max-width: 375px) {
   .what-we-do__row {
     padding: var(--space-16);
     min-height: calc(100vh / 6);
+  }
+  
+  .what-we-do__title {
+    font-size: 2.0625rem;
+    letter-spacing: 0.04125rem;
   }
 }
