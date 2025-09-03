@@ -20,7 +20,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        assetFileNames: 'styles/[name][extname]'    // mantém /styles/style.css em prod
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name.endsWith('.css')) {
+            return 'styles/[name][extname]';
+          }
+          return 'assets/[name]-[hash][extname]';
+        }
       }
     }
   }
