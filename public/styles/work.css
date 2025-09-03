@@ -1,4 +1,7 @@
-/* Work Section Styles */
+/* =========================================
+   WORK SECTION - Estilos Específicos
+   ========================================= */
+
 #work {
   position: relative;
   width: 100%;
@@ -7,6 +10,7 @@
   overflow: hidden;
 }
 
+/* Container para o scroll horizontal */
 .work__container {
   width: 100%;
   height: 100%;
@@ -19,43 +23,30 @@
   align-items: center;
 }
 
-/* Cards */
-.work__project {
-  min-width: 600px;
-  height: 400px;
-  margin-right: 2rem;
-  background: var(--neutral-darker);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--neutral-light);
-  font-size: 2rem;
-}
-
-
-/* trilho horizontal */
+/* Trilho horizontal dos cards */
 .work-track {
   display: inline-flex;
   will-change: transform;
   gap: var(--space-64);
-  /* Padding extra à direita para garantir que o último card fique visível */
   padding: var(--space-64);
   padding-right: calc(var(--space-64) + 100px); /* espaço extra após último card */
   height: 100%;
   align-items: center;
 }
 
+/* Cards de projeto */
 .work-card {
   flex: 0 0 auto;
   will-change: transform;
   width: min(800px, 80vw);
   height: min(600px, 70vh);
   background: var(--neutral-light);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-lg, 8px);
   overflow: hidden;
   position: relative;
 }
 
+/* Media container */
 .work-card__media {
   width: 100%;
   height: 100%;
@@ -69,10 +60,12 @@
   transition: transform 0.6s ease;
 }
 
+/* Hover effect */
 .work-card:hover .work-card__media img {
   transform: scale(1.05);
 }
 
+/* Conteúdo do card */
 .work-card__content {
   position: absolute;
   bottom: 0;
@@ -94,7 +87,11 @@
   opacity: 0.8;
 }
 
-/* Responsivo */
+/* =========================================
+   RESPONSIVO
+   ========================================= */
+
+/* Tablet e Mobile */
 @media (max-width: 1023px) {
   #work {
     height: auto;
@@ -106,6 +103,7 @@
     padding: var(--space-32);
     gap: var(--space-32);
     height: auto;
+    padding-right: var(--space-32); /* Remove o padding extra no mobile */
   }
   
   .work-card {
@@ -117,4 +115,3 @@
     padding: var(--space-16);
   }
 }
-

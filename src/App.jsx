@@ -16,6 +16,7 @@ const App = () => {
 
       {/* Elementos de vidro já existentes */}
       <Glass />
+      
       {/*}
       <GlassCube />
       */}  

@@ -36,6 +36,10 @@
   --space-64: 64px;
   --space-128: 128px;
 
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
 }
 
 /* Box-sizing global */
@@ -60,65 +64,11 @@ html, body {
 body {
   background-color: var(--neutral-normal);
   color: white;
-  position: relative; /* Garante que o pseudo-elemento seja posicionado corretamente */
+  position: relative;
   top: 0;
   left: 0;
 }
-/*
-body::after {
-  content: "";
-  position: fixed;
-  top: -100%;
-  left: -100%;
-  width: 300%;
-  height: 300%;
-  background-image: url("https://i.imgur.com/ax4UqqW.png");
-  background-repeat: repeat;
-  opacity: 0.05;
-  pointer-events: none;
-  animation: noise 12s steps(20) infinite;
-  transition: opacity 0.4s ease;
-  will-change: transform;
-  z-index: -1; /* Ajuste o z-index para garantir que o noise fique atrás do conteúdo 
-}
 
-
-@keyframes noise {
-  0% {
-    transform: translate(20%, -15%);
-  }
-  10% {
-    transform: translate(-20%, -15%);
-  }
-  20% {
-    transform: translate(20%, -5%);
-  }
-  30% {
-    transform: translate(-20%, -5%);
-  }
-  40% {
-    transform: translate(20%, 5%);
-  }
-  50% {
-    transform: translate(-20%, 5%);
-  }
-  60% {
-    transform: translate(20%, 15%);
-  }
-  70% {
-    transform: translate(-20%, 15%);
-  }
-  80% {
-    transform: translate(20%, 5%);
-  }
-  90% {
-    transform: translate(-20%, 5%);
-  }
-  100% {
-    transform: translate(20%, -5%);
-  }
-}
-*/
 /* ================================= */
 /* Overrides para SVG de clipPath    */
 /* ================================= */
@@ -132,8 +82,6 @@ svg[width="0"][height="0"] {
   overflow: hidden;
 }
 
-
-
 /* ----------------------------- */
 /* 3) ESTILOS GERAIS             */
 /* ----------------------------- */
@@ -146,9 +94,11 @@ svg[width="0"][height="0"] {
   height: 100vh;
   z-index: 0;
 }
+
 canvas {
   display: block;
 }
+
 section {
   width: 100%;
   height: 100vh;
@@ -157,6 +107,7 @@ section {
   padding: 0;
   margin: 0;
 }
+
 .container {
   width: 100%;
   margin: 0 auto;
@@ -165,6 +116,7 @@ section {
   flex-direction: column;
   justify-content: center;
 }
+
 /* Para a seção What We Do, usamos um container em linha */
 .container-full {
   width: 100%;
@@ -177,7 +129,7 @@ section {
 }
 
 .spacer {
-  height: 25vh; /* Ajuste a altura conforme necessário */
+  height: 25vh;
   width: 100%;
   display: block;
 }
@@ -187,26 +139,26 @@ section {
 .h-screen       { height: 100vh !important; }
 .overflow-hidden{ overflow: hidden !important; }
 
-
 /* ================================== */
 /* 0) Wrapper comum para Hero + About */
 /* ================================== */
 .intro-wrapper {
   position: relative;
   width: 100%;
-  height: 100vh;           /* soma 100vh + 100vh dos filhos */
-  overflow: hidden;       /* esconde tudo que sair da viewport */
-  background-color: var(--primary-red); /* cor do fundo até About Us aparecer */
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--primary-red);
 }
 
 /* Ambos os filhos do wrapper ocupam exatamente a viewport e ficam empilhados */
 .intro-wrapper > section {
   height: 100vh !important;
-  position: absolute !important;  /* força a camada, tira do fluxo normal */
+  position: absolute !important;
   top: 0 !important;
   left: 0 !important;
   width: 100% !important;
 }
+
 /* ----------------------------- */
 /* 4) HERO SECTION              */
 /* ----------------------------- */
@@ -219,6 +171,7 @@ section {
   background: transparent;
   clip-path: url(#heroClip);
 }
+
 .hero-content {
   margin: 0;
   padding: 0;
@@ -229,6 +182,7 @@ section {
   flex-direction: column;
   justify-content: center;
 }
+
 /* Garante que, ao rotacionar em 3D, a face traseira dos chars seja visível */
 .hero-content .char {
   -webkit-backface-visibility: visible;
@@ -236,7 +190,6 @@ section {
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
-
 
 /* --------------------------------- */
 /* ABOUT US Section                */
@@ -249,6 +202,7 @@ section {
   z-index: 1 !important;
   background-color: var(--primary-red);
 }
+
 .about-us-container-absolute {
   position: relative;
   width: 100%;
@@ -257,13 +211,16 @@ section {
   justify-content: center;
   align-items: center;
 }
+
 .text-back {
   white-space: normal;
 }
+
 .text-back .line {
   display: block;
   overflow: hidden;
 }
+
 .text-back .char {
   display: inline-block;
 }
@@ -273,7 +230,7 @@ section {
    ========================================= */
 #what-we-do {
   background-color: var(--primary-green);
-  align-items: flex-start; /* override default section align-items */
+  align-items: flex-start;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -375,102 +332,9 @@ section {
   }
 }
 
-/* =========================================
-   WORK - Desktop Styles
-   ========================================= */
-#work {
-  position: relative;
-  width: 100vw;
-  height: 100svh;
-  overflow: hidden;
-  background-color: var(--primary-red);
-  /* z-index removido para não pular por cima do pin anterior */
-}
-
-/* trilho horizontal */
-.work-track {
-  display: inline-flex;
-  will-change: transform;
-  gap: var(--space-64);
-  padding: var(--space-64);
-  height: 100%;
-  align-items: center;
-}
-
-.work-card {
-  flex: 0 0 auto;
-  width: min(800px, 80vw);
-  height: min(600px, 70vh);
-  background: var(--neutral-darker);
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  will-change: transform;
-}
-
-.work-card__media {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
-
-.work-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s ease;
-}
-
-.work-card:hover .work-card__media img {
-  transform: scale(1.05);
-}
-
-.work-card__content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-32);
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-  color: var(--neutral-light);
-}
-
-.work-card__content h3 {
-  margin: 0 0 var(--space-8);
-  font-size: 2.5rem;
-}
-
-.work-card__description {
-  margin: 0;
-  font-size: 1rem;
-  opacity: 0.8;
-}
-
-/* Mobile Layout */
-@media (max-width: 1023px) {
-  .work-track {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-32);
-    padding: var(--space-32);
-  }
-
-  .work-card {
-    width: 100%;
-    height: min(400px, 50vh);
-  }
-}
-
-
-
-
-
 /* ----------------------------- */
 /* 5) HEADINGS                   */ 
 /* ----------------------------- */
-
-
 
 /* Headings */
 .heading-large {
@@ -483,6 +347,7 @@ section {
   margin: 0;
   z-index: 1;
 }
+
 .heading-medium {
   color: var(--primary-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
@@ -490,8 +355,8 @@ section {
   font-size: 80px;
   line-height: 1.1;
   letter-spacing: 1px;
-  /* font-style: italic; */
 }
+
 .heading-medium-bold {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
@@ -499,8 +364,8 @@ section {
   font-size: 90px;
   line-height: 1.1;      
   letter-spacing: 3px;
-  /* font-style: italic; */
 }
+
 .heading-small {
   color: var(--primary-red);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;

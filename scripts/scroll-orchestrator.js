@@ -13,6 +13,7 @@ let heroAllChars = [];
 let clipRects = [];
 let aboutChars = [];
 let isHeroAnimationComplete = false;
+let whatWeDoReady = false; // Nova flag para controlar transição
 
 // -----------------------------
 // 1) Preparação: Splitting e gsap.set
@@ -105,8 +106,10 @@ function initHeroAboutTimeline() {
     return;
   }
   
-  // Garante que What We Do está oculto inicialmente
-  gsap.set(whatWeDo, { autoAlpha: 0 });
+  // 🔧 CORREÇÃO: Garante que What We Do esteja oculto inicialmente (simples)
+  gsap.set(whatWeDo, { 
+    autoAlpha: 0
+  });
   
   // Estados iniciais para About Us (escondido)
   gsap.set(aboutChars, {
@@ -130,8 +133,9 @@ function initHeroAboutTimeline() {
       invalidateOnRefresh: true,
       // markers: true, // Descomente para debug
       onComplete: () => {
-        console.log('Hero/About timeline complete - showing What We Do');
-        gsap.set(whatWeDo, { autoAlpha: 1 });
+        console.log('Hero/About timeline complete');
+        // 🔧 CORREÇÃO: Apenas marca como pronto, sem animação
+        whatWeDoReady = true;
       }
     }
   });
@@ -190,7 +194,7 @@ function initHeroAboutTimeline() {
     // Pausa para leitura do About Us
     .to({}, { duration: 0.3 }, '+=0');
 
-  console.log('Hero/About timeline created successfully');
+  console.log('Hero/About timeline created successfully with', aboutChars.length, 'about chars');
 }
 
 // -----------------------------
@@ -208,8 +212,18 @@ function setupWhatWeDoSection() {
   
   console.log('Setting up What We Do section...');
   
-  // Inicialmente escondido
-  gsap.set(section, { autoAlpha: 0 });
+  // 🔧 CORREÇÃO: Estado inicial mais controlado
+  gsap.set(section, { 
+    autoAlpha: 0,
+    y: 20,
+    scale: 0.98
+  });
+  
+  // 🔧 CORREÇÃO: Estado inicial das rows
+  gsap.set(rows, {
+    y: 30,
+    opacity: 0
+  });
   
   // ScrollTrigger para controlar a seção inteira
   ScrollTrigger.create({
@@ -218,34 +232,42 @@ function setupWhatWeDoSection() {
     end: 'bottom bottom',
     pin: true,
     pinSpacing: false,
-    anticipatePin: 1, // suaviza a troca de pins p/ a próxima seção (Work)
+    anticipatePin: 1,
     onEnter: () => {
       console.log('What We Do section entering viewport');
       
-      // Fade in da seção
-      gsap.to(section, {
-        autoAlpha: 1,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-      
-      // Animação das rows
-      if (rows.length > 0) {
-        gsap.fromTo(rows, 
-          {
-            y: 50,
-            opacity: 0
-          },
-          {
+      // 🔧 CORREÇÃO: Só anima se estiver pronto (evita conflito)
+      if (whatWeDoReady) {
+        // Animação das rows (seção já está visível)
+        if (rows.length > 0) {
+          gsap.to(rows, {
             y: 0,
             opacity: 1,
-            stagger: 0.15,
+            stagger: 0.12,
             duration: 0.8,
             ease: 'power3.out',
-            delay: 0.2
+            delay: 0.3
+          });
+        }
+      } else {
+        // Se não estiver pronto, aguarda um pouco
+        gsap.delayedCall(0.2, () => {
+          if (whatWeDoReady && rows.length > 0) {
+            gsap.to(rows, {
+              y: 0,
+              opacity: 1,
+              stagger: 0.12,
+              duration: 0.8,
+              ease: 'power3.out'
+            });
           }
-        );
+        });
       }
+    },
+    
+    // 🔧 CORREÇÃO: Callback para quando a seção está totalmente visível
+    onEnterBack: () => {
+      console.log('What We Do section re-entering from below');
     }
   });
 }
@@ -408,6 +430,7 @@ function debounce(func, wait) {
 function resetAnimations() {
   console.log('Resetting animations...');
   isHeroAnimationComplete = false;
+  whatWeDoReady = false; // 🔧 CORREÇÃO: Reset da nova flag
   ScrollTrigger.getAll().forEach(st => st.kill());
   
   if (heroAllChars.length > 0) {
@@ -443,7 +466,7 @@ window.addEventListener('load', () => {
   
   // Setup outras seções (independente do Hero)
   setupWhatWeDoSection();
-  setupWorkSectionHorizontal();  // Nova função de scroll horizontal
+  setupWorkSectionHorizontal();
   setupTestimonialsSection();
   
   // Refresh após fontes/imagens carregarem
@@ -478,6 +501,7 @@ if (window.location.hash === '#debug') {
     heroChars: () => heroAllChars,
     aboutChars: () => aboutChars,
     isComplete: () => isHeroAnimationComplete,
+    whatWeDoReady: () => whatWeDoReady, // 🔧 CORREÇÃO: Nova função debug
     refresh: refreshScrollTriggers,
     reset: resetAnimations,
     timeline: () => ScrollTrigger.getAll()
