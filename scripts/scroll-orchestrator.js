@@ -105,8 +105,8 @@ function initHeroAboutTimeline() {
     return;
   }
   
-  // Garante que What We Do está oculto inicialmente
-  gsap.set(whatWeDo, { autoAlpha: 0 });
+  // Garante que What We Do está oculto inicialmente (controle apenas na própria seção)
+  // gsap.set(whatWeDo, { autoAlpha: 0 });
   
   // Estados iniciais para About Us (escondido)
   gsap.set(aboutChars, {
@@ -128,11 +128,8 @@ function initHeroAboutTimeline() {
       pinSpacing: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
-      // markers: true, // Descomente para debug
-      onComplete: () => {
-        console.log('Hero/About timeline complete - showing What We Do');
-        gsap.set(whatWeDo, { autoAlpha: 1 });
-      }
+      // markers: true // Descomente para debug
+      // (Removido) onComplete que mostrava o What We Do para evitar flick
     }
   });
 
@@ -217,7 +214,7 @@ function setupWhatWeDoSection() {
     start: 'top top',
     end: 'bottom bottom',
     pin: true,
-    pinSpacing: false,
+    pinSpacing: true,
     anticipatePin: 1, // suaviza a troca de pins p/ a próxima seção (Work)
     onEnter: () => {
       console.log('What We Do section entering viewport');
@@ -253,122 +250,85 @@ function setupWhatWeDoSection() {
 // -----------------------------
 // 5) Outras seções
 // -----------------------------
+// WORK — scroll horizontal com clamp e pin estável
 function setupWorkSectionHorizontal() {
-    const work = document.querySelector("#work");
-    if (!work) return;
+  const work = document.querySelector('#work');
+  if (!work) return;
 
-    const track = work.querySelector(".work-track");
-    if (!track) return;
+  const track = work.querySelector('.work-track');
+  if (!track) return;
 
-    const getDistance = () => {
-        const fullWidth = track.scrollWidth;
-        const containerWidth = work.offsetWidth;
-        const distance = fullWidth - containerWidth;
-        
-        console.log('Work section measurements:', {
-            fullWidth,
-            containerWidth,
-            distance,
-            viewport: window.innerHeight
-        });
-        
-        return distance;
-    };
+  const mq = window.matchMedia('(min-width: 1024px)');
+  let st = null;
+  let horizontalAnimation = null;
 
-    const mm = gsap.matchMedia();
+  // Retorna pelo menos 1px para evitar end zero/negativo
+  const getDistance = () => {
+    const fullWidth = track.scrollWidth || 0;
+    const containerWidth = work.clientWidth || 0;
+    return Math.max(1, fullWidth - containerWidth);
+  };
 
-    mm.add("(min-width: 1024px)", () => {
-        // Reset and prepare section
-        gsap.set(work, { 
-            overflow: "hidden",
-            height: "100vh"
-        });
-        gsap.set(track, { 
-            x: 0,
-            willChange: "transform"
-        });
+  const enable = () => {
+    // Zera qualquer transform prévio
+    gsap.set(track, { x: 0 });
 
-        // Create the horizontal animation
-        const horizontalAnimation = gsap.to(track, {
-            x: () => -getDistance(),
-            ease: "none",
-            paused: true
-        });
-
-        // Create ScrollTrigger with the animation
-        const st = ScrollTrigger.create({
-            trigger: work,
-            start: "top top",
-            end: () => `+=${getDistance()}`,
-            pin: true,
-            anticipatePin: 1,
-            scrub: true,
-            animation: horizontalAnimation,
-            invalidateOnRefresh: true,
-            // markers: true, // Uncomment for debugging
-            onEnter: () => {
-                console.log("Work section entered - pin activated");
-                gsap.to(work, { 
-                    duration: 0.3,
-                    opacity: 1,
-                    ease: "power2.out" 
-                });
-            },
-            onLeave: () => console.log("Work section left - pin released"),
-            onEnterBack: () => console.log("Work section re-entered"),
-            onLeaveBack: () => console.log("Work section left backwards"),
-            onUpdate: self => {
-                // Only log every 0.1 progress for debugging
-                if (Math.round(self.progress * 10) % 1 === 0) {
-                    console.log(`Scroll Progress: ${(self.progress * 100).toFixed(1)}%`);
-                }
-            }
-        });
-
-        // Handle image loading
-        Promise.all(
-            Array.from(track.querySelectorAll('img'))
-                .filter(img => !img.complete)
-                .map(img => new Promise(resolve => {
-                    const handler = () => {
-                        console.log(`Image loaded: ${img.src}`);
-                        resolve();
-                    };
-                    img.addEventListener('load', handler, { once: true });
-                    img.addEventListener('error', handler, { once: true });
-                }))
-        ).then(() => {
-            console.log('All images loaded, refreshing ScrollTrigger');
-            st.refresh();
-        });
-
-        // Handle window resize
-        const resizeHandler = debounce(() => {
-            const newDistance = getDistance();
-            console.log('Window resized, new distance:', newDistance);
-            st.refresh();
-        }, 250);
-
-        window.addEventListener('resize', resizeHandler);
-
-        // Cleanup function
-        return () => {
-            window.removeEventListener('resize', resizeHandler);
-            st.kill();
-        };
+    // Tween com valores em função para atualizar em cada refresh
+    horizontalAnimation = gsap.to(track, {
+      x: () => -getDistance(),
+      ease: 'none',
+      paused: true,
     });
 
-    mm.add("(max-width: 1023px)", () => {
-        // Mobile cleanup
-        gsap.set([work, track], { 
-            clearProps: "all",
-            overflow: "visible" 
-        });
-        
-        ScrollTrigger.getAll()
-            .filter(st => st.vars.trigger === work)
-            .forEach(st => st.kill());
+    st = ScrollTrigger.create({
+      trigger: work,
+      start: 'top top',
+      end: () => `+=${getDistance()}`, // sempre >= 1
+      pin: true,
+      anticipatePin: 1,
+      scrub: true,
+      animation: horizontalAnimation,
+      invalidateOnRefresh: true,
+      onKill: () => {
+        // Garantir reset limpo ao desabilitar
+        gsap.set(track, { x: 0 });
+      },
     });
+
+    // Se houver imagens carregando, faça refresh quando terminarem
+    const imgs = work.querySelectorAll('img');
+    imgs.forEach((img) => {
+      if (!img.complete) {
+        img.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+        img.addEventListener('error', () => ScrollTrigger.refresh(), { once: true });
+      }
+    });
+  };
+
+  const disable = () => {
+    if (st) {
+      st.kill();
+      st = null;
+    }
+    if (horizontalAnimation) {
+      horizontalAnimation.kill();
+      horizontalAnimation = null;
+    }
+    gsap.set(track, { clearProps: 'transform' }); // remove x
+    ScrollTrigger.refresh();
+  };
+
+  // Liga/desliga conforme breakpoint
+  const apply = () => (mq.matches ? enable() : disable());
+  apply();
+
+  // Reagir a mudanças de viewport
+  mq.addEventListener('change', apply);
+
+  // Segurança extra em resize/orientação
+  window.addEventListener('resize', () => {
+    if (st) st.refresh(); // end e x() serão recalculados
+  });
 }
 
 function setupTestimonialsSection() {
@@ -437,7 +397,7 @@ window.addEventListener('load', () => {
   
   const viewport = window.innerHeight;
   wrapper.style.height = `${viewport}px`;
-  
+
   // Inicia animação de entrada do Hero
   animateHeroEntry();
   
