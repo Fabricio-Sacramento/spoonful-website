@@ -4,8 +4,9 @@
   position: relative;
   height: 100vh;
   max-height: 100vh;
-  overflow: hidden;
+  overflow: hidden;              /* unificado (era visible em um bloco) */
   z-index: 1;
+  align-items: flex-start;       /* override do layout da seção */
 }
 
 .container-full {
@@ -19,46 +20,114 @@
   justify-content: center;
   align-items: flex-start;
   flex: 1;
-  height: 100vh;
+  height: 100vh;                 /* unificado (preferível ao 100%) */
   max-height: 100vh;
   overflow-y: auto;
-  /* Solução cross-browser para esconder scrollbar mantendo funcionalidade */
-  padding-right: 20px;  /* Compensa a largura da scrollbar */
-  margin-right: -20px; /* Move o conteúdo de volta */
+
+  /* esconder scrollbar mantendo rolagem */
+  -ms-overflow-style: none;      /* IE/Edge */
+  padding-right: 20px;           /* compensa a largura da scrollbar */
+  margin-right: -20px;           /* realinha o conteúdo */
   box-sizing: content-box;
 }
 
-/* Esconde scrollbar no Chrome/Safari/Webkit */
+/* Chrome/Safari/WebKit */
 .what-we-do__wrapper::-webkit-scrollbar {
-  width: 0px;
+  width: 0;
   background: transparent;
 }
 
-/* Esconde scrollbar no IE/Edge */
-.what-we-do__wrapper {
-  -ms-overflow-style: none;
-}
-
-/* Esconde scrollbar no Firefox */
+/* Firefox */
 @supports (scrollbar-width: none) {
-  .what-we-do__wrapper {
-    scrollbar-width: none;
-  }
+  .what-we-do__wrapper { scrollbar-width: none; }
 }
 
 .what-we-do__row {
   display: flex;
-  padding: 0 var(--space-32) 0 var(--space-16);
   align-items: center;
   gap: var(--space-24);
+  padding: 0 var(--space-32) 0 var(--space-16);
   flex: 1;
-  min-height: calc(100vh / 6); /* Divide igualmente para 6 rows */
+  min-height: calc(100vh / 6);   /* 6 rows iguais */
   max-height: calc(100vh / 6);
   border-bottom: 2px solid var(--neutral-normal);
   position: relative;
   overflow: hidden;
+
+  /* performance/suavidade */
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+.what-we-do__row::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 0;                /* equivale a left/right/bottom/top: 0 */
+  height: 100%;
+  background-color: var(--primary-red);
+  transform: translateY(100%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+  will-change: transform;
+}
+
+.what-we-do__row:hover::before {
+  transform: translateY(0);
+}
+
+/* garantir conteúdo acima do overlay */
+.what-we-do__title,
+.what-we-do__description {
+  position: relative;
+  z-index: 1;
+  transition: color 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: color;
+}
+
+/* contraste no hover */
+.what-we-do__row:hover .what-we-do__title,
+.what-we-do__row:hover .what-we-do__description {
+  color: var(--neutral-light);
+}
+
+.what-we-do__title {
+  color: var(--neutral-normal);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 7.75rem;
+  font-weight: 900;
+  letter-spacing: 0.155rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.what-we-do__description {
+  color: var(--neutral-normal);
+  flex: 1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.05rem;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+/* Responsividade */
+@media (max-width: 834px) {
+  .what-we-do__row {
+    flex-direction: column;
+    padding: var(--space-24) var(--space-16);
+  }
+  .what-we-do__title {
+    font-size: 4.75rem;
+    letter-spacing: 0.095rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .what-we-do__title {
+    font-size: 2.0625rem;
+    letter-spacing: 0.04125rem;
+  }
 }
