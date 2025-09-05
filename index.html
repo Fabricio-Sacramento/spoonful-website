@@ -1,153 +1,160 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fabricio Sacramento - Portfólio</title>
-  <link rel="stylesheet" type="text/css" href="/styles/style.css">
-  <link rel="stylesheet" type="text/css" href="/styles/what-we-do.css"> 
-  <link rel="stylesheet" type="text/css" href="/styles/work.css"> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fabricio Sacramento - PortfÃ³lio</title>
+<link rel="stylesheet" type="text/css" href="/styles/style.css">
+<link rel="stylesheet" type="text/css" href="/styles/what-we-do.css">
+<link rel="stylesheet" type="text/css" href="/styles/work.css">
 </head>
 <body>
-  <!-- SVG para o clipPath do Hero -->
-  <svg width="0" height="0">
-    <defs>
-      <clipPath id="heroClip" clipPathUnits="objectBoundingBox">
-        <rect id="clip-rect-1" x="0"   y="0" width="0.2" height="1" fill="black" />
-        <rect id="clip-rect-2" x="0.2" y="0" width="0.2" height="1" fill="black" />
-        <rect id="clip-rect-3" x="0.4" y="0" width="0.2" height="1" fill="black" />
-        <rect id="clip-rect-4" x="0.6" y="0" width="0.2" height="1" fill="black" />
-        <rect id="clip-rect-5" x="0.8" y="0" width="0.2" height="1" fill="black" />
-      </clipPath>
-    </defs>
-  </svg>
+<!-- SVG para o clipPath do Hero -->
+<svg width="0" height="0">
+<defs>
+<clipPath id="heroClip" clipPathUnits="objectBoundingBox">
+<!-- 5 retÃ¢ngulos que cobrem toda a Ã¡rea inicialmente -->
+<rect id="clip-rect-1" x="0"   y="0" width="0.2" height="1" fill="black" />
+<rect id="clip-rect-2" x="0.2" y="0" width="0.2" height="1" fill="black" />
+<rect id="clip-rect-3" x="0.4" y="0" width="0.2" height="1" fill="black" />
+<rect id="clip-rect-4" x="0.6" y="0" width="0.2" height="1" fill="black" />
+<rect id="clip-rect-5" x="0.8" y="0" width="0.2" height="1" fill="black" />
+</clipPath>
+</defs>
+</svg>
+<!-- HERO + About Us Wrapper -->
+<div class="intro-wrapper">
 
-  <!-- HERO Section - Fluxo natural -->
-  <section id="hero">
-    <!-- Background 3D Scene -->
-    <div id="root"></div>
-    <div class="hero-container">
-      <div class="hero-content">
-        <h2 class="hero-subtitle" data-splitting>DESIGNING</h2>
-        <h2 class="hero-title" data-splitting>BRANDS</h2>
-        <h2 class="hero-title" data-splitting>PRODUCTS</h2>
-        <h2 class="hero-title" data-splitting>EXPERIENCES</h2>
-      </div>
+<!-- HERO Section -->
+<section id="hero">
+<!-- Background 3D Scene -->
+<div id="root"></div>
+<div class="container hero-content">
+<h2 class="heading-small" data-splitting>DESIGNING</h2>
+<h2 class="heading-large" data-splitting>BRANDS</h2>
+<h2 class="heading-large" data-splitting>PRODUCTS</h2>
+<h2 class="heading-large" data-splitting>EXPERIENCES</h2>
+</div>
+</section>
+
+```
+<!-- ABOUT US Section (posicionada atrÃ¡s do Hero) -->
+<section id="about-us">
+  <div class="about-us-container-absolute">
+    <p class="text-back heading-medium" data-splitting>
+      <span class="line"><span>We drive conversion and engagement,</span></span>
+      <span class="line"><span>creating strategic value and lasting impact</span></span>
+      <span class="line"><span>through design and technology.</span></span>
+    </p>
+  </div>
+</section>
+
+```
+
+</div>
+
+<!-- WHAT WE DO Section -->
+<section id="what-we-do">
+<div class="container-full">
+<div class="what-we-do__wrapper">
+<div class="what-we-do__row">
+<h2 class="what-we-do__title">UIUX</h2>
+<p class="what-we-do__description">Designing interfaces and experiences that guide users intuitively. From wireframes to usability testing, we ensure your product is both attractive and effortless.</p>
+</div>
+<div class="what-we-do__row">
+<h2 class="what-we-do__title">Branding</h2>
+<p class="what-we-do__description">Defining your brand's purpose, personality and positioning so you stand out. We craft visual identities and messaging frameworks that make every touchpoint unmistakably "you."</p>
+</div>
+<div class="what-we-do__row">
+<h2 class="what-we-do__title">Web & Digital</h2>
+<p class="what-we-do__description">Building responsive, high-performance websites and platforms tailored to your needs. Whether it's a custom CMS, e-commerce site or landing page, we deliver scalable solutions without prefabricated templates.</p>
+</div>
+<div class="what-we-do__row">
+<h2 class="what-we-do__title">Graphic Design</h2>
+<p class="what-we-do__description">Transforming ideas into clean, compelling visualsâ€”logos, brochures, social posts and infographics. We balance color, typography and layout to communicate your message clearly.</p>
+</div>
+<div class="what-we-do__row">
+<h2 class="what-we-do__title">Digital Strategy</h2>
+<p class="what-we-do__description">Turning data into targeted marketing, SEO, social media and analytics plans. We set objectives, track metrics and optimize so you reach the right audience at the right time.</p>
+</div>
+<div class="what-we-do__row">
+<h2 class="what-we-do__title">Motion & 3D</h2>
+<p class="what-we-do__description">Animating designs with motion graphics and 3D renders. From explainer clips to product visualizations, we create dynamic content that engages.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- WORK Section -->
+<section id="work">
+<div class="work-track">
+<article class="work-card">
+<figure class="work-card__media">
+<img src="placeholder.jpg" alt="Projeto 1" loading="lazy">
+</figure>
+<div class="work-card__content">
+<h3 class="heading-medium">Projeto 1</h3>
+<p class="work-card__description">Branding & Digital Experience</p>
+</div>
+</article>
+
+  <article class="work-card">
+    <figure class="work-card__media">
+      <img src="placeholder.jpg" alt="Projeto 2" loading="lazy">
+    </figure>
+    <div class="work-card__content">
+      <h3 class="heading-medium">Projeto 2</h3>
+      <p class="work-card__description">UI/UX & Development</p>
     </div>
-  </section>
+  </article>
 
-  <!-- ABOUT US Section - Fluxo natural (abaixo do Hero) -->
-  <section id="about-us">
-    <div class="about-container">
-      <div class="about-content">
-        <p class="about-text" data-splitting>
-          <span class="line">We drive conversion and engagement,</span>
-          <span class="line">creating strategic value and lasting impact</span>
-          <span class="line">through design and technology.</span>
-        </p>
-      </div>
+  <article class="work-card">
+    <figure class="work-card__media">
+      <img src="placeholder.jpg" alt="Projeto 3" loading="lazy">
+    </figure>
+    <div class="work-card__content">
+      <h3 class="heading-medium">Projeto 3</h3>
+      <p class="work-card__description">Motion & 3D</p>
     </div>
-  </section>
+  </article>
 
-  <!-- WHAT WE DO Section -->
-  <section id="what-we-do">
-    <div class="container-full">
-      <div class="what-we-do__wrapper">
-        <div class="what-we-do__row">
-          <h2 class="what-we-do__title">UIUX</h2>
-          <p class="what-we-do__description">Designing interfaces and experiences that guide users intuitively. From wireframes to usability testing, we ensure your product is both attractive and effortless.</p>
-        </div>
-        <div class="what-we-do__row">
-          <h2 class="what-we-do__title">Branding</h2>
-          <p class="what-we-do__description">Defining your brand's purpose, personality and positioning so you stand out. We craft visual identities and messaging frameworks that make every touchpoint unmistakably "you."</p>
-        </div>
-        <div class="what-we-do__row">
-          <h2 class="what-we-do__title">Web & Digital</h2>
-          <p class="what-we-do__description">Building responsive, high-performance websites and platforms tailored to your needs. Whether it's a custom CMS, e-commerce site or landing page, we deliver scalable solutions without prefabricated templates.</p>
-        </div>
-        <div class="what-we-do__row">
-          <h2 class="what-we-do__title">Graphic Design</h2>
-          <p class="what-we-do__description">Transforming ideas into clean, compelling visuals—logos, brochures, social posts and infographics. We balance color, typography and layout to communicate your message clearly.</p>
-        </div>
-        <div class="what-we-do__row">
-          <h2 class="what-we-do__title">Digital Strategy</h2>
-          <p class="what-we-do__description">Turning data into targeted marketing, SEO, social media and analytics plans. We set objectives, track metrics and optimize so you reach the right audience at the right time.</p>
-        </div>
-        <div class="what-we-do__row">
-          <h2 class="what-we-do__title">Motion & 3D</h2>
-          <p class="what-we-do__description">Animating designs with motion graphics and 3D renders. From explainer clips to product visualizations, we create dynamic content that engages.</p>
-        </div>
-      </div>
+  <article class="work-card">
+    <figure class="work-card__media">
+      <img src="placeholder.jpg" alt="Projeto 4" loading="lazy">
+    </figure>
+    <div class="work-card__content">
+      <h3 class="heading-medium">Projeto 4</h3>
+      <p class="work-card__description">Digital Strategy</p>
     </div>
-  </section>
+  </article>
+</div>
 
-  <!-- WORK Section -->
-  <section id="work">
-    <div class="work-track">
-      <article class="work-card">
-        <figure class="work-card__media">
-          <img src="placeholder.jpg" alt="Projeto 1" loading="lazy">
-        </figure>
-        <div class="work-card__content">
-          <h3 class="heading-medium">Projeto 1</h3>
-          <p class="work-card__description">Branding & Digital Experience</p>
-        </div>
-      </article>
+```
 
-      <article class="work-card">
-        <figure class="work-card__media">
-          <img src="placeholder.jpg" alt="Projeto 2" loading="lazy">
-        </figure>
-        <div class="work-card__content">
-          <h3 class="heading-medium">Projeto 2</h3>
-          <p class="work-card__description">UI/UX & Development</p>
-        </div>
-      </article>
+</section>
 
-      <article class="work-card">
-        <figure class="work-card__media">
-          <img src="placeholder.jpg" alt="Projeto 3" loading="lazy">
-        </figure>
-        <div class="work-card__content">
-          <h3 class="heading-medium">Projeto 3</h3>
-          <p class="work-card__description">Motion & 3D</p>
-        </div>
-      </article>
+<!-- STATEMENT Section -->
+<section id="statement">
+<div class="container">
+<h2 class="heading-large">Statement</h2>
+</div>
+</section>
 
-      <article class="work-card">
-        <figure class="work-card__media">
-          <img src="placeholder.jpg" alt="Projeto 4" loading="lazy">
-        </figure>
-        <div class="work-card__content">
-          <h3 class="heading-medium">Projeto 4</h3>
-          <p class="work-card__description">Digital Strategy</p>
-        </div>
-      </article>
-    </div>
-  </section>
+<!-- CLIENTS Section -->
+<section id="clients">
+<div class="container">
+<h2 class="heading-large">Clients</h2>
+</div>
+</section>
 
-  <!-- STATEMENT Section -->
-  <section id="statement">
-    <div class="container">
-      <h2 class="heading-large">Statement</h2>
-    </div>
-  </section>
+<!-- CONTACT Section -->
+<section id="contact">
+<div class="container">
+<h2 class="heading-large">Contact</h2>
+</div>
+</section>
 
-  <!-- CLIENTS Section -->
-  <section id="clients">
-    <div class="container">
-      <h2 class="heading-large">Clients</h2>
-    </div>
-  </section>
-
-  <!-- CONTACT Section -->
-  <section id="contact">
-    <div class="container">
-      <h2 class="heading-large">Contact</h2>
-    </div>
-  </section>
-
-  <!-- Bundle React/Vite -->
-  <script type="module" src="/src/main.jsx"></script>
+<!-- Bundle React/Vite -->
+<script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
