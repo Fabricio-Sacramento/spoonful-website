@@ -185,7 +185,7 @@ function initHeroAboutTimeline() {
     )
     
     // Pausa para leitura do About Us (ORIGINAL)
-    .to({}, { duration: 0.3 }, '+=0');
+    .to({}, { duration: 0.6 }, '+=0');
 
   console.log('Hero/About timeline created successfully');
 }
@@ -205,48 +205,42 @@ function setupWhatWeDoSection() {
   
   console.log('Setting up What We Do section...');
   
-  // Inicialmente escondido (MANTIDO ORIGINAL)
-  gsap.set(section, { autoAlpha: 0 });
+  // Estado inicial: conteúdo invisível
+  gsap.set(rows, { opacity: 0, y: 50 });
   
-  // CORREÇÃO #3: ScrollTrigger com refreshPriority e pinSpacing ajustado
+  // ScrollTrigger 1: Animação do conteúdo (quando topo passa pelo centro)
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top center',
+    once: true,
+    refreshPriority: 2,
+    invalidateOnRefresh: true,
+    onEnter: () => {
+      console.log('What We Do content animation triggered');
+      
+      if (rows.length > 0) {
+        gsap.to(rows, {
+          y: 0,
+          opacity: 1,
+          stagger: 0.15,
+          duration: 0.8,
+          ease: 'power3.out'
+        });
+      }
+    }
+  });
+  
+  // ScrollTrigger 2: Pin da seção (pausa para leitura)
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
-    end: 'bottom bottom',
+    end: '+=200', // 2 wheel scrolls de pausa
     pin: true,
-    pinSpacing: false, // CORREÇÃO: Evita acúmulo de spacing
+    pinSpacing: true,
     anticipatePin: 1,
-    refreshPriority: 2, // CORREÇÃO: Prioridade média
+    refreshPriority: 2,
     invalidateOnRefresh: true,
-    onEnter: () => {
-      console.log('What We Do section entering viewport');
-      
-      // Animações MANTIDAS ORIGINAIS
-      gsap.to(section, {
-        autoAlpha: 1,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-      
-      if (rows.length > 0) {
-        gsap.fromTo(rows, 
-          {
-            y: 50,
-            opacity: 0
-          },
-          {
-            y: 0,
-            opacity: 1,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: 'power3.out',
-            delay: 0.2
-          }
-        );
-      }
-    },
     onLeave: () => {
-      // CORREÇÃO: Prepara próxima seção
       const work = document.querySelector('#work');
       if (work) gsap.set(work, { autoAlpha: 1 });
     }
