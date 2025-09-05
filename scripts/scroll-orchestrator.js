@@ -281,14 +281,14 @@ function setupWorkSectionHorizontal() {
     st = ScrollTrigger.create({
       trigger: work,
       start: 'top top',
-      end: () => `+=${getDistance()}`,
+      end: () => `+=${getDistance() + 200}`, // +200 para suavizar o fim
       pin: true,
-      pinSpacing: false, // CORREÇÃO: Evita spacing extra
+      pinSpacing: true, // CORREÇÃO: Evita spacing extra
       anticipatePin: 1,
       scrub: true,
       animation: horizontalAnimation,
       invalidateOnRefresh: true,
-      refreshPriority: 1, // CORREÇÃO: Prioridade baixa
+      refreshPriority: 2, // CORREÇÃO: Prioridade baixa
       onKill: () => {
         gsap.set(track, { x: 0 });
       },
