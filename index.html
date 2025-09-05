@@ -6,13 +6,13 @@
   <title>Fabricio Sacramento - Portfólio</title>
   <link rel="stylesheet" type="text/css" href="/styles/style.css">
   <link rel="stylesheet" type="text/css" href="/styles/what-we-do.css"> 
+  <link rel="stylesheet" type="text/css" href="/styles/work.css"> 
 </head>
 <body>
   <!-- SVG para o clipPath do Hero -->
   <svg width="0" height="0">
     <defs>
       <clipPath id="heroClip" clipPathUnits="objectBoundingBox">
-        <!-- 5 retângulos que cobrem toda a área inicialmente -->
         <rect id="clip-rect-1" x="0"   y="0" width="0.2" height="1" fill="black" />
         <rect id="clip-rect-2" x="0.2" y="0" width="0.2" height="1" fill="black" />
         <rect id="clip-rect-3" x="0.4" y="0" width="0.2" height="1" fill="black" />
@@ -21,32 +21,33 @@
       </clipPath>
     </defs>
   </svg>
-  <!-- HERO + About Us Wrapper -->
-  <div class="intro-wrapper">
-    
-  <!-- HERO Section -->
-    <section id="hero">
-      <!-- Background 3D Scene -->
-      <div id="root"></div>
-      <div class="container hero-content">
-        <h2 class="heading-small" data-splitting>DESIGNING</h2>
-        <h2 class="heading-large" data-splitting>BRANDS</h2>
-        <h2 class="heading-large" data-splitting>PRODUCTS</h2>
-        <h2 class="heading-large" data-splitting>EXPERIENCES</h2>
-      </div>
-    </section>
 
-    <!-- ABOUT US Section (posicionada atrás do Hero) -->
-    <section id="about-us">
-      <div class="about-us-container-absolute">
-        <p class="text-back heading-medium" data-splitting>
-          <span class="line"><span>We drive conversion and engagement,</span></span>
-          <span class="line"><span>creating strategic value and lasting impact</span></span>
-          <span class="line"><span>through design and technology.</span></span>
+  <!-- HERO Section - Fluxo natural -->
+  <section id="hero">
+    <!-- Background 3D Scene -->
+    <div id="root"></div>
+    <div class="hero-container">
+      <div class="hero-content">
+        <h2 class="hero-subtitle" data-splitting>DESIGNING</h2>
+        <h2 class="hero-title" data-splitting>BRANDS</h2>
+        <h2 class="hero-title" data-splitting>PRODUCTS</h2>
+        <h2 class="hero-title" data-splitting>EXPERIENCES</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT US Section - Fluxo natural (abaixo do Hero) -->
+  <section id="about-us">
+    <div class="about-container">
+      <div class="about-content">
+        <p class="about-text" data-splitting>
+          <span class="line">We drive conversion and engagement,</span>
+          <span class="line">creating strategic value and lasting impact</span>
+          <span class="line">through design and technology.</span>
         </p>
       </div>
-    </section>
-  </div>  
+    </div>
+  </section>
 
   <!-- WHAT WE DO Section -->
   <section id="what-we-do">

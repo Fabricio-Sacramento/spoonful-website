@@ -1,7 +1,7 @@
 @import url("./src/fonts.css");
 
 /* ----------------------------- */
-/* 1) DESIGN TOKENS (Variáveis)  */
+/* 1) DESIGN TOKENS              */
 /* ----------------------------- */
 :root {
   /* Primary Green */
@@ -28,24 +28,21 @@
   --neutral-dark: #292929;
   --neutral-darker: #131313;
 
-  /* Espaçamentos */
+  /* Spacings */
   --space-8: 8px;
   --space-16: 16px;
   --space-24: 24px;
   --space-32: 32px;
   --space-64: 64px;
   --space-128: 128px;
-
-}
-
-/* Box-sizing global */
-*, *::before, *::after {
-  box-sizing: border-box;
 }
 
 /* ----------------------------- */
 /* 2) RESET / BASE               */
 /* ----------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
@@ -60,68 +57,10 @@ html, body {
 body {
   background-color: var(--neutral-normal);
   color: white;
-  position: relative; /* Garante que o pseudo-elemento seja posicionado corretamente */
-  top: 0;
-  left: 0;
-}
-/*
-body::after {
-  content: "";
-  position: fixed;
-  top: -100%;
-  left: -100%;
-  width: 300%;
-  height: 300%;
-  background-image: url("https://i.imgur.com/ax4UqqW.png");
-  background-repeat: repeat;
-  opacity: 0.05;
-  pointer-events: none;
-  animation: noise 12s steps(20) infinite;
-  transition: opacity 0.4s ease;
-  will-change: transform;
-  z-index: -1; /* Ajuste o z-index para garantir que o noise fique atrás do conteúdo 
+  font-family: 'Montserrat', sans-serif;
 }
 
-
-@keyframes noise {
-  0% {
-    transform: translate(20%, -15%);
-  }
-  10% {
-    transform: translate(-20%, -15%);
-  }
-  20% {
-    transform: translate(20%, -5%);
-  }
-  30% {
-    transform: translate(-20%, -5%);
-  }
-  40% {
-    transform: translate(20%, 5%);
-  }
-  50% {
-    transform: translate(-20%, 5%);
-  }
-  60% {
-    transform: translate(20%, 15%);
-  }
-  70% {
-    transform: translate(-20%, 15%);
-  }
-  80% {
-    transform: translate(20%, 5%);
-  }
-  90% {
-    transform: translate(-20%, 5%);
-  }
-  100% {
-    transform: translate(20%, -5%);
-  }
-}
-*/
-/* ================================= */
-/* Overrides para SVG de clipPath    */
-/* ================================= */
+/* SVG clipPath styling */
 svg[width="0"][height="0"] {
   display: block;
   position: absolute;
@@ -132,12 +71,9 @@ svg[width="0"][height="0"] {
   overflow: hidden;
 }
 
-
-
 /* ----------------------------- */
-/* 3) ESTILOS GERAIS             */
+/* 3) GLOBAL CONTAINERS          */
 /* ----------------------------- */
-/* Container do canvas 3D */
 #root {
   position: absolute;
   top: 0;
@@ -146,17 +82,226 @@ svg[width="0"][height="0"] {
   height: 100vh;
   z-index: 0;
 }
+
 canvas {
   display: block;
 }
+
 section {
   width: 100%;
-  height: 100vh;
-  display: flex;
   position: relative;
   padding: 0;
   margin: 0;
 }
+
+/* Utility classes */
+.flex { display: flex; }
+.w-max { width: max-content; }
+.h-screen { height: 100vh; }
+.overflow-hidden { overflow: hidden; }
+
+/* ----------------------------- */
+/* 4) HERO SECTION - REFATORADO  */
+/* ----------------------------- */
+#hero {
+  height: 100vh;
+  min-height: 600px; /* fallback para telas muito pequenas */
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  
+  /* Clip-path será aplicado via JS nas animações */
+  clip-path: url(#heroClip);
+}
+
+.hero-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 var(--space-32);
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content {
+  max-width: 1200px;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Garante que chars tenham 3D perspective para animações */
+.hero-content .char {
+  backface-visibility: visible;
+  transform-style: preserve-3d;
+  display: inline-block;
+}
+
+.hero-subtitle {
+  color: var(--primary-red);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 100;
+  font-size: clamp(24px, 4vw, 40px);
+  line-height: 1.5;
+  letter-spacing: 0;
+  margin: 0;
+  padding-left: 5px;
+}
+
+.hero-title {
+  color: var(--neutral-light);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 900;
+  font-size: clamp(60px, 12vw, 120px);
+  line-height: 0.75;
+  letter-spacing: -3px;
+  margin: 0;
+}
+
+/* ----------------------------- */
+/* 5) ABOUT US - REFATORADO      */
+/* ----------------------------- */
+#about-us {
+  height: 100vh;
+  min-height: 600px;
+  background-color: var(--primary-red);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.about-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-32);
+}
+
+.about-content {
+  width: 100%;
+  text-align: left;
+}
+
+.about-text {
+  color: var(--neutral-light);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 900;
+  font-size: clamp(40px, 8vw, 80px);
+  line-height: 1.1;
+  letter-spacing: 1px;
+  margin: 0;
+  white-space: normal;
+}
+
+.about-text .line {
+  display: block;
+  overflow: hidden;
+}
+
+.about-text .char {
+  display: inline-block;
+  backface-visibility: visible;
+  transform-style: preserve-3d;
+}
+
+/* ----------------------------- */
+/* 6) RESPONSIVIDADE             */
+/* ----------------------------- */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .hero-container,
+  .about-container {
+    padding: 0 var(--space-24);
+  }
+  
+  .hero-title {
+    font-size: clamp(48px, 10vw, 80px);
+    letter-spacing: -2px;
+  }
+  
+  .about-text {
+    font-size: clamp(32px, 6vw, 60px);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  #hero,
+  #about-us {
+    min-height: 100svh; /* safe viewport height */
+  }
+  
+  .hero-container,
+  .about-container {
+    padding: 0 var(--space-16);
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(18px, 5vw, 28px);
+  }
+  
+  .hero-title {
+    font-size: clamp(36px, 8vw, 64px);
+    letter-spacing: -1px;
+    line-height: 0.8;
+  }
+  
+  .about-text {
+    font-size: clamp(24px, 6vw, 48px);
+    line-height: 1.2;
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 375px) {
+  .hero-content {
+    gap: var(--space-4);
+  }
+  
+  .hero-title {
+    font-size: clamp(28px, 10vw, 48px);
+  }
+  
+  .about-text {
+    font-size: clamp(20px, 7vw, 36px);
+  }
+}
+
+/* ----------------------------- */
+/* 7) PERFORMANCE OPTIMIZATIONS  */
+/* ----------------------------- */
+
+/* Smooth animations */
+.hero-content,
+.about-content {
+  will-change: transform;
+  transform: translateZ(0); /* força layer de hardware */
+}
+
+/* Otimização de repaints */
+.hero-content .char,
+.about-text .char {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* ----------------------------- */
+/* 8) REMAINING SECTIONS         */
+/* ----------------------------- */
+
+/* Container padrão para outras seções */
 .container {
   width: 100%;
   margin: 0 auto;
@@ -164,8 +309,10 @@ section {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 0 var(--space-32);
 }
-/* Para a seção What We Do, usamos um container em linha */
+
+/* Container full width para What We Do */
 .container-full {
   width: 100%;
   margin: 0 auto;
@@ -176,142 +323,55 @@ section {
   align-items: stretch;
 }
 
+/* Spacer utility */
 .spacer {
-  height: 25vh; /* Ajuste a altura conforme necessário */
+  height: 25vh;
   width: 100%;
   display: block;
 }
 
-.flex           { display: flex !important; }
-.w-max          { width: max-content !important; }
-.h-screen       { height: 100vh !important; }
-.overflow-hidden{ overflow: hidden !important; }
-
-
-/* ================================== */
-/* 0) Wrapper comum para Hero + About */
-/* ================================== */
-.intro-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100vh;           /* soma 100vh + 100vh dos filhos */
-  overflow: hidden;       /* esconde tudo que sair da viewport */
-  background-color: var(--primary-red); /* cor do fundo até About Us aparecer */
-}
-
-/* Ambos os filhos do wrapper ocupam exatamente a viewport e ficam empilhados */
-.intro-wrapper > section {
-  height: 100vh !important;
-  position: absolute !important;  /* força a camada, tira do fluxo normal */
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-}
-/* ----------------------------- */
-/* 4) HERO SECTION              */
-/* ----------------------------- */
-#hero {
-  top: 0;
-  left: 0;
-  position: relative;
-  overflow: hidden;
-  z-index: 2;
-  background: transparent;
-  clip-path: url(#heroClip);
-}
-.hero-content {
-  margin: 0;
-  padding: 0;
-  position: relative;
-  z-index: 1;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-/* Garante que, ao rotacionar em 3D, a face traseira dos chars seja visível */
-.hero-content .char {
-  -webkit-backface-visibility: visible;
-  backface-visibility: visible;
-  -webkit-transform-style: preserve-3d;
-  transform-style: preserve-3d;
-}
-
-
-/* --------------------------------- */
-/* ABOUT US Section                */
-/* --------------------------------- */
-#about-us {
-  top: 0;
-  left: 0;
-  position: relative;
-  overflow: visible;
-  z-index: 1 !important;
-  background-color: var(--primary-red);
-}
-.about-us-container-absolute {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.text-back {
-  white-space: normal;
-}
-.text-back .line {
-  display: block;
-  overflow: hidden;
-}
-.text-back .char {
-  display: inline-block;
-}
-
-
-/* ----------------------------- */
-/* 5) HEADINGS                   */ 
-/* ----------------------------- */
-
-
-
-/* Headings */
+/* Typography classes para outras seções */
 .heading-large {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 900;
-  font-size: 120px;
+  font-size: clamp(60px, 12vw, 120px);
   line-height: 0.75;
   letter-spacing: -3px;
   margin: 0;
-  z-index: 1;
+  text-align: left; /* Force left alignment */
 }
+
 .heading-medium {
-  color: var(--primary-light);
+  color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 900;
-  font-size: 80px;
+  font-size: clamp(40px, 8vw, 80px);
   line-height: 1.1;
   letter-spacing: 1px;
-  /* font-style: italic; */
+  margin: 0;
+  text-align: left; /* Force left alignment */
 }
+
 .heading-medium-bold {
   color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 100;
-  font-size: 90px;
+  font-size: clamp(45px, 9vw, 90px);
   line-height: 1.1;      
   letter-spacing: 3px;
-  /* font-style: italic; */
-}
-.heading-small {
-  color: var(--primary-red);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-weight: 100;
-  font-size: 40px;
-  line-height: 1.5;
-  letter-spacing: 0;
   margin: 0;
-  padding-left: 5px;
-  z-index: 1;
+  text-align: left; /* Force left alignment */
+}
+
+/* Specific section fixes */
+#statement, #clients, #contact {
+  background-color: var(--neutral-dark);
+}
+
+#statement .container,
+#clients .container, 
+#contact .container {
+  align-items: flex-start;
+  text-align: left;
 }
