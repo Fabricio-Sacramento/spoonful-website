@@ -4,6 +4,7 @@
 import Splitting from 'splitting';
 import 'splitting/dist/splitting.css';
 import gsap from 'gsap';
+import KineticWorkScroll from './kinetic-work-scroll.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -250,81 +251,48 @@ function setupWhatWeDoSection() {
 // -----------------------------
 // 5) WORK – scroll horizontal com clamp e pin estável (CORRIGIDA)
 // -----------------------------
-function setupWorkSectionHorizontal() {
-  const work = document.querySelector('#work');
-  if (!work) return;
-
-  const track = work.querySelector('.work-track');
-  if (!track) return;
-
-  const mq = window.matchMedia('(min-width: 1024px)');
-  let st = null;
-  let horizontalAnimation = null;
-
-  // Função para calcular distância (MANTIDA ORIGINAL)
-  const getDistance = () => {
-    const fullWidth = track.scrollWidth || 0;
-    const containerWidth = work.clientWidth || 0;
-    return Math.max(1, fullWidth - containerWidth);
-  };
-
-  const enable = () => {
-    gsap.set(track, { x: 0 });
-
-    horizontalAnimation = gsap.to(track, {
-      x: () => -getDistance(),
-      ease: 'none',
-      paused: true,
-    });
-
-    // CORREÇÃO #4: refreshPriority baixa e pinSpacing ajustado
-    st = ScrollTrigger.create({
-      trigger: work,
-      start: 'top top',
-      end: () => `+=${getDistance() + 200}`, // +200 para suavizar o fim
-      pin: true,
-      pinSpacing: true, // CORREÇÃO: Evita spacing extra
-      anticipatePin: 1,
-      scrub: true,
-      animation: horizontalAnimation,
-      invalidateOnRefresh: true,
-      refreshPriority: 2, // CORREÇÃO: Prioridade baixa
-      onKill: () => {
-        gsap.set(track, { x: 0 });
-      },
-    });
-
-    // Refresh apenas se necessário (OTIMIZADO)
-    const imgs = work.querySelectorAll('img');
-    imgs.forEach((img) => {
-      if (!img.complete) {
-        img.addEventListener('load', () => smartRefresh(), { once: true });
-        img.addEventListener('error', () => smartRefresh(), { once: true });
-      }
-    });
-  };
-
-  const disable = () => {
-    if (st) {
-      st.kill();
-      st = null;
-    }
-    if (horizontalAnimation) {
-      horizontalAnimation.kill();
-      horizontalAnimation = null;
-    }
-    gsap.set(track, { clearProps: 'transform' });
-    smartRefresh();
-  };
-
-  const apply = () => (mq.matches ? enable() : disable());
-  apply();
-
-  mq.addEventListener('change', apply);
-
-  window.addEventListener('resize', () => {
-    if (st) st.refresh();
+function setupWorkSectionKinetic() {
+  console.log('🎬 Iniciando setup da seção Work com Kinetic Scroll...');
+  
+  // Verifica se a classe está disponível
+  if (typeof KineticWorkScroll === 'undefined') {
+    console.error('❌ KineticWorkScroll não encontrado! Verifique o import.');
+    return;
+  }
+  
+  // Verifica se os elementos existem (usando os seletores corretos)
+  const workSection = document.querySelector('#work');
+  const workTrack = workSection?.querySelector('.work-track');
+  
+  if (!workSection) {
+    console.error('❌ Seção #work não encontrada!');
+    return;
+  }
+  
+  if (!workTrack) {
+    console.error('❌ Container .work-track não encontrado!');
+    return;
+  }
+  
+  console.log('✅ Elementos encontrados:', {
+    section: !!workSection,
+    track: !!workTrack,
+    cards: workSection.querySelectorAll('.work-card').length
   });
+  
+  // Inicializa o kinetic scroll
+  const kineticScroll = new KineticWorkScroll();
+  kineticScroll.init();
+  
+  // Guarda referência global para debug e cleanup
+  window.workKineticInstance = kineticScroll;
+  
+  console.log('✅ Kinetic Scroll configurado com sucesso!');
+  
+  // Debug info (opcional)
+  setTimeout(() => {
+    console.log('📊 Debug Info:', kineticScroll.getDebugInfo());
+  }, 1000);
 }
 
 function setupTestimonialsSection() {
@@ -414,7 +382,7 @@ window.addEventListener('load', () => {
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    setupWorkSectionHorizontal();
+    setupWorkSectionKinetic();
     setupTestimonialsSection();
   });
   
