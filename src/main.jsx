@@ -2,7 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
-import '../scripts/scroll-orchestrator.js';
+import './scripts/scroll-orchestrator.js';
 
 
 // 1) Monta o canvas 3D / cena React no #root

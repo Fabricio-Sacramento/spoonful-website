@@ -56,7 +56,7 @@ class KineticWorkScroll {
     this.scrollTrigger = ScrollTrigger.create({
       trigger: this.workSection,
       start: 'top top',
-      end: () => `+=${this.bounds.max + window.innerHeight * 0.3}`,
+      end: () => `+=${this.bounds.max + window.innerHeight * 1.2}`, // Aumentar de 0.3 para 1.2
       pin: true,
       pinSpacing: true,
       
@@ -118,18 +118,6 @@ class KineticWorkScroll {
 
   handleWheel(e) {
     if (!this.isActive) return;
-    
-    // Verifica se está nos limites e usuário quer continuar
-    const atStart = this.position <= this.config.exitThreshold;
-    const atEnd = this.position >= this.bounds.max - this.config.exitThreshold;
-    const slowVelocity = Math.abs(this.velocity) < 1;
-    
-    if ((atStart && e.deltaY < 0 && slowVelocity) || 
-        (atEnd && e.deltaY > 0 && slowVelocity)) {
-      // Libera scroll - não previne o evento
-      this.stopKinetic();
-      return;
-    }
     
     e.preventDefault();
     

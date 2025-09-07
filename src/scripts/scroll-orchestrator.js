@@ -381,3 +381,12 @@ if (window.location.hash === '#debug') {
 
 // Export (MANTIDO ORIGINAL)
 export { smartRefresh as refreshScrollTriggers, resetAnimations };
+
+// Disponibilizar para debug
+window.debugKinetic = () => {
+  console.log('Kinetic debug info:', {
+    workSection: document.querySelector('#work'),
+    workTrack: document.querySelector('.work-track'),
+    // outros dados relevantes
+  });
+};
