@@ -253,46 +253,9 @@ function setupWhatWeDoSection() {
 // -----------------------------
 function setupWorkSectionKinetic() {
   console.log('🎬 Iniciando setup da seção Work com Kinetic Scroll...');
-  
-  // Verifica se a classe está disponível
-  if (typeof KineticWorkScroll === 'undefined') {
-    console.error('❌ KineticWorkScroll não encontrado! Verifique o import.');
-    return;
-  }
-  
-  // Verifica se os elementos existem (usando os seletores corretos)
-  const workSection = document.querySelector('#work');
-  const workTrack = workSection?.querySelector('.work-track');
-  
-  if (!workSection) {
-    console.error('❌ Seção #work não encontrada!');
-    return;
-  }
-  
-  if (!workTrack) {
-    console.error('❌ Container .work-track não encontrado!');
-    return;
-  }
-  
-  console.log('✅ Elementos encontrados:', {
-    section: !!workSection,
-    track: !!workTrack,
-    cards: workSection.querySelectorAll('.work-card').length
-  });
-  
-  // Inicializa o kinetic scroll
-  const kineticScroll = new KineticWorkScroll();
-  kineticScroll.init();
-  
-  // Guarda referência global para debug e cleanup
-  window.workKineticInstance = kineticScroll;
-  
-  console.log('✅ Kinetic Scroll configurado com sucesso!');
-  
-  // Debug info (opcional)
-  setTimeout(() => {
-    console.log('📊 Debug Info:', kineticScroll.getDebugInfo());
-  }, 1000);
+  const kinetic = new KineticWorkScroll();
+  kinetic.init();
+  window.workKineticInstance = kinetic;
 }
 
 function setupTestimonialsSection() {
