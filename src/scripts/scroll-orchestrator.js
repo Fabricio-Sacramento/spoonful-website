@@ -4,7 +4,7 @@
 import Splitting from 'splitting';
 import 'splitting/dist/splitting.css';
 import gsap from 'gsap';
-import KineticWorkScroll from './kinetic-work-scroll.js';
+//import KineticWorkScroll from './kinetic-work-scroll.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -242,7 +242,7 @@ function setupWhatWeDoSection() {
     refreshPriority: 2,
     invalidateOnRefresh: true,
     onLeave: () => {
-      const work = document.querySelector('#work');
+      const work = document.querySelector('#work-mount-point');
       if (work) gsap.set(work, { autoAlpha: 1 });
     }
   });
@@ -251,12 +251,12 @@ function setupWhatWeDoSection() {
 // -----------------------------
 // 5) WORK – scroll horizontal com clamp e pin estável (CORRIGIDA)
 // -----------------------------
-function setupWorkSectionKinetic() {
-  console.log('🎬 Iniciando setup da seção Work com Kinetic Scroll...');
-  const kinetic = new KineticWorkScroll();
-  kinetic.init();
-  window.workKineticInstance = kinetic;
-}
+// function setupWorkSectionKinetic() {
+//  console.log('🎬 Iniciando setup da seção Work com Kinetic Scroll...');
+//  const kinetic = new KineticWorkScroll();
+//  kinetic.init();
+//  window.workKineticInstance = kinetic;
+//}
 
 function setupTestimonialsSection() {
   const section = document.querySelector('#testimonials');
@@ -345,7 +345,7 @@ window.addEventListener('load', () => {
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    setupWorkSectionKinetic();
+    //setupWorkSectionKinetic();
     setupTestimonialsSection();
   });
   
