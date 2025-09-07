@@ -99,6 +99,10 @@
 
 /* Mobile Layout */
 @media (max-width: 1023px) {
+  #work {
+    height: auto !important;
+    overflow: visible !important;
+  }
   .work-track {
     display: flex;
     flex-direction: column;
@@ -108,6 +112,7 @@
 
   .work-card {
     width: 100%;
+    max-width: none;
     height: min(400px, 50vh);
   }
 }

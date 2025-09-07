@@ -1,37 +1,49 @@
 /**
- * 🚀 Kinetic Scroll para Seção Work - VERSÃO CORRIGIDA
- * Implementação custom com GSAP + ScrollTrigger integration
- * Mantém compatibilidade total com arquitetura existente
+ * 🚀 Kinetic Scroll para Seção Work - VERSÃO FINAL REFINADA
+ * Implementação com todos os ajustes cirúrgicos aplicados
+ * Resolve todos os edge cases e problemas de lifecycle
  */
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// Registra o plugin
 gsap.registerPlugin(ScrollTrigger);
 
 class KineticWorkScroll {
   constructor() {
+    // Estados da máquina de estados
+    this.states = {
+      IDLE: 'idle',
+      ENTERING: 'entering', 
+      ACTIVE: 'active',
+      EXITING: 'exiting'
+    };
+    
+    this.currentState = this.states.IDLE;
+    
     // Physics parameters
     this.velocity = 0;
     this.position = 0;
     this.targetPosition = 0;
-    this.isKineticActive = false;
+    this.currentCardIndex = 0;
     
-    // Configuration
+    // Configuration otimizada
     this.config = {
-      friction: 0.92,           // Desaceleração natural
-      maxVelocity: 20,          // Velocidade máxima reduzida
-      bounceStiffness: 0.1,     // Bounce muito sutil
-      damping: 0.8,             // Amortecimento natural
-      sensitivity: 0.8,         // Sensibilidade reduzida
-      velocityThreshold: 0.1    // Threshold para parar animação
+      friction: 0.92,
+      maxVelocity: 18,
+      bounceStiffness: 0.08,
+      damping: 0.85,
+      sensitivity: 0.6,
+      velocityThreshold: 0.1,
+      boundaryThreshold: 3, // reduzido para liberação mais natural
+      exitScrollBuffer: 300 // corredor maior para facilitar saída
     };
     
     // State management
     this.bounds = { min: 0, max: 0 };
     this.scrollTriggerInstance = null;
     this.rafId = null;
+    this.isDesktop = window.matchMedia('(min-width: 1024px)').matches;
     
     // Elements
     this.workSection = null;
@@ -49,11 +61,29 @@ class KineticWorkScroll {
     // Performance optimization
     this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     
-    console.log('🎯 KineticWorkScroll - Versão Corrigida Criada');
+    // Observers para cleanup
+    this.cardObserver = null;
+    
+    // Bound handlers para attach/detach consistente
+    this.handleWheelThrottled = this.throttle(this.handleWheel.bind(this), 16);
+    this.handleResizeDebounced = this.debounce(this.handleResize.bind(this), 250);
+    this.handleKeydownBound = this.handleKeydown.bind(this);
+    this.handleTouchStartBound = this.handleTouchStart.bind(this);
+    this.handleTouchMoveBound = this.handleTouchMove.bind(this);
+    this.handleTouchEndBound = this.handleTouchEnd.bind(this);
+    
+    // Performance monitoring (dev only)
+    this.performanceMonitor = {
+      frameCount: 0,
+      lastTime: performance.now(),
+      enabled: import.meta.env.DEV === true
+    };
+    
+    console.log('🎯 KineticWorkScroll - Versão Final Refinada Criada');
   }
 
   /**
-   * Inicialização principal
+   * Inicialização com matchMedia para desktop/mobile
    */
   init() {
     this.workSection = document.querySelector('#work');
@@ -62,43 +92,154 @@ class KineticWorkScroll {
     
     if (!this.workSection || !this.cardsContainer) {
       console.warn('Work section elements not found');
-      console.log('Looking for: #work and .work-track');
-      console.log('Found section:', !!this.workSection);
-      console.log('Found container:', !!this.cardsContainer);
       return;
     }
 
-    this.calculateBounds();
-    this.setupScrollTrigger();
-    this.setupEventListeners();
+    // Configuração responsiva usando matchMedia
+    ScrollTrigger.matchMedia({
+      "(min-width: 1024px)": () => {
+        this.setupDesktop();
+      },
+      "(max-width: 1023px)": () => {
+        this.setupMobile();
+      }
+    });
     
-    console.log('🚀 Kinetic Work Scroll initialized - FIXED VERSION');
+    console.log('🚀 Kinetic Work Scroll initialized - FINAL REFINED VERSION');
   }
 
   /**
-   * Calcula os limites do scroll horizontal
+   * Configuração para desktop
+   */
+  setupDesktop() {
+    if (this.reduceMotion) {
+      this.setupReducedMotion();
+      return;
+    }
+    
+    this.calculateBounds();
+    this.setupScrollTrigger();
+    // Não anexa listeners aqui - serão anexados apenas quando ACTIVE
+    
+    console.log('💻 Desktop kinetic scroll configurado');
+  }
+
+  /**
+   * Configuração para mobile (sem kinetic)
+   */
+  setupMobile() {
+    // Remove height fixa e overflow hidden para permitir scroll vertical
+    gsap.set(this.workSection, {
+      height: 'auto',
+      overflow: 'visible'
+    });
+    
+    // ScrollTrigger simples sem pin para mobile
+    ScrollTrigger.create({
+      trigger: this.workSection,
+      start: 'top 80%',
+      end: 'bottom 20%',
+      onEnter: () => this.animateCardsIn(),
+      onLeave: () => console.log('Mobile: saindo da seção Work'),
+    });
+    
+    console.log('📱 Mobile layout configurado (sem kinetic)');
+  }
+
+  /**
+   * Configuração para usuários com motion reduzido
+   */
+  setupReducedMotion() {
+    // ScrollTrigger simples sem pin
+    ScrollTrigger.create({
+      trigger: this.workSection,
+      start: 'top 80%', 
+      end: 'bottom 20%',
+      onEnter: () => {
+        gsap.to(this.cards, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'power2.out'
+        });
+      }
+    });
+    
+    console.log('♿ Modo reduzido de movimento configurado');
+  }
+
+  /**
+   * Animação de entrada dos cards no mobile com cleanup adequado
+   */
+  animateCardsIn() {
+    // Desconecta observer anterior se existir
+    if (this.cardObserver) {
+      this.cardObserver.disconnect();
+    }
+    
+    this.cardObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          gsap.to(entry.target, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'power2.out'
+          });
+          this.cardObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    this.cards.forEach(card => {
+      gsap.set(card, { autoAlpha: 0, y: 30 });
+      this.cardObserver.observe(card);
+    });
+  }
+
+  /**
+   * Calcula os limites do scroll horizontal considerando padding
    */
   calculateBounds() {
     const containerWidth = this.cardsContainer.scrollWidth;
-    const viewportWidth = this.workSection.offsetWidth;
-    this.bounds.max = Math.max(0, containerWidth - viewportWidth);
+    const viewportWidth = this.workSection.clientWidth; // clientWidth mais estável
     
-    console.log('Scroll bounds:', this.bounds);
+    // Considera padding do container para alinhamento perfeito
+    const style = window.getComputedStyle(this.cardsContainer);
+    const padLeft = parseFloat(style.paddingLeft) || 0;
+    const padRight = parseFloat(style.paddingRight) || 0;
+    const effectiveScrollWidth = containerWidth - padLeft - padRight;
+    
+    this.bounds.max = Math.max(0, effectiveScrollWidth - viewportWidth + padLeft);
+    
+    console.log('Scroll bounds calculados:', {
+      max: this.bounds.max,
+      containerWidth,
+      viewportWidth,
+      padding: { left: padLeft, right: padRight }
+    });
   }
 
   /**
-   * Setup ScrollTrigger com integração kinetic
+   * Obtém o gap real do CSS
+   */
+  getGapPx() {
+    const style = window.getComputedStyle(this.cardsContainer);
+    const gap = parseFloat(style.columnGap || style.gap || '0') || 0;
+    return gap;
+  }
+
+  /**
+   * Setup ScrollTrigger para desktop com lógica de reset corrigida
    */
   setupScrollTrigger() {
-    // ScrollTrigger principal com configuração corrigida
     this.scrollTriggerInstance = ScrollTrigger.create({
       trigger: this.workSection,
       start: 'top top',
       end: () => {
-        // Calcula end baseado no conteúdo a ser scrollado
         this.calculateBounds();
-        // Reduz a distância para permitir saída mais fácil
-        const scrollDistance = this.bounds.max + window.innerHeight * 0.3;
+        const scrollDistance = this.bounds.max + this.config.exitScrollBuffer;
         console.log('📏 ScrollTrigger end distance:', scrollDistance);
         return `+=${scrollDistance}`;
       },
@@ -106,76 +247,80 @@ class KineticWorkScroll {
       pinSpacing: true,
       scrub: false,
       refreshPriority: 2,
-      anticipatePin: 1, // Ajuda com performance
+      anticipatePin: 1,
       
       onUpdate: (self) => {
         const progress = self.progress;
-        console.log('📊 ScrollTrigger progress:', progress.toFixed(3));
         
-        // Se chegou muito perto do final (95%), facilita a saída
-        if (progress > 0.95) {
-          console.log('🚪 Preparando saída da seção...');
-          this.prepareExit();
+        // Preparar saída quando muito próximo do fim (evita re-entrada)
+        if (
+          progress > 0.97 &&
+          (this.currentState === this.states.ACTIVE || this.currentState === this.states.EXITING)
+        ) {
+          this.forceLeaveForward();
         }
       },
       
       onEnter: () => {
         console.log('🎯 Entrando na seção Work');
-        this.resetState();
-        setTimeout(() => this.startKineticMode(), 100);
+        this.transitionTo(this.states.ENTERING);
       },
       
       onLeave: () => {
-        console.log('🚪 Saindo da seção Work');
-        this.stopKineticMode();
-        this.resetPosition();
-        this.restorePageScroll();
+        console.log('🚪 Saindo da seção Work (forward)');
+        this.transitionTo(this.states.IDLE);
+        // NÃO reseta posição ao sair para frente - mantém último card visível
       },
       
       onEnterBack: () => {
         console.log('🔄 Voltando para seção Work');
-        this.resetState();
-        setTimeout(() => this.startKineticMode(), 100);
+        this.resetPosition(); // Reseta ANTES de reentrar
+        this.transitionTo(this.states.ENTERING);
       },
       
       onLeaveBack: () => {
-        console.log('⬅️ Saindo da seção Work (volta)');
-        this.stopKineticMode();
-        this.resetPosition();
-        this.restorePageScroll();
+        console.log('⬅️ Saindo da seção Work (backward)');
+        this.transitionTo(this.states.IDLE);
+        this.resetPosition(); // Reseta ao sair para trás
       }
     });
-    
-    console.log('🎬 ScrollTrigger criado com configuração otimizada');
   }
 
   /**
-   * Prepara a saída quando chegou no final
+   * Máquina de estados para controle explícito
    */
-  prepareExit() {
-    // Reduz friction para facilitar movimento
-    if (this.velocity !== 0) {
-      this.velocity *= 0.5;
-    }
+  transitionTo(newState) {
+    if (this.currentState === newState) return;
     
-    // Se está praticamente parado no final, força conclusão
-    const isAtEnd = this.position >= this.bounds.max * 0.95;
-    const isIdle = Math.abs(this.velocity) < 0.5;
+    console.log(`State: ${this.currentState} → ${newState}`);
+    this.currentState = newState;
     
-    if (isAtEnd && isIdle) {
-      console.log('🏁 Forçando conclusão do scroll horizontal');
-      this.position = this.bounds.max;
-      this.targetPosition = this.bounds.max;
-      this.velocity = 0;
-    }
+    this.handleStateChange(newState);
   }
 
   /**
-   * Restaura scroll da página
+   * Gerencia mudanças de estado
    */
-  restorePageScroll() {
-    document.body.style.overflow = '';
-    console.log('📜 Scroll da página restaurado');
+  handleStateChange(newState) {
+    switch(newState) {
+      case this.states.ENTERING:
+        this.resetState();
+        // Ativação imediata - sem setTimeout
+        this.transitionTo(this.states.ACTIVE);
+        break;
+        
+      case this.states.ACTIVE:
+        this.startKineticMode();
+        break;
+        
+      case this.states.EXITING:
+        this.prepareExit();
+        break;
+        
+      case this.states.IDLE:
+        this.stopKineticMode();
+        break;
+    }
   }
 
   /**
@@ -185,13 +330,119 @@ class KineticWorkScroll {
     this.velocity = 0;
     this.position = 0;
     this.targetPosition = 0;
+    this.currentCardIndex = 0;
+    
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
+  /**
+   * Ativa modo kinetic e anexa listeners
+   */
+  startKineticMode() {
+    if (this.currentState !== this.states.ACTIVE) return;
+    
+    this.attachListeners(); // Anexa listeners apenas quando ativo
+    this.startRenderLoop();
+    this.workSection.classList.add('kinetic-active');
+    
+    console.log('🎯 Kinetic mode activated');
+  }
+
+  /**
+   * Desativa modo kinetic e remove listeners
+   */
+  stopKineticMode() {
+    this.velocity = 0;
     
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
     
-    console.log('🔄 Estado resetado');
+    this.detachListeners(); // Remove listeners ao desativar
+    this.workSection.classList.remove('kinetic-active');
+    console.log('🛑 Kinetic mode deactivated');
+  }
+
+  /**
++   * Empurra programaticamente além do end do ScrollTrigger para garantir onLeave
++   * (escape hatch contra travas por falta de delta vertical suficiente)
++   */
+  forceLeaveForward() {
+    // Para interceptação imediatamente
+    this.stopKineticMode();
+    this.currentState = this.states.IDLE;
+
+    if (this.scrollTriggerInstance) {
+      const end = this.scrollTriggerInstance.end; // px absolutos do scroller (window)
+      // Nudge no frame seguinte para não conflitar com o wheel atual
+      requestAnimationFrame(() => {
+        const y = window.scrollY || window.pageYOffset || 0;
+        if (y < end - 1) {
+          window.scrollTo({ top: end + 2, behavior: 'auto' });
+        } else {
+          // Mesmo colado no end, 1px garante disparo do onLeave
+          window.scrollBy({ top: 1, left: 0, behavior: 'auto' });
+        }
+      });
+    }
+  }
+
+  /**
+   * Anexa event listeners (apenas quando ACTIVE)
+   */
+  attachListeners() {
+    if (!this.workSection) return;
+    
+    this.workSection.addEventListener('wheel', this.handleWheelThrottled, { passive: false });
+    this.workSection.addEventListener('touchstart', this.handleTouchStartBound, { passive: true });
+    this.workSection.addEventListener('touchmove', this.handleTouchMoveBound, { passive: false });
+    this.workSection.addEventListener('touchend', this.handleTouchEndBound, { passive: true });
+    window.addEventListener('keydown', this.handleKeydownBound);
+    window.addEventListener('resize', this.handleResizeDebounced);
+    
+    console.log('📎 Event listeners anexados');
+  }
+
+  /**
+   * Remove event listeners
+   */
+  detachListeners() {
+    if (this.workSection) {
+      this.workSection.removeEventListener('wheel', this.handleWheelThrottled);
+      this.workSection.removeEventListener('touchstart', this.handleTouchStartBound);
+      this.workSection.removeEventListener('touchmove', this.handleTouchMoveBound);
+      this.workSection.removeEventListener('touchend', this.handleTouchEndBound);
+    }
+    
+    window.removeEventListener('keydown', this.handleKeydownBound);
+    window.removeEventListener('resize', this.handleResizeDebounced);
+    
+    console.log('✂️ Event listeners removidos');
+  }
+
+  /**
+   * Prepara saída quando chegou próximo do fim
+   */
+  prepareExit() {
+    console.log('🚪 Preparando saída...');
+    
+    // Reduz velocidade para facilitar transição
+    this.velocity *= 0.3;
+    
+    // Se praticamente parado no final, força conclusão
+    const isNearEnd = this.position >= this.bounds.max * 0.95;
+    const isIdle = Math.abs(this.velocity) < 1;
+    
+    if (isNearEnd && isIdle) {
+      console.log('🏁 Forçando conclusão do scroll horizontal');
+      this.position = this.bounds.max;
+      this.targetPosition = this.bounds.max;
+      this.velocity = 0;
+    }
   }
 
   /**
@@ -202,58 +453,32 @@ class KineticWorkScroll {
       x: 0,
       clearProps: "transform"
     });
-    
     this.resetState();
     console.log('📍 Posição resetada');
   }
 
   /**
-   * Ativa modo kinetic
-   */
-  startKineticMode() {
-    if (this.reduceMotion || this.isKineticActive) return;
-    
-    this.isKineticActive = true;
-    this.startRenderLoop();
-    this.workSection.classList.add('kinetic-active');
-    
-    console.log('🎯 Kinetic mode activated');
-  }
-
-  /**
-   * Desativa modo kinetic
-   */
-  stopKineticMode() {
-    if (!this.isKineticActive) return;
-    
-    this.isKineticActive = false;
-    this.velocity = 0;
-    
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = null;
-    }
-    
-    this.workSection.classList.remove('kinetic-active');
-    console.log('🛑 Kinetic mode deactivated');
-  }
-
-  /**
-   * Setup event listeners
-   */
-  setupEventListeners() {
-    this.workSection.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
-    this.workSection.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
-    this.workSection.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-    this.workSection.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
-    window.addEventListener('resize', this.handleResize.bind(this));
-  }
-
-  /**
-   * Handle wheel events
+   * Handle wheel events com detecção de limites refinada
    */
   handleWheel(e) {
-    if (!this.isKineticActive) return;
+    if (this.currentState !== this.states.ACTIVE) return;
+    
+    // Threshold adaptativo
+    const threshold = Math.max(2, Math.min(24, this.config.boundaryThreshold));
+    const atEnd = this.position >= (this.bounds.max - threshold);
+    const atStart = this.position <= threshold;
+    const lowVelocity = Math.abs(this.velocity) < 0.8; // mais permissivo
+    
+    // Liberar scroll se no limite E velocidade baixa E usuário continua rolando
+    if ((atEnd && e.deltaY > 0 && lowVelocity) ||
+        (atStart && e.deltaY < 0 && lowVelocity)) {
+      console.log('🚪 Liberando scroll vertical nos limites');
+      this.stopKineticMode(); // Para imediatamente e remove interceptação
+      // Não chama preventDefault() - deixa o evento passar
+      this.forceLeaveForward(); // garante cruzar o end e disparar onLeave
+      // Não chama preventDefault() - deixa o evento passar
+      return;
+    }
     
     e.preventDefault();
     e.stopPropagation();
@@ -262,7 +487,7 @@ class KineticWorkScroll {
     if (e.deltaMode === 1) normalizedDelta *= 16;
     if (e.deltaMode === 2) normalizedDelta *= 16 * 24;
     
-    const adjustedDelta = normalizedDelta * this.config.sensitivity * 0.2;
+    const adjustedDelta = normalizedDelta * this.config.sensitivity * 0.3;
     
     this.velocity += adjustedDelta;
     this.velocity = Math.max(-this.config.maxVelocity, 
@@ -270,10 +495,66 @@ class KineticWorkScroll {
   }
 
   /**
-   * Touch handlers
+   * Navegação por teclado para acessibilidade
+   */
+  handleKeydown(e) {
+    if (this.currentState !== this.states.ACTIVE) return;
+    
+    switch(e.key) {
+      case 'ArrowRight':
+        e.preventDefault();
+        this.navigateToCard(this.currentCardIndex + 1);
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        this.navigateToCard(this.currentCardIndex - 1);
+        break;
+      case 'Escape':
+        e.preventDefault();
+        this.stopKineticMode();
+        break;
+      case 'Home':
+        e.preventDefault();
+        this.navigateToCard(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        this.navigateToCard(this.cards.length - 1);
+        break;
+    }
+  }
+
+  /**
+   * Navega para um card específico usando gap real
+   */
+  navigateToCard(index) {
+    const clampedIndex = Math.max(0, Math.min(this.cards.length - 1, index));
+    this.currentCardIndex = clampedIndex;
+    
+    // Calcula posição baseada no card com gap real
+    const cardWidth = this.cards[0]?.offsetWidth || 400;
+    const gap = this.getGapPx();
+    const targetPosition = clampedIndex * (cardWidth + gap);
+    
+    // Anima suavemente para a posição
+    gsap.to(this, {
+      position: Math.min(targetPosition, this.bounds.max),
+      duration: 0.8,
+      ease: 'power2.out',
+      onUpdate: () => {
+        this.targetPosition = this.position;
+        this.updateTransform();
+      }
+    });
+    
+    console.log(`Navegando para card ${clampedIndex} (gap: ${gap}px)`);
+  }
+
+  /**
+   * Touch handlers com verificação de limites
    */
   handleTouchStart(e) {
-    if (!this.isKineticActive) return;
+    if (this.currentState !== this.states.ACTIVE) return;
     
     this.touch.isActive = true;
     this.touch.startX = e.touches[0].clientX;
@@ -283,19 +564,30 @@ class KineticWorkScroll {
   }
 
   handleTouchMove(e) {
-    if (!this.isKineticActive || !this.touch.isActive) return;
-    
-    e.preventDefault();
+    if (this.currentState !== this.states.ACTIVE || !this.touch.isActive) return;
     
     const currentX = e.touches[0].clientX;
     const deltaX = currentX - this.touch.lastX;
     
+    // Verificar limites também no touch
+    const threshold = Math.max(2, Math.min(24, this.config.boundaryThreshold));
+    const atEnd = this.position >= (this.bounds.max - threshold);
+    const atStart = this.position <= threshold;
+    
+    // Se no limite e tentando continuar, libera scroll
+    if ((atEnd && deltaX < 0) || (atStart && deltaX > 0)) {
+      this.touch.isActive = false;
+      this.forceLeaveForward();
+      return; // Não previne default, permite scroll nativo
+    }
+    
+    e.preventDefault();
     this.velocity = -deltaX * this.config.sensitivity;
     this.touch.lastX = currentX;
   }
 
   handleTouchEnd() {
-    if (!this.isKineticActive || !this.touch.isActive) return;
+    if (this.currentState !== this.states.ACTIVE || !this.touch.isActive) return;
     
     this.touch.isActive = false;
     
@@ -303,33 +595,49 @@ class KineticWorkScroll {
     const totalTime = Date.now() - this.touch.startTime;
     
     if (totalTime > 0) {
-      const finalVelocity = -(totalDelta / totalTime) * 12;
+      const finalVelocity = -(totalDelta / totalTime) * 10;
       this.velocity = Math.max(-this.config.maxVelocity, 
                               Math.min(this.config.maxVelocity, finalVelocity));
     }
   }
 
   /**
-   * Handle resize
+   * Handle resize com debounce
    */
   handleResize() {
     this.calculateBounds();
     this.position = Math.max(0, Math.min(this.bounds.max, this.position));
     this.targetPosition = this.position;
+    
+    // Atualiza ScrollTrigger após resize
+    if (this.scrollTriggerInstance) {
+      ScrollTrigger.refresh();
+    }
   }
 
   /**
-   * Main render loop - SEM updateScrollTriggerProgress!
+   * Main render loop com monitor de performance (dev)
    */
   startRenderLoop() {
-    if (!this.isKineticActive) return;
+    if (this.currentState !== this.states.ACTIVE) return;
     
     const render = () => {
-      if (!this.isKineticActive) return;
+      if (this.currentState !== this.states.ACTIVE) return;
+      
+      // Performance monitoring (dev only)
+      if (this.performanceMonitor.enabled) {
+        this.performanceMonitor.frameCount++;
+        const now = performance.now();
+        if (now - this.performanceMonitor.lastTime >= 1000) {
+          console.log(`FPS: ${this.performanceMonitor.frameCount}`);
+          this.performanceMonitor.frameCount = 0;
+          this.performanceMonitor.lastTime = now;
+        }
+      }
       
       this.updatePhysics();
       this.updateTransform();
-      // REMOVIDO COMPLETAMENTE: this.updateScrollTriggerProgress();
+      this.updateCardIndex();
       
       this.rafId = requestAnimationFrame(render);
     };
@@ -343,7 +651,7 @@ class KineticWorkScroll {
   updatePhysics() {
     this.targetPosition += this.velocity;
     
-    // Bounce nos limites
+    // Bounce nos limites com amortecimento
     if (this.targetPosition < this.bounds.min) {
       this.targetPosition = this.bounds.min;
       this.velocity *= -this.config.bounceStiffness;
@@ -371,43 +679,168 @@ class KineticWorkScroll {
     const xPos = -this.position;
     gsap.set(this.cardsContainer, {
       x: xPos,
-      force3D: true
+      force3D: true,
+      willChange: 'transform'
     });
   }
 
   /**
-   * Cleanup e destroy
+   * Atualiza índice do card atual usando gap real
    */
-  destroy() {
-    this.stopKineticMode();
+  updateCardIndex() {
+    if (this.cards.length === 0) return;
     
-    if (this.scrollTriggerInstance) {
-      this.scrollTriggerInstance.kill();
-    }
+    const cardWidth = this.cards[0]?.offsetWidth || 400;
+    const gap = this.getGapPx();
+    const newIndex = Math.round(this.position / (cardWidth + gap));
     
-    this.workSection?.removeEventListener('wheel', this.handleWheel);
-    this.workSection?.removeEventListener('touchstart', this.handleTouchStart);
-    this.workSection?.removeEventListener('touchmove', this.handleTouchMove);
-    this.workSection?.removeEventListener('touchend', this.handleTouchEnd);
-    window.removeEventListener('resize', this.handleResize);
-    
-    console.log('🧹 Kinetic Work Scroll destroyed');
+    // Clamp index to valid range
+    this.currentCardIndex = Math.max(0, Math.min(this.cards.length - 1, newIndex));
   }
 
   /**
-   * Debug info
+   * Throttle utility
+   */
+  throttle(func, delay) {
+    let lastCall = 0;
+    let scheduled = false;
+    
+    return (...args) => {
+      const now = Date.now();
+      
+      if (now - lastCall >= delay) {
+        lastCall = now;
+        func(...args);
+      } else if (!scheduled) {
+        scheduled = true;
+        setTimeout(() => {
+          scheduled = false;
+          lastCall = Date.now();
+          func(...args);
+        }, delay - (now - lastCall));
+      }
+    };
+  }
+
+  /**
+   * Debounce utility
+   */
+  debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
+
+  /**
+   * Cleanup completo com prevenção de memory leaks
+   */
+  destroy() {
+    console.log('🧹 Iniciando cleanup do Kinetic Work Scroll...');
+    
+    // Para o modo kinetic primeiro (que remove listeners)
+    if (this.currentState === this.states.ACTIVE) {
+      this.stopKineticMode();
+    }
+    
+    // Cancelar RAFs pendentes
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+    
+    // Desconectar observers
+    if (this.cardObserver) {
+      this.cardObserver.disconnect();
+      this.cardObserver = null;
+    }
+    
+    // Garantir remoção de listeners (caso não tenha sido feito)
+    this.detachListeners();
+    
+    // Kill ScrollTriggers
+    if (this.scrollTriggerInstance) {
+      this.scrollTriggerInstance.kill();
+      this.scrollTriggerInstance = null;
+    }
+    
+    // Limpar classes
+    if (this.workSection) {
+      this.workSection.classList.remove('kinetic-active');
+    }
+    
+    // Limpar referências DOM
+    this.workSection = null;
+    this.cardsContainer = null;
+    this.cards = null;
+    
+    // Reset estado
+    this.currentState = this.states.IDLE;
+    
+    console.log('✅ Kinetic Work Scroll completamente destruído');
+  }
+
+  /**
+   * Debug info aprimorado
    */
   getDebugInfo() {
     return {
+      state: this.currentState,
       velocity: this.velocity.toFixed(2),
       position: this.position.toFixed(2),
       targetPosition: this.targetPosition.toFixed(2),
+      currentCard: this.currentCardIndex,
+      totalCards: this.cards.length,
       bounds: this.bounds,
-      isActive: this.isKineticActive,
-      version: 'FIXED_VERSION_2.0'
+      gap: this.getGapPx(),
+      isDesktop: this.isDesktop,
+      reduceMotion: this.reduceMotion,
+      rafActive: !!this.rafId,
+      scrollTriggerActive: !!this.scrollTriggerInstance,
+      version: 'FINAL_REFINED_4.0'
     };
   }
 }
 
-// Export para uso como módulo ES6
+// Singleton pattern para evitar múltiplas instâncias em HMR
+let instance = null;
+
+export function initKineticWorkScroll() {
+  // Cleanup instância anterior se existir (útil para HMR)
+  if (instance) {
+    instance.destroy();
+    instance = null;
+  }
+  
+  // Verifica se já existe instância global (redundância para HMR)
+  if (window.workKineticInstance) {
+    window.workKineticInstance.destroy();
+    window.workKineticInstance = null;
+  }
+  
+  instance = new KineticWorkScroll();
+  instance.init();
+  
+  // Guarda referência global
+  window.workKineticInstance = instance;
+  
+  // Expor para debug em desenvolvimento
+  if (import.meta.env.DEV) {
+    console.log('Debug: window.workKineticInstance disponível');
+  }
+  
+  return instance;
+}
+
+// Auto-cleanup em HMR
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    if (instance) {
+      instance.destroy();
+      instance = null;
+    }
+  });
+}
+
 export default KineticWorkScroll;
