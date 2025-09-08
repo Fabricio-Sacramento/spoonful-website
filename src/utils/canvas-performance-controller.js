@@ -1,4 +1,6 @@
-// src/utils/canvas-performance-controller.js
+/**
+   * Conecta aos callbacks do ScrollTrigger principal
+   */// src/utils/canvas-performance-controller.js
 // Sistema de controle de performance do Canvas 3D integrado ao GSAP
 
 import { gsap } from 'gsap';
@@ -39,29 +41,22 @@ class CanvasPerformanceController {
    * Conecta aos callbacks do ScrollTrigger principal
    */
   attachToMainTimeline() {
-    // Busca o ScrollTrigger da intro-wrapper
-    const mainScrollTrigger = ScrollTrigger.getAll().find(st => 
-      st.trigger?.classList?.contains('intro-wrapper')
-    );
-
-    if (!mainScrollTrigger) {
-      console.warn('⚠️ ScrollTrigger principal não encontrado');
-      return;
-    }
-
-    // Intercepta o onUpdate original (se existir)
-    const originalOnUpdate = mainScrollTrigger.vars.onUpdate;
+    // Ao invés de interceptar, cria um ScrollTrigger dedicado para performance
+    console.log('Criando ScrollTrigger dedicado para performance...');
     
-    // Substitui com nossa versão que inclui controle de performance
-    mainScrollTrigger.vars.onUpdate = (self) => {
-      // Chama callback original se existir
-      if (originalOnUpdate) originalOnUpdate(self);
-      
-      // Nossa lógica de performance
-      this.handleTimelineProgress(self.progress);
-    };
+    ScrollTrigger.create({
+      trigger: '.intro-wrapper',
+      start: 'top top',
+      end: 'bottom top',
+      onUpdate: (self) => {
+        this.handleTimelineProgress(self.progress);
+      },
+      onToggle: (self) => {
+        console.log(`ScrollTrigger toggle: active=${self.isActive}, progress=${self.progress}`);
+      }
+    });
 
-    console.log('🔗 Controller conectado ao ScrollTrigger principal');
+    console.log('🔗 Controller conectado com ScrollTrigger dedicado');
   }
 
   /**
@@ -70,13 +65,20 @@ class CanvasPerformanceController {
   handleTimelineProgress(progress) {
     const isMovingForward = progress > this.lastProgress;
     
+    // Throttle logs para evitar spam
+    if (Math.abs(progress - this.lastProgress) > 0.01) {
+      console.log(`📊 Progress: ${progress.toFixed(3)} | Forward: ${isMovingForward} | Active: ${this.isCanvasActive}`);
+    }
+    
     // KILL: Indo para frente e passando do threshold
     if (isMovingForward && progress >= this.thresholds.killProgress && this.isCanvasActive) {
+      console.log('🚫 KILLING Canvas at progress:', progress);
       this.killCanvas();
     }
     
     // RESUME: Voltando e antes do threshold de resume
     if (!isMovingForward && progress <= this.thresholds.resumeProgress && !this.isCanvasActive) {
+      console.log('✅ RESUMING Canvas at progress:', progress);
       this.resumeCanvas();
     }
 
@@ -167,9 +169,8 @@ class CanvasPerformanceController {
    */
   destroy() {
     this.canvasContainer = null;
-    this.canvas3DComponent = null;
     this.onCanvasStateChange = null;
-    console.log('🧹 Canvas Performance Controller destroyed');
+    console.log('Canvas Performance Controller destroyed');
   }
 }
 
