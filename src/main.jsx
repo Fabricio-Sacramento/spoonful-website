@@ -6,28 +6,31 @@ import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 
-// 1) Monta o canvas 3D / cena React no #root
-const root3D = ReactDOM.createRoot(document.getElementById('root'));
-root3D.render(
+// Componente Canvas para ser montado/desmontado
+const CanvasApp = () => (
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
 
+// 1) Monta o canvas 3D inicial
+const root3D = ReactDOM.createRoot(document.getElementById('root'));
+root3D.render(<CanvasApp />);
+
+// 2) Monta Work Section (não afetada)
 const workRoot = ReactDOM.createRoot(document.getElementById('work-mount-point'));
 workRoot.render(<WorkSection />);
 
-// 2) Inicializa Performance Controller após tudo estar montado
+// 3) Inicializa Canvas Performance Controller
 window.addEventListener('load', () => {
   setTimeout(() => {
-    canvasController.init((state) => {
-      console.log(`Canvas State: ${state}`);
-    });
-    console.log('Performance Controller integrado');
-  }, 600);
+    // Passa referências para o controller
+    canvasController.init(root3D, <CanvasApp />);
+    console.log('Canvas Performance Controller ativo');
+  }, 600); // Aguarda GSAP setup
 });
 
-// Debug helpers
+// Debug helpers - mantendo API original
 if (window.location.hash === '#debug') {
   window.debugCanvas = {
     controller: canvasController,
