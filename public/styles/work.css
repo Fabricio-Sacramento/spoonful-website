@@ -1,118 +1,221 @@
-/* Work Section Styles */
+/* ================================= */
+/* WORK SECTION - BASE */
+/* ================================= */
 #work {
   position: relative;
-  width: 100vw;                  /* unificado (evita gaps laterais) */
-  height: 100svh;                /* svh = viewport seguro em mobile */
+  width: 100vw;
+  height: 100svh;
   background-color: var(--primary-red);
-  overflow: hidden;              /* evita "pulos" e vazamentos */
-  /* z-index propositalmente ausente para não sobrepor pin anterior */
-}
-
-.work__container {
-  width: 100%;
-  height: 100%;
-}
-
-.work__wrapper {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding: 0 var(--space-32);    /* antes: 0 2rem */
+  overflow: hidden;
 }
 
 /* Trilho horizontal */
 .work-track {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-64);
-  padding: var(--space-64);
+  gap: 0;
+  padding: 0;
   height: 100%;
   will-change: transform;
 }
 
-/* Cartões modernos */
+/* ================================= */
+/* CARD WORK - TÍTULO DE ENTRADA */
+/* ================================= */
+.work-card--intro {
+  background-color: var(--primary-red);
+}
+
+.work-intro-title {
+  color: var(--neutral-normal);
+  text-align: center;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 13.39713rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: normal;
+  letter-spacing: 0.134rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ================================= */
+/* CARDS DE PROJETO */
+/* ================================= */
 .work-card {
   flex: 0 0 auto;
-  width: min(800px, 80vw);
-  height: min(600px, 70vh);
-  background: var(--neutral-darker);
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
   will-change: transform;
 }
 
-.work-card__media {
+.work-card--project {
+  cursor: pointer;
+}
+
+/* Área de imagem */
+.work-card__image-container {
   width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
-
-.work-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s ease;
-}
-
-.work-card:hover .work-card__media img {
-  transform: scale(1.05);
-}
-
-.work-card__content {
-  position: absolute;
-  inset: auto 0 0 0;             /* bottom:0; left/right:0 */
-  padding: var(--space-32);
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-  color: var(--neutral-light);
-}
-
-.work-card__content h3 {
-  margin: 0 0 var(--space-8);
-  font-size: 2.5rem;
-}
-
-.work-card__description {
-  margin: 0;
-  font-size: 1rem;
-  opacity: 0.8;
-}
-
-/* Suporte legado: mantém .work__project funcionando
-   (pode remover quando migrar tudo para .work-card) */
-.work__project {
-  flex: 0 0 auto;
-  min-width: 600px;
-  height: 400px;
-  margin-right: var(--space-32); /* antes: 2rem */
-  background: var(--neutral-darker);
+  max-width: 600px;
+  height: auto;
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: var(--neutral-light);
-  font-size: 2rem;
-  border-radius: 8px;            /* aproxima do visual atual */
-  overflow: hidden;
-  position: relative;
+  align-items: center;
 }
 
-/* Mobile Layout */
-@media (max-width: 1023px) {
+.work-card__image {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Tags - CORRIGIDO */
+.work-card__tag {
+  color: #FFF;
+  text-align: center;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 2.5rem;
+  letter-spacing: 0.1125rem;
+  margin: 0;
+}
+
+/* Título do projeto */
+.work-card__title {
+  color: #FFF;
+  text-align: center;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 5.75rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 5rem;
+  letter-spacing: 0.115rem;
+  margin: 0;
+}
+
+/* Descrição do projeto - CORRIGIDA */
+.work-card__description {
+  color: #FFF;
+  text-align: center;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 1.875rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 0.1875rem;
+  margin: 0;
+}
+
+/* ================================= */
+/* TABLET LAYOUT - 70% reduction */
+/* ================================= */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .work-intro-title {
+    font-size: 7.77569rem;
+    letter-spacing: 0.07775rem;
+  }
+
+  .work-card--project {
+    flex-direction: column !important;
+  }
+
+  .work-card__image-section {
+    width: 100% !important;
+    height: 50vh !important;
+  }
+
+  .work-card__content-section {
+    width: 100% !important;
+    height: 50vh !important;
+    padding: 4rem 0 !important;
+  }
+
+  .work-card__tag {
+    font-size: 0.7875rem; /* 1.125 * 0.7 */
+    line-height: 1.75rem; /* 2.5 * 0.7 */
+    letter-spacing: 0.07875rem; /* 0.1125 * 0.7 */
+  }
+
+  .work-card__title {
+    font-size: 4.025rem; /* 5.75 * 0.7 */
+    line-height: 3.5rem; /* 5 * 0.7 */
+    letter-spacing: 0.0805rem; /* 0.115 * 0.7 */
+  }
+
+  .work-card__description {
+    font-size: 1.3125rem; /* 1.875 * 0.7 */
+    letter-spacing: 0.13125rem; /* 0.1875 * 0.7 */
+  }
+}
+
+/* ================================= */
+/* MOBILE LAYOUT - 50% reduction */
+/* ================================= */
+@media (max-width: 767px) {
   #work {
     height: auto !important;
     overflow: visible !important;
   }
+
   .work-track {
     display: flex;
     flex-direction: column;
-    gap: var(--space-32);
-    padding: var(--space-32);
+    gap: 0;
+    padding: 0;
+  }
+
+  .work-intro-title {
+    font-size: 7.77569rem;
+    letter-spacing: 0.07775rem;
   }
 
   .work-card {
     width: 100%;
     max-width: none;
-    height: min(400px, 50vh);
+    height: 100vh;
+  }
+
+  .work-card--project {
+    flex-direction: column !important;
+  }
+
+  .work-card__image-section {
+    width: 100% !important;
+    height: 50vh !important;
+  }
+
+  .work-card__content-section {
+    width: 100% !important;
+    height: 50vh !important;
+    padding: 4rem 0 !important;
+  }
+
+  .work-card__tags {
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 0.5rem 1.5rem !important;
+    align-self: stretch;
+    flex-wrap: wrap;
+  }
+
+  .work-card__tag {
+    font-size: 0.5625rem; /* 1.125 * 0.5 */
+    line-height: 1.25rem; /* 2.5 * 0.5 */
+    letter-spacing: 0.05625rem; /* 0.1125 * 0.5 */
+  }
+
+  .work-card__title {
+    font-size: 2.875rem; /* 5.75 * 0.5 */
+    line-height: 2.5rem; /* 5 * 0.5 */
+    letter-spacing: 0.0575rem; /* 0.115 * 0.5 */
+  }
+
+  .work-card__description {
+    font-size: 0.9375rem; /* 1.875 * 0.5 */
+    letter-spacing: 0.09375rem; /* 0.1875 * 0.5 */
   }
 }

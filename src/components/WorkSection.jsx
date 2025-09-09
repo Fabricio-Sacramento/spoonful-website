@@ -16,9 +16,9 @@ const WorkSection = () => {
       title: "Itaway Ecotours",
       description: "E-commerce platform for sustainable travel experiences",
       tags: ["WEBSITE", "E-COMMERCE", "UIUX", "DEVELOPMENT"],
-      image: "/images/projects/itaway-ecotours.jpg",
+      image: "/src/assets/images/New-Flakes-02.jpg",
       projectUrl: "https://itaway-ecotours.com",
-      backgroundColor: "var(--primary-red)"
+      backgroundColor: "var(--primary-green)"
     },
     {
       id: 2,
@@ -36,7 +36,7 @@ const WorkSection = () => {
       tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
       image: "/images/projects/humaita-digital.jpg",
       projectUrl: "https://humaita-digital.com",
-      backgroundColor: "var(--primary-red)"
+      backgroundColor: "var(--primary-green)"
     },
     {
       id: 4,
@@ -54,7 +54,7 @@ const WorkSection = () => {
       tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
       image: "/images/projects/myhabitat.jpg",
       projectUrl: "https://myhabitat.com",
-      backgroundColor: "var(--primary-red)"
+      backgroundColor: "var(--primary-green)"
     },
     {
       id: 6,
@@ -72,7 +72,7 @@ const WorkSection = () => {
       tags: ["ART DIRECTION", "ILLUSTRATION", "MOTION", "3D"],
       image: "/images/projects/hb.jpg",
       projectUrl: "https://hb-project.com",
-      backgroundColor: "var(--primary-red)"
+      backgroundColor: "var(--primary-green)"
     },
     {
       id: 8,
@@ -90,7 +90,7 @@ const WorkSection = () => {
       tags: ["BRANDING", "WEBSITE", "BOOKING SOLUTION", "UIUX", "DEVELOPMENT"],
       image: "/images/projects/urban-woof-nyc.jpg",
       projectUrl: "https://urban-woof-nyc.com",
-      backgroundColor: "var(--primary-red)"
+      backgroundColor: "var(--primary-green)"
     },
     {
       id: 10,
@@ -121,7 +121,7 @@ const WorkSection = () => {
       gsap.set(track, {
         flexDirection: 'column',
         width: '100%',
-        gap: '2rem'
+        gap: '0'
       });
 
       // Animação simples de entrada
@@ -157,39 +157,14 @@ const WorkSection = () => {
       animation: gsap.to(track, {
         x: -distance,
         ease: 'none'
-      }),
-      onUpdate: () => {
-        // Opcional: adicionar efeitos baseados no progresso
-        // console.log('Scroll progress:', self.progress);
-      }
+      })
     });
-
-    // Animação de entrada dos cards
-    gsap.fromTo('.work-card', 
-      {
-        y: 60,
-        opacity: 0
-      },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse'
-        }
-      }
-    );
 
     // Cleanup function
     return () => {
       if (scrollTriggerRef.current) {
         scrollTriggerRef.current.kill();
       }
-      ScrollTrigger.getById('work-cards-animation')?.kill();
     };
 
   }, []);
@@ -219,45 +194,101 @@ const WorkSection = () => {
         className="work-track"
         style={{
           display: 'flex',
-          gap: '3rem',
+          gap: '0',
           width: 'max-content',
           willChange: 'transform'
         }}
       >
+        {/* Card WORK - Capa da seção */}
+        <div 
+          className="work-card work-card--intro"
+          style={{
+            display: 'flex',
+            width: '100vw',
+            height: '100vh',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'var(--primary-red)',
+            flexShrink: 0
+          }}
+        >
+          <h1 className="work-intro-title">WORK</h1>
+        </div>
+
+        {/* Cards de projetos */}
         {projects.map((project) => (
           <article 
             key={project.id}
-            className="work-card"
+            className="work-card work-card--project"
             style={{
-              flexShrink: 0,
-              width: '600px',
-              opacity: 0, // Para animação de entrada
-              transform: 'translateY(60px)' // Para animação de entrada
+              display: 'flex',
+              width: '100vw',
+              height: '100vh',
+              alignItems: 'center',
+              background: project.backgroundColor,
+              flexShrink: 0
             }}
           >
-            <figure className="work-card__media">
-              <img 
-                src={project.image} 
-                alt={project.title}
-                loading="lazy"
+            {/* Split Esquerda: Imagem */}
+            <div 
+              className="work-card__image-section"
+              style={{
+                display: 'flex',
+                width: '50%',
+                height: '100vh',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <div className="work-card__image-container">
+                <img 
+                  src={project.image} 
+                  alt={project.title}
+                  loading="lazy"
+                  className="work-card__image"
+                />
+              </div>
+            </div>
+
+            {/* Split Direita: Conteúdo */}
+            <div 
+              className="work-card__content-section"
+              style={{
+                display: 'flex',
+                padding: '8rem 0',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flex: '1 0 0',
+                alignSelf: 'stretch'
+              }}
+            >
+              {/* Tags */}
+              <div 
+                className="work-card__tags"
                 style={{
-                  width: '100%',
-                  height: '300px',
-                  objectFit: 'cover',
-                  borderRadius: '8px'
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '2rem'
                 }}
-              />
-            </figure>
-            <div className="work-card__content">
-              <h3 className="heading-medium">{project.title}</h3>
-              <p className="work-card__description">{project.description}</p>
-              <div className="work-card__tags">
+              >
                 {project.tags.map((tag, index) => (
                   <span key={index} className="work-card__tag">
                     {tag}
                   </span>
                 ))}
               </div>
+
+              {/* Título */}
+              <h2 className="work-card__title">
+                {project.title}
+              </h2>
+
+              {/* Descrição */}
+              <p className="work-card__description">
+                {project.description}
+              </p>
             </div>
           </article>
         ))}
