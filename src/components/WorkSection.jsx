@@ -9,31 +9,97 @@ const WorkSection = () => {
   const trackRef = useRef(null);
   const scrollTriggerRef = useRef(null);
 
-  // Mock data - substitua pelos seus projetos reais
+  // Dados dos projetos do portfolio
   const projects = [
     {
       id: 1,
-      title: "Projeto 1",
-      description: "Branding & Digital Experience",
-      image: "placeholder.jpg"
+      title: "Itaway Ecotours",
+      description: "E-commerce platform for sustainable travel experiences",
+      tags: ["WEBSITE", "E-COMMERCE", "UIUX", "DEVELOPMENT"],
+      image: "/images/projects/itaway-ecotours.jpg",
+      projectUrl: "https://itaway-ecotours.com",
+      backgroundColor: "var(--primary-red)"
     },
     {
       id: 2,
-      title: "Projeto 2", 
-      description: "UI/UX & Development",
-      image: "placeholder.jpg"
+      title: "TropiView",
+      description: "Visual identity and editorial design for tropical research",
+      tags: ["VISUAL IDENTITY", "EDITORIAL DESIGN", "GRAPHIC DESIGN", "PRINT"],
+      image: "/images/projects/tropiview.jpg",
+      projectUrl: "https://tropiview.com",
+      backgroundColor: "var(--primary-red)"
     },
     {
       id: 3,
-      title: "Projeto 3",
-      description: "Motion & 3D", 
-      image: "placeholder.jpg"
+      title: "Humaita Digital",
+      description: "Digital platform for urban development initiatives",
+      tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
+      image: "/images/projects/humaita-digital.jpg",
+      projectUrl: "https://humaita-digital.com",
+      backgroundColor: "var(--primary-red)"
     },
     {
       id: 4,
-      title: "Projeto 4",
-      description: "Digital Strategy",
-      image: "placeholder.jpg"
+      title: "Hysteria",
+      description: "Contemporary art gallery digital presence",
+      tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
+      image: "/images/projects/hysteria.jpg",
+      projectUrl: "https://hysteria.com",
+      backgroundColor: "var(--primary-red)"
+    },
+    {
+      id: 5,
+      title: "myHABITAT",
+      description: "IoT-driven environmental monitoring platform",
+      tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
+      image: "/images/projects/myhabitat.jpg",
+      projectUrl: "https://myhabitat.com",
+      backgroundColor: "var(--primary-red)"
+    },
+    {
+      id: 6,
+      title: "Vale EnvironPact",
+      description: "Environmental impact documentation and design",
+      tags: ["EDITORIAL DESIGN", "GRAPHIC DESIGN", "PRINT"],
+      image: "/images/projects/vale-environpact.jpg",
+      projectUrl: "https://vale-environpact.com",
+      backgroundColor: "var(--primary-red)"
+    },
+    {
+      id: 7,
+      title: "HB",
+      description: "Art direction and 3D visualization project",
+      tags: ["ART DIRECTION", "ILLUSTRATION", "MOTION", "3D"],
+      image: "/images/projects/hb.jpg",
+      projectUrl: "https://hb-project.com",
+      backgroundColor: "var(--primary-red)"
+    },
+    {
+      id: 8,
+      title: "Crypto Beerfest",
+      description: "Visual identity for blockchain-themed event",
+      tags: ["VISUAL IDENTITY", "ILLUSTRATION", "GRAPHIC DESIGN", "MOTION GRAPHICS", "3D"],
+      image: "/images/projects/crypto-beerfest.jpg",
+      projectUrl: "https://crypto-beerfest.com",
+      backgroundColor: "var(--primary-red)"
+    },
+    {
+      id: 9,
+      title: "Urban Woof NYC",
+      description: "Branding and booking platform for dog services",
+      tags: ["BRANDING", "WEBSITE", "BOOKING SOLUTION", "UIUX", "DEVELOPMENT"],
+      image: "/images/projects/urban-woof-nyc.jpg",
+      projectUrl: "https://urban-woof-nyc.com",
+      backgroundColor: "var(--primary-red)"
+    },
+    {
+      id: 10,
+      title: "Tangente DIY Skateparks",
+      description: "Brand identity for custom skatepark construction",
+      tags: ["BRANDING", "VISUAL IDENTITY"],
+      image: "/images/projects/tangente-diy.jpg",
+      projectUrl: "https://tangente-diy.com",
+      backgroundColor: "var(--primary-red)"
     }
   ];
 
@@ -164,7 +230,7 @@ const WorkSection = () => {
             className="work-card"
             style={{
               flexShrink: 0,
-              width: '600px', // Aumentado de 400px para 600px
+              width: '600px',
               opacity: 0, // Para animação de entrada
               transform: 'translateY(60px)' // Para animação de entrada
             }}
@@ -185,6 +251,13 @@ const WorkSection = () => {
             <div className="work-card__content">
               <h3 className="heading-medium">{project.title}</h3>
               <p className="work-card__description">{project.description}</p>
+              <div className="work-card__tags">
+                {project.tags.map((tag, index) => (
+                  <span key={index} className="work-card__tag">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           </article>
         ))}
