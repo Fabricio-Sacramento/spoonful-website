@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import Glass from './components/Glass';
 import DynamicBackground from './components/DynamicBackground';
-//import GlassCube from './components/GlassCube';
+import GlassCube from './components/GlassCube';
 //import ConceptualCore from './components/ConceptualCore';
 import { OrbitControls } from '@react-three/drei';
 
@@ -16,14 +16,19 @@ const App = () => {
 
       {/* Elementos de vidro já existentes */}
       <Glass />
-      {/*}
-      <GlassCube />
-      */}  
+      {/* Glass Cube */}
+      <GlassCube />  
 
       {/* Novo objeto 3D conceitual 
       <ConceptualCore /> */}
 
-      <OrbitControls />
+      <OrbitControls
+        enableZoom={false}        // Desabilita zoom com scroll
+        enablePan={false}         // Desabilita pan (opcional)
+        enableRotate={true}       // Mantém rotação com drag
+        enableDamping={true}      // Suaviza movimentos
+        dampingFactor={0.05}      // Controla a suavidade
+      />
     </Canvas>
   );
 };

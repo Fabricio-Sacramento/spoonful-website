@@ -224,6 +224,7 @@ text-align: left;
 display: flex;
 flex-direction: column;
 justify-content: center;
+pointer-events: none;
 }
 /* Garante que, ao rotacionar em 3D, a face traseira dos chars seja visÃ­vel */
 .hero-content .char {
