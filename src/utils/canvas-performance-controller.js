@@ -12,10 +12,11 @@ class CanvasPerformanceController {
     this.canvasComponent = null;
     this.container = null;
     this.lastProgress = 0;
+    this.debounceTimeout = null;
     
     this.thresholds = {
-      unmountProgress: 0.4,   // 40% - após clipRects completarem
-      remountProgress: 0.35   // 35% - pequena folga para remount
+      unmountProgress: 0.28,   // 38% - logo após clipRects (35%) terminarem
+      remountProgress: 0.18    // 25% - mantém zona morta de 13%
     };
   }
 
@@ -61,23 +62,29 @@ class CanvasPerformanceController {
    * Monitora progresso e controla lifecycle do Canvas
    */
   handleScrollProgress(progress) {
-    const isMovingForward = progress > this.lastProgress;
+    // Cancela operação anterior se ainda estiver pendente
+    clearTimeout(this.debounceTimeout);
     
-    // UNMOUNT: Indo para frente e Canvas ainda montado
-    if (isMovingForward && 
-        progress >= this.thresholds.unmountProgress && 
-        this.isCanvasMounted) {
-      this.unmountCanvas();
-    }
-    
-    // REMOUNT: Voltando e Canvas desmontado  
-    if (!isMovingForward && 
-        progress <= this.thresholds.remountProgress && 
-        !this.isCanvasMounted) {
-      this.remountCanvas();
-    }
+    // Debounce para evitar múltiplos ciclos muito rápidos
+    this.debounceTimeout = setTimeout(() => {
+      const isMovingForward = progress > this.lastProgress;
+      
+      // UNMOUNT: Indo para frente e Canvas ainda montado
+      if (isMovingForward && 
+          progress >= this.thresholds.unmountProgress && 
+          this.isCanvasMounted) {
+        this.unmountCanvas();
+      }
+      
+      // REMOUNT: Voltando e Canvas desmontado  
+      if (!isMovingForward && 
+          progress <= this.thresholds.remountProgress && 
+          !this.isCanvasMounted) {
+        this.remountCanvas();
+      }
 
-    this.lastProgress = progress;
+      this.lastProgress = progress;
+    }, 150); // 150ms de debounce
   }
 
   /**
@@ -149,6 +156,7 @@ class CanvasPerformanceController {
     if (this.reactRoot && this.isCanvasMounted) {
       this.reactRoot.unmount();
     }
+    clearTimeout(this.debounceTimeout);
     this.reactRoot = null;
     this.canvasComponent = null;
     this.container = null;
