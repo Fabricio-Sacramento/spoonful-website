@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, useEffect } from 'react';
+import { useLayoutEffect, useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Modal from './Modal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +13,22 @@ const WorkSection = () => {
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef(null);
   const snapTimeoutRef = useRef(null);
+
+  // Estado do modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  // Função para abrir modal
+  const openModal = (project) => {
+    setSelectedProject(project);
+    setModalOpen(true);
+  };
+
+  // Função para fechar modal
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedProject(null);
+  };
 
   // Dados dos projetos do portfolio
   const projects = [
@@ -326,10 +343,7 @@ const WorkSection = () => {
           <article 
             key={project.id}
             className="work-card work-card--project"
-            onClick={() => {
-              // Função de clique será implementada na próxima etapa (modal)
-              console.log('Card clicked:', project.title);
-            }}
+            onClick={() => openModal(project)}
             style={{
               display: 'flex',
               width: '100vw',
@@ -403,6 +417,13 @@ const WorkSection = () => {
           </article>
         ))}
       </div>
+
+      {/* Modal */}
+      <Modal 
+        isOpen={modalOpen}
+        onClose={closeModal}
+        project={selectedProject}
+      />
     </section>
   );
 };
