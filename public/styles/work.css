@@ -52,6 +52,7 @@
 
 .work-card--project {
   cursor: pointer;
+  transform-origin: left center;
 }
 
 /* Área de imagem */

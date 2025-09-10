@@ -9,6 +9,9 @@ const WorkSection = () => {
   const trackRef = useRef(null);
   const workTitleRef = useRef(null);
   const scrollTriggerRef = useRef(null);
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef(null);
+  const snapTimeoutRef = useRef(null);
 
   // Dados dos projetos do portfolio
   const projects = [
@@ -110,6 +113,38 @@ const WorkSection = () => {
     
     if (!section || !track) return;
 
+    // Função para calcular snap position
+    const getSnapPosition = () => {
+      const sectionWidth = section.offsetWidth;
+      const currentX = gsap.getProperty(track, 'x');
+      const cardWidth = sectionWidth; // Cada card ocupa 100vw
+      
+      // Calcula qual card está mais próximo do centro
+      const currentIndex = Math.round(Math.abs(currentX) / cardWidth);
+      const totalCards = projects.length + 1; // +1 para o card WORK
+      
+      // Limita o índice aos bounds válidos
+      const clampedIndex = Math.max(0, Math.min(currentIndex, totalCards - 1));
+      
+      // Posição alvo para centralizar o card
+      return -(clampedIndex * cardWidth);
+    };
+
+    // Função para executar snap
+    const executeSnap = () => {
+      const targetX = getSnapPosition();
+      const currentX = gsap.getProperty(track, 'x');
+      
+      // Só faz snap se houver diferença significativa (mais de 10px)
+      if (Math.abs(targetX - currentX) > 10) {
+        gsap.to(track, {
+          x: targetX,
+          duration: 0.6,
+          ease: 'power2.out'
+        });
+      }
+    };
+
     // Calcula bounds dinamicamente
     const calculateDistance = () => {
       const trackWidth = track.scrollWidth;
@@ -156,7 +191,44 @@ const WorkSection = () => {
         pinSpacing: true,
         scrub: 1,
         anticipatePin: 1,
-        refreshPriority: 1
+        refreshPriority: 1,
+        onUpdate: (self) => {
+          // Detecta se está fazendo scroll
+          const isScrolling = self.getVelocity() !== 0;
+          
+          if (isScrolling && !isScrollingRef.current) {
+            // Começou a fazer scroll - reduz cards para 75%
+            isScrollingRef.current = true;
+            gsap.to('.work-card--project', {
+              scale: 0.75,
+              duration: 0.3,
+              ease: 'power2.out'
+            });
+          }
+          
+          // Clear timeout anterior e define novo
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+          
+          // Define timeout para quando parar de fazer scroll
+          scrollTimeoutRef.current = setTimeout(() => {
+            if (isScrollingRef.current) {
+              // Parou de fazer scroll - volta cards para 100%
+              isScrollingRef.current = false;
+              gsap.to('.work-card--project', {
+                scale: 1,
+                duration: 0.4,
+                ease: 'power2.out'
+              });
+              
+              // Executa snap após cards voltarem ao tamanho normal
+              snapTimeoutRef.current = setTimeout(() => {
+                executeSnap();
+              }, 200);
+            }
+          }, 150); // 150ms de delay para detectar parada
+        }
       }
     });
 
@@ -191,10 +263,16 @@ const WorkSection = () => {
       if (scrollTriggerRef.current) {
         scrollTriggerRef.current.kill();
       }
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      if (snapTimeoutRef.current) {
+        clearTimeout(snapTimeoutRef.current);
+      }
       mainTimeline.kill();
     };
 
-  }, []);
+  }, [projects.length]);
 
   // Handle resize
   useEffect(() => {
@@ -234,7 +312,8 @@ const WorkSection = () => {
             width: '100vw',
             height: '100vh',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-end',
+            paddingRight: '5vw',
             backgroundColor: 'var(--primary-red)',
             flexShrink: 0
           }}
@@ -247,6 +326,10 @@ const WorkSection = () => {
           <article 
             key={project.id}
             className="work-card work-card--project"
+            onClick={() => {
+              // Função de clique será implementada na próxima etapa (modal)
+              console.log('Card clicked:', project.title);
+            }}
             style={{
               display: 'flex',
               width: '100vw',

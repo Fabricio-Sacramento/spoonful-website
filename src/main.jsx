@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
+import CustomCursor from './components/CustomCursor.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 
 // Componente Canvas para ser montado/desmontado
@@ -21,7 +22,15 @@ root3D.render(<CanvasApp />);
 const workRoot = ReactDOM.createRoot(document.getElementById('work-mount-point'));
 workRoot.render(<WorkSection />);
 
-// 3) Inicializa Canvas Performance Controller
+// 3) Monta Custom Cursor em container próprio
+const cursorDiv = document.createElement('div');
+cursorDiv.id = 'custom-cursor-mount';
+document.body.appendChild(cursorDiv);
+
+const cursorRoot = ReactDOM.createRoot(cursorDiv);
+cursorRoot.render(<CustomCursor />);
+
+// 4) Inicializa Canvas Performance Controller
 window.addEventListener('load', () => {
   setTimeout(() => {
     // Passa referências para o controller
