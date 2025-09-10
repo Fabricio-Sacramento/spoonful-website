@@ -7,6 +7,7 @@ gsap.registerPlugin(ScrollTrigger);
 const WorkSection = () => {
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
+  const workTitleRef = useRef(null);
   const scrollTriggerRef = useRef(null);
 
   // Dados dos projetos do portfolio
@@ -90,7 +91,7 @@ const WorkSection = () => {
       tags: ["BRANDING", "WEBSITE", "BOOKING SOLUTION", "UIUX", "DEVELOPMENT"],
       image: "/src/assets/images/New-Flakes-02.jpg",
       projectUrl: "https://urban-woof-nyc.com",
-      backgroundColor: "var(--primary-redv)"
+      backgroundColor: "var(--primary-red)"
     },
     {
       id: 10,
@@ -145,26 +146,52 @@ const WorkSection = () => {
     // Desktop: scroll horizontal
     const distance = calculateDistance();
     
-    scrollTriggerRef.current = ScrollTrigger.create({
-      trigger: section,
-      start: 'top top',
-      end: () => `+=${distance + window.innerHeight * 0.5}`,
-      pin: true,
-      pinSpacing: true,
-      scrub: 1,
-      anticipatePin: 1,
-      refreshPriority: 1,
-      animation: gsap.to(track, {
-        x: -distance,
-        ease: 'none'
-      })
+    // Timeline principal para coordenar todas as animações
+    const mainTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${distance + window.innerHeight * 0.5}`,
+        pin: true,
+        pinSpacing: true,
+        scrub: 1,
+        anticipatePin: 1,
+        refreshPriority: 1
+      }
     });
+
+    // Animação 1: Movimento horizontal do track
+    mainTimeline.to(track, {
+      x: -distance,
+      ease: 'none',
+      duration: 1
+    }, 0);
+
+    // Animação 2: Scale da palavra WORK (1 → 4 → 1)
+    // Durante a primeira parte do scroll (saída do card WORK)
+    const workTitle = workTitleRef.current;
+    if (workTitle) {
+      mainTimeline
+        .to(workTitle, {
+          scale: 4,
+          ease: 'power2.out',
+          duration: 0.3
+        }, 0)
+        .to(workTitle, {
+          scale: 1,
+          ease: 'power2.out',
+          duration: 0.3
+        }, 0.3);
+    }
+
+    scrollTriggerRef.current = mainTimeline.scrollTrigger;
 
     // Cleanup function
     return () => {
       if (scrollTriggerRef.current) {
         scrollTriggerRef.current.kill();
       }
+      mainTimeline.kill();
     };
 
   }, []);
@@ -212,7 +239,7 @@ const WorkSection = () => {
             flexShrink: 0
           }}
         >
-          <h1 className="work-intro-title">WORK</h1>
+          <h1 ref={workTitleRef} className="work-intro-title">WORK</h1>
         </div>
 
         {/* Cards de projetos */}

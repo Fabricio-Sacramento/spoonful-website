@@ -24,6 +24,8 @@
 /* ================================= */
 .work-card--intro {
   background-color: var(--primary-red);
+  justify-content: flex-end !important;
+  padding-right: 5vw !important;
 }
 
 .work-intro-title {
@@ -37,6 +39,7 @@
   letter-spacing: 0.134rem;
   text-transform: uppercase;
   margin: 0;
+  transform-origin: center right;
 }
 
 /* ================================= */
