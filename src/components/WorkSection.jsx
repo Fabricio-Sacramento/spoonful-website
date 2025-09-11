@@ -10,9 +10,6 @@ const WorkSection = () => {
   const trackRef = useRef(null);
   const workTitleRef = useRef(null);
   const scrollTriggerRef = useRef(null);
-  const isScrollingRef = useRef(false);
-  const scrollTimeoutRef = useRef(null);
-  const snapTimeoutRef = useRef(null);
 
   // Estado do modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -130,43 +127,11 @@ const WorkSection = () => {
     
     if (!section || !track) return;
 
-    // Função para calcular snap position
-    const getSnapPosition = () => {
-      const sectionWidth = section.offsetWidth;
-      const currentX = gsap.getProperty(track, 'x');
-      const cardWidth = sectionWidth; // Cada card ocupa 100vw
-      
-      // Calcula qual card está mais próximo do centro
-      const currentIndex = Math.round(Math.abs(currentX) / cardWidth);
-      const totalCards = projects.length + 1; // +1 para o card WORK
-      
-      // Limita o índice aos bounds válidos
-      const clampedIndex = Math.max(0, Math.min(currentIndex, totalCards - 1));
-      
-      // Posição alvo para centralizar o card
-      return -(clampedIndex * cardWidth);
-    };
-
-    // Função para executar snap
-    const executeSnap = () => {
-      const targetX = getSnapPosition();
-      const currentX = gsap.getProperty(track, 'x');
-      
-      // Só faz snap se houver diferença significativa (mais de 10px)
-      if (Math.abs(targetX - currentX) > 10) {
-        gsap.to(track, {
-          x: targetX,
-          duration: 0.6,
-          ease: 'power2.out'
-        });
-      }
-    };
-
     // Calcula bounds dinamicamente
     const calculateDistance = () => {
-      const trackWidth = track.scrollWidth;
       const sectionWidth = section.offsetWidth;
-      return trackWidth - sectionWidth;
+      const total = projects.length + 1;
+      return (total * sectionWidth) - sectionWidth;
     };
 
     // Mobile: layout vertical
@@ -177,7 +142,6 @@ const WorkSection = () => {
         gap: '0'
       });
 
-      // Animação simples de entrada
       scrollTriggerRef.current = ScrollTrigger.create({
         trigger: section,
         start: 'top 80%',
@@ -195,69 +159,38 @@ const WorkSection = () => {
       return;
     }
 
-    // Desktop: scroll horizontal
-    const distance = calculateDistance();
-    
-    // Timeline principal para coordenar todas as animações
+    // Desktop: scroll horizontal COM SNAP NATIVO
+    const totalCards = projects.length + 1; // WORK + projetos
+    const step = 1 / (totalCards - 1);
+
     const mainTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         start: 'top top',
-        end: () => `+=${distance + window.innerHeight * 0.5}`,
+        end: () => `+=${calculateDistance()}`, // SEM o + window.innerHeight * 0.5
         pin: true,
         pinSpacing: true,
         scrub: 1,
+        invalidateOnRefresh: true,
         anticipatePin: 1,
         refreshPriority: 1,
-        onUpdate: (self) => {
-          // Detecta se está fazendo scroll
-          const isScrolling = self.getVelocity() !== 0;
-          
-          if (isScrolling && !isScrollingRef.current) {
-            // Começou a fazer scroll - reduz cards para 75%
-            isScrollingRef.current = true;
-            gsap.to('.work-card--project', {
-              scale: 0.75,
-              duration: 0.3,
-              ease: 'power2.out'
-            });
-          }
-          
-          // Clear timeout anterior e define novo
-          if (scrollTimeoutRef.current) {
-            clearTimeout(scrollTimeoutRef.current);
-          }
-          
-          // Define timeout para quando parar de fazer scroll
-          scrollTimeoutRef.current = setTimeout(() => {
-            if (isScrollingRef.current) {
-              // Parou de fazer scroll - volta cards para 100%
-              isScrollingRef.current = false;
-              gsap.to('.work-card--project', {
-                scale: 1,
-                duration: 0.4,
-                ease: 'power2.out'
-              });
-              
-              // Executa snap após cards voltarem ao tamanho normal
-              snapTimeoutRef.current = setTimeout(() => {
-                executeSnap();
-              }, 200);
-            }
-          }, 150); // 150ms de delay para detectar parada
+        snap: {
+          snapTo: (value) => gsap.utils.snap(step, value),
+          duration: 0.6,
+          ease: "power2.out",
+          delay: 0.15
         }
       }
     });
 
-    // Animação 1: Movimento horizontal do track
+    // Movimento horizontal
     mainTimeline.to(track, {
-      x: -distance,
+      x: () => -calculateDistance(),
       ease: 'none',
       duration: 1
     }, 0);
 
-    // Animação 2: Scale da palavra WORK (1 → 4 → 1)
-    // Durante a primeira parte do scroll (saída do card WORK)
+    // Animação da palavra WORK
     const workTitle = workTitleRef.current;
     if (workTitle) {
       mainTimeline
@@ -275,16 +208,10 @@ const WorkSection = () => {
 
     scrollTriggerRef.current = mainTimeline.scrollTrigger;
 
-    // Cleanup function
+    // Cleanup
     return () => {
       if (scrollTriggerRef.current) {
         scrollTriggerRef.current.kill();
-      }
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
-      if (snapTimeoutRef.current) {
-        clearTimeout(snapTimeoutRef.current);
       }
       mainTimeline.kill();
     };
@@ -321,7 +248,7 @@ const WorkSection = () => {
           willChange: 'transform'
         }}
       >
-        {/* Card WORK - Capa da seção */}
+        {/* Card WORK */}
         <div 
           className="work-card work-card--intro"
           style={{
@@ -353,7 +280,6 @@ const WorkSection = () => {
               flexShrink: 0
             }}
           >
-            {/* Split Esquerda: Imagem */}
             <div 
               className="work-card__image-section"
               style={{
@@ -375,7 +301,6 @@ const WorkSection = () => {
               </div>
             </div>
 
-            {/* Split Direita: Conteúdo */}
             <div 
               className="work-card__content-section"
               style={{
@@ -388,7 +313,6 @@ const WorkSection = () => {
                 alignSelf: 'stretch'
               }}
             >
-              {/* Tags */}
               <div 
                 className="work-card__tags"
                 style={{
@@ -404,12 +328,10 @@ const WorkSection = () => {
                 ))}
               </div>
 
-              {/* Título */}
               <h2 className="work-card__title">
                 {project.title}
               </h2>
 
-              {/* Descrição */}
               <p className="work-card__description">
                 {project.description}
               </p>
@@ -418,7 +340,6 @@ const WorkSection = () => {
         ))}
       </div>
 
-      {/* Modal */}
       <Modal 
         isOpen={modalOpen}
         onClose={closeModal}

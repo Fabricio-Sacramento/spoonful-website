@@ -52,7 +52,8 @@
 
 .work-card--project {
   cursor: pointer;
-  transform-origin: left center;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 /* Área de imagem */
