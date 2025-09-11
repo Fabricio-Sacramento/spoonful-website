@@ -159,9 +159,10 @@ const WorkSection = () => {
       return;
     }
 
-    // Desktop: scroll horizontal COM SNAP NATIVO
+    // Desktop: scroll horizontal COM SNAP NATIVO + SKEW EFFECT
     const totalCards = projects.length + 1; // WORK + projetos
     const step = 1 / (totalCards - 1);
+    const clamper = gsap.utils.clamp(-8, 8); // Skew mais sutil que o original (-20, 20)
 
     const mainTimeline = gsap.timeline({
       scrollTrigger: {
@@ -178,7 +179,27 @@ const WorkSection = () => {
           snapTo: (value) => gsap.utils.snap(step, value),
           duration: 0.6,
           ease: "power2.out",
-          delay: 0.15
+          delay: 0.15,
+          onStart: () => {
+            // Reset skew quando snap inicia
+            gsap.to('.work-card--project', {
+              skewY: 0, // Reset apenas eixo Y
+              skewX: 0, // Força eixo X sempre zero
+              duration: 0.4,
+              ease: "power2.out"
+            });
+          }
+        },
+        onUpdate: (self) => {
+          // Aplica skew baseado na velocidade do scroll
+          const velocity = self.getVelocity();
+          const skew = clamper(velocity / -300); // Divisor maior = skew mais sutil
+          
+          gsap.set('.work-card--project', {
+            skewY: skew,
+            skewX: 0, // Força eixo X sempre zero
+            transformOrigin: "center center"
+          });
         }
       }
     });
