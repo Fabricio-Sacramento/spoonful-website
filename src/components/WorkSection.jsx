@@ -182,9 +182,8 @@ const WorkSection = () => {
           delay: 0.15,
           onStart: () => {
             // Reset skew quando snap inicia
-            gsap.to('.work-card--project', {
-              skewY: 0, // Reset apenas eixo Y
-              skewX: 0, // Força eixo X sempre zero
+            gsap.to(track, { // Reset no container track
+              skewX: 0,
               duration: 0.4,
               ease: "power2.out"
             });
@@ -196,8 +195,7 @@ const WorkSection = () => {
           const skew = clamper(velocity / -300); // Divisor maior = skew mais sutil
           
           gsap.set('.work-card--project', {
-            skewY: skew,
-            skewX: 0, // Força eixo X sempre zero
+            skewX: skew,
             transformOrigin: "center center"
           });
         }
