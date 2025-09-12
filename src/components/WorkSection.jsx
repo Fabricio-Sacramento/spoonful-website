@@ -163,6 +163,7 @@ const WorkSection = () => {
     const totalCards = projects.length + 1; // WORK + projetos
     const step = 1 / (totalCards - 1);
     const clamper = gsap.utils.clamp(-8, 8); // Skew mais sutil que o original (-20, 20)
+    let resetTimeout;
 
     const mainTimeline = gsap.timeline({
       scrollTrigger: {
@@ -190,14 +191,19 @@ const WorkSection = () => {
           }
         },
         onUpdate: (self) => {
-          // Aplica skew baseado na velocidade do scroll
           const velocity = self.getVelocity();
-          const skew = clamper(velocity / -300); // Divisor maior = skew mais sutil
+          
+          // Se velocidade for muito baixa, força skew zero
+          const skew = Math.abs(velocity) < 40 ? 0 : clamper(velocity / -300);
           
           gsap.set('.work-card--project', {
             skewX: skew,
             transformOrigin: "center center"
           });
+            clearTimeout(resetTimeout);
+            resetTimeout = setTimeout(() => {
+              gsap.set('.work-card--project', { skewX: 0 });
+          }, 100);
         }
       }
     });
