@@ -385,19 +385,41 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'flex-end',
-              gap: '0.5rem', // Reduzido de 2rem para 0.5rem (8px)
+              gap: '0.5rem',
               textAlign: 'right',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              overflow: 'hidden' // Previne overflow do título
+            }}
+            onMouseEnter={(e) => {
+              const button = e.currentTarget;
+              const title = button.querySelector('h2');
+              const label = button.querySelector('span:first-child');
+              const tags = button.querySelector('span:last-child');
+              
+              title.style.transform = 'scale(1.2)'; // Reduzido de 1.25 para 1.2
+              label.style.transform = 'translateY(-0.5rem)';
+              tags.style.transform = 'translateY(0.5rem)';
+            }}
+            onMouseLeave={(e) => {
+              const button = e.currentTarget;
+              const title = button.querySelector('h2');
+              const label = button.querySelector('span:first-child');
+              const tags = button.querySelector('span:last-child');
+              
+              title.style.transform = 'scale(1)';
+              label.style.transform = 'translateY(0)';
+              tags.style.transform = 'translateY(0)';
             }}
           >
             <span style={{
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
               fontSize: '2.8125rem',
-              fontWeight: '100', // Voltou para 100
+              fontWeight: '100',
               letterSpacing: '0.9px',
-              lineHeight: '1.3'
+              lineHeight: '1.3',
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               Previous project
             </span>
@@ -410,7 +432,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textTransform: 'uppercase',
               letterSpacing: '2px',
               lineHeight: '0.8',
-              margin: 0
+              margin: 0,
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              transformOrigin: 'right center'
             }}>
               {prevProject.title}
             </h2>
@@ -421,7 +445,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               fontSize: '1.3125rem',
               fontWeight: '400',
               letterSpacing: '0.84px',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               {prevProject.tags?.join(' • ')}
             </span>
@@ -488,19 +513,41 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'flex-start',
-              gap: '0.5rem', // Reduzido de 2rem para 0.5rem (8px)
+              gap: '0.5rem',
               textAlign: 'left',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              overflow: 'hidden' // Previne overflow do título
+            }}
+            onMouseEnter={(e) => {
+              const button = e.currentTarget;
+              const title = button.querySelector('h2');
+              const label = button.querySelector('span:first-child');
+              const tags = button.querySelector('span:last-child');
+              
+              title.style.transform = 'scale(1.2)'; // Reduzido de 1.25 para 1.2
+              label.style.transform = 'translateY(-0.5rem)';
+              tags.style.transform = 'translateY(0.5rem)';
+            }}
+            onMouseLeave={(e) => {
+              const button = e.currentTarget;
+              const title = button.querySelector('h2');
+              const label = button.querySelector('span:first-child');
+              const tags = button.querySelector('span:last-child');
+              
+              title.style.transform = 'scale(1)';
+              label.style.transform = 'translateY(0)';
+              tags.style.transform = 'translateY(0)';
             }}
           >
             <span style={{
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
               fontSize: '2.8125rem',
-              fontWeight: '100', // Voltou para 100
+              fontWeight: '100',
               letterSpacing: '0.9px',
-              lineHeight: '1.3'
+              lineHeight: '1.3',
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               Next project
             </span>
@@ -513,7 +560,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textTransform: 'uppercase',
               letterSpacing: '2px',
               lineHeight: '0.8',
-              margin: 0
+              margin: 0,
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              transformOrigin: 'left center'
             }}>
               {nextProject.title}
             </h2>
@@ -524,7 +573,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               fontSize: '1.3125rem',
               fontWeight: '400',
               letterSpacing: '0.84px',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               {nextProject.tags?.join(' • ')}
             </span>
