@@ -385,7 +385,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'flex-end',
-              gap: '2rem',
+              gap: '0.5rem', // Reduzido de 2rem para 0.5rem (8px)
               textAlign: 'right',
               border: 'none',
               cursor: 'pointer'
@@ -395,7 +395,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
               fontSize: '2.8125rem',
-              fontWeight: '100',
+              fontWeight: '100', // Alterado de 100 para 200
               letterSpacing: '0.9px',
               lineHeight: '1.3'
             }}>
@@ -488,7 +488,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'flex-start',
-              gap: '2rem',
+              gap: '0.5rem', // Reduzido de 2rem para 0.5rem (8px)
               textAlign: 'left',
               border: 'none',
               cursor: 'pointer'
@@ -498,7 +498,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
               fontSize: '2.8125rem',
-              fontWeight: '100',
+              fontWeight: '100', // Alterado de 100 para 200
               letterSpacing: '0.9px',
               lineHeight: '1.3'
             }}>
