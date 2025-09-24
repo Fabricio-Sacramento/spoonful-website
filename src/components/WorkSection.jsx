@@ -121,6 +121,13 @@ const WorkSection = () => {
     }
   ];
 
+  // Função para navegar entre projetos no modal - DEPOIS do array projects
+  const handleProjectNavigation = (index) => {
+    if (projects[index]) {
+      setSelectedProject(projects[index]);
+    }
+  };
+
   useLayoutEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
@@ -169,7 +176,7 @@ const WorkSection = () => {
       scrollTrigger: {
         trigger: section,
         start: 'top top',
-        end: () => `+=${calculateDistance()}`, // SEM o + window.innerHeight * 0.5
+        end: () => `+=${calculateDistance()}`,
         pin: true,
         pinSpacing: true,
         scrub: 1,
@@ -183,7 +190,7 @@ const WorkSection = () => {
           delay: 0.15,
           onStart: () => {
             // Reset skew quando snap inicia
-            gsap.to(track, { // Reset no container track
+            gsap.to(track, {
               skewX: 0,
               duration: 0.4,
               ease: "power2.out"
@@ -200,9 +207,10 @@ const WorkSection = () => {
             skewX: skew,
             transformOrigin: "center center"
           });
-            clearTimeout(resetTimeout);
-            resetTimeout = setTimeout(() => {
-              gsap.set('.work-card--project', { skewX: 0 });
+          
+          clearTimeout(resetTimeout);
+          resetTimeout = setTimeout(() => {
+            gsap.set('.work-card--project', { skewX: 0 });
           }, 100);
         }
       }
@@ -302,7 +310,8 @@ const WorkSection = () => {
               height: '100vh',
               alignItems: 'center',
               background: project.backgroundColor,
-              flexShrink: 0
+              flexShrink: 0,
+              cursor: 'pointer'
             }}
           >
             <div 
@@ -369,6 +378,8 @@ const WorkSection = () => {
         isOpen={modalOpen}
         onClose={closeModal}
         project={selectedProject}
+        projects={projects}
+        onNavigate={handleProjectNavigation}
       />
     </section>
   );
