@@ -347,40 +347,40 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
       </div>
 
-      {/* NAVIGATION SECTION */}
+      {/* NAVIGATION SECTION - Layout 2x2 */}
       <div style={{
-        height: '400px',
+        height: '100vh', // Altura total da tela
         display: 'flex',
+        flexDirection: 'column',
         backgroundColor: 'var(--primary-red)',
         width: '100%',
         position: 'relative',
-        zIndex: 2,
-        marginTop: 0
+        zIndex: 2
       }}>
-        {/* Previous Project */}
-        <button
-          onClick={goToPrevious}
-          style={{
-            flex: 1,
-            display: 'flex',
-            border: 'none',
-            cursor: 'pointer',
-            backgroundColor: 'transparent',
-            overflow: 'hidden'
-          }}
-        >
-          {/* Previous Project Info */}
-          <div style={{
-            flex: 1,
-            backgroundColor: 'var(--primary-red)',
-            padding: '2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            gap: '2rem',
-            textAlign: 'right'
-          }}>
+        {/* ROW 1 - Previous Project */}
+        <div style={{
+          height: '50vh', // 50% da altura da tela
+          display: 'flex',
+          width: '100%'
+        }}>
+          {/* Previous Project Info - LEFT */}
+          <button
+            onClick={goToPrevious}
+            style={{
+              width: '50%', // 50% da largura
+              height: '100%',
+              backgroundColor: 'var(--primary-red)',
+              padding: '2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              gap: '2rem',
+              textAlign: 'right',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
             <span style={{
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -415,11 +415,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             }}>
               {prevProject.tags?.join(' • ')}
             </span>
-          </div>
+          </button>
 
-          {/* Previous Project Image */}
+          {/* Previous Project Image - RIGHT */}
           <div style={{
-            flex: 1,
+            width: '50%', // 50% da largura
+            height: '100%',
             position: 'relative',
             overflow: 'hidden'
           }}>
@@ -436,23 +437,18 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }}
             />
           </div>
-        </button>
+        </div>
 
-        {/* Next Project */}
-        <button
-          onClick={goToNext}
-          style={{
-            flex: 1,
-            display: 'flex',
-            border: 'none',
-            cursor: 'pointer',
-            backgroundColor: 'transparent',
-            overflow: 'hidden'
-          }}
-        >
-          {/* Next Project Image */}
+        {/* ROW 2 - Next Project */}
+        <div style={{
+          height: '50vh', // 50% da altura da tela
+          display: 'flex',
+          width: '100%'
+        }}>
+          {/* Next Project Image - LEFT */}
           <div style={{
-            flex: 1,
+            width: '50%', // 50% da largura
+            height: '100%',
             position: 'relative',
             overflow: 'hidden'
           }}>
@@ -470,18 +466,24 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             />
           </div>
 
-          {/* Next Project Info */}
-          <div style={{
-            flex: 1,
-            backgroundColor: 'var(--primary-red)',
-            padding: '2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: '2rem',
-            textAlign: 'left'
-          }}>
+          {/* Next Project Info - RIGHT */}
+          <button
+            onClick={goToNext}
+            style={{
+              width: '50%', // 50% da largura
+              height: '100%',
+              backgroundColor: 'var(--primary-red)',
+              padding: '2rem',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              gap: '2rem',
+              textAlign: 'left',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
             <span style={{
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -516,8 +518,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             }}>
               {nextProject.tags?.join(' • ')}
             </span>
-          </div>
-        </button>
+          </button>
+        </div>
       </div>
     </div>
   );
