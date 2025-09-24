@@ -149,9 +149,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             src={currentProject.image}
             alt={currentProject.title}
             style={{
-              maxWidth: '60%',
-              maxHeight: '60%',
-              objectFit: 'contain',
+              width: '100%', // Ocupar toda largura disponível
+              height: '100%', // Ocupar toda altura disponível
+              objectFit: 'cover',
               objectPosition: 'center'
             }}
             onError={() => {
@@ -321,12 +321,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
-        padding: '1rem 2rem',
+        padding: '2rem',
         width: '100%',
         position: 'relative',
         zIndex: 1
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           {/* 5 Single Images */}
           {[...Array(5)].map((_, i) => (
             <div key={i} style={{
@@ -349,7 +349,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   inset: 0,
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain'
+                  objectFit: 'cover' // Alterado de contain para cover
                 }}
               />
             </div>
@@ -395,7 +395,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
               fontSize: '2.8125rem',
-              fontWeight: '100', // Alterado de 100 para 200
+              fontWeight: '100', // Voltou para 100
               letterSpacing: '0.9px',
               lineHeight: '1.3'
             }}>
@@ -498,7 +498,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               color: 'var(--neutral-light)',
               fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
               fontSize: '2.8125rem',
-              fontWeight: '100', // Alterado de 100 para 200
+              fontWeight: '100', // Voltou para 100
               letterSpacing: '0.9px',
               lineHeight: '1.3'
             }}>
