@@ -369,6 +369,7 @@ const WorkSection = () => {
         isOpen={modalOpen}
         onClose={closeModal}
         project={selectedProject}
+        projects={projects}
       />
     </section>
   );
