@@ -311,17 +311,17 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
-        padding: '2rem',
+        padding: '2rem', // 16px top/bottom, 32px left/right
         width: '100%',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}> {/* Gap reduzido */}
           {/* 5 Single Images */}
           {[...Array(5)].map((_, i) => (
             <div key={i} style={{
               width: '100%',
-              height: '400px',
+              height: 'calc(100vh - 1rem)',
               borderRadius: '25px',
               overflow: 'hidden',
               position: 'relative'
