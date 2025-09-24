@@ -132,11 +132,13 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         width: '100%',
         height: '100vh',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        flexShrink: 0
       }}>
-        {/* Project Image - TOP - 50% da tela */}
+        {/* Project Image - TOP - EXATAMENTE 50% da tela */}
         <div style={{
-          height: '50vh', // Exatamente 50% da viewport
+          height: '50vh',
+          flexShrink: 0,
           backgroundColor: '#00ebff',
           display: 'flex',
           alignItems: 'center',
@@ -158,23 +160,27 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           />
         </div>
 
-        {/* Project Description - BOTTOM - 50% da tela */}
+        {/* Project Description - BOTTOM - EXATAMENTE 50% da tela */}
         <div style={{
-          height: '50vh', // Exatamente 50% da viewport
+          height: '50vh',
+          flexShrink: 0,
           backgroundColor: 'var(--neutral-normal)',
-          padding: '2rem 3rem',
+          padding: '2.25rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1.5rem'
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          gap: '0.5rem',
+          overflow: 'hidden'
         }}>
           {/* Tags */}
           <div style={{
             color: 'var(--primary-green)',
             fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
             fontSize: '1.125rem',
-            fontWeight: '500',
-            textTransform: 'uppercase',
-            letterSpacing: '0.72px'
+            fontWeight: '600',
+            letterSpacing: '0.045rem',
+            textTransform: 'capitalize'
           }}>
             {currentProject.tags?.join(' • ') || 'WEBSITE • E-COMMERCE • UI/UX • DEVELOPMENT'}
           </div>
@@ -183,26 +189,25 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           <h1 style={{
             color: 'var(--neutral-light)',
             fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-            fontSize: 'clamp(3rem, 8vw, 7.75rem)',
+            fontSize: '7.75rem',
             fontWeight: '900',
-            lineHeight: '0.9',
-            letterSpacing: '2.48px',
+            letterSpacing: '0.155rem',
             margin: 0
           }}>
             {currentProject.title}
           </h1>
 
-          {/* Subtitle and Description Row */}
-          <div style={{ display: 'flex', gap: '4rem' }}>
-            {/* Left Column - Description */}
-            <div style={{ flex: 2 }}>
+          {/* Layout Row - 50% + 25% + 25% */}
+          <div style={{ display: 'flex', width: '100%', gap: '2rem' }}>
+            {/* Left Column - Title & Description (50%) */}
+            <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h2 style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                 fontSize: '1.375rem',
-                fontWeight: '500',
-                letterSpacing: '0.88px',
-                margin: '0 0 1rem 0'
+                fontWeight: '600',
+                letterSpacing: '0.055rem',
+                margin: 0
               }}>
                 Plataforma de Ecoturismo Sustentável
               </h2>
@@ -211,27 +216,25 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                 fontSize: '1.25rem',
-                fontWeight: '300',
-                letterSpacing: '1px',
-                lineHeight: '1.4',
+                fontWeight: '200',
+                letterSpacing: '0.0625rem',
                 margin: 0
               }}>
-                {currentProject.description}
+                Plataforma completa para experiências de turismo sustentável, com sistema de reservas, pagamentos integrados e dashboard para operadores locais. Designing interfaces and experiences that guide users intuitively. From wireframes to usability testing, we ensure your product is both attractive and effortless.
               </p>
             </div>
 
-            {/* Right Columns - Stacks and Link */}
-            <div style={{ flex: 1, display: 'flex', gap: '3rem' }}>
-              {/* Design Stack */}
+            {/* Middle Column - Stacks (25%) */}
+            <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <div>
                 <h3 style={{
                   color: 'var(--neutral-light)',
                   fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                   fontSize: '1.0625rem',
-                  fontWeight: '500',
-                  letterSpacing: '0.68px',
+                  fontWeight: '600',
+                  letterSpacing: '0.0425rem',
                   textTransform: 'capitalize',
-                  margin: '0 0 0.625rem 0'
+                  margin: '0 0 0.5rem 0'
                 }}>
                   Design Stack
                 </h3>
@@ -239,21 +242,24 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   color: 'var(--neutral-light)',
                   fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                   fontSize: '1.25rem',
-                  fontWeight: '300',
-                  letterSpacing: '1px',
-                  margin: '0 0 2rem 0'
+                  fontWeight: '200',
+                  letterSpacing: '0.0625rem',
+                  textTransform: 'capitalize',
+                  margin: 0
                 }}>
                   Brand Strategy, UI/UX, Graphic Design, Front-end & Backend Development
                 </p>
+              </div>
 
+              <div>
                 <h3 style={{
                   color: 'var(--neutral-light)',
                   fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                   fontSize: '1.0625rem',
-                  fontWeight: '500',
-                  letterSpacing: '0.68px',
+                  fontWeight: '600',
+                  letterSpacing: '0.0425rem',
                   textTransform: 'capitalize',
-                  margin: '0 0 0.625rem 0'
+                  margin: '0 0 0.5rem 0'
                 }}>
                   Tech Stack
                 </h3>
@@ -261,25 +267,28 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   color: 'var(--neutral-light)',
                   fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                   fontSize: '1.25rem',
-                  fontWeight: '300',
-                  letterSpacing: '1px',
+                  fontWeight: '200',
+                  letterSpacing: '0.0625rem',
+                  textTransform: 'capitalize',
                   margin: 0
                 }}>
                   React • Node.js • Stripe • MongoDB
                 </p>
               </div>
+            </div>
 
-              {/* Go Live */}
+            {/* Right Column - Go Live (25%) */}
+            <div style={{ flex: '1' }}>
               {currentProject.projectUrl && (
                 <div>
                   <h3 style={{
                     color: 'var(--neutral-light)',
                     fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                     fontSize: '1.0625rem',
-                    fontWeight: '500',
-                    letterSpacing: '0.68px',
+                    fontWeight: '600',
+                    letterSpacing: '0.0425rem',
                     textTransform: 'capitalize',
-                    margin: '0 0 0.625rem 0'
+                    margin: '0 0 0.5rem 0'
                   }}>
                     Go Live
                   </h3>
@@ -291,8 +300,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                       color: 'var(--primary-green)',
                       fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                       fontSize: '1.25rem',
-                      fontWeight: '300',
-                      letterSpacing: '1px',
+                      fontWeight: '400',
+                      letterSpacing: '0.0625rem',
+                      textTransform: 'capitalize',
                       textDecoration: 'none',
                       cursor: 'pointer'
                     }}
@@ -311,12 +321,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
-        padding: '2rem', // 16px top/bottom, 32px left/right
+        padding: '1rem 2rem',
         width: '100%',
         position: 'relative',
-        zIndex: 1,
+        zIndex: 1
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}> {/* Gap reduzido */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {/* 5 Single Images */}
           {[...Array(5)].map((_, i) => (
             <div key={i} style={{
@@ -349,7 +359,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
       {/* NAVIGATION SECTION - Layout 2x2 */}
       <div style={{
-        height: '100vh', // Altura total da tela
+        height: '100vh',
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: 'var(--primary-red)',
@@ -359,7 +369,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }}>
         {/* ROW 1 - Previous Project */}
         <div style={{
-          height: '50vh', // 50% da altura da tela
+          height: '50vh',
           display: 'flex',
           width: '100%'
         }}>
@@ -367,7 +377,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           <button
             onClick={goToPrevious}
             style={{
-              width: '50%', // 50% da largura
+              width: '50%',
               height: '100%',
               backgroundColor: 'var(--primary-red)',
               padding: '2rem',
@@ -419,7 +429,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
           {/* Previous Project Image - RIGHT */}
           <div style={{
-            width: '50%', // 50% da largura
+            width: '50%',
             height: '100%',
             position: 'relative',
             overflow: 'hidden'
@@ -441,13 +451,13 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
         {/* ROW 2 - Next Project */}
         <div style={{
-          height: '50vh', // 50% da altura da tela
+          height: '50vh',
           display: 'flex',
           width: '100%'
         }}>
           {/* Next Project Image - LEFT */}
           <div style={{
-            width: '50%', // 50% da largura
+            width: '50%',
             height: '100%',
             position: 'relative',
             overflow: 'hidden'
@@ -470,7 +480,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           <button
             onClick={goToNext}
             style={{
-              width: '50%', // 50% da largura
+              width: '50%',
               height: '100%',
               backgroundColor: 'var(--primary-red)',
               padding: '2rem',
