@@ -134,9 +134,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Project Image - TOP */}
+        {/* Project Image - TOP - 50% da tela */}
         <div style={{
-          flex: 1,
+          height: '50vh', // Exatamente 50% da viewport
           backgroundColor: '#00ebff',
           display: 'flex',
           alignItems: 'center',
@@ -158,8 +158,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           />
         </div>
 
-        {/* Project Description - BOTTOM */}
+        {/* Project Description - BOTTOM - 50% da tela */}
         <div style={{
+          height: '50vh', // Exatamente 50% da viewport
           backgroundColor: 'var(--neutral-normal)',
           padding: '2rem 3rem',
           display: 'flex',
@@ -307,93 +308,42 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
       </div>
 
-      {/* GALLERY SECTION */}
+      {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
         padding: '2rem',
-        minHeight: '100vh'
+        width: '100%',
+        position: 'relative',
+        zIndex: 1
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Single Image */}
-          <div style={{
-            width: '100%',
-            height: '400px',
-            borderRadius: '25px',
-            overflow: 'hidden',
-            position: 'relative'
-          }}>
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: '#00ebff'
-            }} />
-            <img 
-              src={currentProject.image}
-              alt={`${currentProject.title} - Gallery 1`}
-              style={{
+          {/* 5 Single Images */}
+          {[...Array(5)].map((_, i) => (
+            <div key={i} style={{
+              width: '100%',
+              height: '400px',
+              borderRadius: '25px',
+              overflow: 'hidden',
+              position: 'relative'
+            }}>
+              <div style={{
                 position: 'absolute',
                 inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain'
-              }}
-            />
-          </div>
-
-          {/* Two Images Side by Side */}
-          <div style={{ display: 'flex', gap: '2rem', height: '400px' }}>
-            {[...Array(2)].map((_, i) => (
-              <div key={i} style={{
-                flex: 1,
-                borderRadius: '25px',
-                overflow: 'hidden',
-                position: 'relative'
-              }}>
-                <div style={{
+                backgroundColor: '#00ebff'
+              }} />
+              <img 
+                src={currentProject.image}
+                alt={`${currentProject.title} - Gallery ${i + 1}`}
+                style={{
                   position: 'absolute',
                   inset: 0,
-                  backgroundColor: '#00ebff'
-                }} />
-                <img 
-                  src={currentProject.image}
-                  alt={`${currentProject.title} - Gallery ${i + 2}`}
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain'
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Another Single Image */}
-          <div style={{
-            width: '100%',
-            height: '400px',
-            borderRadius: '25px',
-            overflow: 'hidden',
-            position: 'relative'
-          }}>
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: '#00ebff'
-            }} />
-            <img 
-              src={currentProject.image}
-              alt={`${currentProject.title} - Gallery 4`}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain'
-              }}
-            />
-          </div>
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
+              />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -401,7 +351,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       <div style={{
         height: '400px',
         display: 'flex',
-        backgroundColor: 'var(--primary-red)'
+        backgroundColor: 'var(--primary-red)',
+        width: '100%',
+        position: 'relative',
+        zIndex: 2,
+        marginTop: 0
       }}>
         {/* Previous Project */}
         <button
