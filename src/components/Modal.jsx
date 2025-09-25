@@ -127,193 +127,160 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         ×
       </button>
 
-      {/* HERO SECTION - Imagem em cima, texto embaixo */}
+      {/* HERO SECTION - Apenas detalhes do projeto, mantendo 50vh */}
       <div style={{
         width: '100%',
-        height: '100vh',
+        height: '50vh',
         display: 'flex',
         flexDirection: 'column',
-        flexShrink: 0
+        flexShrink: 0,
+        backgroundColor: 'var(--neutral-normal)',
+        padding: '2.25rem',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        gap: '0.5rem',
+        overflow: 'hidden'
       }}>
-        {/* Project Image - TOP - EXATAMENTE 50% da tela */}
+        {/* Tags */}
         <div style={{
-          height: '50vh',
-          flexShrink: 0,
-          backgroundColor: '#00ebff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative'
+          color: 'var(--primary-green)',
+          fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+          fontSize: '1.125rem',
+          fontWeight: '600',
+          letterSpacing: '0.045rem',
+          textTransform: 'capitalize'
         }}>
-          <img 
-            src={currentProject.image}
-            alt={currentProject.title}
-            style={{
-              width: '100%', // Ocupar toda largura disponível
-              height: '100%', // Ocupar toda altura disponível
-              objectFit: 'cover',
-              objectPosition: 'center'
-            }}
-            onError={() => {
-              console.log('Image failed to load:', currentProject.image);
-            }}
-          />
+          {currentProject.tags?.join(' • ') || 'WEBSITE • E-COMMERCE • UI/UX • DEVELOPMENT'}
         </div>
 
-        {/* Project Description - BOTTOM - EXATAMENTE 50% da tela */}
-        <div style={{
-          height: '50vh',
-          flexShrink: 0,
-          backgroundColor: 'var(--neutral-normal)',
-          padding: '2.25rem',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          gap: '0.5rem',
-          overflow: 'hidden'
+        {/* Title */}
+        <h1 style={{
+          color: 'var(--neutral-light)',
+          fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+          fontSize: '7.75rem',
+          fontWeight: '900',
+          letterSpacing: '0.155rem',
+          margin: 0
         }}>
-          {/* Tags */}
-          <div style={{
-            color: 'var(--primary-green)',
-            fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-            fontSize: '1.125rem',
-            fontWeight: '600',
-            letterSpacing: '0.045rem',
-            textTransform: 'capitalize'
-          }}>
-            {currentProject.tags?.join(' • ') || 'WEBSITE • E-COMMERCE • UI/UX • DEVELOPMENT'}
+          {currentProject.title}
+        </h1>
+
+        {/* Layout Row - 50% + 25% + 25% */}
+        <div style={{ display: 'flex', width: '100%', gap: '2rem' }}>
+          {/* Left Column - Title & Description (50%) */}
+          <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h2 style={{
+              color: 'var(--neutral-light)',
+              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+              fontSize: '1.375rem',
+              fontWeight: '600',
+              letterSpacing: '0.055rem',
+              margin: 0
+            }}>
+              Plataforma de Ecoturismo Sustentável
+            </h2>
+            
+            <p style={{
+              color: 'var(--neutral-light)',
+              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+              fontSize: '1.25rem',
+              fontWeight: '200',
+              letterSpacing: '0.0625rem',
+              margin: 0
+            }}>
+              Plataforma completa para experiências de turismo sustentável, com sistema de reservas, pagamentos integrados e dashboard para operadores locais. Designing interfaces and experiences that guide users intuitively. From wireframes to usability testing, we ensure your product is both attractive and effortless.
+            </p>
           </div>
 
-          {/* Title */}
-          <h1 style={{
-            color: 'var(--neutral-light)',
-            fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-            fontSize: '7.75rem',
-            fontWeight: '900',
-            letterSpacing: '0.155rem',
-            margin: 0
-          }}>
-            {currentProject.title}
-          </h1>
-
-          {/* Layout Row - 50% + 25% + 25% */}
-          <div style={{ display: 'flex', width: '100%', gap: '2rem' }}>
-            {/* Left Column - Title & Description (50%) */}
-            <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h2 style={{
+          {/* Middle Column - Stacks (25%) */}
+          <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div>
+              <h3 style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.375rem',
+                fontSize: '1.0625rem',
                 fontWeight: '600',
-                letterSpacing: '0.055rem',
-                margin: 0
+                letterSpacing: '0.0425rem',
+                textTransform: 'capitalize',
+                margin: '0 0 0.5rem 0'
               }}>
-                Plataforma de Ecoturismo Sustentável
-              </h2>
-              
+                Design Stack
+              </h3>
               <p style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                 fontSize: '1.25rem',
                 fontWeight: '200',
                 letterSpacing: '0.0625rem',
+                textTransform: 'capitalize',
                 margin: 0
               }}>
-                Plataforma completa para experiências de turismo sustentável, com sistema de reservas, pagamentos integrados e dashboard para operadores locais. Designing interfaces and experiences that guide users intuitively. From wireframes to usability testing, we ensure your product is both attractive and effortless.
+                Brand Strategy, UI/UX, Graphic Design, Front-end & Backend Development
               </p>
             </div>
 
-            {/* Middle Column - Stacks (25%) */}
-            <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              <div>
-                <h3 style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.0625rem',
-                  fontWeight: '600',
-                  letterSpacing: '0.0425rem',
-                  textTransform: 'capitalize',
-                  margin: '0 0 0.5rem 0'
-                }}>
-                  Design Stack
-                </h3>
-                <p style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.25rem',
-                  fontWeight: '200',
-                  letterSpacing: '0.0625rem',
-                  textTransform: 'capitalize',
-                  margin: 0
-                }}>
-                  Brand Strategy, UI/UX, Graphic Design, Front-end & Backend Development
-                </p>
-              </div>
-
-              <div>
-                <h3 style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.0625rem',
-                  fontWeight: '600',
-                  letterSpacing: '0.0425rem',
-                  textTransform: 'capitalize',
-                  margin: '0 0 0.5rem 0'
-                }}>
-                  Tech Stack
-                </h3>
-                <p style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.25rem',
-                  fontWeight: '200',
-                  letterSpacing: '0.0625rem',
-                  textTransform: 'capitalize',
-                  margin: 0
-                }}>
-                  React • Node.js • Stripe • MongoDB
-                </p>
-              </div>
+            <div>
+              <h3 style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '1.0625rem',
+                fontWeight: '600',
+                letterSpacing: '0.0425rem',
+                textTransform: 'capitalize',
+                margin: '0 0 0.5rem 0'
+              }}>
+                Tech Stack
+              </h3>
+              <p style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '1.25rem',
+                fontWeight: '200',
+                letterSpacing: '0.0625rem',
+                textTransform: 'capitalize',
+                margin: 0
+              }}>
+                React • Node.js • Stripe • MongoDB
+              </p>
             </div>
+          </div>
 
-            {/* Right Column - Go Live (25%) */}
-            <div style={{ flex: '1' }}>
-              {currentProject.projectUrl && (
-                <div>
-                  <h3 style={{
-                    color: 'var(--neutral-light)',
+          {/* Right Column - Go Live (25%) */}
+          <div style={{ flex: '1' }}>
+            {currentProject.projectUrl && (
+              <div>
+                <h3 style={{
+                  color: 'var(--neutral-light)',
+                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                  fontSize: '1.0625rem',
+                  fontWeight: '600',
+                  letterSpacing: '0.0425rem',
+                  textTransform: 'capitalize',
+                  margin: '0 0 0.5rem 0'
+                }}>
+                  Go Live
+                </h3>
+                <a 
+                  href={currentProject.projectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: 'var(--primary-green)',
                     fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                    fontSize: '1.0625rem',
-                    fontWeight: '600',
-                    letterSpacing: '0.0425rem',
+                    fontSize: '1.25rem',
+                    fontWeight: '400',
+                    letterSpacing: '0.0625rem',
                     textTransform: 'capitalize',
-                    margin: '0 0 0.5rem 0'
-                  }}>
-                    Go Live
-                  </h3>
-                  <a 
-                    href={currentProject.projectUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: 'var(--primary-green)',
-                      fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                      fontSize: '1.25rem',
-                      fontWeight: '400',
-                      letterSpacing: '0.0625rem',
-                      textTransform: 'capitalize',
-                      textDecoration: 'none',
-                      cursor: 'pointer'
-                    }}
-                    onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-                    onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
-                  >
-                    Visit Website
-                  </a>
-                </div>
-              )}
-            </div>
+                    textDecoration: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                  onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                >
+                  Visit Website
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -349,7 +316,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   inset: 0,
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover' // Alterado de contain para cover
+                  objectFit: 'cover'
                 }}
               />
             </div>
@@ -389,7 +356,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textAlign: 'right',
               border: 'none',
               cursor: 'pointer',
-              overflow: 'hidden' // Previne overflow do título
+              overflow: 'hidden'
             }}
             onMouseEnter={(e) => {
               const button = e.currentTarget;
@@ -397,7 +364,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               const label = button.querySelector('span:first-child');
               const tags = button.querySelector('span:last-child');
               
-              title.style.transform = 'scale(1.2)'; // Reduzido de 1.25 para 1.2
+              title.style.transform = 'scale(1.2)';
               label.style.transform = 'translateY(-0.5rem)';
               tags.style.transform = 'translateY(0.5rem)';
             }}
@@ -517,7 +484,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textAlign: 'left',
               border: 'none',
               cursor: 'pointer',
-              overflow: 'hidden' // Previne overflow do título
+              overflow: 'hidden'
             }}
             onMouseEnter={(e) => {
               const button = e.currentTarget;
@@ -525,7 +492,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               const label = button.querySelector('span:first-child');
               const tags = button.querySelector('span:last-child');
               
-              title.style.transform = 'scale(1.2)'; // Reduzido de 1.25 para 1.2
+              title.style.transform = 'scale(1.2)';
               label.style.transform = 'translateY(-0.5rem)';
               tags.style.transform = 'translateY(0.5rem)';
             }}
