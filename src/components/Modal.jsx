@@ -122,10 +122,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       onClick={handleOverlayClick}
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
+        inset: 0,                      // usa inset ao invés de 100vw/100vh
         backgroundColor: 'var(--neutral-normal)',
         zIndex: 10000,
         display: 'flex',
@@ -134,7 +131,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         visibility: isOpen ? 'visible' : 'hidden',
         transition: 'opacity 0.3s ease, visibility 0.3s ease',
         overflowY: 'auto',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        boxSizing: 'border-box'        // evita paddings estourarem a largura
       }}
     >
       {/* Close Button */}
@@ -365,12 +363,13 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           {/* IMAGENS 2-5 - Já expandidas */}
           {[...Array(4)].map((_, i) => (
             <div key={i + 1} style={{
-              width: '100vw',
+              width: '100%',        // <-- trocar 100vw por 100%
               height: '100vh',
               margin: '0',
               borderRadius: '0',
               overflow: 'hidden',
-              position: 'relative'
+              position: 'relative',
+              boxSizing: 'border-box'
             }}>
               <div style={{
                 position: 'absolute',
