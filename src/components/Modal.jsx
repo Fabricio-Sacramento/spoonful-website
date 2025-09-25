@@ -4,7 +4,67 @@ import PropTypes from 'prop-types';
 
 const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const modalRef = useRef(null);
+  const firstImageRef = useRef(null);
+  const observerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Setup IntersectionObserver para animação da primeira imagem
+  useEffect(() => {
+    if (!isOpen || !firstImageRef.current) return;
+
+    // Cleanup observer anterior
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    const firstImage = firstImageRef.current;
+    
+    // INICIALIZAÇÃO: Define estado inicial explicitamente
+    firstImage.style.setProperty('--expand-padding', '32px');
+    firstImage.style.setProperty('--expand-radius', '25px');
+    
+    // Observer config - threshold array para transição suave
+    const observerOptions = {
+      root: modalRef.current, // Observa dentro do modal
+      rootMargin: '0px',
+      threshold: Array.from({ length: 21 }, (_, i) => i / 20) // Reduzido para menos cálculos
+    };
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+
+      // Lógica corrigida: quanto MENOS visível, MAIS expandida deve ficar
+      const visibilityRatio = entry.intersectionRatio;
+      const expansionProgress = 1 - visibilityRatio; // Inverso da visibilidade
+      
+      // Quando intersectionRatio = 1 (totalmente visível) = estado inicial (padding 32px)
+      // Quando intersectionRatio = 0 (não visível) = estado expandido (padding 0px)
+      const padding = 32 * visibilityRatio; // Quanto mais visível, MAIS padding
+      const borderRadius = 25 * visibilityRatio; // Quanto mais visível, MAIS border-radius
+      
+      console.log('Animation values:', { 
+        visibilityRatio, 
+        expansionProgress, 
+        padding, 
+        borderRadius 
+      });
+      
+      // Aplica transformações
+      firstImage.style.setProperty('--expand-padding', `${padding}px`);
+      firstImage.style.setProperty('--expand-radius', `${borderRadius}px`);
+      
+    }, observerOptions);
+
+    observerRef.current.observe(firstImage);
+
+    // Cleanup ao desmontar
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [isOpen, currentIndex]); // Re-setup quando modal abre ou projeto muda
 
   // Encontra o índice do projeto atual
   useEffect(() => {
@@ -294,12 +354,49 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         zIndex: 1
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          {/* 5 Single Images */}
-          {[...Array(5)].map((_, i) => (
-            <div key={i} style={{
+          {/* PRIMEIRA IMAGEM - Com animação expansiva */}
+          <div 
+            ref={firstImageRef}
+            style={{
               width: '100%',
               height: 'calc(100vh - 1rem)',
-              borderRadius: '25px',
+              padding: 'var(--expand-padding, 32px)',
+              overflow: 'hidden',
+              position: 'relative',
+              transformOrigin: 'center bottom',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Container interno sem inset - apenas recebe border-radius */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 'var(--expand-radius, 25px)',
+              overflow: 'hidden',
+              backgroundColor: '#00ebff'
+            }}>
+              <img 
+                src={currentProject.image}
+                alt={`${currentProject.title} - Gallery 1`}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* IMAGENS 2-5 - Já no estado expandido */}
+          {[...Array(4)].map((_, i) => (
+            <div key={i + 1} style={{
+              width: '100vw',
+              height: '100vh',
+              marginLeft: '-2rem',
+              marginRight: '-2rem',
+              borderRadius: '0',
               overflow: 'hidden',
               position: 'relative'
             }}>
@@ -310,7 +407,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }} />
               <img 
                 src={currentProject.image}
-                alt={`${currentProject.title} - Gallery ${i + 1}`}
+                alt={`${currentProject.title} - Gallery ${i + 2}`}
                 style={{
                   position: 'absolute',
                   inset: 0,
