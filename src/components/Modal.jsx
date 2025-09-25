@@ -20,7 +20,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     const firstImage = firstImageRef.current;
     
     // INICIALIZAÇÃO: Define estado inicial explicitamente
-    firstImage.style.setProperty('--expand-padding', '32px');
+    firstImage.style.setProperty('--expand-width', '100%');
+    firstImage.style.setProperty('--expand-height', 'calc(100vh - 1rem)');
+    firstImage.style.setProperty('--expand-margin-left', '0px');
     firstImage.style.setProperty('--expand-radius', '25px');
     
     // Observer config - threshold array para transição suave
@@ -34,25 +36,28 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       const entry = entries[0];
       if (!entry) return;
 
-      // Lógica corrigida: quanto MENOS visível, MAIS expandida deve ficar
+      // Só anima quando a imagem está saindo da viewport (scroll para cima)
       const visibilityRatio = entry.intersectionRatio;
-      const expansionProgress = 1 - visibilityRatio; // Inverso da visibilidade
       
-      // Quando intersectionRatio = 1 (totalmente visível) = estado inicial (padding 32px)
-      // Quando intersectionRatio = 0 (não visível) = estado expandido (padding 0px)
-      const padding = 32 * visibilityRatio; // Quanto mais visível, MAIS padding
-      const borderRadius = 25 * visibilityRatio; // Quanto mais visível, MAIS border-radius
+      // Lógica mais precisa: só expande quando visibility < 0.8 
+      if (visibilityRatio >= 0.8) {
+        // Estado inicial - totalmente visível
+        firstImage.style.setProperty('--expand-width', '100%');
+        firstImage.style.setProperty('--expand-height', 'calc(100vh - 1rem)');
+        firstImage.style.setProperty('--expand-margin-left', '0px');
+        firstImage.style.setProperty('--expand-radius', '25px');
+      } else {
+        // Estado expandido - saindo da view
+        firstImage.style.setProperty('--expand-width', '100vw');
+        firstImage.style.setProperty('--expand-height', '100vh');
+        firstImage.style.setProperty('--expand-margin-left', '-2rem');
+        firstImage.style.setProperty('--expand-radius', '0px');
+      }
       
-      console.log('Animation values:', { 
-        visibilityRatio, 
-        expansionProgress, 
-        padding, 
-        borderRadius 
+      console.log('Animation triggered:', { 
+        visibilityRatio,
+        state: visibilityRatio >= 0.8 ? 'inicial' : 'expandido'
       });
-      
-      // Aplica transformações
-      firstImage.style.setProperty('--expand-padding', `${padding}px`);
-      firstImage.style.setProperty('--expand-radius', `${borderRadius}px`);
       
     }, observerOptions);
 
@@ -353,43 +358,35 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         position: 'relative',
         zIndex: 1
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          {/* PRIMEIRA IMAGEM - Com animação expansiva */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+          {/* PRIMEIRA IMAGEM - Expansão simples via dimensões */}
           <div 
             ref={firstImageRef}
             style={{
-              width: '100%',
-              height: 'calc(100vh - 1rem)',
-              padding: 'var(--expand-padding, 32px)',
-              overflow: 'hidden',
-              position: 'relative',
-              transformOrigin: 'center bottom',
-              boxSizing: 'border-box'
-            }}
-          >
-            {/* Container interno sem inset - apenas recebe border-radius */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
+              width: 'var(--expand-width, 100%)',
+              height: 'var(--expand-height, calc(100vh - 1rem))',
+              marginLeft: 'var(--expand-margin-left, 0px)',
               borderRadius: 'var(--expand-radius, 25px)',
               overflow: 'hidden',
-              backgroundColor: '#00ebff'
-            }}>
-              <img 
-                src={currentProject.image}
-                alt={`${currentProject.title} - Gallery 1`}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
-            </div>
+              position: 'relative',
+              backgroundColor: '#00ebff',
+              transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}
+          >
+            <img 
+              src={currentProject.image}
+              alt={`${currentProject.title} - Gallery 1`}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
           </div>
 
-          {/* IMAGENS 2-5 - Já no estado expandido */}
+          {/* IMAGENS 2-5 - Já no estado expandido, sem gap */}
           {[...Array(4)].map((_, i) => (
             <div key={i + 1} style={{
               width: '100vw',
