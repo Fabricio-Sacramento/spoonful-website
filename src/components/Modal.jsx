@@ -1,75 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import PropTypes from 'prop-types';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const modalRef = useRef(null);
   const firstImageRef = useRef(null);
-  const observerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Setup IntersectionObserver para animação da primeira imagem
-  useEffect(() => {
-    if (!isOpen || !firstImageRef.current) return;
-
-    // Cleanup observer anterior
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    const firstImage = firstImageRef.current;
-    
-    // INICIALIZAÇÃO: Define estado inicial explicitamente
-    firstImage.style.setProperty('--expand-width', '100%');
-    firstImage.style.setProperty('--expand-height', 'calc(100vh - 1rem)');
-    firstImage.style.setProperty('--expand-margin-left', '0px');
-    firstImage.style.setProperty('--expand-radius', '25px');
-    
-    // Observer config - threshold array para transição suave
-    const observerOptions = {
-      root: modalRef.current, // Observa dentro do modal
-      rootMargin: '0px',
-      threshold: Array.from({ length: 21 }, (_, i) => i / 20) // Reduzido para menos cálculos
-    };
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-
-      // Só anima quando a imagem está saindo da viewport (scroll para cima)
-      const visibilityRatio = entry.intersectionRatio;
-      
-      // Lógica mais precisa: só expande quando visibility < 0.8 
-      if (visibilityRatio >= 0.8) {
-        // Estado inicial - totalmente visível
-        firstImage.style.setProperty('--expand-width', '100%');
-        firstImage.style.setProperty('--expand-height', 'calc(100vh - 1rem)');
-        firstImage.style.setProperty('--expand-margin-left', '0px');
-        firstImage.style.setProperty('--expand-radius', '25px');
-      } else {
-        // Estado expandido - saindo da view
-        firstImage.style.setProperty('--expand-width', '100vw');
-        firstImage.style.setProperty('--expand-height', '100vh');
-        firstImage.style.setProperty('--expand-margin-left', '-2rem');
-        firstImage.style.setProperty('--expand-radius', '0px');
-      }
-      
-      console.log('Animation triggered:', { 
-        visibilityRatio,
-        state: visibilityRatio >= 0.8 ? 'inicial' : 'expandido'
-      });
-      
-    }, observerOptions);
-
-    observerRef.current.observe(firstImage);
-
-    // Cleanup ao desmontar
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [isOpen, currentIndex]); // Re-setup quando modal abre ou projeto muda
 
   // Encontra o índice do projeto atual
   useEffect(() => {
@@ -80,6 +20,38 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
     }
   }, [project, projects]);
+
+  // GSAP ScrollTrigger para primeira imagem
+  useEffect(() => {
+    if (!isOpen || !firstImageRef.current || !modalRef.current) return;
+
+    const firstImage = firstImageRef.current;
+    const modal = modalRef.current;
+
+    ScrollTrigger.create({
+      trigger: firstImage,
+      start: "top 50%",
+      end: "bottom 30%", 
+      scroller: modal,
+      scrub: 1,
+      onUpdate: (self) => {
+        const progress = self.progress;
+        
+        gsap.set(firstImage, {
+          width: progress > 0.5 ? "100vw" : "100%",
+          height: progress > 0.5 ? "100vh" : "calc(100vh - 1rem)",
+          borderRadius: 25 * (1 - progress) + "px",
+          marginLeft: progress > 0.5 ? "-2rem" : "0px"
+        });
+      }
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(st => {
+        if (st.scroller === modal) st.kill();
+      });
+    };
+  }, [isOpen, currentIndex]);
 
   // Navegação com loop infinito
   const goToPrevious = useCallback(() => {
@@ -161,7 +133,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         opacity: isOpen ? 1 : 0,
         visibility: isOpen ? 'visible' : 'hidden',
         transition: 'opacity 0.3s ease, visibility 0.3s ease',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        overflowX: 'hidden'
       }}
     >
       {/* Close Button */}
@@ -350,29 +323,32 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
       </div>
 
-      {/* GALLERY SECTION - 5 imagens sequenciais */}
+      {/* GALLERY SECTION */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
         padding: '2rem',
         width: '100%',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        overflowX: 'hidden'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-          {/* PRIMEIRA IMAGEM - Expansão simples via dimensões */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+          {/* PRIMEIRA IMAGEM - Com animação */}
           <div 
             ref={firstImageRef}
             style={{
-              width: 'var(--expand-width, 100%)',
-              height: 'var(--expand-height, calc(100vh - 1rem))',
-              marginLeft: 'var(--expand-margin-left, 0px)',
-              borderRadius: 'var(--expand-radius, 25px)',
+              width: '100%',
+              height: 'calc(100vh - 1rem)',
+              borderRadius: '25px',
               overflow: 'hidden',
-              position: 'relative',
-              backgroundColor: '#00ebff',
-              transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+              position: 'relative'
             }}
           >
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: '#00ebff'
+            }} />
             <img 
               src={currentProject.image}
               alt={`${currentProject.title} - Gallery 1`}
@@ -386,13 +362,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             />
           </div>
 
-          {/* IMAGENS 2-5 - Já no estado expandido, sem gap */}
+          {/* IMAGENS 2-5 - Já expandidas */}
           {[...Array(4)].map((_, i) => (
             <div key={i + 1} style={{
               width: '100vw',
               height: '100vh',
-              marginLeft: '-2rem',
-              marginRight: '-2rem',
+              margin: '0',
               borderRadius: '0',
               overflow: 'hidden',
               position: 'relative'
