@@ -1,15 +1,70 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import PropTypes from 'prop-types';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const modalRef = useRef(null);
   const firstImageRef = useRef(null);
+  const observerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Setup IntersectionObserver para animação da primeira imagem
+  useEffect(() => {
+    if (!isOpen || !firstImageRef.current) return;
+
+    // Cleanup observer anterior
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    const firstImage = firstImageRef.current;
+    
+    // INICIALIZAÇÃO: Define estado inicial explicitamente
+    firstImage.style.setProperty('--expand-padding', '32px');
+    firstImage.style.setProperty('--expand-radius', '25px');
+    
+    // Observer config - threshold array para transição suave
+    const observerOptions = {
+      root: modalRef.current, // Observa dentro do modal
+      rootMargin: '0px',
+      threshold: Array.from({ length: 21 }, (_, i) => i / 20) // Reduzido para menos cálculos
+    };
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+
+      // Lógica corrigida: quanto MENOS visível, MAIS expandida deve ficar
+      const visibilityRatio = entry.intersectionRatio;
+      const expansionProgress = 1 - visibilityRatio; // Inverso da visibilidade
+      
+      // Quando intersectionRatio = 1 (totalmente visível) = estado inicial (padding 32px)
+      // Quando intersectionRatio = 0 (não visível) = estado expandido (padding 0px)
+      const padding = 32 * visibilityRatio; // Quanto mais visível, MAIS padding
+      const borderRadius = 25 * visibilityRatio; // Quanto mais visível, MAIS border-radius
+      
+      console.log('Animation values:', { 
+        visibilityRatio, 
+        expansionProgress, 
+        padding, 
+        borderRadius 
+      });
+      
+      // Aplica transformações
+      firstImage.style.setProperty('--expand-padding', `${padding}px`);
+      firstImage.style.setProperty('--expand-radius', `${borderRadius}px`);
+      
+    }, observerOptions);
+
+    observerRef.current.observe(firstImage);
+
+    // Cleanup ao desmontar
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [isOpen, currentIndex]); // Re-setup quando modal abre ou projeto muda
 
   // Encontra o índice do projeto atual
   useEffect(() => {
@@ -20,38 +75,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
     }
   }, [project, projects]);
-
-  // GSAP ScrollTrigger para primeira imagem
-  useEffect(() => {
-    if (!isOpen || !firstImageRef.current || !modalRef.current) return;
-
-    const firstImage = firstImageRef.current;
-    const modal = modalRef.current;
-
-    ScrollTrigger.create({
-      trigger: firstImage,
-      start: "top 50%",
-      end: "bottom 30%", 
-      scroller: modal,
-      scrub: 1,
-      onUpdate: (self) => {
-        const progress = self.progress;
-        
-        gsap.set(firstImage, {
-          width: progress > 0.5 ? "100vw" : "100%",
-          height: progress > 0.5 ? "100vh" : "calc(100vh - 1rem)",
-          borderRadius: 25 * (1 - progress) + "px",
-          marginLeft: progress > 0.5 ? "-2rem" : "0px"
-        });
-      }
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach(st => {
-        if (st.scroller === modal) st.kill();
-      });
-    };
-  }, [isOpen, currentIndex]);
 
   // Navegação com loop infinito
   const goToPrevious = useCallback(() => {
@@ -131,7 +154,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         visibility: isOpen ? 'visible' : 'hidden',
         transition: 'opacity 0.3s ease, visibility 0.3s ease',
         overflowY: 'auto',
-        overflowX: 'hidden',
+        overflowX: 'hidden',           // bloqueia scroll horizontal
         boxSizing: 'border-box'        // evita paddings estourarem a largura
       }}
     >
@@ -321,51 +344,58 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
       </div>
 
-      {/* GALLERY SECTION */}
+      {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
         padding: '2rem',
         width: '100%',
         position: 'relative',
         zIndex: 1,
-        overflowX: 'hidden'
+        boxSizing: 'border-box'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
-          {/* PRIMEIRA IMAGEM - Com animação */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* PRIMEIRA IMAGEM - Com animação expansiva */}
           <div 
             ref={firstImageRef}
             style={{
               width: '100%',
               height: 'calc(100vh - 1rem)',
-              borderRadius: '25px',
+              padding: 'var(--expand-padding, 32px)',
               overflow: 'hidden',
-              position: 'relative'
+              position: 'relative',
+              transformOrigin: 'center bottom',
+              boxSizing: 'border-box'
             }}
           >
+            {/* Container interno sem inset - apenas recebe border-radius */}
             <div style={{
               position: 'absolute',
               inset: 0,
+              borderRadius: 'var(--expand-radius, 25px)',
+              overflow: 'hidden',
               backgroundColor: '#00ebff'
-            }} />
-            <img 
-              src={currentProject.image}
-              alt={`${currentProject.title} - Gallery 1`}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover'
-              }}
-            />
+            }}>
+              <img 
+                src={currentProject.image}
+                alt={`${currentProject.title} - Gallery 1`}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </div>
           </div>
 
-          {/* IMAGENS 2-5 - Já expandidas */}
+          {/* IMAGENS 2-5 - Já no estado expandido */}
           {[...Array(4)].map((_, i) => (
             <div key={i + 1} style={{
               width: '100%',        // <-- trocar 100vw por 100%
               height: '100vh',
-              margin: '0',
+              marginLeft: 0,        // remove margens negativas
+              marginRight: 0,
               borderRadius: '0',
               overflow: 'hidden',
               position: 'relative',
