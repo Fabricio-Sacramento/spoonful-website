@@ -13,14 +13,16 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   // Animation control refs
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
 
-  // Handle open animation - Phase 2 Otimizada
+  // Handle open animation - Phase 2 Refinada
   useEffect(() => {
     if (!isOpen || !modalRef.current) return;
     
     const modal = modalRef.current;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const overlayDuration = prefersReducedMotion ? 80 : 260;
-    const staggerStep = prefersReducedMotion ? 20 : 60;
+    
+    // Timings refinados para fluidez
+    const overlayDuration = prefersReducedMotion ? 120 : 450; // 260ms → 450ms
+    const staggerDelays = prefersReducedMotion ? [0, 20, 40] : [0, 90, 160]; // Progressão mais natural
     
     // Set animation flags
     animRef.current.isAnimating = true;
@@ -37,24 +39,29 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       const hero = modal.querySelector('.modal-hero');
       
       if (hero) {
-        // Apply stagger delays
+        // Apply refined stagger delays
         const items = Array.from(hero.querySelectorAll('[data-reveal]'));
         items.forEach((el, i) => {
-          el.style.transitionDelay = `${i * staggerStep}ms`;
+          const delay = staggerDelays[i] || staggerDelays[staggerDelays.length - 1] + (i - staggerDelays.length + 1) * 70;
+          el.style.transitionDelay = `${delay}ms`;
         });
 
-        // Start reveal after overlay completes
+        // Start reveal when overlay is 70% complete (mais orgânico)
+        const revealStartTime = overlayDuration * 0.7;
+        
         const timeoutId = setTimeout(() => {
           hero.classList.add('modal-hero--visible');
           
-          // Release scroll immediately (don't wait for stagger)
-          animRef.current.isAnimating = false;
-          animRef.current.suppressScroll = false;
-        }, overlayDuration);
+          // Release scroll after overlay completes + pequeno buffer
+          setTimeout(() => {
+            animRef.current.isAnimating = false;
+            animRef.current.suppressScroll = false;
+          }, overlayDuration * 0.3); // Buffer de 30% do tempo total
+          
+        }, revealStartTime);
         
         // Return cleanup function with timeoutId in closure
         return () => {
-          // Cleanup
           clearTimeout(timeoutId);
           modal.classList.remove('modal-overlay--entering', 'modal-overlay--visible');
           
@@ -68,10 +75,10 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         };
       }
       
-      // Focus management
+      // Focus management com timing refinado
       const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
       if (closeButton) {
-        setTimeout(() => closeButton.focus(), overlayDuration + 100);
+        setTimeout(() => closeButton.focus(), overlayDuration + 150); // Pequeno delay extra
       }
     });
     
@@ -516,7 +523,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
       </div>
 
-      {/* NAVIGATION SECTION - Layout 2x2 */}
+      {/* NAVIGATION SECTION - Layout 2x2 com refinamentos */}
       <div style={{
         height: '100vh',
         display: 'flex',
@@ -534,6 +541,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         }}>
           {/* Previous Project Info - LEFT */}
           <button
+            className="modal-navigation-button"
             onClick={goToPrevious}
             style={{
               width: '50%',
@@ -548,7 +556,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textAlign: 'right',
               border: 'none',
               cursor: 'pointer',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}
             onMouseEnter={(e) => {
               const button = e.currentTarget;
@@ -556,9 +565,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               const label = button.querySelector('span:first-child');
               const tags = button.querySelector('span:last-child');
               
-              title.style.transform = 'scale(1.2)';
-              label.style.transform = 'translateY(-0.5rem)';
-              tags.style.transform = 'translateY(0.5rem)';
+              if (title) title.style.transform = 'scale(1.2)';
+              if (label) label.style.transform = 'translateY(-0.5rem)';
+              if (tags) tags.style.transform = 'translateY(0.5rem)';
             }}
             onMouseLeave={(e) => {
               const button = e.currentTarget;
@@ -566,9 +575,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               const label = button.querySelector('span:first-child');
               const tags = button.querySelector('span:last-child');
               
-              title.style.transform = 'scale(1)';
-              label.style.transform = 'translateY(0)';
-              tags.style.transform = 'translateY(0)';
+              if (title) title.style.transform = 'scale(1)';
+              if (label) label.style.transform = 'translateY(0)';
+              if (tags) tags.style.transform = 'translateY(0)';
             }}
           >
             <span style={{
@@ -578,7 +587,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               fontWeight: '100',
               letterSpacing: '0.9px',
               lineHeight: '1.3',
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               Previous project
             </span>
@@ -592,7 +601,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               letterSpacing: '2px',
               lineHeight: '0.8',
               margin: 0,
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
               transformOrigin: 'right center'
             }}>
               {prevProject.title}
@@ -605,7 +614,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               fontWeight: '400',
               letterSpacing: '0.84px',
               textTransform: 'uppercase',
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               {prevProject.tags?.join(' • ')}
             </span>
@@ -662,6 +671,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
           {/* Next Project Info - RIGHT */}
           <button
+            className="modal-navigation-button"
             onClick={goToNext}
             style={{
               width: '50%',
@@ -676,7 +686,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textAlign: 'left',
               border: 'none',
               cursor: 'pointer',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
             }}
             onMouseEnter={(e) => {
               const button = e.currentTarget;
@@ -684,9 +695,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               const label = button.querySelector('span:first-child');
               const tags = button.querySelector('span:last-child');
               
-              title.style.transform = 'scale(1.2)';
-              label.style.transform = 'translateY(-0.5rem)';
-              tags.style.transform = 'translateY(0.5rem)';
+              if (title) title.style.transform = 'scale(1.2)';
+              if (label) label.style.transform = 'translateY(-0.5rem)';
+              if (tags) tags.style.transform = 'translateY(0.5rem)';
             }}
             onMouseLeave={(e) => {
               const button = e.currentTarget;
@@ -694,9 +705,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               const label = button.querySelector('span:first-child');
               const tags = button.querySelector('span:last-child');
               
-              title.style.transform = 'scale(1)';
-              label.style.transform = 'translateY(0)';
-              tags.style.transform = 'translateY(0)';
+              if (title) title.style.transform = 'scale(1)';
+              if (label) label.style.transform = 'translateY(0)';
+              if (tags) tags.style.transform = 'translateY(0)';
             }}
           >
             <span style={{
@@ -706,7 +717,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               fontWeight: '100',
               letterSpacing: '0.9px',
               lineHeight: '1.3',
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               Next project
             </span>
@@ -720,7 +731,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               letterSpacing: '2px',
               lineHeight: '0.8',
               margin: 0,
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
               transformOrigin: 'left center'
             }}>
               {nextProject.title}
@@ -733,7 +744,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               fontWeight: '400',
               letterSpacing: '0.84px',
               textTransform: 'uppercase',
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
               {nextProject.tags?.join(' • ')}
             </span>
