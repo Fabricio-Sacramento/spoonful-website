@@ -10,22 +10,87 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const rafRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // NEW: Animation control refs
+  // Animation control refs
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
 
+  // Handle open animation - Phase 2 Otimizada
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+    
+    const modal = modalRef.current;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const overlayDuration = prefersReducedMotion ? 80 : 260;
+    const staggerStep = prefersReducedMotion ? 20 : 60;
+    
+    // Set animation flags
+    animRef.current.isAnimating = true;
+    animRef.current.suppressScroll = true;
+    
+    // Set initial state
+    modal.classList.add('modal-overlay--entering');
+    
+    requestAnimationFrame(() => {
+      // Start overlay animation
+      modal.classList.remove('modal-overlay--entering');
+      modal.classList.add('modal-overlay--visible');
+      
+      const hero = modal.querySelector('.modal-hero');
+      
+      if (hero) {
+        // Apply stagger delays
+        const items = Array.from(hero.querySelectorAll('[data-reveal]'));
+        items.forEach((el, i) => {
+          el.style.transitionDelay = `${i * staggerStep}ms`;
+        });
 
+        // Start reveal after overlay completes
+        const timeoutId = setTimeout(() => {
+          hero.classList.add('modal-hero--visible');
+          
+          // Release scroll immediately (don't wait for stagger)
+          animRef.current.isAnimating = false;
+          animRef.current.suppressScroll = false;
+        }, overlayDuration);
+        
+        // Return cleanup function with timeoutId in closure
+        return () => {
+          // Cleanup
+          clearTimeout(timeoutId);
+          modal.classList.remove('modal-overlay--entering', 'modal-overlay--visible');
+          
+          const hero = modal.querySelector('.modal-hero');
+          if (hero) {
+            hero.classList.remove('modal-hero--visible');
+            hero.querySelectorAll('[data-reveal]').forEach(el => {
+              el.style.transitionDelay = '';
+            });
+          }
+        };
+      }
+      
+      // Focus management
+      const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
+      if (closeButton) {
+        setTimeout(() => closeButton.focus(), overlayDuration + 100);
+      }
+    });
+    
+    return () => {
+      // Default cleanup when no hero found
+      modal.classList.remove('modal-overlay--entering', 'modal-overlay--visible');
+    };
+  }, [isOpen]);
 
-  // ---------- NEW: scroll-driven animation for first image ----------
+  // Scroll-driven animation for first image
   useEffect(() => {
     if (!isOpen || !firstImageRef.current || !modalRef.current) return;
 
     const scroller = modalRef.current;
     const target = firstImageRef.current;
-    const currentAnimRef = animRef.current; // Capture ref at start
+    const currentAnimRef = animRef.current;
     let running = true;
     let rootHalf = scroller.clientHeight / 2;
 
-    // Inicializa vars CSS: radius 25px, scale 0.9 (reduced 10%)
     target.style.setProperty('--expand-radius', '25px');
     target.style.setProperty('--expand-scale', '0.9');
 
@@ -79,7 +144,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       scroller.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       
-      // Use captured reference
+      target.style.removeProperty('--expand-scale');
+      target.style.removeProperty('--expand-radius');
+      
       currentAnimRef.isAnimating = false;
       currentAnimRef.suppressScroll = false;
       
@@ -94,7 +161,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     };
   }, [isOpen, currentIndex]);
 
-  // Encontra o índice do projeto atual
+  // Find current project index
   useEffect(() => {
     if (project && projects.length > 0) {
       const index = projects.findIndex(p => p.id === project.id);
@@ -104,7 +171,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
   }, [project, projects]);
 
-  // Navegação com loop infinito
+  // Navigation with infinite loop
   const goToPrevious = useCallback(() => {
     setCurrentIndex(prev => prev === 0 ? projects.length - 1 : prev - 1);
   }, [projects.length]);
@@ -178,9 +245,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         zIndex: 10000,
         display: 'flex',
         flexDirection: 'column',
-        opacity: isOpen ? 1 : 0,
-        visibility: isOpen ? 'visible' : 'hidden',
-        transition: 'opacity 0.3s ease, visibility 0.3s ease',
         overflowY: 'auto',
         overflowX: 'hidden',
         boxSizing: 'border-box'
@@ -214,8 +278,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         ×
       </button>
 
-      {/* HERO SECTION - Apenas detalhes do projeto, mantendo 50vh */}
-      <div style={{
+      {/* HERO SECTION com classe modal-hero e data-reveal */}
+      <div className="modal-hero" style={{
         width: '100%',
         height: '50vh',
         display: 'flex',
@@ -229,7 +293,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         overflow: 'hidden'
       }}>
         {/* Tags */}
-        <div style={{
+        <div data-reveal style={{
           color: 'var(--primary-green)',
           fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
           fontSize: '1.125rem',
@@ -241,7 +305,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
 
         {/* Title */}
-        <h1 style={{
+        <h1 data-reveal style={{
           color: 'var(--neutral-light)',
           fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
           fontSize: '7.75rem',
@@ -252,8 +316,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           {currentProject.title}
         </h1>
 
-        {/* Layout Row - 50% + 25% + 25% */}
-        <div style={{ display: 'flex', width: '100%', gap: '2rem' }}>
+        {/* Description Row */}
+        <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
           {/* Left Column - Title & Description (50%) */}
           <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <h2 style={{
@@ -395,19 +459,18 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               boxSizing: 'border-box'
             }}
           >
-            {/* Container interno sem inset - recebe border-radius e scale via CSS var */}
             <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  borderRadius: 'var(--expand-radius, 25px)',
-                  overflow: 'hidden',
-                  backgroundColor: 'var(--neutral-normal)',
-                  transform: 'scale(var(--expand-scale, 1))',
-                  transformOrigin: 'center bottom',
-                  willChange: 'transform, border-radius',
-                  WebkitBackfaceVisibility: 'hidden',
-                  backfaceVisibility: 'hidden',
-                  }}>
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 'var(--expand-radius, 25px)',
+              overflow: 'hidden',
+              backgroundColor: 'var(--neutral-normal)',
+              transform: 'scale(var(--expand-scale, 1))',
+              transformOrigin: 'center bottom',
+              willChange: 'transform, border-radius',
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+            }}>
               <img 
                 src={currentProject.image}
                 alt={`${currentProject.title} - Gallery 1`}
@@ -436,11 +499,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               position: 'relative',
               boxSizing: 'border-box'
             }}>
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundColor: '#00ebff'
-              }} />
               <img 
                 src={currentProject.image}
                 alt={`${currentProject.title} - Gallery ${i + 2}`}

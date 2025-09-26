@@ -309,6 +309,53 @@ padding-left: 5px;
 z-index: 1;
 }
 
+/* Modal Animation Classes - Phase 2 */
+.modal-overlay { 
+  --overlay-ease: cubic-bezier(.2,.9,.2,1); 
+}
+
+.modal-overlay--entering { 
+  transform: translateY(100%); 
+  opacity: 0; 
+}
+
+.modal-overlay--visible {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 260ms var(--overlay-ease), 
+              opacity 200ms var(--overlay-ease);
+}
+
+/* Hero reveal items (in-flow) */
+.modal-hero [data-reveal] {
+  opacity: 0;
+  transform: translateY(8px);
+  transition-property: opacity, transform;
+  transition-duration: 240ms;
+  transition-timing-function: var(--overlay-ease);
+  will-change: opacity, transform;
+}
+
+.modal-hero--visible [data-reveal] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay--entering, 
+  .modal-overlay--visible { 
+    transition: none; 
+    transform: none; 
+    opacity: 1; 
+  }
+  .modal-hero [data-reveal] { 
+    transition: none; 
+    opacity: 1; 
+    transform: none; 
+  }
+}
+
 /* ================================= */
 /* CUSTOM CURSORS */
 /* ================================= */
