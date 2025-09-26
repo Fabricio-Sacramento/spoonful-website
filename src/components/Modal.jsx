@@ -20,7 +20,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     const firstImage = firstImageRef.current;
     
     // INICIALIZAÇÃO: Define estado inicial explicitamente
-    firstImage.style.setProperty('--expand-padding', '32px');
+    // INICIALIZAÇÃO: Define estado inicial do radius (removido o padding)
     firstImage.style.setProperty('--expand-radius', '25px');
     
     // Observer config - threshold array para transição suave
@@ -38,20 +38,16 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       const visibilityRatio = entry.intersectionRatio;
       const expansionProgress = 1 - visibilityRatio; // Inverso da visibilidade
       
-      // Quando intersectionRatio = 1 (totalmente visível) = estado inicial (padding 32px)
-      // Quando intersectionRatio = 0 (não visível) = estado expandido (padding 0px)
-      const padding = 32 * visibilityRatio; // Quanto mais visível, MAIS padding
+      // Ajusta apenas border-radius conforme visibilidade (remoção do controle de padding)
       const borderRadius = 25 * visibilityRatio; // Quanto mais visível, MAIS border-radius
       
       console.log('Animation values:', { 
         visibilityRatio, 
         expansionProgress, 
-        padding, 
         borderRadius 
       });
       
-      // Aplica transformações
-      firstImage.style.setProperty('--expand-padding', `${padding}px`);
+      // Aplica transformações (somente radius — padding foi removido)
       firstImage.style.setProperty('--expand-radius', `${borderRadius}px`);
       
     }, observerOptions);
@@ -347,25 +343,25 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
-        padding: '2rem',
+        padding: 0, /* padding removido para que imagens preencham edge-to-edge */
         width: '100%',
         position: 'relative',
         zIndex: 1,
         boxSizing: 'border-box'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
           {/* PRIMEIRA IMAGEM - Com animação expansiva */}
           <div 
             ref={firstImageRef}
-            style={{
-              width: '100%',
-              height: 'calc(100vh - 1rem)',
-              padding: 'var(--expand-padding, 32px)',
-              overflow: 'hidden',
-              position: 'relative',
-              transformOrigin: 'center bottom',
-              boxSizing: 'border-box'
-            }}
+          style={{
+            width: '100%',
+            height: 'calc(100vh - 1rem)',
+            padding: 0, /* padding removido conforme solicitado */
+            overflow: 'hidden',
+            position: 'relative',
+            transformOrigin: 'center bottom',
+            boxSizing: 'border-box'
+          }}
           >
             {/* Container interno sem inset - apenas recebe border-radius */}
             <div style={{
@@ -396,6 +392,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               height: '100vh',
               marginLeft: 0,        // remove margens negativas
               marginRight: 0,
+              padding: 0,           // padding removido conforme solicitado
               borderRadius: '0',
               overflow: 'hidden',
               position: 'relative',
