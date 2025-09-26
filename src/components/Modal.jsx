@@ -9,6 +9,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const firstImageRef = useRef(null);
   const rafRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // NEW: Animation control refs
+  const animRef = useRef({ isAnimating: false, suppressScroll: false });
+
+
 
   // ---------- NEW: scroll-driven animation for first image ----------
   useEffect(() => {
@@ -16,39 +21,32 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
     const scroller = modalRef.current;
     const target = firstImageRef.current;
+    const currentAnimRef = animRef.current; // Capture ref at start
     let running = true;
     let rootHalf = scroller.clientHeight / 2;
 
     // Inicializa vars CSS: radius 25px, scale 0.9 (reduced 10%)
-    // We'll animate CSS vars: --expand-radius and --expand-scale
     target.style.setProperty('--expand-radius', '25px');
     target.style.setProperty('--expand-scale', '0.9');
 
-    // Ensure inner wrapper uses transform with the var --expand-scale.
-    // (The inner wrapper is the absolutely positioned child within target)
-    // We'll rely on inline style in JSX that uses transform: scale(var(--expand-scale, 1))
-
     const computeAndApply = () => {
       if (!running) return;
+      if (currentAnimRef.suppressScroll || currentAnimRef.isAnimating) {
+        return;
+      }
       const targetRect = target.getBoundingClientRect();
       const scrollerRect = scroller.getBoundingClientRect();
-      // top of target relative to scroller viewport
       const elemTop = targetRect.top - scrollerRect.top;
-      // progress: 0 when elemTop == rootHalf, 1 when elemTop <= 0
       const progress = clamp((rootHalf - elemTop) / rootHalf, 0, 1);
-      // scale from 0.9 -> 1.02 (pequeno overscale para esconder hairlines por subpixel)
-      const scale = 0.9 + 0.12 * progress; // 0.9 + 0.12*1 = 1.02
-      // radius from 25 -> 0
+      const scale = 0.9 + 0.12 * progress;
       const radius = 25 * (1 - progress);
 
       target.style.setProperty('--expand-scale', String(scale));
       target.style.setProperty('--expand-radius', `${radius}px`);
-      // prepare for next frame id
       rafRef.current = null;
     };
 
     const onScroll = () => {
-      // debounce via rAF
       if (rafRef.current) return;
       rafRef.current = requestAnimationFrame(() => {
         computeAndApply();
@@ -57,21 +55,17 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
     const onResize = () => {
       rootHalf = scroller.clientHeight / 2;
-      // force recompute on resize
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => computeAndApply());
     };
 
-    // Run once immediately to set correct state (in case user already scrolled)
     computeAndApply();
 
     scroller.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
 
-    // If image inside loads later, recompute
     const innerImg = target.querySelector('img');
     const onImgLoad = () => {
-      // recompute sizes and rootHalf
       rootHalf = scroller.clientHeight / 2;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(() => computeAndApply());
@@ -84,6 +78,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       running = false;
       scroller.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
+      
+      // Use captured reference
+      currentAnimRef.isAnimating = false;
+      currentAnimRef.suppressScroll = false;
+      
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (innerImg && onImgLoad) {
         try {
