@@ -2,65 +2,98 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 
+const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
+
 const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const modalRef = useRef(null);
   const firstImageRef = useRef(null);
-  const observerRef = useRef(null);
+  const rafRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Setup IntersectionObserver para animação da primeira imagem
+  // ---------- NEW: scroll-driven animation for first image ----------
   useEffect(() => {
-    if (!isOpen || !firstImageRef.current) return;
+    if (!isOpen || !firstImageRef.current || !modalRef.current) return;
 
-    // Cleanup observer anterior
-    if (observerRef.current) {
-      observerRef.current.disconnect();
+    const scroller = modalRef.current;
+    const target = firstImageRef.current;
+    let running = true;
+    let rootHalf = scroller.clientHeight / 2;
+
+    // Inicializa vars CSS: radius 25px, scale 0.9 (reduced 10%)
+    // We'll animate CSS vars: --expand-radius and --expand-scale
+    target.style.setProperty('--expand-radius', '25px');
+    target.style.setProperty('--expand-scale', '0.9');
+
+    // Ensure inner wrapper uses transform with the var --expand-scale.
+    // (The inner wrapper is the absolutely positioned child within target)
+    // We'll rely on inline style in JSX that uses transform: scale(var(--expand-scale, 1))
+
+    const computeAndApply = () => {
+      if (!running) return;
+      const targetRect = target.getBoundingClientRect();
+      const scrollerRect = scroller.getBoundingClientRect();
+      // top of target relative to scroller viewport
+      const elemTop = targetRect.top - scrollerRect.top;
+      // progress: 0 when elemTop == rootHalf, 1 when elemTop <= 0
+      const progress = clamp((rootHalf - elemTop) / rootHalf, 0, 1);
+      // scale from 0.9 -> 1.02 (pequeno overscale para esconder hairlines por subpixel)
+      const scale = 0.9 + 0.12 * progress; // 0.9 + 0.12*1 = 1.02
+      // radius from 25 -> 0
+      const radius = 25 * (1 - progress);
+
+      target.style.setProperty('--expand-scale', String(scale));
+      target.style.setProperty('--expand-radius', `${radius}px`);
+      // prepare for next frame id
+      rafRef.current = null;
+    };
+
+    const onScroll = () => {
+      // debounce via rAF
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(() => {
+        computeAndApply();
+      });
+    };
+
+    const onResize = () => {
+      rootHalf = scroller.clientHeight / 2;
+      // force recompute on resize
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => computeAndApply());
+    };
+
+    // Run once immediately to set correct state (in case user already scrolled)
+    computeAndApply();
+
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+
+    // If image inside loads later, recompute
+    const innerImg = target.querySelector('img');
+    const onImgLoad = () => {
+      // recompute sizes and rootHalf
+      rootHalf = scroller.clientHeight / 2;
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => computeAndApply());
+    };
+    if (innerImg && !innerImg.complete) {
+      innerImg.addEventListener('load', onImgLoad, { once: true });
     }
 
-    const firstImage = firstImageRef.current;
-    
-    // INICIALIZAÇÃO: Define estado inicial explicitamente
-    // INICIALIZAÇÃO: Define estado inicial do radius (removido o padding)
-    firstImage.style.setProperty('--expand-radius', '25px');
-    
-    // Observer config - threshold array para transição suave
-    const observerOptions = {
-      root: modalRef.current, // Observa dentro do modal
-      rootMargin: '0px',
-      threshold: Array.from({ length: 21 }, (_, i) => i / 20) // Reduzido para menos cálculos
-    };
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-
-      // Lógica corrigida: quanto MENOS visível, MAIS expandida deve ficar
-      const visibilityRatio = entry.intersectionRatio;
-      const expansionProgress = 1 - visibilityRatio; // Inverso da visibilidade
-      
-      // Ajusta apenas border-radius conforme visibilidade (remoção do controle de padding)
-      const borderRadius = 25 * visibilityRatio; // Quanto mais visível, MAIS border-radius
-      
-      console.log('Animation values:', { 
-        visibilityRatio, 
-        expansionProgress, 
-        borderRadius 
-      });
-      
-      // Aplica transformações (somente radius — padding foi removido)
-      firstImage.style.setProperty('--expand-radius', `${borderRadius}px`);
-      
-    }, observerOptions);
-
-    observerRef.current.observe(firstImage);
-
-    // Cleanup ao desmontar
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+      running = false;
+      scroller.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (innerImg && onImgLoad) {
+        try {
+          innerImg.removeEventListener('load', onImgLoad);
+        } catch (err) {
+          console.warn('Error removing image load listener', err);
+        }
       }
     };
-  }, [isOpen, currentIndex]); // Re-setup quando modal abre ou projeto muda
+  }, [isOpen, currentIndex]);
 
   // Encontra o índice do projeto atual
   useEffect(() => {
@@ -141,7 +174,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       onClick={handleOverlayClick}
       style={{
         position: 'fixed',
-        inset: 0,                      // usa inset ao invés de 100vw/100vh
+        inset: 0,
         backgroundColor: 'var(--neutral-normal)',
         zIndex: 10000,
         display: 'flex',
@@ -150,8 +183,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         visibility: isOpen ? 'visible' : 'hidden',
         transition: 'opacity 0.3s ease, visibility 0.3s ease',
         overflowY: 'auto',
-        overflowX: 'hidden',           // bloqueia scroll horizontal
-        boxSizing: 'border-box'        // evita paddings estourarem a largura
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
       }}
     >
       {/* Close Button */}
@@ -343,34 +376,39 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       {/* GALLERY SECTION - 5 imagens sequenciais */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
-        padding: 0, /* padding removido para que imagens preencham edge-to-edge */
+        padding: 0,
         width: '100%',
         position: 'relative',
         zIndex: 1,
         boxSizing: 'border-box'
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           {/* PRIMEIRA IMAGEM - Com animação expansiva */}
           <div 
             ref={firstImageRef}
-          style={{
-            width: '100%',
-            height: 'calc(100vh - 1rem)',
-            padding: 0, /* padding removido conforme solicitado */
-            overflow: 'hidden',
-            position: 'relative',
-            transformOrigin: 'center bottom',
-            boxSizing: 'border-box'
-          }}
-          >
-            {/* Container interno sem inset - apenas recebe border-radius */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: 'var(--expand-radius, 25px)',
+            style={{
+              width: '100%',
+              height: 'calc(100vh - 1rem)',
+              padding: 0,
               overflow: 'hidden',
-              backgroundColor: '#00ebff'
-            }}>
+              position: 'relative',
+              transformOrigin: 'center bottom',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Container interno sem inset - recebe border-radius e scale via CSS var */}
+            <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: 'var(--expand-radius, 25px)',
+                  overflow: 'hidden',
+                  backgroundColor: 'var(--neutral-normal)',
+                  transform: 'scale(var(--expand-scale, 1))',
+                  transformOrigin: 'center bottom',
+                  willChange: 'transform, border-radius',
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  }}>
               <img 
                 src={currentProject.image}
                 alt={`${currentProject.title} - Gallery 1`}
@@ -379,7 +417,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   inset: 0,
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  display: 'block'
                 }}
               />
             </div>
@@ -388,11 +427,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           {/* IMAGENS 2-5 - Já no estado expandido */}
           {[...Array(4)].map((_, i) => (
             <div key={i + 1} style={{
-              width: '100%',        // <-- trocar 100vw por 100%
+              width: '100%',
               height: '100vh',
-              marginLeft: 0,        // remove margens negativas
+              marginLeft: 0,
               marginRight: 0,
-              padding: 0,           // padding removido conforme solicitado
+              padding: 0,
               borderRadius: '0',
               overflow: 'hidden',
               position: 'relative',
@@ -411,7 +450,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   inset: 0,
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  display: 'block'
                 }}
               />
             </div>
