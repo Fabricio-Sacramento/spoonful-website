@@ -198,6 +198,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           currentAnimRef.suppressScroll = false;
         }, overlayDuration);
       }
+      closeTimersRef.current.raf = rafIdRef.id; // ← NOVA LINHA
     });
 
     return () => {
@@ -220,6 +221,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       // garante reset das flags (importante se fechar no meio) - usa captured ref
       currentAnimRef.isAnimating = false;
       currentAnimRef.suppressScroll = false;
+
+      closeTimersRef.current.raf = null; // ← NOVA LINHA
     };
   }, [isOpen]);
 
