@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
+import styles from './Modal.module.css'; // Import CSS Module
 
 const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
 
@@ -14,6 +15,199 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
   const closeTimersRef = useRef({ hide: null, overlay: null, raf: null });
   const prevFocusRef = useRef(null);
+
+  // ================================
+  // NAVIGATION HELPERS
+  // ================================
+  
+  /**
+   * Smooth scroll to top with Promise
+   */
+  const smoothScrollToTop = useCallback((el, duration = 650, preferReduced = false) => {
+    return new Promise((resolve) => {
+      if (!el || preferReduced) {
+        // Instant scroll for reduced motion
+        el.scrollTop = 0;
+        return resolve();
+      }
+
+      const start = el.scrollTop;
+      if (start === 0) return resolve();
+
+      const startTime = performance.now();
+      let animId = null;
+
+      const animate = (now) => {
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / duration);
+        // easeInOutQuad
+        const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        el.scrollTop = Math.round(start * (1 - eased));
+        
+        if (t < 1) {
+          animId = requestAnimationFrame(animate);
+        } else {
+          animId = null;
+          resolve();
+        }
+      };
+      
+      animId = requestAnimationFrame(animate);
+
+      // Safety timeout
+      setTimeout(() => {
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+        el.scrollTop = 0;
+        resolve();
+      }, duration + 120);
+    });
+  }, []);
+
+  /**
+   * Wait for CSS transition end with fallback timer
+   */
+  const waitForTransition = useCallback((el, timeout = 560) => {
+    return new Promise((resolve) => {
+      if (!el) return resolve();
+      
+      let done = false;
+      const onEnd = (e) => {
+        if (e && e.target !== el) return;
+        if (done) return;
+        done = true;
+        el.removeEventListener('transitionend', onEnd);
+        clearTimeout(timer);
+        resolve();
+      };
+      
+      el.addEventListener('transitionend', onEnd, { once: true });
+      const timer = setTimeout(() => {
+        if (done) return;
+        done = true;
+        el.removeEventListener('transitionend', onEnd);
+        resolve();
+      }, timeout + 60);
+    });
+  }, []);
+
+  /**
+   * Preload image Promise
+   */
+  const preloadImage = useCallback((src) => {
+    return new Promise((resolve) => {
+      if (!src) return resolve();
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Don't fail on image errors
+      img.src = src;
+    });
+  }, []);
+
+  /**
+   * Main navigation orchestrator
+   */
+  const navigateTo = useCallback(async (direction) => {
+    if (animRef.current.isAnimating) return;
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    animRef.current.isAnimating = true;
+    animRef.current.suppressScroll = true;
+
+    // Compute new index
+    const targetIndex = direction === 'next'
+      ? (currentIndex === projects.length - 1 ? 0 : currentIndex + 1)
+      : (currentIndex === 0 ? projects.length - 1 : currentIndex - 1);
+
+    try {
+      // 1) Preload hero of target project
+      const targetProject = projects[targetIndex];
+      const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
+      await preloadImage(heroSrc);
+
+      // Skip animations for reduced motion
+      if (preferReduced) {
+        setCurrentIndex(targetIndex);
+        // Focus management for reduced motion
+        setTimeout(() => {
+          const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
+          if (title && typeof title.focus === 'function') {
+            title.focus();
+          }
+        }, 50);
+        return;
+      }
+
+      // 2) Scroll to top of modal
+      await smoothScrollToTop(modal, 650, false);
+
+      // 3) Find content wrapper
+      const contentEl = modal.querySelector(`.${styles.modalContent}`);
+      if (!contentEl) {
+        // Fallback: instant swap
+        setCurrentIndex(targetIndex);
+        return;
+      }
+
+      // 4) Slide out current content
+      const slideOutClass = direction === 'next' ? styles.slideOutLeft : styles.slideOutRight;
+      contentEl.classList.add(slideOutClass);
+      await waitForTransition(contentEl, 560);
+
+      // 5) Swap content while offscreen
+      setCurrentIndex(targetIndex);
+
+      // Force reflow to ensure new content is rendered
+      contentEl.offsetHeight;
+
+      // 6) Slide in from opposite direction
+      contentEl.classList.remove(styles.slideOutLeft, styles.slideOutRight);
+      const slideInClass = direction === 'next' ? styles.slideInFromRight : styles.slideInFromLeft;
+      contentEl.classList.add(slideInClass);
+
+      // Small delay for smooth transition
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Remove slide-in class to trigger slide-in animation
+      contentEl.classList.remove(slideInClass);
+      await waitForTransition(contentEl, 560);
+
+      // 7) Reveal hero with existing system
+      const hero = modal.querySelector('.modal-hero');
+      if (hero) {
+        hero.classList.remove('modal-hero--visible');
+        // Trigger reveal with small delay
+        setTimeout(() => {
+          hero.classList.add('modal-hero--visible');
+        }, 80);
+      }
+
+      // 8) Focus management - focus on title for accessibility
+      setTimeout(() => {
+        const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
+        if (title && typeof title.focus === 'function') {
+          title.focus();
+        }
+      }, 320); // After hero reveal
+
+    } catch (error) {
+      console.warn('Navigation animation error:', error);
+      // Fallback to instant swap
+      setCurrentIndex(targetIndex);
+    } finally {
+      // Always reset flags
+      animRef.current.isAnimating = false;
+      animRef.current.suppressScroll = false;
+    }
+  }, [currentIndex, projects, smoothScrollToTop, waitForTransition, preloadImage]);
+
+  // ================================
+  // EXISTING MODAL LOGIC (PRESERVED)
+  // ================================
 
   // Handle close animation - Phase 3 Refinada (staggered + fluida)
   const handleClose = useCallback(() => {
@@ -137,6 +331,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       closeTimersRef.current = { hide: null, overlay: null, raf: null };
     };
   }, []);
+
   useEffect(() => {
     if (!isOpen || !modalRef.current) return;
 
@@ -316,14 +511,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
   }, [project, projects]);
 
-  // Navigation with infinite loop
+  // UPDATED: Navigation functions now use navigateTo
   const goToPrevious = useCallback(() => {
-    setCurrentIndex(prev => prev === 0 ? projects.length - 1 : prev - 1);
-  }, [projects.length]);
+    navigateTo('prev');
+  }, [navigateTo]);
 
   const goToNext = useCallback(() => {
-    setCurrentIndex(prev => prev === projects.length - 1 ? 0 : prev + 1);
-  }, [projects.length]);
+    navigateTo('next');
+  }, [navigateTo]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -367,7 +562,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
   // Close on overlay click
   const handleOverlayClick = (e) => {
-    if (e.target === modalRef.current) {
+    if (e.target === e.currentTarget) {
       handleClose();
     }
   };
@@ -392,7 +587,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const modalContent = (
     <div 
       ref={modalRef}
-      className="modal-overlay"
+      className={`modal-overlay ${styles.modalOverlay}`}
       onClick={handleOverlayClick}
       style={{
         position: 'fixed',
@@ -406,7 +601,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         boxSizing: 'border-box'
       }}
     >
-      {/* Close Button */}
+      {/* Close Button - OUTSIDE MODAL CONTENT for stability */}
       <button 
         onClick={handleClose}
         style={{
@@ -434,127 +629,81 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         ×
       </button>
 
-      {/* HERO SECTION - AGORA COM DADOS DINÂMICOS */}
-      <div className="modal-hero" style={{
-        width: '100%',
-        height: '50vh',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
-        backgroundColor: 'var(--neutral-normal)',
-        padding: '2.25rem',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        gap: '0.5rem',
-        overflow: 'hidden'
-      }}>
-        {/* Tags - DINAMIZADAS */}
-        <div data-reveal style={{
-          color: 'var(--primary-green)',
-          fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-          fontSize: '1.125rem',
-          fontWeight: '600',
-          letterSpacing: '0.045rem',
-          textTransform: 'capitalize'
+      {/* MODAL CONTENT WRAPPER - For transitions */}
+      <div className={styles.modalContent}>
+        {/* HERO SECTION - AGORA COM DADOS DINÂMICOS */}
+        <div className="modal-hero" style={{
+          width: '100%',
+          height: '50vh',
+          display: 'flex',
+          flexDirection: 'column',
+          flexShrink: 0,
+          backgroundColor: 'var(--neutral-normal)',
+          padding: '2.25rem',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          gap: '0.5rem',
+          overflow: 'hidden'
         }}>
-          {currentProject.tags?.join(' • ') || 'PROJECT'}
-        </div>
-
-        {/* Title - JÁ DINÂMICO */}
-        <h1 data-reveal style={{
-          color: 'var(--neutral-light)',
-          fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-          fontSize: '7.75rem',
-          fontWeight: '900',
-          letterSpacing: '0.155rem',
-          margin: 0
-        }}>
-          {currentProject.title}
-        </h1>
-
-        {/* Description Row - DINAMIZADA */}
-        <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
-          {/* Left Column - Title & Description (50%) */}
-          <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <h2 style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '1.375rem',
-              fontWeight: '600',
-              letterSpacing: '0.055rem',
-              margin: 0
-            }}>
-              {currentProject.subtitle || currentProject.description}
-            </h2>
-            
-            <p style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '1.25rem',
-              fontWeight: '200',
-              letterSpacing: '0.0625rem',
-              margin: 0
-            }}>
-              {currentProject.fullDescription || currentProject.description}
-            </p>
+          {/* Tags - DINAMIZADAS */}
+          <div data-reveal style={{
+            color: 'var(--primary-green)',
+            fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+            fontSize: '1.125rem',
+            fontWeight: '600',
+            letterSpacing: '0.045rem',
+            textTransform: 'capitalize'
+          }}>
+            {currentProject.tags?.join(' • ') || 'PROJECT'}
           </div>
 
-          {/* Middle Column - Stacks (25%) - DINAMIZADAS */}
-          <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div>
-              <h3 style={{
+          {/* Title - JÁ DINÂMICO with focus target */}
+          <h1 
+            data-reveal 
+            data-focus-target
+            tabIndex="-1"
+            style={{
+              color: 'var(--neutral-light)',
+              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+              fontSize: '7.75rem',
+              fontWeight: '900',
+              letterSpacing: '0.155rem',
+              margin: 0,
+              outline: 'none'
+            }}
+          >
+            {currentProject.title}
+          </h1>
+
+          {/* Description Row - DINAMIZADA */}
+          <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
+            {/* Left Column - Title & Description (50%) */}
+            <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h2 style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.0625rem',
+                fontSize: '1.375rem',
                 fontWeight: '600',
-                letterSpacing: '0.0425rem',
-                textTransform: 'capitalize',
-                margin: '0 0 0.5rem 0'
+                letterSpacing: '0.055rem',
+                margin: 0
               }}>
-                Design Stack
-              </h3>
+                {currentProject.subtitle || currentProject.description}
+              </h2>
+              
               <p style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
                 fontSize: '1.25rem',
                 fontWeight: '200',
                 letterSpacing: '0.0625rem',
-                textTransform: 'capitalize',
                 margin: 0
               }}>
-                {currentProject.designStack || 'Brand Strategy, UI/UX, Development'}
+                {currentProject.fullDescription || currentProject.description}
               </p>
             </div>
 
-            <div>
-              <h3 style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.0625rem',
-                fontWeight: '600',
-                letterSpacing: '0.0425rem',
-                textTransform: 'capitalize',
-                margin: '0 0 0.5rem 0'
-              }}>
-                Tech Stack
-              </h3>
-              <p style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.25rem',
-                fontWeight: '200',
-                letterSpacing: '0.0625rem',
-                textTransform: 'capitalize',
-                margin: 0
-              }}>
-                {currentProject.techStack || 'React • Node.js • MongoDB'}
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column - Go Live (25%) */}
-          <div style={{ flex: '1' }}>
-            {currentProject.projectUrl && (
+            {/* Middle Column - Stacks (25%) - DINAMIZADAS */}
+            <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <div>
                 <h3 style={{
                   color: 'var(--neutral-light)',
@@ -565,339 +714,400 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   textTransform: 'capitalize',
                   margin: '0 0 0.5rem 0'
                 }}>
-                  Go Live
+                  Design Stack
                 </h3>
-                <a 
-                  href={currentProject.projectUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: 'var(--primary-green)',
-                    fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                    fontSize: '1.25rem',
-                    fontWeight: '400',
-                    letterSpacing: '0.0625rem',
-                    textTransform: 'capitalize',
-                    textDecoration: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-                  onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
-                >
-                  Visit Website
-                </a>
+                <p style={{
+                  color: 'var(--neutral-light)',
+                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                  fontSize: '1.25rem',
+                  fontWeight: '200',
+                  letterSpacing: '0.0625rem',
+                  textTransform: 'capitalize',
+                  margin: 0
+                }}>
+                  {currentProject.designStack || 'Brand Strategy, UI/UX, Development'}
+                </p>
               </div>
-            )}
+
+              <div>
+                <h3 style={{
+                  color: 'var(--neutral-light)',
+                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                  fontSize: '1.0625rem',
+                  fontWeight: '600',
+                  letterSpacing: '0.0425rem',
+                  textTransform: 'capitalize',
+                  margin: '0 0 0.5rem 0'
+                }}>
+                  Tech Stack
+                </h3>
+                <p style={{
+                  color: 'var(--neutral-light)',
+                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                  fontSize: '1.25rem',
+                  fontWeight: '200',
+                  letterSpacing: '0.0625rem',
+                  textTransform: 'capitalize',
+                  margin: 0
+                }}>
+                  {currentProject.techStack || 'React • Node.js • MongoDB'}
+                </p>
+              </div>
+            </div>
+
+            {/* Right Column - Go Live (25%) */}
+            <div style={{ flex: '1' }}>
+              {currentProject.projectUrl && (
+                <div>
+                  <h3 style={{
+                    color: 'var(--neutral-light)',
+                    fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                    fontSize: '1.0625rem',
+                    fontWeight: '600',
+                    letterSpacing: '0.0425rem',
+                    textTransform: 'capitalize',
+                    margin: '0 0 0.5rem 0'
+                  }}>
+                    Go Live
+                  </h3>
+                  <a 
+                    href={currentProject.projectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: 'var(--primary-green)',
+                      fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                      fontSize: '1.25rem',
+                      fontWeight: '400',
+                      letterSpacing: '0.0625rem',
+                      textTransform: 'capitalize',
+                      textDecoration: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                    onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                  >
+                    Visit Website
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* GALLERY SECTION - AGORA COM IMAGENS DINÂMICAS */}
-      <div style={{
-        backgroundColor: 'var(--neutral-normal)',
-        padding: 0,
-        width: '100%',
-        position: 'relative',
-        zIndex: 1,
-        boxSizing: 'border-box'
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {/* PRIMEIRA IMAGEM - Com animação expansiva */}
-          <div 
-            ref={firstImageRef}
-            style={{
-              width: '100%',
-              height: 'calc(100vh - 1rem)',
-              padding: 0,
-              overflow: 'hidden',
-              position: 'relative',
-              transformOrigin: 'center bottom',
-              boxSizing: 'border-box'
-            }}
-          >
+        {/* GALLERY SECTION - AGORA COM IMAGENS DINÂMICAS */}
+        <div style={{
+          backgroundColor: 'var(--neutral-normal)',
+          padding: 0,
+          width: '100%',
+          position: 'relative',
+          zIndex: 1,
+          boxSizing: 'border-box'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {/* PRIMEIRA IMAGEM - Com animação expansiva */}
+            <div 
+              ref={firstImageRef}
+              style={{
+                width: '100%',
+                height: 'calc(100vh - 1rem)',
+                padding: 0,
+                overflow: 'hidden',
+                position: 'relative',
+                transformOrigin: 'center bottom',
+                boxSizing: 'border-box'
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: 'var(--expand-radius, 25px)',
+                overflow: 'hidden',
+                backgroundColor: 'var(--neutral-normal)',
+                transform: 'scale(var(--expand-scale, 1))',
+                transformOrigin: 'center bottom',
+                willChange: 'transform, border-radius',
+                WebkitBackfaceVisibility: 'hidden',
+                backfaceVisibility: 'hidden',
+              }}>
+                <img 
+                  src={galleryImages[0]}
+                  alt={`${currentProject.title} - Gallery 1`}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* IMAGENS 2-5 - Já no estado expandido COM IMAGENS DINÂMICAS */}
+            {galleryImages.slice(1).map((imageSrc, i) => (
+              <div key={i + 1} style={{
+                width: '100%',
+                height: '100vh',
+                marginLeft: 0,
+                marginRight: 0,
+                padding: 0,
+                borderRadius: '0',
+                overflow: 'hidden',
+                position: 'relative',
+                boxSizing: 'border-box'
+              }}>
+                <img 
+                  src={imageSrc}
+                  alt={`${currentProject.title} - Gallery ${i + 2}`}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block'
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* NAVIGATION SECTION - Layout 2x2 com refinamentos */}
+        <div style={{
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: 'var(--primary-red)',
+          width: '100%',
+          position: 'relative',
+          zIndex: 2
+        }}>
+          {/* ROW 1 - Previous Project */}
+          <div style={{
+            height: '50vh',
+            display: 'flex',
+            width: '100%'
+          }}>
+            {/* Previous Project Info - LEFT */}
+            <button
+              className="modal-navigation-button"
+              onClick={goToPrevious}
+              disabled={animRef.current.isAnimating}
+              style={{
+                width: '50%',
+                height: '100%',
+                backgroundColor: 'var(--primary-red)',
+                padding: '2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                gap: '0.5rem',
+                textAlign: 'right',
+                border: 'none',
+                cursor: animRef.current.isAnimating ? 'wait' : 'pointer',
+                overflow: 'hidden',
+                transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                opacity: animRef.current.isAnimating ? 0.6 : 1
+              }}
+              onMouseEnter={(e) => {
+                if (animRef.current.isAnimating) return;
+                const button = e.currentTarget;
+                const title = button.querySelector('h2');
+                const label = button.querySelector('span:first-child');
+                const tags = button.querySelector('span:last-child');
+                
+                if (title) title.style.transform = 'scale(1.2)';
+                if (label) label.style.transform = 'translateY(-0.5rem)';
+                if (tags) tags.style.transform = 'translateY(0.5rem)';
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget;
+                const title = button.querySelector('h2');
+                const label = button.querySelector('span:first-child');
+                const tags = button.querySelector('span:last-child');
+                
+                if (title) title.style.transform = 'scale(1)';
+                if (label) label.style.transform = 'translateY(0)';
+                if (tags) tags.style.transform = 'translateY(0)';
+              }}
+            >
+              <span style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '2.8125rem',
+                fontWeight: '100',
+                letterSpacing: '0.9px',
+                lineHeight: '1.3',
+                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
+              }}>
+                Previous project
+              </span>
+              
+              <h2 style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '6.25rem',
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                lineHeight: '0.8',
+                margin: 0,
+                transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transformOrigin: 'right center'
+              }}>
+                {prevProject.title}
+              </h2>
+              
+              <span style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '1.3125rem',
+                fontWeight: '400',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
+              }}>
+                {prevProject.tags?.join(' • ') || 'PROJECT'}
+              </span>
+            </button>
+
+            {/* Previous Project Image - RIGHT */}
             <div style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: 'var(--expand-radius, 25px)',
-              overflow: 'hidden',
-              backgroundColor: 'var(--neutral-normal)',
-              transform: 'scale(var(--expand-scale, 1))',
-              transformOrigin: 'center bottom',
-              willChange: 'transform, border-radius',
-              WebkitBackfaceVisibility: 'hidden',
-              backfaceVisibility: 'hidden',
-            }}>
-              <img 
-                src={galleryImages[0]}
-                alt={`${currentProject.title} - Gallery 1`}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* IMAGENS 2-5 - Já no estado expandido COM IMAGENS DINÂMICAS */}
-          {galleryImages.slice(1).map((imageSrc, i) => (
-            <div key={i + 1} style={{
-              width: '100%',
-              height: '100vh',
-              marginLeft: 0,
-              marginRight: 0,
-              padding: 0,
-              borderRadius: '0',
-              overflow: 'hidden',
+              width: '50%',
+              height: '100%',
               position: 'relative',
-              boxSizing: 'border-box'
+              overflow: 'hidden'
             }}>
               <img 
-                src={imageSrc}
-                alt={`${currentProject.title} - Gallery ${i + 2}`}
+                src={prevProject.image}
+                alt={prevProject.title}
                 style={{
                   position: 'absolute',
                   inset: 0,
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
-                  display: 'block'
+                  objectPosition: 'center'
                 }}
               />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* NAVIGATION SECTION - Layout 2x2 com refinamentos */}
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: 'var(--primary-red)',
-        width: '100%',
-        position: 'relative',
-        zIndex: 2
-      }}>
-        {/* ROW 1 - Previous Project */}
-        <div style={{
-          height: '50vh',
-          display: 'flex',
-          width: '100%'
-        }}>
-          {/* Previous Project Info - LEFT */}
-          <button
-            className="modal-navigation-button"
-            onClick={goToPrevious}
-            style={{
-              width: '50%',
-              height: '100%',
-              backgroundColor: 'var(--primary-red)',
-              padding: '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              gap: '0.5rem',
-              textAlign: 'right',
-              border: 'none',
-              cursor: 'pointer',
-              overflow: 'hidden',
-              transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-            }}
-            onMouseEnter={(e) => {
-              const button = e.currentTarget;
-              const title = button.querySelector('h2');
-              const label = button.querySelector('span:first-child');
-              const tags = button.querySelector('span:last-child');
-              
-              if (title) title.style.transform = 'scale(1.2)';
-              if (label) label.style.transform = 'translateY(-0.5rem)';
-              if (tags) tags.style.transform = 'translateY(0.5rem)';
-            }}
-            onMouseLeave={(e) => {
-              const button = e.currentTarget;
-              const title = button.querySelector('h2');
-              const label = button.querySelector('span:first-child');
-              const tags = button.querySelector('span:last-child');
-              
-              if (title) title.style.transform = 'scale(1)';
-              if (label) label.style.transform = 'translateY(0)';
-              if (tags) tags.style.transform = 'translateY(0)';
-            }}
-          >
-            <span style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '2.8125rem',
-              fontWeight: '100',
-              letterSpacing: '0.9px',
-              lineHeight: '1.3',
-              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-            }}>
-              Previous project
-            </span>
-            
-            <h2 style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '6.25rem',
-              fontWeight: '900',
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              lineHeight: '0.8',
-              margin: 0,
-              transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
-              transformOrigin: 'right center'
-            }}>
-              {prevProject.title}
-            </h2>
-            
-            <span style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '1.3125rem',
-              fontWeight: '400',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-            }}>
-              {prevProject.tags?.join(' • ') || 'PROJECT'}
-            </span>
-          </button>
-
-          {/* Previous Project Image - RIGHT */}
-          <div style={{
-            width: '50%',
-            height: '100%',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <img 
-              src={prevProject.image}
-              alt={prevProject.title}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center'
-              }}
-            />
-          </div>
-        </div>
-
-        {/* ROW 2 - Next Project */}
-        <div style={{
-          height: '50vh',
-          display: 'flex',
-          width: '100%'
-        }}>
-          {/* Next Project Image - LEFT */}
-          <div style={{
-            width: '50%',
-            height: '100%',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <img 
-              src={nextProject.image}
-              alt={nextProject.title}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center'
-              }}
-            />
           </div>
 
-          {/* Next Project Info - RIGHT */}
-          <button
-            className="modal-navigation-button"
-            onClick={goToNext}
-            style={{
+          {/* ROW 2 - Next Project */}
+          <div style={{
+            height: '50vh',
+            display: 'flex',
+            width: '100%'
+          }}>
+            {/* Next Project Image - LEFT */}
+            <div style={{
               width: '50%',
               height: '100%',
-              backgroundColor: 'var(--primary-red)',
-              padding: '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              gap: '0.5rem',
-              textAlign: 'left',
-              border: 'none',
-              cursor: 'pointer',
-              overflow: 'hidden',
-              transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-            }}
-            onMouseEnter={(e) => {
-              const button = e.currentTarget;
-              const title = button.querySelector('h2');
-              const label = button.querySelector('span:first-child');
-              const tags = button.querySelector('span:last-child');
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <img 
+                src={nextProject.image}
+                alt={nextProject.title}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center'
+                }}
+              />
+            </div>
+
+            {/* Next Project Info - RIGHT */}
+            <button
+              className="modal-navigation-button"
+              onClick={goToNext}
+              disabled={animRef.current.isAnimating}
+              style={{
+                width: '50%',
+                height: '100%',
+                backgroundColor: 'var(--primary-red)',
+                padding: '2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                gap: '0.5rem',
+                textAlign: 'left',
+                border: 'none',
+                cursor: animRef.current.isAnimating ? 'wait' : 'pointer',
+                overflow: 'hidden',
+                transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                opacity: animRef.current.isAnimating ? 0.6 : 1
+              }}
+              onMouseEnter={(e) => {
+                if (animRef.current.isAnimating) return;
+                const button = e.currentTarget;
+                const title = button.querySelector('h2');
+                const label = button.querySelector('span:first-child');
+                const tags = button.querySelector('span:last-child');
+                
+                if (title) title.style.transform = 'scale(1.2)';
+                if (label) label.style.transform = 'translateY(-0.5rem)';
+                if (tags) tags.style.transform = 'translateY(0.5rem)';
+              }}
+              onMouseLeave={(e) => {
+                const button = e.currentTarget;
+                const title = button.querySelector('h2');
+                const label = button.querySelector('span:first-child');
+                const tags = button.querySelector('span:last-child');
+                
+                if (title) title.style.transform = 'scale(1)';
+                if (label) label.style.transform = 'translateY(0)';
+                if (tags) tags.style.transform = 'translateY(0)';
+              }}
+            >
+              <span style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '2.8125rem',
+                fontWeight: '100',
+                letterSpacing: '0.9px',
+                lineHeight: '1.3',
+                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
+              }}>
+                Next project
+              </span>
               
-              if (title) title.style.transform = 'scale(1.2)';
-              if (label) label.style.transform = 'translateY(-0.5rem)';
-              if (tags) tags.style.transform = 'translateY(0.5rem)';
-            }}
-            onMouseLeave={(e) => {
-              const button = e.currentTarget;
-              const title = button.querySelector('h2');
-              const label = button.querySelector('span:first-child');
-              const tags = button.querySelector('span:last-child');
+              <h2 style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '6.25rem',
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                lineHeight: '0.8',
+                margin: 0,
+                transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
+                transformOrigin: 'left center'
+              }}>
+                {nextProject.title}
+              </h2>
               
-              if (title) title.style.transform = 'scale(1)';
-              if (label) label.style.transform = 'translateY(0)';
-              if (tags) tags.style.transform = 'translateY(0)';
-            }}
-          >
-            <span style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '2.8125rem',
-              fontWeight: '100',
-              letterSpacing: '0.9px',
-              lineHeight: '1.3',
-              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-            }}>
-              Next project
-            </span>
-            
-            <h2 style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '6.25rem',
-              fontWeight: '900',
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              lineHeight: '0.8',
-              margin: 0,
-              transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
-              transformOrigin: 'left center'
-            }}>
-              {nextProject.title}
-            </h2>
-            
-            <span style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '1.3125rem',
-              fontWeight: '400',
-              letterSpacing: '0.84px',
-              textTransform: 'uppercase',
-              transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-            }}>
-              {nextProject.tags?.join(' • ') || 'PROJECT'}
-            </span>
-          </button>
+              <span style={{
+                color: 'var(--neutral-light)',
+                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
+                fontSize: '1.3125rem',
+                fontWeight: '400',
+                letterSpacing: '0.84px',
+                textTransform: 'uppercase',
+                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
+              }}>
+                {nextProject.tags?.join(' • ') || 'PROJECT'}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
