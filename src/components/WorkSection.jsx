@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Modal from './Modal';
+import { projects } from '../scripts/projects'; // Importa dados reais
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,8 +16,13 @@ const WorkSection = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
-  // Função para abrir modal
+  // Função para abrir modal com preload
   const openModal = (project) => {
+    // Preload do hero para reduzir jank
+    const heroImage = project.galleryImages?.[0] ?? project.image;
+    const img = new Image();
+    img.src = heroImage; // força cache
+    
     setSelectedProject(project);
     setModalOpen(true);
   };
@@ -26,100 +32,6 @@ const WorkSection = () => {
     setModalOpen(false);
     setSelectedProject(null);
   };
-
-  // Dados dos projetos do portfolio
-  const projects = [
-    {
-      id: 1,
-      title: "Itaway Ecotours",
-      description: "E-commerce platform for sustainable travel experiences",
-      tags: ["WEBSITE", "E-COMMERCE", "UIUX", "DEVELOPMENT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://itaway-ecotours.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 2,
-      title: "TropiView",
-      description: "Visual identity and editorial design for tropical research",
-      tags: ["VISUAL IDENTITY", "EDITORIAL DESIGN", "GRAPHIC DESIGN", "PRINT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://tropiview.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 3,
-      title: "Humaita Digital",
-      description: "Digital platform for urban development initiatives",
-      tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://humaita-digital.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 4,
-      title: "Hysteria",
-      description: "Contemporary art gallery digital presence",
-      tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://hysteria.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 5,
-      title: "myHABITAT",
-      description: "IoT-driven environmental monitoring platform",
-      tags: ["WEBSITE", "UIUX", "DEVELOPMENT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://myhabitat.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 6,
-      title: "Vale EnvironPact",
-      description: "Environmental impact documentation and design",
-      tags: ["EDITORIAL DESIGN", "GRAPHIC DESIGN", "PRINT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://vale-environpact.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 7,
-      title: "HB",
-      description: "Art direction and 3D visualization project",
-      tags: ["ART DIRECTION", "ILLUSTRATION", "MOTION", "3D"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://hb-project.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 8,
-      title: "Crypto Beerfest",
-      description: "Visual identity for blockchain-themed event",
-      tags: ["VISUAL IDENTITY", "ILLUSTRATION", "GRAPHIC DESIGN", "MOTION GRAPHICS", "3D"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://crypto-beerfest.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 9,
-      title: "Urban Woof NYC",
-      description: "Branding and booking platform for dog services",
-      tags: ["BRANDING", "WEBSITE", "BOOKING SOLUTION", "UIUX", "DEVELOPMENT"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://urban-woof-nyc.com",
-      backgroundColor: "var(--primary-red)"
-    },
-    {
-      id: 10,
-      title: "Tangente DIY Skateparks",
-      description: "Brand identity for custom skatepark construction",
-      tags: ["BRANDING", "VISUAL IDENTITY"],
-      image: "/src/assets/images/New-Flakes-02.jpg",
-      projectUrl: "https://tangente-diy.com",
-      backgroundColor: "var(--primary-red)"
-    }
-  ];
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -241,7 +153,7 @@ const WorkSection = () => {
       mainTimeline.kill();
     };
 
-  }, [projects.length]);
+  }, []); // Removido projects.length como você corrigiu
 
   // Handle resize
   useEffect(() => {
@@ -290,7 +202,7 @@ const WorkSection = () => {
           <h1 ref={workTitleRef} className="work-intro-title">WORK</h1>
         </div>
 
-        {/* Cards de projetos */}
+        {/* Cards de projetos - Agora com dados reais do projects.js */}
         {projects.map((project) => (
           <article 
             key={project.id}
