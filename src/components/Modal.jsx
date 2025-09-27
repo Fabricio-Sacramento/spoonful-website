@@ -375,6 +375,17 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const prevProject = projects[currentIndex === 0 ? projects.length - 1 : currentIndex - 1];
   const nextProject = projects[currentIndex === projects.length - 1 ? 0 : currentIndex + 1];
 
+  // NOVA LÓGICA: Preparar imagens da galeria com fallbacks seguros
+  const getGalleryImages = (project) => {
+    if (project.galleryImages && project.galleryImages.length >= 5) {
+      return project.galleryImages.slice(0, 5);
+    }
+    // Fallback: usar imagem principal para todas as 5 posições
+    return Array(5).fill(project.image);
+  };
+
+  const galleryImages = getGalleryImages(currentProject);
+
   const modalContent = (
     <div 
       ref={modalRef}
@@ -420,7 +431,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         ×
       </button>
 
-      {/* HERO SECTION com classe modal-hero e data-reveal */}
+      {/* HERO SECTION - AGORA COM DADOS DINÂMICOS */}
       <div className="modal-hero" style={{
         width: '100%',
         height: '50vh',
@@ -434,7 +445,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         gap: '0.5rem',
         overflow: 'hidden'
       }}>
-        {/* Tags */}
+        {/* Tags - DINAMIZADAS */}
         <div data-reveal style={{
           color: 'var(--primary-green)',
           fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -443,10 +454,10 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           letterSpacing: '0.045rem',
           textTransform: 'capitalize'
         }}>
-          {currentProject.tags?.join(' • ') || 'WEBSITE • E-COMMERCE • UI/UX • DEVELOPMENT'}
+          {currentProject.tags?.join(' • ') || 'PROJECT'}
         </div>
 
-        {/* Title */}
+        {/* Title - JÁ DINÂMICO */}
         <h1 data-reveal style={{
           color: 'var(--neutral-light)',
           fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -458,7 +469,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           {currentProject.title}
         </h1>
 
-        {/* Description Row */}
+        {/* Description Row - DINAMIZADA */}
         <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
           {/* Left Column - Title & Description (50%) */}
           <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -470,7 +481,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               letterSpacing: '0.055rem',
               margin: 0
             }}>
-              Plataforma de Ecoturismo Sustentável
+              {currentProject.subtitle || currentProject.description}
             </h2>
             
             <p style={{
@@ -481,11 +492,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               letterSpacing: '0.0625rem',
               margin: 0
             }}>
-              Plataforma completa para experiências de turismo sustentável, com sistema de reservas, pagamentos integrados e dashboard para operadores locais. Designing interfaces and experiences that guide users intuitively. From wireframes to usability testing, we ensure your product is both attractive and effortless.
+              {currentProject.fullDescription || currentProject.description}
             </p>
           </div>
 
-          {/* Middle Column - Stacks (25%) */}
+          {/* Middle Column - Stacks (25%) - DINAMIZADAS */}
           <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div>
               <h3 style={{
@@ -508,7 +519,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 textTransform: 'capitalize',
                 margin: 0
               }}>
-                Brand Strategy, UI/UX, Graphic Design, Front-end & Backend Development
+                {currentProject.designStack || 'Brand Strategy, UI/UX, Development'}
               </p>
             </div>
 
@@ -533,7 +544,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 textTransform: 'capitalize',
                 margin: 0
               }}>
-                React • Node.js • Stripe • MongoDB
+                {currentProject.techStack || 'React • Node.js • MongoDB'}
               </p>
             </div>
           </div>
@@ -578,7 +589,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         </div>
       </div>
 
-      {/* GALLERY SECTION - 5 imagens sequenciais */}
+      {/* GALLERY SECTION - AGORA COM IMAGENS DINÂMICAS */}
       <div style={{
         backgroundColor: 'var(--neutral-normal)',
         padding: 0,
@@ -614,7 +625,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               backfaceVisibility: 'hidden',
             }}>
               <img 
-                src={currentProject.image}
+                src={galleryImages[0]}
                 alt={`${currentProject.title} - Gallery 1`}
                 style={{
                   position: 'absolute',
@@ -628,8 +639,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             </div>
           </div>
 
-          {/* IMAGENS 2-5 - Já no estado expandido */}
-          {[...Array(4)].map((_, i) => (
+          {/* IMAGENS 2-5 - Já no estado expandido COM IMAGENS DINÂMICAS */}
+          {galleryImages.slice(1).map((imageSrc, i) => (
             <div key={i + 1} style={{
               width: '100%',
               height: '100vh',
@@ -642,7 +653,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               boxSizing: 'border-box'
             }}>
               <img 
-                src={currentProject.image}
+                src={imageSrc}
                 alt={`${currentProject.title} - Gallery ${i + 2}`}
                 style={{
                   position: 'absolute',
@@ -751,7 +762,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textTransform: 'uppercase',
               transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
-              {prevProject.tags?.join(' • ')}
+              {prevProject.tags?.join(' • ') || 'PROJECT'}
             </span>
           </button>
 
@@ -881,7 +892,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               textTransform: 'uppercase',
               transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
-              {nextProject.tags?.join(' • ')}
+              {nextProject.tags?.join(' • ') || 'PROJECT'}
             </span>
           </button>
         </div>
@@ -900,8 +911,12 @@ Modal.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     description: PropTypes.string,
+    fullDescription: PropTypes.string,
+    designStack: PropTypes.string,
+    techStack: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     image: PropTypes.string,
+    galleryImages: PropTypes.arrayOf(PropTypes.string),
     projectUrl: PropTypes.string
   }),
   projects: PropTypes.arrayOf(PropTypes.shape({
@@ -909,8 +924,12 @@ Modal.propTypes = {
     title: PropTypes.string,
     subtitle: PropTypes.string,
     description: PropTypes.string,
+    fullDescription: PropTypes.string,
+    designStack: PropTypes.string,
+    techStack: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     image: PropTypes.string,
+    galleryImages: PropTypes.arrayOf(PropTypes.string),
     projectUrl: PropTypes.string
   }))
 };
