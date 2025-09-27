@@ -67,56 +67,115 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   }, []);
 
   /**
-   * Wait for CSS transition end with fallback timer
+   * Wait for CSS transition end with fallback timer - IMPROVED
    */
   const waitForTransition = useCallback((el, timeout = 560) => {
     return new Promise((resolve) => {
-      if (!el) return resolve();
+      if (!el) {
+        console.warn('⚠️ waitForTransition: no element provided');
+        return resolve();
+      }
       
       let done = false;
       const onEnd = (e) => {
+        // Only handle transitions on the target element
         if (e && e.target !== el) return;
         if (done) return;
         done = true;
         el.removeEventListener('transitionend', onEnd);
         clearTimeout(timer);
+        console.log('✅ Transition completed via event');
         resolve();
       };
       
+      // Listen for transition end
       el.addEventListener('transitionend', onEnd, { once: true });
+      
+      // Safety fallback timer
       const timer = setTimeout(() => {
         if (done) return;
         done = true;
         el.removeEventListener('transitionend', onEnd);
+        console.warn('⚠️ Transition completed via timeout fallback');
         resolve();
-      }, timeout + 60);
+      }, timeout + 100); // Extra 100ms buffer
     });
   }, []);
 
   /**
-   * Preload image Promise
+   * Preload image Promise - WITH MEMORY CLEANUP
    */
   const preloadImage = useCallback((src) => {
     return new Promise((resolve) => {
-      if (!src) return resolve();
+      if (!src) {
+        console.log('📸 No image to preload');
+        return resolve();
+      }
+      
       const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve(); // Don't fail on image errors
+      let loaded = false;
+      
+      const cleanup = () => {
+        if (loaded) return;
+        loaded = true;
+        img.onload = null;
+        img.onerror = null;
+        img.src = ''; // Clear src to potentially free memory
+      };
+      
+      img.onload = () => {
+        console.log('📸 Image preloaded successfully:', src);
+        cleanup();
+        resolve();
+      };
+      
+      img.onerror = () => {
+        console.warn('📸 Image preload failed:', src);
+        cleanup();
+        resolve(); // Don't fail on image errors
+      };
+      
+      // Safety timeout for image loading
+      setTimeout(() => {
+        if (!loaded) {
+          console.warn('📸 Image preload timeout:', src);
+          cleanup();
+          resolve();
+        }
+      }, 3000); // 3 second timeout for image loading
+      
       img.src = src;
     });
   }, []);
 
   /**
-   * Main navigation orchestrator
+   * Main navigation orchestrator - WITH SAFETY MECHANISMS
    */
   const navigateTo = useCallback(async (direction) => {
-    if (animRef.current.isAnimating) return;
+    if (animRef.current.isAnimating) {
+      console.warn('🚫 Navigation blocked - animation in progress');
+      return;
+    }
+    
     const modal = modalRef.current;
-    if (!modal) return;
+    if (!modal) {
+      console.warn('🚫 Navigation blocked - modal not found');
+      return;
+    }
 
     const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    console.log(`🎬 Starting navigation to ${direction}`, { preferReduced });
+    
+    // Set flags with safety timeout
     animRef.current.isAnimating = true;
     animRef.current.suppressScroll = true;
+
+    // SAFETY: Force reset after maximum time
+    const safetyTimeoutId = setTimeout(() => {
+      console.warn('⚠️ SAFETY: Force resetting animation flags after timeout');
+      animRef.current.isAnimating = false;
+      animRef.current.suppressScroll = false;
+    }, 5000); // 5 second safety net
 
     // Compute new index
     const targetIndex = direction === 'next'
@@ -127,10 +186,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       // 1) Preload hero of target project
       const targetProject = projects[targetIndex];
       const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
+      console.log('📸 Preloading image:', heroSrc);
       await preloadImage(heroSrc);
 
       // Skip animations for reduced motion
       if (preferReduced) {
+        console.log('♿ Reduced motion: instant swap');
         setCurrentIndex(targetIndex);
         // Focus management for reduced motion
         setTimeout(() => {
@@ -143,28 +204,39 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
 
       // 2) Scroll to top of modal
-      await smoothScrollToTop(modal, 650, false);
+      console.log('⬆️ Scrolling to top');
+      await Promise.race([
+        smoothScrollToTop(modal, 650, false),
+        new Promise(resolve => setTimeout(resolve, 1000)) // 1s timeout
+      ]);
 
       // 3) Find content wrapper
       const contentEl = modal.querySelector(`.${styles.modalContent}`);
       if (!contentEl) {
-        // Fallback: instant swap
+        console.warn('⚠️ Content wrapper not found - instant swap');
         setCurrentIndex(targetIndex);
         return;
       }
 
       // 4) Slide out current content
+      console.log('⬅️ Sliding out current content');
       const slideOutClass = direction === 'next' ? styles.slideOutLeft : styles.slideOutRight;
       contentEl.classList.add(slideOutClass);
-      await waitForTransition(contentEl, 560);
+      
+      await Promise.race([
+        waitForTransition(contentEl, 560),
+        new Promise(resolve => setTimeout(resolve, 800)) // 800ms timeout
+      ]);
 
       // 5) Swap content while offscreen
+      console.log('🔄 Swapping content to index:', targetIndex);
       setCurrentIndex(targetIndex);
 
       // Force reflow to ensure new content is rendered
       contentEl.offsetHeight;
 
       // 6) Slide in from opposite direction
+      console.log('➡️ Sliding in new content');
       contentEl.classList.remove(styles.slideOutLeft, styles.slideOutRight);
       const slideInClass = direction === 'next' ? styles.slideInFromRight : styles.slideInFromLeft;
       contentEl.classList.add(slideInClass);
@@ -174,9 +246,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
       // Remove slide-in class to trigger slide-in animation
       contentEl.classList.remove(slideInClass);
-      await waitForTransition(contentEl, 560);
+      
+      await Promise.race([
+        waitForTransition(contentEl, 560),
+        new Promise(resolve => setTimeout(resolve, 800)) // 800ms timeout
+      ]);
 
       // 7) Reveal hero with existing system
+      console.log('🎭 Revealing hero');
       const hero = modal.querySelector('.modal-hero');
       if (hero) {
         hero.classList.remove('modal-hero--visible');
@@ -192,16 +269,23 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         if (title && typeof title.focus === 'function') {
           title.focus();
         }
+        console.log('🎯 Focus set on title');
       }, 320); // After hero reveal
 
+      console.log('✅ Navigation completed successfully');
+
     } catch (error) {
-      console.warn('Navigation animation error:', error);
+      console.error('❌ Navigation animation error:', error);
       // Fallback to instant swap
       setCurrentIndex(targetIndex);
     } finally {
+      // Clear safety timeout
+      clearTimeout(safetyTimeoutId);
+      
       // Always reset flags
       animRef.current.isAnimating = false;
       animRef.current.suppressScroll = false;
+      console.log('🏁 Animation flags reset');
     }
   }, [currentIndex, projects, smoothScrollToTop, waitForTransition, preloadImage]);
 
@@ -911,7 +995,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 cursor: animRef.current.isAnimating ? 'wait' : 'pointer',
                 overflow: 'hidden',
                 transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                opacity: animRef.current.isAnimating ? 0.6 : 1
+                opacity: animRef.current.isAnimating ? 0.6 : 1,
+                pointerEvents: animRef.current.isAnimating ? 'none' : 'auto'
               }}
               onMouseEnter={(e) => {
                 if (animRef.current.isAnimating) return;
@@ -1044,7 +1129,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 cursor: animRef.current.isAnimating ? 'wait' : 'pointer',
                 overflow: 'hidden',
                 transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                opacity: animRef.current.isAnimating ? 0.6 : 1
+                opacity: animRef.current.isAnimating ? 0.6 : 1,
+                pointerEvents: animRef.current.isAnimating ? 'none' : 'auto'
               }}
               onMouseEnter={(e) => {
                 if (animRef.current.isAnimating) return;
