@@ -13,78 +13,178 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   // Animation control refs
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
 
-  // Handle open animation - Phase 2 Refinada
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-    
+  // Handle close animation - Phase 3 Refinada (staggered + fluida)
+  const handleClose = useCallback(() => {
     const modal = modalRef.current;
+    if (!modal) {
+      onClose();
+      return;
+    }
+
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
-    // Timings refinados para fluidez
-    const overlayDuration = prefersReducedMotion ? 120 : 450; // 260ms → 450ms
-    const staggerDelays = prefersReducedMotion ? [0, 20, 40] : [0, 90, 160]; // Progressão mais natural
-    
-    // Set animation flags
+    const overlayDuration = prefersReducedMotion ? 120 : 520; // Aumentado de 380ms para 520ms
+    const staggerDelays = prefersReducedMotion ? [0, 15, 30] : [0, 60, 120]; // Reverse order delays
+
+    // Guard refs para cleanup
+    const hideTimeoutRef = { id: null };
+    const overlayTimeoutRef = { id: null };
+
+    // Lock interactions and set flags
     animRef.current.isAnimating = true;
     animRef.current.suppressScroll = true;
+
+    const hero = modal.querySelector('.modal-hero');
     
-    // Set initial state
+    if (hero) {
+      // Start with hero staggered hide (reverse order)
+      const items = Array.from(hero.querySelectorAll('[data-reveal]'));
+      
+      // Apply reverse stagger delays
+      items.forEach((el, i) => {
+        const reverseIndex = items.length - 1 - i; // Reverse order
+        const delay = staggerDelays[reverseIndex] ?? (staggerDelays[staggerDelays.length - 1] + (reverseIndex - staggerDelays.length + 1) * 40);
+        el.style.transitionDelay = `${delay}ms`;
+      });
+
+      // Add hiding class to trigger staggered hide
+      hero.classList.add('modal-hero--hiding');
+      hero.classList.remove('modal-hero--visible');
+
+      // Start overlay exit when hero hiding is 60% complete
+      const maxStaggerDelay = Math.max(...staggerDelays.slice(0, Math.min(items.length, staggerDelays.length)));
+      const heroHideDuration = Math.round(320 + maxStaggerDelay); // 320ms transition + stagger
+      const overlayStartTime = Math.round(heroHideDuration * 0.6);
+
+      overlayTimeoutRef.id = window.setTimeout(() => {
+        // Start overlay exit animation
+        modal.classList.add('modal-overlay--exiting');
+        modal.classList.remove('modal-overlay--visible');
+      }, overlayStartTime);
+
+      // Call parent close after everything completes
+      const totalDuration = Math.max(overlayStartTime + overlayDuration, heroHideDuration);
+      
+      hideTimeoutRef.id = window.setTimeout(() => {
+        // Clean up stagger delays
+        items.forEach(el => {
+          el.style.transitionDelay = '';
+        });
+
+        // Clear flags so cleanup effect can run clean
+        animRef.current.isAnimating = false;
+        animRef.current.suppressScroll = false;
+
+        // Call external onClose to actually unmount / hide modal
+        onClose();
+      }, totalDuration);
+
+    } else {
+      // No hero -> just do overlay exit
+      modal.classList.add('modal-overlay--exiting');
+      modal.classList.remove('modal-overlay--visible');
+
+      hideTimeoutRef.id = window.setTimeout(() => {
+        animRef.current.isAnimating = false;
+        animRef.current.suppressScroll = false;
+        onClose();
+      }, overlayDuration);
+    }
+
+    // Cleanup function (embora não seja retornado, mantém padrão de limpeza)
+    const cleanup = () => {
+      if (hideTimeoutRef.id != null) clearTimeout(hideTimeoutRef.id);
+      if (overlayTimeoutRef.id != null) clearTimeout(overlayTimeoutRef.id);
+    };
+
+    // Store cleanup for potential future use
+    cleanup._refs = { hideTimeoutRef, overlayTimeoutRef };
+
+  }, [onClose]);
+
+  // Handle open animation - Phase 2 (corrigido: timers/raf limpos corretamente)
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
+    const modal = modalRef.current;
+    const currentAnimRef = animRef.current; // Capture ref value at effect start
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Timings
+    const overlayDuration = prefersReducedMotion ? 120 : 450;
+    const staggerDelays = prefersReducedMotion ? [0, 20, 40] : [0, 90, 160];
+
+    // Guard refs para cleanup
+    const rafIdRef = { id: null };
+    const revealTimeoutRef = { id: null };
+    const releaseTimeoutRef = { id: null };
+    const focusTimeoutRef = { id: null };
+
+    currentAnimRef.isAnimating = true;
+    currentAnimRef.suppressScroll = true;
+
     modal.classList.add('modal-overlay--entering');
-    
-    requestAnimationFrame(() => {
-      // Start overlay animation
+
+    // Vamos usar requestAnimationFrame mas guardar o id no rafIdRef
+    rafIdRef.id = requestAnimationFrame(() => {
       modal.classList.remove('modal-overlay--entering');
       modal.classList.add('modal-overlay--visible');
-      
+
       const hero = modal.querySelector('.modal-hero');
-      
+
       if (hero) {
-        // Apply refined stagger delays
         const items = Array.from(hero.querySelectorAll('[data-reveal]'));
         items.forEach((el, i) => {
-          const delay = staggerDelays[i] || staggerDelays[staggerDelays.length - 1] + (i - staggerDelays.length + 1) * 70;
+          const delay = staggerDelays[i] ?? (staggerDelays[staggerDelays.length - 1] + (i - staggerDelays.length + 1) * 70);
           el.style.transitionDelay = `${delay}ms`;
         });
 
-        // Start reveal when overlay is 70% complete (mais orgânico)
-        const revealStartTime = overlayDuration * 0.7;
-        
-        const timeoutId = setTimeout(() => {
+        // Start reveal when overlay is 70% complete
+        const revealStartTime = Math.round(overlayDuration * 0.7);
+
+        revealTimeoutRef.id = window.setTimeout(() => {
           hero.classList.add('modal-hero--visible');
-          
-          // Release scroll after overlay completes + pequeno buffer
-          setTimeout(() => {
-            animRef.current.isAnimating = false;
-            animRef.current.suppressScroll = false;
-          }, overlayDuration * 0.3); // Buffer de 30% do tempo total
-          
+
+          // Release scroll after overlay completes + small buffer
+          releaseTimeoutRef.id = window.setTimeout(() => {
+            currentAnimRef.isAnimating = false;
+            currentAnimRef.suppressScroll = false;
+          }, Math.round(overlayDuration * 0.3));
         }, revealStartTime);
-        
-        // Return cleanup function with timeoutId in closure
-        return () => {
-          clearTimeout(timeoutId);
-          modal.classList.remove('modal-overlay--entering', 'modal-overlay--visible');
-          
-          const hero = modal.querySelector('.modal-hero');
-          if (hero) {
-            hero.classList.remove('modal-hero--visible');
-            hero.querySelectorAll('[data-reveal]').forEach(el => {
-              el.style.transitionDelay = '';
-            });
-          }
-        };
-      }
-      
-      // Focus management com timing refinado
-      const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
-      if (closeButton) {
-        setTimeout(() => closeButton.focus(), overlayDuration + 150); // Pequeno delay extra
+
+        // Focus management: focus close button after overlay fully done (safe)
+        const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
+        if (closeButton) {
+          focusTimeoutRef.id = window.setTimeout(() => closeButton.focus(), overlayDuration + 150);
+        }
+      } else {
+        // No hero -> just release after overlayDuration
+        releaseTimeoutRef.id = window.setTimeout(() => {
+          currentAnimRef.isAnimating = false;
+          currentAnimRef.suppressScroll = false;
+        }, overlayDuration);
       }
     });
-    
+
     return () => {
-      // Default cleanup when no hero found
+      // cleanup tudo
+      if (rafIdRef.id != null) cancelAnimationFrame(rafIdRef.id);
+      if (revealTimeoutRef.id != null) clearTimeout(revealTimeoutRef.id);
+      if (releaseTimeoutRef.id != null) clearTimeout(releaseTimeoutRef.id);
+      if (focusTimeoutRef.id != null) clearTimeout(focusTimeoutRef.id);
+
       modal.classList.remove('modal-overlay--entering', 'modal-overlay--visible');
+
+      const hero = modal.querySelector('.modal-hero');
+      if (hero) {
+        hero.classList.remove('modal-hero--visible');
+        hero.querySelectorAll('[data-reveal]').forEach(el => {
+          el.style.transitionDelay = '';
+        });
+      }
+
+      // garante reset das flags (importante se fechar no meio) - usa captured ref
+      currentAnimRef.isAnimating = false;
+      currentAnimRef.suppressScroll = false;
     };
   }, [isOpen]);
 
@@ -194,7 +294,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       
       switch (e.key) {
         case 'Escape':
-          onClose();
+          handleClose();
           break;
         case 'ArrowLeft':
           goToPrevious();
@@ -209,7 +309,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, goToPrevious, goToNext]);
+  }, [isOpen, handleClose, goToPrevious, goToNext]);
 
   // Lock body scroll
   useEffect(() => {
@@ -230,7 +330,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   // Close on overlay click
   const handleOverlayClick = (e) => {
     if (e.target === modalRef.current) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -259,7 +359,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     >
       {/* Close Button */}
       <button 
-        onClick={onClose}
+        onClick={handleClose}
         style={{
           position: 'fixed',
           top: '2rem',
