@@ -12,9 +12,19 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   
   // Animation control refs
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
+  const closeTimersRef = useRef({ hide: null, overlay: null, raf: null });
+  const prevFocusRef = useRef(null);
 
   // Handle close animation - Phase 3 Refinada (staggered + fluida)
   const handleClose = useCallback(() => {
+    if (animRef.current.isAnimating) return; // Guard contra múltiplos handleClose
+
+    // Limpar timers antigos por segurança
+    if (closeTimersRef.current.overlay) clearTimeout(closeTimersRef.current.overlay);
+    if (closeTimersRef.current.hide) clearTimeout(closeTimersRef.current.hide);
+    if (closeTimersRef.current.raf) cancelAnimationFrame(closeTimersRef.current.raf);
+    closeTimersRef.current = { hide: null, overlay: null, raf: null };
+
     const modal = modalRef.current;
     if (!modal) {
       onClose();
@@ -22,12 +32,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const overlayDuration = prefersReducedMotion ? 120 : 520; // Aumentado de 380ms para 520ms
+    const overlayDuration = prefersReducedMotion ? 120 : 420; // Meio termo: 420ms
     const staggerDelays = prefersReducedMotion ? [0, 15, 30] : [0, 60, 120]; // Reverse order delays
-
-    // Guard refs para cleanup
-    const hideTimeoutRef = { id: null };
-    const overlayTimeoutRef = { id: null };
 
     // Lock interactions and set flags
     animRef.current.isAnimating = true;
@@ -55,7 +61,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       const heroHideDuration = Math.round(320 + maxStaggerDelay); // 320ms transition + stagger
       const overlayStartTime = Math.round(heroHideDuration * 0.6);
 
-      overlayTimeoutRef.id = window.setTimeout(() => {
+      closeTimersRef.current.overlay = window.setTimeout(() => {
         // Start overlay exit animation
         modal.classList.add('modal-overlay--exiting');
         modal.classList.remove('modal-overlay--visible');
@@ -64,7 +70,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       // Call parent close after everything completes
       const totalDuration = Math.max(overlayStartTime + overlayDuration, heroHideDuration);
       
-      hideTimeoutRef.id = window.setTimeout(() => {
+      closeTimersRef.current.hide = window.setTimeout(() => {
         // Clean up stagger delays
         items.forEach(el => {
           el.style.transitionDelay = '';
@@ -73,6 +79,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         // Clear flags so cleanup effect can run clean
         animRef.current.isAnimating = false;
         animRef.current.suppressScroll = false;
+
+        // Restore focus before calling onClose
+        if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
+          prevFocusRef.current.focus();
+        }
+
+        // Reset closeTimersRef após finalizar
+        closeTimersRef.current = { hide: null, overlay: null, raf: null };
 
         // Call external onClose to actually unmount / hide modal
         onClose();
@@ -83,25 +97,46 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       modal.classList.add('modal-overlay--exiting');
       modal.classList.remove('modal-overlay--visible');
 
-      hideTimeoutRef.id = window.setTimeout(() => {
+      closeTimersRef.current.hide = window.setTimeout(() => {
         animRef.current.isAnimating = false;
         animRef.current.suppressScroll = false;
+        
+        // Restore focus
+        if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
+          prevFocusRef.current.focus();
+        }
+
+        // Reset closeTimersRef após finalizar
+        closeTimersRef.current = { hide: null, overlay: null, raf: null };
+        
         onClose();
       }, overlayDuration);
     }
-
-    // Cleanup function (embora não seja retornado, mantém padrão de limpeza)
-    const cleanup = () => {
-      if (hideTimeoutRef.id != null) clearTimeout(hideTimeoutRef.id);
-      if (overlayTimeoutRef.id != null) clearTimeout(overlayTimeoutRef.id);
-    };
-
-    // Store cleanup for potential future use
-    cleanup._refs = { hideTimeoutRef, overlayTimeoutRef };
-
   }, [onClose]);
 
-  // Handle open animation - Phase 2 (corrigido: timers/raf limpos corretamente)
+  // Focus management and cleanup
+  useEffect(() => {
+    if (isOpen) {
+      // Capture focus before opening
+      prevFocusRef.current = document.activeElement;
+    } else {
+      // Optional: restore focus on close (if component still mounted)
+      if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
+        prevFocusRef.current.focus();
+      }
+    }
+  }, [isOpen]);
+
+  // Cleanup close timers on unmount or when modal closes
+  useEffect(() => {
+    return () => {
+      if (closeTimersRef.current.raf != null) cancelAnimationFrame(closeTimersRef.current.raf);
+      if (closeTimersRef.current.overlay != null) clearTimeout(closeTimersRef.current.overlay);
+      if (closeTimersRef.current.hide != null) clearTimeout(closeTimersRef.current.hide);
+      // Reset
+      closeTimersRef.current = { hide: null, overlay: null, raf: null };
+    };
+  }, []);
   useEffect(() => {
     if (!isOpen || !modalRef.current) return;
 
