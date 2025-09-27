@@ -98,7 +98,7 @@ export const projects = [
     image: tropiviewSlide01,
     galleryImages: [tropiviewSlide01, tropiviewSlide02, tropiviewSlide03, tropiviewSlide04, tropiviewSlide05],
     projectUrl: "https://tropiview-portfolio.vercel.app",
-    backgroundColor: "var(--primary-green)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 3,
@@ -112,7 +112,7 @@ export const projects = [
     image: humaitaSlide01,
     galleryImages: [humaitaSlide01, humaitaSlide02, humaitaSlide03, humaitaSlide04, humaitaSlide05],
     projectUrl: "https://humaita-digital.netlify.app",
-    backgroundColor: "var(--primary-blue)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 4,
@@ -126,7 +126,7 @@ export const projects = [
     image: hysteriaSlide01,
     galleryImages: [hysteriaSlide01, hysteriaSlide02, hysteriaSlide03, hysteriaSlide04, hysteriaSlide05],
     projectUrl: "https://hysteria-gallery.vercel.app",
-    backgroundColor: "var(--primary-yellow)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 5,
@@ -140,7 +140,7 @@ export const projects = [
     image: myhabitatSlide01,
     galleryImages: [myhabitatSlide01, myhabitatSlide02, myhabitatSlide03, myhabitatSlide04, myhabitatSlide05],
     projectUrl: "https://myhabitat-iot.com",
-    backgroundColor: "var(--primary-green)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 6,
@@ -168,7 +168,7 @@ export const projects = [
     image: hbSlide01,
     galleryImages: [hbSlide01, hbSlide02, hbSlide03, hbSlide04, hbSlide05],
     projectUrl: "https://hb-architecture.portfolio.com",
-    backgroundColor: "var(--primary-blue)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 8,
@@ -182,7 +182,7 @@ export const projects = [
     image: cryptobeerSlide01,
     galleryImages: [cryptobeerSlide01, cryptobeerSlide02, cryptobeerSlide03, cryptobeerSlide04, cryptobeerSlide05],
     projectUrl: "https://crypto-beerfest.xyz",
-    backgroundColor: "var(--primary-yellow)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 9,
@@ -196,7 +196,7 @@ export const projects = [
     image: urbanwoofSlide01,
     galleryImages: [urbanwoofSlide01, urbanwoofSlide02, urbanwoofSlide03, urbanwoofSlide04, urbanwoofSlide05],
     projectUrl: "https://urbanwoof.nyc",
-    backgroundColor: "var(--primary-green)"
+    backgroundColor: "var(--primary-red)"
   },
   {
     id: 10,
