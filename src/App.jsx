@@ -1,13 +1,18 @@
+// src/App.jsx
 import { Canvas } from '@react-three/fiber';
 import Glass from './components/Glass';
 import DynamicBackground from './components/DynamicBackground';
 import GlassCube from './components/GlassCube';
+import AppCanvasCleanupRegistrar from './components/AppCanvasCleanupRegistrar';
 //import ConceptualCore from './components/ConceptualCore';
 import { OrbitControls } from '@react-three/drei';
 
 const App = () => {
   return (
-    <Canvas camera={{ position: [0, 0, 5], fov: 50 }} shadows>
+    <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 50 }} shadows>
+      {/* Registrador de cleanup - deve estar dentro do Canvas para acessar useThree */}
+      <AppCanvasCleanupRegistrar />
+      
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
 

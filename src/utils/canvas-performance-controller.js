@@ -13,6 +13,7 @@ class CanvasPerformanceController {
     this.container = null;
     this.lastProgress = 0;
     this.debounceTimeout = null;
+    this.cleanupFn = null; // Função de cleanup registrada
     
     this.thresholds = {
       unmountProgress: 0.28,   // 38% - logo após clipRects (35%) terminarem
@@ -39,6 +40,15 @@ class CanvasPerformanceController {
     gsap.delayedCall(0.3, () => {
       this.createScrollMonitor();
     });
+  }
+
+  /**
+   * Registra função de cleanup para ser chamada antes do unmount
+   */
+  registerCleanup(fn) {
+    if (typeof fn !== 'function') return;
+    this.cleanupFn = fn;
+    console.log('Cleanup function registrada');
   }
 
   /**
@@ -88,23 +98,46 @@ class CanvasPerformanceController {
   }
 
   /**
-   * Desmonta Canvas React - Performance máxima
+   * Desmonta Canvas React com cleanup gracioso - versão robusta
    */
-  unmountCanvas() {
-    if (!this.isCanvasMounted || !this.reactRoot) return;
+  async unmountCanvas() {
+    if (!this.isCanvasMounted || !this.reactRoot || !this.container) return;
+    console.log('UNMOUNTING Canvas - Performance mode ON (graceful)');
 
-    console.log('UNMOUNTING Canvas - Performance mode ON');
-    
     try {
-      // Desmonta React cleanly
-      this.reactRoot.unmount();
-      
-      // Limpa container deixando apenas um placeholder
-      this.container.innerHTML = '<div style="width:100%;height:100vh;background:transparent;"></div>';
-      
+      if (this.cleanupFn) {
+        try {
+          await Promise.race([
+            Promise.resolve().then(() => this.cleanupFn()),
+            new Promise((_, rej) => setTimeout(() => rej(new Error('cleanup timeout')), 1500))
+          ]);
+          console.log('Cleanup completed');
+        } catch (err) {
+          console.warn('Cleanup failed or timed out, continuing with unmount', err);
+        }
+      }
+
+      // give a tiny gap to avoid colliding with UI animations
+      await new Promise(res => setTimeout(res, 80));
+
+      // reactRoot.unmount() pode lançar se já desmontado — proteja
+      try {
+        if (this.reactRoot) {
+          this.reactRoot.unmount();
+        }
+      } catch(e) {
+        console.warn('reactRoot.unmount failed', e);
+      }
+
+      // cleanup container html (placeholder)
+      try {
+        this.container.innerHTML = '<div style="width:100%;height:100vh;background:transparent;"></div>';
+      } catch(e) { console.warn('container cleanup failed', e); }
+
+      // ensure we clear reactRoot reference
+      this.reactRoot = null;
       this.isCanvasMounted = false;
-      console.log('Canvas unmounted successfully');
-      
+      console.log('Canvas unmounted successfully (graceful)');
     } catch (error) {
       console.error('Erro ao desmontar Canvas:', error);
     }
@@ -114,20 +147,14 @@ class CanvasPerformanceController {
    * Remonta Canvas React
    */
   remountCanvas() {
-    if (this.isCanvasMounted || !this.canvasComponent) return;
-
+    if (this.isCanvasMounted || !this.canvasComponent || !this.container) return;
     console.log('REMOUNTING Canvas - 3D mode ON');
-    
     try {
-      // Recria ReactRoot no mesmo container
+      // recreate ReactRoot
       this.reactRoot = ReactDOM.createRoot(this.container);
-      
-      // Renderiza Canvas novamente
       this.reactRoot.render(this.canvasComponent);
-      
       this.isCanvasMounted = true;
       console.log('Canvas remounted successfully');
-      
     } catch (error) {
       console.error('Erro ao remontar Canvas:', error);
     }
@@ -144,6 +171,7 @@ class CanvasPerformanceController {
       isMounted: this.isCanvasMounted,
       hasRoot: !!this.reactRoot,
       hasContainer: !!this.container,
+      hasCleanup: !!this.cleanupFn,
       thresholds: this.thresholds,
       lastProgress: this.lastProgress
     };
@@ -160,6 +188,7 @@ class CanvasPerformanceController {
     this.reactRoot = null;
     this.canvasComponent = null;
     this.container = null;
+    this.cleanupFn = null;
     console.log('Canvas Performance Controller destroyed');
   }
 }

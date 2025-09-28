@@ -1,18 +1,10 @@
 // src/main.jsx
-import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.jsx';
+import CanvasApp from './components/CanvasApp.jsx';
 import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
 import CustomCursor from './components/CustomCursor.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
-
-// Componente Canvas para ser montado/desmontado
-const CanvasApp = () => (
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
 
 // 1) Monta o canvas 3D inicial
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
