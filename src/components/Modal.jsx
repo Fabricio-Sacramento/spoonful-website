@@ -151,6 +151,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   /**
    * Main navigation orchestrator - WITH SAFETY MECHANISMS
    */
+  // navigateTo simplificado - apenas fade, sem slides laterais
   const navigateTo = useCallback(async (direction) => {
     if (animRef.current.isAnimating) {
       console.warn('🚫 Navigation blocked - animation in progress');
@@ -158,136 +159,115 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
     
     const modal = modalRef.current;
-    if (!modal) {
-      console.warn('🚫 Navigation blocked - modal not found');
-      return;
-    }
+    if (!modal) return;
 
     const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    console.log(`🎬 Starting navigation to ${direction}`, { preferReduced });
-    
-    // Set flags with safety timeout
     animRef.current.isAnimating = true;
     animRef.current.suppressScroll = true;
-
-    // SAFETY: Force reset after maximum time
-    const safetyTimeoutId = setTimeout(() => {
-      console.warn('⚠️ SAFETY: Force resetting animation flags after timeout');
+    
+    const safety = setTimeout(() => {
       animRef.current.isAnimating = false;
       animRef.current.suppressScroll = false;
-    }, 5000); // 5 second safety net
+    }, 5000);
 
-    // Compute new index
-    const targetIndex = direction === 'next'
-      ? (currentIndex === projects.length - 1 ? 0 : currentIndex + 1)
-      : (currentIndex === 0 ? projects.length - 1 : currentIndex - 1);
+    const total = projects.length;
+    const targetIndex = direction === 'next' ? 
+      (currentIndex === total - 1 ? 0 : currentIndex + 1) :
+      (currentIndex === 0 ? total - 1 : currentIndex - 1);
 
     try {
-      // 1) Preload hero of target project
+      // Preload hero
       const targetProject = projects[targetIndex];
       const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
       console.log('📸 Preloading image:', heroSrc);
       await preloadImage(heroSrc);
 
-      // Skip animations for reduced motion
       if (preferReduced) {
-        console.log('♿ Reduced motion: instant swap');
+        console.log('⚡ Reduced motion - direct swap');
         setCurrentIndex(targetIndex);
-        // Focus management for reduced motion
         setTimeout(() => {
           const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-          if (title && typeof title.focus === 'function') {
-            title.focus();
-          }
-        }, 50);
+          if (title && typeof title.focus === 'function') title.focus();
+        }, 20);
         return;
       }
 
-      // 2) Scroll to top of modal
+      // 1) Scroll to top
       console.log('⬆️ Scrolling to top');
       await Promise.race([
-        smoothScrollToTop(modal, 650, false),
-        new Promise(resolve => setTimeout(resolve, 1000)) // 1s timeout
+        smoothScrollToTop(modal, 650, false), 
+        new Promise(r => setTimeout(r, 1000))
       ]);
 
-      // 3) Find content wrapper
+      // 2) Fade out current content
       const contentEl = modal.querySelector(`.${styles.modalContent}`);
       if (!contentEl) {
-        console.warn('⚠️ Content wrapper not found - instant swap');
+        console.warn('⚠️ Content element not found, direct swap');
         setCurrentIndex(targetIndex);
         return;
       }
 
-      // 4) Slide out current content
-      console.log('⬅️ Sliding out current content');
-      const slideOutClass = direction === 'next' ? styles.slideOutLeft : styles.slideOutRight;
-      contentEl.classList.add(slideOutClass);
-      
+      console.log('🌫️ Fading out current content');
+      contentEl.classList.add('fading');
+
+      // Wait for fade-out transition
       await Promise.race([
-        waitForTransition(contentEl, 560),
-        new Promise(resolve => setTimeout(resolve, 800)) // 800ms timeout
+        waitForTransition(contentEl, 500, 'opacity'),
+        new Promise(r => setTimeout(r, 600))
       ]);
 
-      // 5) Swap content while offscreen
+      // 3) Swap content
       console.log('🔄 Swapping content to index:', targetIndex);
       setCurrentIndex(targetIndex);
 
-      // Force reflow to ensure new content is rendered
+      // Force reflow so new content is rendered
       contentEl.offsetHeight;
 
-      // 6) Slide in from opposite direction
-      console.log('➡️ Sliding in new content');
-      contentEl.classList.remove(styles.slideOutLeft, styles.slideOutRight);
-      const slideInClass = direction === 'next' ? styles.slideInFromRight : styles.slideInFromLeft;
-      contentEl.classList.add(slideInClass);
-
-      // Small delay for smooth transition
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      // Remove slide-in class to trigger slide-in animation
-      contentEl.classList.remove(slideInClass);
+      // 4) Fade in new content
+      console.log('✨ Fading in new content');
       
+      // Use requestAnimationFrame for reliable timing
+      await new Promise(resolve => requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // Remove fading class to trigger CSS transition back to opacity: 1
+          contentEl.classList.remove('fading');
+          resolve();
+        });
+      }));
+
+      // Wait for fade-in transition
       await Promise.race([
-        waitForTransition(contentEl, 560),
-        new Promise(resolve => setTimeout(resolve, 800)) // 800ms timeout
+        waitForTransition(contentEl, 500, 'opacity'),
+        new Promise(r => setTimeout(r, 600))
       ]);
 
-      // 7) Reveal hero with existing system
+      // 5) Reveal hero
       console.log('🎭 Revealing hero');
       const hero = modal.querySelector('.modal-hero');
       if (hero) {
         hero.classList.remove('modal-hero--visible');
-        // Trigger reveal with small delay
-        setTimeout(() => {
-          hero.classList.add('modal-hero--visible');
-        }, 80);
+        setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
       }
-
-      // 8) Focus management - focus on title for accessibility
-      setTimeout(() => {
-        const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-        if (title && typeof title.focus === 'function') {
-          title.focus();
-        }
-        console.log('🎯 Focus set on title');
-      }, 320); // After hero reveal
 
       console.log('✅ Navigation completed successfully');
 
-    } catch (error) {
-      console.error('❌ Navigation animation error:', error);
-      // Fallback to instant swap
-      setCurrentIndex(targetIndex);
+      // Focus management
+      console.log('🎯 Focus set on title');
+      setTimeout(() => {
+        const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
+        if (title && typeof title.focus === 'function') title.focus();
+      }, 320);
+
+    } catch (err) {
+      console.error('❌ navigateTo error:', err);
+      setCurrentIndex(targetIndex); // fallback
     } finally {
-      // Clear safety timeout
-      clearTimeout(safetyTimeoutId);
-      
-      // Always reset flags
+      clearTimeout(safety);
       animRef.current.isAnimating = false;
       animRef.current.suppressScroll = false;
       console.log('🏁 Animation flags reset');
     }
-  }, [currentIndex, projects, smoothScrollToTop, waitForTransition, preloadImage]);
+  }, [currentIndex, projects, preloadImage, smoothScrollToTop, waitForTransition]);
 
   // ================================
   // EXISTING MODAL LOGIC (PRESERVED)
