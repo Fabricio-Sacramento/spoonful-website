@@ -1,7 +1,7 @@
 // src/components/AppCanvasCleanupRegistrar.jsx
 // Registra função de cleanup para o Canvas Performance Controller
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import { gsap } from 'gsap';
 import canvasController from '../utils/canvas-performance-controller.js';
@@ -9,11 +9,15 @@ import { disposeScene, disposeRenderer, disposeComposer } from '../utils/three-d
 
 function AppCanvasCleanupRegistrar() {
   const { gl, scene, camera } = useThree();
+  const unregisterRef = useRef(null);
+  const registeredRef = useRef(false);
 
   useEffect(() => {
+    if (registeredRef.current) return;
+    registeredRef.current = true;
+
     const cleanup = async () => {
       console.log('[r3f] Running scene cleanup...');
-
       try {
         // 1) dispose scene children
         disposeScene(scene);
@@ -29,7 +33,7 @@ function AppCanvasCleanupRegistrar() {
           }
         } catch(e){ console.warn('[r3f] composer dispose failed', e); }
 
-        // 3) kill GSAP tweens (already present)
+        // 3) kill GSAP tweens
         try {
           if (gsap) {
             gsap.killTweensOf(scene);
@@ -70,7 +74,7 @@ function AppCanvasCleanupRegistrar() {
 
     // Registra cleanup no controller
     if (canvasController && typeof canvasController.registerCleanup === 'function') {
-      canvasController.registerCleanup(cleanup);
+      unregisterRef.current = canvasController.registerCleanup(cleanup);
       console.log('[r3f] Cleanup registered to canvas controller');
     } else {
       // Fallback: anexa ao window para segurança
@@ -78,10 +82,13 @@ function AppCanvasCleanupRegistrar() {
       console.warn('[r3f] Canvas controller not available, cleanup attached to window');
     }
 
-    // Cleanup local ao desmontar este componente (redundante, mas seguro)
     return () => {
-      // O controller já vai chamar cleanup, então não fazemos nada aqui
-      // para evitar double-cleanup
+      // Unregister on unmount
+      if (typeof unregisterRef.current === 'function') {
+        unregisterRef.current();
+        unregisterRef.current = null;
+      }
+      registeredRef.current = false;
     };
   }, [gl, scene, camera]);
 

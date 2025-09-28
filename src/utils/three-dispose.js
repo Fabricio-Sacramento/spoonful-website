@@ -111,25 +111,27 @@ export function disposeComposer(composer) {
 export function disposeRenderer(renderer) {
   if (!renderer) return;
   try {
-    // try renderer.forceContextLoss if available (Three exposes it)
-    if (typeof renderer.forceContextLoss === 'function') {
-      try {
-        renderer.forceContextLoss();
-      } catch(e) {
-        console.warn('[three-dispose] forceContextLoss failed', e);
-      }
+    const isGlobalLost = typeof window !== 'undefined' && !!window.__R3F_CONTEXT_LOST;
+    const gl = renderer.getContext && renderer.getContext();
+    const contextLost = gl && typeof gl.isContextLost === 'function' && gl.isContextLost();
+
+    if (isGlobalLost || contextLost) {
+      console.log('[three-dispose] Skipping loseContext: already marked/lost');
     } else {
-      // fallback: try the WEBGL_lose_context extension on the canvas context
+      // Try renderer.forceContextLoss wrapped
       try {
-        const gl = renderer.getContext && renderer.getContext();
-        if (gl) {
+        if (typeof renderer.forceContextLoss === 'function') {
+          renderer.forceContextLoss();
+          if (typeof window !== 'undefined') window.__R3F_CONTEXT_LOST = true;
+        } else if (gl) {
           const ext = gl.getExtension && (gl.getExtension('WEBGL_lose_context') || gl.getExtension('MOZ_WEBGL_lose_context') || gl.getExtension('WEBKIT_WEBGL_lose_context'));
           if (ext && typeof ext.loseContext === 'function') {
-            try { ext.loseContext(); } catch(e){ console.warn('loseContext failed', e); }
+            ext.loseContext();
+            if (typeof window !== 'undefined') window.__R3F_CONTEXT_LOST = true;
           }
         }
-      } catch(e) {
-        console.warn('[three-dispose] fallback loseContext failed', e);
+      } catch (e) {
+        console.warn('[three-dispose] loseContext/forceContextLoss failed', e);
       }
     }
 
