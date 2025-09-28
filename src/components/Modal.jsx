@@ -148,131 +148,131 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   /**
    * Main navigation orchestrator - WITH SAFETY MECHANISMS */
   // navigateTo simplificado - apenas fade, sem slides laterais
-  const navigateTo = useCallback(async (direction) => {
-    if (animRef.current.isAnimating) {
-      console.warn('🚫 Navigation blocked - animation in progress');
-      return;
-    }
-    
-    const modal = modalRef.current;
-    if (!modal) return;
+const navigateTo = useCallback(async (direction) => {
+  if (animRef.current.isAnimating) {
+    console.warn('🚫 Navigation blocked - animation in progress');
+    return;
+  }
+  
+  const modal = modalRef.current;
+  if (!modal) return;
 
-    const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    animRef.current.isAnimating = true;
-    animRef.current.suppressScroll = true;
-    
-    const safety = setTimeout(() => {
-      animRef.current.isAnimating = false;
-      animRef.current.suppressScroll = false;
-    }, 5000);
+  const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  animRef.current.isAnimating = true;
+  animRef.current.suppressScroll = true;
+  
+  const safety = setTimeout(() => {
+    animRef.current.isAnimating = false;
+    animRef.current.suppressScroll = false;
+  }, 5000);
 
-    const total = projects.length;
-    const targetIndex = direction === 'next' ? 
-      (currentIndex === total - 1 ? 0 : currentIndex + 1) :
-      (currentIndex === 0 ? total - 1 : currentIndex - 1);
+  const total = projects.length;
+  const targetIndex = direction === 'next' ? 
+    (currentIndex === total - 1 ? 0 : currentIndex + 1) :
+    (currentIndex === 0 ? total - 1 : currentIndex - 1);
 
-    try {
-      // Preload hero
-      const targetProject = projects[targetIndex];
-      const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
-      console.log('📸 Preloading image:', heroSrc);
-      await preloadImage(heroSrc);
+  try {
+    // Preload hero
+    const targetProject = projects[targetIndex];
+    const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
+    console.log('📸 Preloading image:', heroSrc);
+    await preloadImage(heroSrc);
 
-      if (preferReduced) {
-        console.log('⚡ Reduced motion - direct swap');
-        setCurrentIndex(targetIndex);
-        setTimeout(() => {
-          const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-          if (title && typeof title.focus === 'function') title.focus();
-        }, 20);
-        return;
-      }
-
-      // 1) Scroll to top
-      console.log('⬆️ Scrolling to top');
-      await Promise.race([
-        smoothScrollToTop(modal, 650, false), 
-        new Promise(r => setTimeout(r, 1000))
-      ]);
-
-      // 2) Fade out current content
-      const contentEl = modal.querySelector(`.${styles.modalContent}`);
-      if (!contentEl) {
-        console.warn('⚠️ Content element not found, direct swap');
-        setCurrentIndex(targetIndex);
-        return;
-      }
-
-      console.log('🌫️ Fading out current content');
-      contentEl.classList.add(styles.fading);
-
-      // Wait for fade-out transition
-      await Promise.race([
-        waitForTransition(contentEl, 700, 'opacity'),
-        new Promise(r => setTimeout(r, 900))
-      ]);
-
-      // 3) Swap content
-      console.log('🔄 Swapping content to index:', targetIndex);
+    if (preferReduced) {
+      console.log('⚡ Reduced motion - direct swap');
       setCurrentIndex(targetIndex);
-
-      // → espera o React atualizar o DOM (duplo rAF) e re-seleciona o elemento
-      await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
-      
-      let newContentEl = modal.querySelector(`.${styles.modalContent}`);
-      if (!newContentEl) {
-        console.warn('⚠️ new content element not found after setCurrentIndex, giving up swap');
-        return;
-      }
-
-      // small reflow to ensure class state applied
-      newContentEl.offsetHeight;
-      await new Promise(res => setTimeout(res, 10));
-
-      // 4) Fade in new content (remover classe no novo elemento)
-      console.log('✨ Fading in new content');
-      
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          console.log('DEBUG removing fading class from NEW element...');
-          newContentEl.classList.remove(styles.fading);
-          console.log('DEBUG new classList after remove:', newContentEl.classList.toString());
-        });
-      });
-
-      // aguarda transição no novo elemento (use 'all' para ser mais permissivo)
-      await Promise.race([
-        waitForTransition(newContentEl, 900, 'all'),
-        new Promise(r => setTimeout(r, 1100))
-      ]);
-
-      // 5) Reveal hero
-      console.log('🎭 Revealing hero');
-      const hero = modal.querySelector('.modal-hero');
-      if (hero) {
-        hero.classList.remove('modal-hero--visible');
-        setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
-      }
-
-      console.log('✅ Navigation completed successfully');
-
-      // Focus management
-      console.log('🎯 Focus set on title');
       setTimeout(() => {
         const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
         if (title && typeof title.focus === 'function') title.focus();
-      }, 320);
-
-    } catch (err) {
-      console.error('❌ navigateTo error:', err);
-      setCurrentIndex(targetIndex); // fallback
-    } finally {
-      clearTimeout(safety);
-      animRef.current.isAnimating = false;
-      animRef.current.suppressScroll = false;
-      console.log('🏁 Animation flags reset');
+      }, 20);
+      return;
     }
-  }, [currentIndex, projects, preloadImage, smoothScrollToTop, waitForTransition]);
+
+    // 1) Scroll to top
+    console.log('⬆️ Scrolling to top');
+    await Promise.race([
+      smoothScrollToTop(modal, 650, false), 
+      new Promise(r => setTimeout(r, 1000))
+    ]);
+
+    // 2) Fade out current content
+    const contentEl = modal.querySelector(`.${styles.modalContent}`);
+    if (!contentEl) {
+      console.warn('⚠️ Content element not found, direct swap');
+      setCurrentIndex(targetIndex);
+      return;
+    }
+
+    console.log('🌫️ Fading out current content');
+    contentEl.classList.add(styles.fading);
+
+    // Wait for fade-out transition
+    await Promise.race([
+      waitForTransition(contentEl, 700, 'opacity'),
+      new Promise(r => setTimeout(r, 900))
+    ]);
+
+    // 3) Swap content
+    console.log('🔄 Swapping content to index:', targetIndex);
+    setCurrentIndex(targetIndex);
+
+    // → espera o React atualizar o DOM (duplo rAF) e re-seleciona o elemento
+    await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+    
+    let newContentEl = modal.querySelector(`.${styles.modalContent}`);
+    if (!newContentEl) {
+      console.warn('⚠️ new content element not found after setCurrentIndex, giving up swap');
+      return;
+    }
+
+    // small reflow to ensure class state applied
+    newContentEl.offsetHeight;
+    await new Promise(res => setTimeout(res, 10));
+
+    // 4) Fade in new content (remover classe no novo elemento)
+    console.log('✨ Fading in new content');
+    
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        console.log('DEBUG removing fading class from NEW element...');
+        newContentEl.classList.remove(styles.fading);
+        console.log('DEBUG new classList after remove:', newContentEl.classList.toString());
+      });
+    });
+
+    // aguarda transição no novo elemento (use 'all' para ser mais permissivo)
+    await Promise.race([
+      waitForTransition(newContentEl, 900, 'all'),
+      new Promise(r => setTimeout(r, 1100))
+    ]);
+
+    // 5) Reveal hero
+    console.log('🎭 Revealing hero');
+    const hero = modal.querySelector('.modal-hero');
+    if (hero) {
+      hero.classList.remove('modal-hero--visible');
+      setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
+    }
+
+    console.log('✅ Navigation completed successfully');
+
+    // Focus management
+    console.log('🎯 Focus set on title');
+    setTimeout(() => {
+      const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
+      if (title && typeof title.focus === 'function') title.focus();
+    }, 320);
+
+  } catch (err) {
+    console.error('❌ navigateTo error:', err);
+    setCurrentIndex(targetIndex); // fallback
+  } finally {
+    clearTimeout(safety);
+    animRef.current.isAnimating = false;
+    animRef.current.suppressScroll = false;
+    console.log('🏁 Animation flags reset');
+  }
+}, [currentIndex, projects, preloadImage, smoothScrollToTop, waitForTransition]);
 
   // ================================
   // EXISTING MODAL LOGIC (PRESERVED)
