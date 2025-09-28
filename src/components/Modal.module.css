@@ -10,9 +10,9 @@
   transform: translateZ(0); /* Force GPU layer */
 }
 
-/* Estado de fade durante transição */
-.modalContent.fading {
-  opacity: 0;
+/* Estado de fade durante transição - classe exportada para CSS Modules */
+.fading {
+  opacity: 0 !important;
   pointer-events: none;
   -webkit-user-select: none;
   -moz-user-select: none;

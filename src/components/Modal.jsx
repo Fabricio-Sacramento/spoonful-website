@@ -67,38 +67,35 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   }, []);
 
   /**
-   * Wait for CSS transition end with fallback timer - IMPROVED
-   */
-  const waitForTransition = useCallback((el, timeout = 560) => {
+   * Wait for CSS transition end with fallback timer - IMPROVED */
+  // waitForTransition tolerante (aceita 'all' como wildcard)
+  const waitForTransition = useCallback((el, timeout = 800, property = 'opacity') => {
     return new Promise((resolve) => {
-      if (!el) {
-        console.warn('⚠️ waitForTransition: no element provided');
-        return resolve();
-      }
-      
+      if (!el) return resolve();
+
+      const cs = window.getComputedStyle(el);
+      const durations = (cs.transitionDuration || '0s').split(',').map(s => parseFloat(s) || 0);
+      const maxDuration = durations.length ? Math.max(...durations) * 1000 : 0;
+      if (maxDuration <= 0) return resolve();
+
       let done = false;
       const onEnd = (e) => {
-        // Only handle transitions on the target element
-        if (e && e.target !== el) return;
+        if (!e || e.target !== el) return;
+        if (property && property !== 'all' && e.propertyName !== property) return;
         if (done) return;
         done = true;
         el.removeEventListener('transitionend', onEnd);
         clearTimeout(timer);
-        console.log('✅ Transition completed via event');
         resolve();
       };
-      
-      // Listen for transition end
-      el.addEventListener('transitionend', onEnd, { once: true });
-      
-      // Safety fallback timer
+
+      el.addEventListener('transitionend', onEnd);
       const timer = setTimeout(() => {
         if (done) return;
         done = true;
         el.removeEventListener('transitionend', onEnd);
-        console.warn('⚠️ Transition completed via timeout fallback');
         resolve();
-      }, timeout + 100); // Extra 100ms buffer
+      }, Math.max(timeout, Math.round(maxDuration + 80)));
     });
   }, []);
 
@@ -149,8 +146,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   }, []);
 
   /**
-   * Main navigation orchestrator - WITH SAFETY MECHANISMS
-   */
+   * Main navigation orchestrator - WITH SAFETY MECHANISMS */
   // navigateTo simplificado - apenas fade, sem slides laterais
   const navigateTo = useCallback(async (direction) => {
     if (animRef.current.isAnimating) {
@@ -208,37 +204,46 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
 
       console.log('🌫️ Fading out current content');
-      contentEl.classList.add('fading');
+      contentEl.classList.add(styles.fading);
 
       // Wait for fade-out transition
       await Promise.race([
-        waitForTransition(contentEl, 500, 'opacity'),
-        new Promise(r => setTimeout(r, 600))
+        waitForTransition(contentEl, 700, 'opacity'),
+        new Promise(r => setTimeout(r, 900))
       ]);
 
       // 3) Swap content
       console.log('🔄 Swapping content to index:', targetIndex);
       setCurrentIndex(targetIndex);
 
-      // Force reflow so new content is rendered
-      contentEl.offsetHeight;
+      // → espera o React atualizar o DOM (duplo rAF) e re-seleciona o elemento
+      await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+      
+      let newContentEl = modal.querySelector(`.${styles.modalContent}`);
+      if (!newContentEl) {
+        console.warn('⚠️ new content element not found after setCurrentIndex, giving up swap');
+        return;
+      }
 
-      // 4) Fade in new content
+      // small reflow to ensure class state applied
+      newContentEl.offsetHeight;
+      await new Promise(res => setTimeout(res, 10));
+
+      // 4) Fade in new content (remover classe no novo elemento)
       console.log('✨ Fading in new content');
       
-      // Use requestAnimationFrame for reliable timing
-      await new Promise(resolve => requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          // Remove fading class to trigger CSS transition back to opacity: 1
-          contentEl.classList.remove('fading');
-          resolve();
+          console.log('DEBUG removing fading class from NEW element...');
+          newContentEl.classList.remove(styles.fading);
+          console.log('DEBUG new classList after remove:', newContentEl.classList.toString());
         });
-      }));
+      });
 
-      // Wait for fade-in transition
+      // aguarda transição no novo elemento (use 'all' para ser mais permissivo)
       await Promise.race([
-        waitForTransition(contentEl, 500, 'opacity'),
-        new Promise(r => setTimeout(r, 600))
+        waitForTransition(newContentEl, 900, 'all'),
+        new Promise(r => setTimeout(r, 1100))
       ]);
 
       // 5) Reveal hero
