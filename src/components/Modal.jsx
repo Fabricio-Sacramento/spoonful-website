@@ -1,9 +1,54 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import styles from './Modal.module.css'; // Import CSS Module
+import styles from './Modal.module.css';
 
 const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
+
+// ================================
+// HELPERS
+// ================================
+
+const nextPaint = () => 
+  new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+
+const waitForTransition = (el, timeout = 800, property = 'opacity') => {
+  return new Promise((resolve) => {
+    if (!el) return resolve({ via: 'no-element' });
+
+    const cs = window.getComputedStyle(el);
+    const durations = (cs.transitionDuration || '0').split(',').map(s => parseFloat(s) || 0);
+    const maxDuration = Math.max(...durations) * 1000;
+    
+    if (maxDuration <= 0) return resolve({ via: 'no-transition' });
+
+    let done = false;
+    
+    const onEnd = (e) => {
+      if (property !== 'all' && e.propertyName !== property) return;
+      if (e.target !== el) return;
+      if (done) return;
+      
+      done = true;
+      el.removeEventListener('transitionend', onEnd);
+      clearTimeout(timer);
+      resolve({ via: 'event', property: e.propertyName });
+    };
+    
+    el.addEventListener('transitionend', onEnd, { passive: true });
+
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      el.removeEventListener('transitionend', onEnd);
+      resolve({ via: 'timeout' });
+    }, Math.max(timeout, maxDuration + 80));
+  });
+};
+
+// ================================
+// MODAL COMPONENT
+// ================================
 
 const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const modalRef = useRef(null);
@@ -11,22 +56,16 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const rafRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Animation control refs
+  const [fadingState, setFadingState] = useState('visible');
+  
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
   const closeTimersRef = useRef({ hide: null, overlay: null, raf: null });
   const prevFocusRef = useRef(null);
+  const isMountedRef = useRef(true);
 
-  // ================================
-  // NAVIGATION HELPERS
-  // ================================
-  
-  /**
-   * Smooth scroll to top with Promise
-   */
   const smoothScrollToTop = useCallback((el, duration = 650, preferReduced = false) => {
     return new Promise((resolve) => {
       if (!el || preferReduced) {
-        // Instant scroll for reduced motion
         el.scrollTop = 0;
         return resolve();
       }
@@ -40,7 +79,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       const animate = (now) => {
         const elapsed = now - startTime;
         const t = Math.min(1, elapsed / duration);
-        // easeInOutQuad
         const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         el.scrollTop = Math.round(start * (1 - eased));
         
@@ -48,14 +86,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           animId = requestAnimationFrame(animate);
         } else {
           animId = null;
+          clearTimeout(safetyId); // NOVO
           resolve();
         }
       };
       
       animId = requestAnimationFrame(animate);
 
-      // Safety timeout
-      setTimeout(() => {
+      const safetyId = setTimeout(() => {
         if (animId) {
           cancelAnimationFrame(animId);
           animId = null;
@@ -66,42 +104,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     });
   }, []);
 
-  /**
-   * Wait for CSS transition end with fallback timer - IMPROVED */
-  // waitForTransition tolerante (aceita 'all' como wildcard)
-  const waitForTransition = useCallback((el, timeout = 800, property = 'opacity') => {
-    return new Promise((resolve) => {
-      if (!el) return resolve();
-
-      const cs = window.getComputedStyle(el);
-      const durations = (cs.transitionDuration || '0s').split(',').map(s => parseFloat(s) || 0);
-      const maxDuration = durations.length ? Math.max(...durations) * 1000 : 0;
-      if (maxDuration <= 0) return resolve();
-
-      let done = false;
-      const onEnd = (e) => {
-        if (!e || e.target !== el) return;
-        if (property && property !== 'all' && e.propertyName !== property) return;
-        if (done) return;
-        done = true;
-        el.removeEventListener('transitionend', onEnd);
-        clearTimeout(timer);
-        resolve();
-      };
-
-      el.addEventListener('transitionend', onEnd);
-      const timer = setTimeout(() => {
-        if (done) return;
-        done = true;
-        el.removeEventListener('transitionend', onEnd);
-        resolve();
-      }, Math.max(timeout, Math.round(maxDuration + 80)));
-    });
-  }, []);
-
-  /**
-   * Preload image Promise - WITH MEMORY CLEANUP
-   */
   const preloadImage = useCallback((src) => {
     return new Promise((resolve) => {
       if (!src) {
@@ -111,13 +113,15 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       
       const img = new Image();
       let loaded = false;
+      let timerId = null; // NOVO
       
       const cleanup = () => {
         if (loaded) return;
         loaded = true;
+        if (timerId) clearTimeout(timerId); // NOVO
         img.onload = null;
         img.onerror = null;
-        img.src = ''; // Clear src to potentially free memory
+        img.src = '';
       };
       
       img.onload = () => {
@@ -129,160 +133,162 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       img.onerror = () => {
         console.warn('📸 Image preload failed:', src);
         cleanup();
-        resolve(); // Don't fail on image errors
+        resolve();
       };
       
-      // Safety timeout for image loading
-      setTimeout(() => {
+      timerId = setTimeout(() => {
         if (!loaded) {
           console.warn('📸 Image preload timeout:', src);
           cleanup();
           resolve();
         }
-      }, 3000); // 3 second timeout for image loading
+      }, 3000);
       
       img.src = src;
     });
   }, []);
 
-  /**
-   * Main navigation orchestrator - WITH SAFETY MECHANISMS */
-  // navigateTo simplificado - apenas fade, sem slides laterais
-const navigateTo = useCallback(async (direction) => {
-  if (animRef.current.isAnimating) {
-    console.warn('🚫 Navigation blocked - animation in progress');
-    return;
-  }
-  
-  const modal = modalRef.current;
-  if (!modal) return;
+  const navigateTo = useCallback(async (direction) => {
+    if (!['next', 'prev'].includes(direction)) {
+      console.warn('🚫 Invalid direction:', direction);
+      return;
+    }
+    
+    if (animRef.current.isAnimating) {
+      console.warn('🚫 Navigation blocked - animation in progress');
+      return;
+    }
+    
+    const modal = modalRef.current;
+    if (!modal) return;
 
-  const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  animRef.current.isAnimating = true;
-  animRef.current.suppressScroll = true;
-  
-  const safety = setTimeout(() => {
-    animRef.current.isAnimating = false;
-    animRef.current.suppressScroll = false;
-  }, 5000);
+    const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    animRef.current.isAnimating = true;
+    animRef.current.suppressScroll = true;
+    
+    const safety = setTimeout(() => {
+      animRef.current.isAnimating = false;
+      animRef.current.suppressScroll = false;
+      if (!isMountedRef.current) return;
+      setFadingState('visible');
+    }, 5000);
 
-  const total = projects.length;
-  const targetIndex = direction === 'next' ? 
-    (currentIndex === total - 1 ? 0 : currentIndex + 1) :
-    (currentIndex === 0 ? total - 1 : currentIndex - 1);
+    const total = projects.length;
+    const targetIndex = direction === 'next' ? 
+      (currentIndex === total - 1 ? 0 : currentIndex + 1) :
+      (currentIndex === 0 ? total - 1 : currentIndex - 1);
 
-  try {
-    // Preload hero
-    const targetProject = projects[targetIndex];
-    const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
-    console.log('📸 Preloading image:', heroSrc);
-    await preloadImage(heroSrc);
+    try {
+      const targetProject = projects[targetIndex];
+      const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
+      console.log('📸 Preloading image:', heroSrc);
+      await preloadImage(heroSrc);
 
-    if (preferReduced) {
-      console.log('⚡ Reduced motion - direct swap');
+      if (preferReduced) {
+        console.log('⚡ Reduced motion - direct swap');
+        clearTimeout(safety); // CRÍTICO: limpar safety antes de return
+        if (isMountedRef.current) {
+          setCurrentIndex(targetIndex);
+        }
+        setTimeout(() => {
+          const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
+          if (title && typeof title.focus === 'function') title.focus();
+        }, 20);
+        // Reset flags antes de sair
+        animRef.current.isAnimating = false;
+        animRef.current.suppressScroll = false;
+        return;
+      }
+
+      console.log('⬆️ Scrolling to top');
+      await Promise.race([
+        smoothScrollToTop(modal, 650, false), 
+        new Promise(r => setTimeout(r, 1000))
+      ]);
+
+      console.log('🌫️ Fading out');
+      if (!isMountedRef.current) return;
+      setFadingState('fading');
+      await nextPaint();
+      
+      const contentEl = modal.querySelector(`.${styles.modalContent}`);
+      if (!contentEl) {
+        console.warn('⚠️ Content element not found');
+        if (isMountedRef.current) setCurrentIndex(targetIndex); // MODIFICADO
+        return;
+      }
+      
+      const fadeOutResult = await waitForTransition(contentEl, 700, 'opacity');
+      console.log('Fade-out result:', fadeOutResult);
+
+      console.log('🔄 Swapping content to index:', targetIndex);
+      if (!isMountedRef.current) return;
       setCurrentIndex(targetIndex);
+      await nextPaint();
+
+      console.log('✨ Fading in');
+      if (!isMountedRef.current) return;
+      setFadingState('visible');
+      await nextPaint();
+      
+      if (!modalRef.current) { // NOVO
+        console.warn('⚠️ Modal ref lost after swap');
+        return;
+      }
+      const newContentEl = modal.querySelector(`.${styles.modalContent}`);
+      if (!newContentEl) {
+        console.warn('⚠️ New content element not found');
+        return;
+      }
+      
+      const fadeInResult = await waitForTransition(newContentEl, 700, 'opacity');
+      console.log('Fade-in result:', fadeInResult);
+      console.log('🔍 DOM STATE CHECK:', {
+      currentIndex,
+      projectTitle: currentProject.title,
+      heroTitle: modal.querySelector('.modal-hero h1')?.textContent,
+      prevProjectTitle: prevProject.title,
+      nextProjectTitle: nextProject.title,
+      fadingState,
+      modalContentOpacity: window.getComputedStyle(newContentEl).opacity
+       });
+
+      console.log('🎭 Revealing hero');
+      const hero = modal.querySelector('.modal-hero');
+      if (hero) {
+        hero.classList.remove('modal-hero--visible');
+        setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
+      }
+
+      console.log('✅ Navigation completed successfully');
+
       setTimeout(() => {
         const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-        if (title && typeof title.focus === 'function') title.focus();
-      }, 20);
-      return;
+        if (title && typeof title.focus === 'function') {
+          console.log('🎯 Focus set on title');
+          title.focus();
+        }
+      }, 320);
+
+    } catch (err) {
+      console.error('❌ navigateTo error:', err);
+      if (isMountedRef.current) {
+        setCurrentIndex(targetIndex);
+      }
+    } finally {
+      clearTimeout(safety);
+      animRef.current.isAnimating = false;
+      animRef.current.suppressScroll = false;
+      if (isMountedRef.current) {
+        setFadingState('visible');
+      }
+      console.log('🏁 Animation flags reset');
     }
+  }, [currentIndex, projects, preloadImage, smoothScrollToTop]);
 
-    // 1) Scroll to top
-    console.log('⬆️ Scrolling to top');
-    await Promise.race([
-      smoothScrollToTop(modal, 650, false), 
-      new Promise(r => setTimeout(r, 1000))
-    ]);
-
-    // 2) Fade out current content
-    const contentEl = modal.querySelector(`.${styles.modalContent}`);
-    if (!contentEl) {
-      console.warn('⚠️ Content element not found, direct swap');
-      setCurrentIndex(targetIndex);
-      return;
-    }
-
-    console.log('🌫️ Fading out current content');
-    contentEl.classList.add(styles.fading);
-
-    // Wait for fade-out transition
-    await Promise.race([
-      waitForTransition(contentEl, 700, 'opacity'),
-      new Promise(r => setTimeout(r, 900))
-    ]);
-
-    // 3) Swap content
-    console.log('🔄 Swapping content to index:', targetIndex);
-    setCurrentIndex(targetIndex);
-
-    // → espera o React atualizar o DOM (duplo rAF) e re-seleciona o elemento
-    await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
-    
-    let newContentEl = modal.querySelector(`.${styles.modalContent}`);
-    if (!newContentEl) {
-      console.warn('⚠️ new content element not found after setCurrentIndex, giving up swap');
-      return;
-    }
-
-    // small reflow to ensure class state applied
-    newContentEl.offsetHeight;
-    await new Promise(res => setTimeout(res, 10));
-
-    // 4) Fade in new content (remover classe no novo elemento)
-    console.log('✨ Fading in new content');
-    
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        console.log('DEBUG removing fading class from NEW element...');
-        newContentEl.classList.remove(styles.fading);
-        console.log('DEBUG new classList after remove:', newContentEl.classList.toString());
-      });
-    });
-
-    // aguarda transição no novo elemento (use 'all' para ser mais permissivo)
-    await Promise.race([
-      waitForTransition(newContentEl, 900, 'all'),
-      new Promise(r => setTimeout(r, 1100))
-    ]);
-
-    // 5) Reveal hero
-    console.log('🎭 Revealing hero');
-    const hero = modal.querySelector('.modal-hero');
-    if (hero) {
-      hero.classList.remove('modal-hero--visible');
-      setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
-    }
-
-    console.log('✅ Navigation completed successfully');
-
-    // Focus management
-    console.log('🎯 Focus set on title');
-    setTimeout(() => {
-      const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-      if (title && typeof title.focus === 'function') title.focus();
-    }, 320);
-
-  } catch (err) {
-    console.error('❌ navigateTo error:', err);
-    setCurrentIndex(targetIndex); // fallback
-  } finally {
-    clearTimeout(safety);
-    animRef.current.isAnimating = false;
-    animRef.current.suppressScroll = false;
-    console.log('🏁 Animation flags reset');
-  }
-}, [currentIndex, projects, preloadImage, smoothScrollToTop, waitForTransition]);
-
-  // ================================
-  // EXISTING MODAL LOGIC (PRESERVED)
-  // ================================
-
-  // Handle close animation - Phase 3 Refinada (staggered + fluida)
   const handleClose = useCallback(() => {
-    if (animRef.current.isAnimating) return; // Guard contra múltiplos handleClose
+    if (animRef.current.isAnimating) return;
 
-    // Limpar timers antigos por segurança
     if (closeTimersRef.current.overlay) clearTimeout(closeTimersRef.current.overlay);
     if (closeTimersRef.current.hide) clearTimeout(closeTimersRef.current.hide);
     if (closeTimersRef.current.raf) cancelAnimationFrame(closeTimersRef.current.raf);
@@ -295,108 +301,107 @@ const navigateTo = useCallback(async (direction) => {
     }
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const overlayDuration = prefersReducedMotion ? 120 : 420; // Meio termo: 420ms
-    const staggerDelays = prefersReducedMotion ? [0, 15, 30] : [0, 60, 120]; // Reverse order delays
+    const overlayDuration = prefersReducedMotion ? 120 : 420;
+    const staggerDelays = prefersReducedMotion ? [0, 15, 30] : [0, 60, 120];
 
-    // Lock interactions and set flags
     animRef.current.isAnimating = true;
     animRef.current.suppressScroll = true;
 
     const hero = modal.querySelector('.modal-hero');
     
     if (hero) {
-      // Start with hero staggered hide (reverse order)
       const items = Array.from(hero.querySelectorAll('[data-reveal]'));
       
-      // Apply reverse stagger delays
       items.forEach((el, i) => {
-        const reverseIndex = items.length - 1 - i; // Reverse order
+        const reverseIndex = items.length - 1 - i;
         const delay = staggerDelays[reverseIndex] ?? (staggerDelays[staggerDelays.length - 1] + (reverseIndex - staggerDelays.length + 1) * 40);
         el.style.transitionDelay = `${delay}ms`;
       });
 
-      // Add hiding class to trigger staggered hide
       hero.classList.add('modal-hero--hiding');
       hero.classList.remove('modal-hero--visible');
 
-      // Start overlay exit when hero hiding is 60% complete
       const maxStaggerDelay = Math.max(...staggerDelays.slice(0, Math.min(items.length, staggerDelays.length)));
-      const heroHideDuration = Math.round(320 + maxStaggerDelay); // 320ms transition + stagger
+      const heroHideDuration = Math.round(320 + maxStaggerDelay);
       const overlayStartTime = Math.round(heroHideDuration * 0.6);
 
       closeTimersRef.current.overlay = window.setTimeout(() => {
-        // Start overlay exit animation
         modal.classList.add('modal-overlay--exiting');
         modal.classList.remove('modal-overlay--visible');
       }, overlayStartTime);
 
-      // Call parent close after everything completes
       const totalDuration = Math.max(overlayStartTime + overlayDuration, heroHideDuration);
       
       closeTimersRef.current.hide = window.setTimeout(() => {
-        // Clean up stagger delays
         items.forEach(el => {
           el.style.transitionDelay = '';
         });
 
-        // Clear flags so cleanup effect can run clean
         animRef.current.isAnimating = false;
         animRef.current.suppressScroll = false;
 
-        // Restore focus before calling onClose
         if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
           prevFocusRef.current.focus();
         }
 
-        // Reset closeTimersRef após finalizar
         closeTimersRef.current = { hide: null, overlay: null, raf: null };
-
-        // Call external onClose to actually unmount / hide modal
         onClose();
       }, totalDuration);
 
     } else {
-      // No hero -> just do overlay exit
       modal.classList.add('modal-overlay--exiting');
       modal.classList.remove('modal-overlay--visible');
 
       closeTimersRef.current.hide = window.setTimeout(() => {
+        // Hero cleanup completo
+        const hero = modal.querySelector('.modal-hero');
+        if (hero) {
+          hero.classList.remove('modal-hero--visible', 'modal-hero--hiding');
+          hero.querySelectorAll('[data-reveal]').forEach(el => {
+            el.style.transitionDelay = '';
+          });
+        }
+
         animRef.current.isAnimating = false;
         animRef.current.suppressScroll = false;
-        
-        // Restore focus
+
         if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
           prevFocusRef.current.focus();
         }
 
-        // Reset closeTimersRef após finalizar
         closeTimersRef.current = { hide: null, overlay: null, raf: null };
-        
         onClose();
       }, overlayDuration);
     }
   }, [onClose]);
 
-  // Focus management and cleanup
   useEffect(() => {
     if (isOpen) {
-      // Capture focus before opening
       prevFocusRef.current = document.activeElement;
     } else {
-      // Optional: restore focus on close (if component still mounted)
       if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
         prevFocusRef.current.focus();
       }
     }
   }, [isOpen]);
 
-  // Cleanup close timers on unmount or when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      console.log('🧹 Modal closed - resetting all state');
+      if (isMountedRef.current) {
+        setFadingState('visible');
+      }
+      // Reset animation flags
+      animRef.current.isAnimating = false;
+      animRef.current.suppressScroll = false;
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     return () => {
       if (closeTimersRef.current.raf != null) cancelAnimationFrame(closeTimersRef.current.raf);
       if (closeTimersRef.current.overlay != null) clearTimeout(closeTimersRef.current.overlay);
       if (closeTimersRef.current.hide != null) clearTimeout(closeTimersRef.current.hide);
-      // Reset
       closeTimersRef.current = { hide: null, overlay: null, raf: null };
     };
   }, []);
@@ -405,14 +410,12 @@ const navigateTo = useCallback(async (direction) => {
     if (!isOpen || !modalRef.current) return;
 
     const modal = modalRef.current;
-    const currentAnimRef = animRef.current; // Capture ref value at effect start
+    const currentAnimRef = animRef.current;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Timings
     const overlayDuration = prefersReducedMotion ? 120 : 450;
     const staggerDelays = prefersReducedMotion ? [0, 20, 40] : [0, 90, 160];
 
-    // Guard refs para cleanup
     const rafIdRef = { id: null };
     const revealTimeoutRef = { id: null };
     const releaseTimeoutRef = { id: null };
@@ -423,7 +426,6 @@ const navigateTo = useCallback(async (direction) => {
 
     modal.classList.add('modal-overlay--entering');
 
-    // Vamos usar requestAnimationFrame mas guardar o id no rafIdRef
     rafIdRef.id = requestAnimationFrame(() => {
       modal.classList.remove('modal-overlay--entering');
       modal.classList.add('modal-overlay--visible');
@@ -437,36 +439,31 @@ const navigateTo = useCallback(async (direction) => {
           el.style.transitionDelay = `${delay}ms`;
         });
 
-        // Start reveal when overlay is 70% complete
         const revealStartTime = Math.round(overlayDuration * 0.7);
 
         revealTimeoutRef.id = window.setTimeout(() => {
           hero.classList.add('modal-hero--visible');
 
-          // Release scroll after overlay completes + small buffer
           releaseTimeoutRef.id = window.setTimeout(() => {
             currentAnimRef.isAnimating = false;
             currentAnimRef.suppressScroll = false;
           }, Math.round(overlayDuration * 0.3));
         }, revealStartTime);
 
-        // Focus management: focus close button after overlay fully done (safe)
         const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
         if (closeButton) {
           focusTimeoutRef.id = window.setTimeout(() => closeButton.focus(), overlayDuration + 150);
         }
       } else {
-        // No hero -> just release after overlayDuration
         releaseTimeoutRef.id = window.setTimeout(() => {
           currentAnimRef.isAnimating = false;
           currentAnimRef.suppressScroll = false;
         }, overlayDuration);
       }
-      closeTimersRef.current.raf = rafIdRef.id; // ← NOVA LINHA
+      closeTimersRef.current.raf = rafIdRef.id;
     });
 
     return () => {
-      // cleanup tudo
       if (rafIdRef.id != null) cancelAnimationFrame(rafIdRef.id);
       if (revealTimeoutRef.id != null) clearTimeout(revealTimeoutRef.id);
       if (releaseTimeoutRef.id != null) clearTimeout(releaseTimeoutRef.id);
@@ -476,21 +473,20 @@ const navigateTo = useCallback(async (direction) => {
 
       const hero = modal.querySelector('.modal-hero');
       if (hero) {
-        hero.classList.remove('modal-hero--visible');
+        hero.classList.remove('modal-hero--visible', 'modal-hero--hiding');
         hero.querySelectorAll('[data-reveal]').forEach(el => {
           el.style.transitionDelay = '';
+          el.style.opacity = '';
+          el.style.transform = '';
         });
       }
 
-      // garante reset das flags (importante se fechar no meio) - usa captured ref
       currentAnimRef.isAnimating = false;
       currentAnimRef.suppressScroll = false;
-
-      closeTimersRef.current.raf = null; // ← NOVA LINHA
+      closeTimersRef.current.raf = null;
     };
   }, [isOpen]);
 
-  // Scroll-driven animation for first image
   useEffect(() => {
     if (!isOpen || !firstImageRef.current || !modalRef.current) return;
 
@@ -570,7 +566,6 @@ const navigateTo = useCallback(async (direction) => {
     };
   }, [isOpen, currentIndex]);
 
-  // Find current project index
   useEffect(() => {
     if (project && projects.length > 0) {
       const index = projects.findIndex(p => p.id === project.id);
@@ -580,7 +575,6 @@ const navigateTo = useCallback(async (direction) => {
     }
   }, [project, projects]);
 
-  // UPDATED: Navigation functions now use navigateTo
   const goToPrevious = useCallback(() => {
     navigateTo('prev');
   }, [navigateTo]);
@@ -589,7 +583,6 @@ const navigateTo = useCallback(async (direction) => {
     navigateTo('next');
   }, [navigateTo]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isOpen) return;
@@ -613,7 +606,6 @@ const navigateTo = useCallback(async (direction) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleClose, goToPrevious, goToNext]);
 
-  // Lock body scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -629,7 +621,25 @@ const navigateTo = useCallback(async (direction) => {
     };
   }, [isOpen]);
 
-  // Close on overlay click
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const { currentProject, prevProject, nextProject } = useMemo(() => {
+    const current = projects[currentIndex] || projects[0];
+    const prevIdx = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
+    const nextIdx = currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
+    
+    return {
+      currentProject: current,
+      prevProject: projects[prevIdx],
+      nextProject: projects[nextIdx]
+    };
+  }, [currentIndex, projects]);
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       handleClose();
@@ -638,16 +648,10 @@ const navigateTo = useCallback(async (direction) => {
 
   if (!isOpen || projects.length === 0) return null;
 
-  const currentProject = projects[currentIndex];
-  const prevProject = projects[currentIndex === 0 ? projects.length - 1 : currentIndex - 1];
-  const nextProject = projects[currentIndex === projects.length - 1 ? 0 : currentIndex + 1];
-
-  // NOVA LÓGICA: Preparar imagens da galeria com fallbacks seguros
   const getGalleryImages = (project) => {
     if (project.galleryImages && project.galleryImages.length >= 5) {
       return project.galleryImages.slice(0, 5);
     }
-    // Fallback: usar imagem principal para todas as 5 posições
     return Array(5).fill(project.image);
   };
 
@@ -670,7 +674,6 @@ const navigateTo = useCallback(async (direction) => {
         boxSizing: 'border-box'
       }}
     >
-      {/* Close Button - OUTSIDE MODAL CONTENT for stability */}
       <button 
         onClick={handleClose}
         style={{
@@ -698,9 +701,7 @@ const navigateTo = useCallback(async (direction) => {
         ×
       </button>
 
-      {/* MODAL CONTENT WRAPPER - For transitions */}
-      <div className={styles.modalContent}>
-        {/* HERO SECTION - AGORA COM DADOS DINÂMICOS */}
+      <div className={`${styles.modalContent} ${fadingState === 'fading' ? styles.fading : ''}`}>
         <div className="modal-hero" style={{
           width: '100%',
           height: '50vh',
@@ -714,7 +715,6 @@ const navigateTo = useCallback(async (direction) => {
           gap: '0.5rem',
           overflow: 'hidden'
         }}>
-          {/* Tags - DINAMIZADAS */}
           <div data-reveal style={{
             color: 'var(--primary-green)',
             fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -726,7 +726,6 @@ const navigateTo = useCallback(async (direction) => {
             {currentProject.tags?.join(' • ') || 'PROJECT'}
           </div>
 
-          {/* Title - JÁ DINÂMICO with focus target */}
           <h1 
             data-reveal 
             data-focus-target
@@ -744,9 +743,7 @@ const navigateTo = useCallback(async (direction) => {
             {currentProject.title}
           </h1>
 
-          {/* Description Row - DINAMIZADA */}
           <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
-            {/* Left Column - Title & Description (50%) */}
             <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h2 style={{
                 color: 'var(--neutral-light)',
@@ -771,7 +768,6 @@ const navigateTo = useCallback(async (direction) => {
               </p>
             </div>
 
-            {/* Middle Column - Stacks (25%) - DINAMIZADAS */}
             <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <div>
                 <h3 style={{
@@ -824,7 +820,6 @@ const navigateTo = useCallback(async (direction) => {
               </div>
             </div>
 
-            {/* Right Column - Go Live (25%) */}
             <div style={{ flex: '1' }}>
               {currentProject.projectUrl && (
                 <div>
@@ -864,7 +859,6 @@ const navigateTo = useCallback(async (direction) => {
           </div>
         </div>
 
-        {/* GALLERY SECTION - AGORA COM IMAGENS DINÂMICAS */}
         <div style={{
           backgroundColor: 'var(--neutral-normal)',
           padding: 0,
@@ -874,7 +868,6 @@ const navigateTo = useCallback(async (direction) => {
           boxSizing: 'border-box'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {/* PRIMEIRA IMAGEM - Com animação expansiva */}
             <div 
               ref={firstImageRef}
               style={{
@@ -914,7 +907,6 @@ const navigateTo = useCallback(async (direction) => {
               </div>
             </div>
 
-            {/* IMAGENS 2-5 - Já no estado expandido COM IMAGENS DINÂMICAS */}
             {galleryImages.slice(1).map((imageSrc, i) => (
               <div key={i + 1} style={{
                 width: '100%',
@@ -944,7 +936,6 @@ const navigateTo = useCallback(async (direction) => {
           </div>
         </div>
 
-        {/* NAVIGATION SECTION - Layout 2x2 com refinamentos */}
         <div style={{
           height: '100vh',
           display: 'flex',
@@ -954,13 +945,11 @@ const navigateTo = useCallback(async (direction) => {
           position: 'relative',
           zIndex: 2
         }}>
-          {/* ROW 1 - Previous Project */}
           <div style={{
             height: '50vh',
             display: 'flex',
             width: '100%'
           }}>
-            {/* Previous Project Info - LEFT */}
             <button
               className="modal-navigation-button"
               onClick={goToPrevious}
@@ -1045,7 +1034,6 @@ const navigateTo = useCallback(async (direction) => {
               </span>
             </button>
 
-            {/* Previous Project Image - RIGHT */}
             <div style={{
               width: '50%',
               height: '100%',
@@ -1067,13 +1055,11 @@ const navigateTo = useCallback(async (direction) => {
             </div>
           </div>
 
-          {/* ROW 2 - Next Project */}
           <div style={{
             height: '50vh',
             display: 'flex',
             width: '100%'
           }}>
-            {/* Next Project Image - LEFT */}
             <div style={{
               width: '50%',
               height: '100%',
@@ -1094,7 +1080,6 @@ const navigateTo = useCallback(async (direction) => {
               />
             </div>
 
-            {/* Next Project Info - RIGHT */}
             <button
               className="modal-navigation-button"
               onClick={goToNext}
