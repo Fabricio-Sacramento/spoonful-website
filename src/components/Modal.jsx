@@ -9,9 +9,10 @@ const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
 // HELPERS
 // ================================
 
-const nextPaint = () => 
+const nextPaint = () =>
   new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
 
+// waitForTransition unchanged (robust)
 const waitForTransition = (el, timeout = 800, property = 'opacity') => {
   return new Promise((resolve) => {
     if (!el) return resolve({ via: 'no-element' });
@@ -19,22 +20,22 @@ const waitForTransition = (el, timeout = 800, property = 'opacity') => {
     const cs = window.getComputedStyle(el);
     const durations = (cs.transitionDuration || '0').split(',').map(s => parseFloat(s) || 0);
     const maxDuration = Math.max(...durations) * 1000;
-    
+
     if (maxDuration <= 0) return resolve({ via: 'no-transition' });
 
     let done = false;
-    
+
     const onEnd = (e) => {
       if (property !== 'all' && e.propertyName !== property) return;
       if (e.target !== el) return;
       if (done) return;
-      
+
       done = true;
       el.removeEventListener('transitionend', onEnd);
       clearTimeout(timer);
       resolve({ via: 'event', property: e.propertyName });
     };
-    
+
     el.addEventListener('transitionend', onEnd, { passive: true });
 
     const timer = setTimeout(() => {
@@ -55,10 +56,19 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const firstImageRef = useRef(null);
   const rafRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   const [fadingState, setFadingState] = useState('visible');
-  
+
+  // animRef stays for imperative logic (suppressScroll etc.)
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
+  // mirror animating into state so UI re-renders
+  const [isAnimatingState, setIsAnimatingState] = useState(false);
+  const setAnimating = useCallback((val) => {
+    animRef.current.isAnimating = !!val;
+    // only update state when different (avoid unnecessary renders)
+    setIsAnimatingState(prev => (prev === !!val ? prev : !!val));
+  }, []);
+
   const closeTimersRef = useRef({ hide: null, overlay: null, raf: null });
   const prevFocusRef = useRef(null);
   const isMountedRef = useRef(true);
@@ -81,16 +91,16 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         const t = Math.min(1, elapsed / duration);
         const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         el.scrollTop = Math.round(start * (1 - eased));
-        
+
         if (t < 1) {
           animId = requestAnimationFrame(animate);
         } else {
           animId = null;
-          clearTimeout(safetyId); // NOVO
+          clearTimeout(safetyId);
           resolve();
         }
       };
-      
+
       animId = requestAnimationFrame(animate);
 
       const safetyId = setTimeout(() => {
@@ -110,32 +120,32 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         console.log('📸 No image to preload');
         return resolve();
       }
-      
+
       const img = new Image();
       let loaded = false;
-      let timerId = null; // NOVO
-      
+      let timerId = null;
+
       const cleanup = () => {
         if (loaded) return;
         loaded = true;
-        if (timerId) clearTimeout(timerId); // NOVO
+        if (timerId) clearTimeout(timerId);
         img.onload = null;
         img.onerror = null;
         img.src = '';
       };
-      
+
       img.onload = () => {
         console.log('📸 Image preloaded successfully:', src);
         cleanup();
         resolve();
       };
-      
+
       img.onerror = () => {
         console.warn('📸 Image preload failed:', src);
         cleanup();
         resolve();
       };
-      
+
       timerId = setTimeout(() => {
         if (!loaded) {
           console.warn('📸 Image preload timeout:', src);
@@ -143,7 +153,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           resolve();
         }
       }, 3000);
-      
+
       img.src = src;
     });
   }, []);
@@ -153,28 +163,29 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       console.warn('🚫 Invalid direction:', direction);
       return;
     }
-    
+
     if (animRef.current.isAnimating) {
       console.warn('🚫 Navigation blocked - animation in progress');
       return;
     }
-    
+
     const modal = modalRef.current;
     if (!modal) return;
 
     const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    animRef.current.isAnimating = true;
+    // set both ref and state via helper
+    setAnimating(true);
     animRef.current.suppressScroll = true;
-    
+
     const safety = setTimeout(() => {
-      animRef.current.isAnimating = false;
+      setAnimating(false);
       animRef.current.suppressScroll = false;
       if (!isMountedRef.current) return;
       setFadingState('visible');
     }, 5000);
 
     const total = projects.length;
-    const targetIndex = direction === 'next' ? 
+    const targetIndex = direction === 'next' ?
       (currentIndex === total - 1 ? 0 : currentIndex + 1) :
       (currentIndex === 0 ? total - 1 : currentIndex - 1);
 
@@ -186,7 +197,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
       if (preferReduced) {
         console.log('⚡ Reduced motion - direct swap');
-        clearTimeout(safety); // CRÍTICO: limpar safety antes de return
+        clearTimeout(safety);
         if (isMountedRef.current) {
           setCurrentIndex(targetIndex);
         }
@@ -195,31 +206,31 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           if (title && typeof title.focus === 'function') title.focus();
         }, 20);
         // Reset flags antes de sair
-        animRef.current.isAnimating = false;
+        setAnimating(false);
         animRef.current.suppressScroll = false;
         return;
       }
-
-      console.log('⬆️ Scrolling to top');
-      await Promise.race([
-        smoothScrollToTop(modal, 650, false), 
-        new Promise(r => setTimeout(r, 1000))
-      ]);
 
       console.log('🌫️ Fading out');
       if (!isMountedRef.current) return;
       setFadingState('fading');
       await nextPaint();
-      
+
       const contentEl = modal.querySelector(`.${styles.modalContent}`);
       if (!contentEl) {
         console.warn('⚠️ Content element not found');
-        if (isMountedRef.current) setCurrentIndex(targetIndex); // MODIFICADO
+        if (isMountedRef.current) setCurrentIndex(targetIndex);
         return;
       }
-      
+
       const fadeOutResult = await waitForTransition(contentEl, 700, 'opacity');
       console.log('Fade-out result:', fadeOutResult);
+
+      console.log('⬆️ Scrolling to top');
+      await Promise.race([
+        smoothScrollToTop(modal, 650, false),
+        new Promise(r => setTimeout(r, 1000))
+      ]);
 
       console.log('🔄 Swapping content to index:', targetIndex);
       if (!isMountedRef.current) return;
@@ -230,8 +241,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       if (!isMountedRef.current) return;
       setFadingState('visible');
       await nextPaint();
-      
-      if (!modalRef.current) { // NOVO
+
+      if (!modalRef.current) {
         console.warn('⚠️ Modal ref lost after swap');
         return;
       }
@@ -240,18 +251,16 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         console.warn('⚠️ New content element not found');
         return;
       }
-      
+
       const fadeInResult = await waitForTransition(newContentEl, 700, 'opacity');
       console.log('Fade-in result:', fadeInResult);
       console.log('🔍 DOM STATE CHECK:', {
-      currentIndex,
-      projectTitle: currentProject.title,
-      heroTitle: modal.querySelector('.modal-hero h1')?.textContent,
-      prevProjectTitle: prevProject.title,
-      nextProjectTitle: nextProject.title,
-      fadingState,
-      modalContentOpacity: window.getComputedStyle(newContentEl).opacity
-       });
+        currentIndex,
+        projectTitle: (projects[currentIndex] && projects[currentIndex].title) || undefined,
+        heroTitle: modal.querySelector('.modal-hero h1')?.textContent,
+        fadingState,
+        modalContentOpacity: window.getComputedStyle(newContentEl).opacity
+      });
 
       console.log('🎭 Revealing hero');
       const hero = modal.querySelector('.modal-hero');
@@ -277,14 +286,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
     } finally {
       clearTimeout(safety);
-      animRef.current.isAnimating = false;
+      setAnimating(false);
       animRef.current.suppressScroll = false;
       if (isMountedRef.current) {
         setFadingState('visible');
       }
       console.log('🏁 Animation flags reset');
     }
-  }, [currentIndex, projects, preloadImage, smoothScrollToTop]);
+  }, [currentIndex, projects, preloadImage, smoothScrollToTop, setAnimating]);
 
   const handleClose = useCallback(() => {
     if (animRef.current.isAnimating) return;
@@ -304,14 +313,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     const overlayDuration = prefersReducedMotion ? 120 : 420;
     const staggerDelays = prefersReducedMotion ? [0, 15, 30] : [0, 60, 120];
 
-    animRef.current.isAnimating = true;
+    setAnimating(true);
     animRef.current.suppressScroll = true;
 
     const hero = modal.querySelector('.modal-hero');
-    
+
     if (hero) {
       const items = Array.from(hero.querySelectorAll('[data-reveal]'));
-      
+
       items.forEach((el, i) => {
         const reverseIndex = items.length - 1 - i;
         const delay = staggerDelays[reverseIndex] ?? (staggerDelays[staggerDelays.length - 1] + (reverseIndex - staggerDelays.length + 1) * 40);
@@ -331,13 +340,13 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }, overlayStartTime);
 
       const totalDuration = Math.max(overlayStartTime + overlayDuration, heroHideDuration);
-      
+
       closeTimersRef.current.hide = window.setTimeout(() => {
         items.forEach(el => {
           el.style.transitionDelay = '';
         });
 
-        animRef.current.isAnimating = false;
+        setAnimating(false);
         animRef.current.suppressScroll = false;
 
         if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
@@ -362,7 +371,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           });
         }
 
-        animRef.current.isAnimating = false;
+        setAnimating(false);
         animRef.current.suppressScroll = false;
 
         if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
@@ -373,7 +382,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         onClose();
       }, overlayDuration);
     }
-  }, [onClose]);
+  }, [onClose, setAnimating]);
 
   useEffect(() => {
     if (isOpen) {
@@ -385,17 +394,18 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
   }, [isOpen]);
 
+  // When modal closes ensure visible flags and anim state are reset
   useEffect(() => {
     if (!isOpen) {
       console.log('🧹 Modal closed - resetting all state');
       if (isMountedRef.current) {
         setFadingState('visible');
       }
-      // Reset animation flags
-      animRef.current.isAnimating = false;
+      // Reset animation flags (both ref and state)
+      setAnimating(false);
       animRef.current.suppressScroll = false;
     }
-  }, [isOpen]);
+  }, [isOpen, setAnimating]);
 
   useEffect(() => {
     return () => {
@@ -410,7 +420,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     if (!isOpen || !modalRef.current) return;
 
     const modal = modalRef.current;
-    const currentAnimRef = animRef.current;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const overlayDuration = prefersReducedMotion ? 120 : 450;
@@ -421,8 +430,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     const releaseTimeoutRef = { id: null };
     const focusTimeoutRef = { id: null };
 
-    currentAnimRef.isAnimating = true;
-    currentAnimRef.suppressScroll = true;
+    setAnimating(true);
+    animRef.current.suppressScroll = true;
 
     modal.classList.add('modal-overlay--entering');
 
@@ -445,8 +454,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           hero.classList.add('modal-hero--visible');
 
           releaseTimeoutRef.id = window.setTimeout(() => {
-            currentAnimRef.isAnimating = false;
-            currentAnimRef.suppressScroll = false;
+            setAnimating(false);
+            animRef.current.suppressScroll = false;
           }, Math.round(overlayDuration * 0.3));
         }, revealStartTime);
 
@@ -456,8 +465,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         }
       } else {
         releaseTimeoutRef.id = window.setTimeout(() => {
-          currentAnimRef.isAnimating = false;
-          currentAnimRef.suppressScroll = false;
+          setAnimating(false);
+          animRef.current.suppressScroll = false;
         }, overlayDuration);
       }
       closeTimersRef.current.raf = rafIdRef.id;
@@ -481,11 +490,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         });
       }
 
-      currentAnimRef.isAnimating = false;
-      currentAnimRef.suppressScroll = false;
+      setAnimating(false);
+      animRef.current.suppressScroll = false;
       closeTimersRef.current.raf = null;
     };
-  }, [isOpen]);
+  }, [isOpen, setAnimating]);
 
   useEffect(() => {
     if (!isOpen || !firstImageRef.current || !modalRef.current) return;
@@ -548,13 +557,13 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       running = false;
       scroller.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
-      
+
       target.style.removeProperty('--expand-scale');
       target.style.removeProperty('--expand-radius');
-      
-      currentAnimRef.isAnimating = false;
-      currentAnimRef.suppressScroll = false;
-      
+
+      setAnimating(false);
+      animRef.current.suppressScroll = false;
+
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (innerImg && onImgLoad) {
         try {
@@ -564,7 +573,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         }
       }
     };
-  }, [isOpen, currentIndex]);
+  }, [isOpen, currentIndex, setAnimating]);
 
   useEffect(() => {
     if (project && projects.length > 0) {
@@ -586,7 +595,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isOpen) return;
-      
+
       switch (e.key) {
         case 'Escape':
           handleClose();
@@ -632,7 +641,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     const current = projects[currentIndex] || projects[0];
     const prevIdx = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
     const nextIdx = currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
-    
+
     return {
       currentProject: current,
       prevProject: projects[prevIdx],
@@ -646,6 +655,15 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
   };
 
+  console.log('🔍 RENDER STATE:', {
+    currentIndex,
+    currentProject: currentProject?.title,
+    prevProject: prevProject?.title,
+    nextProject: nextProject?.title,
+    fadingState,
+    isAnimatingState
+  });
+
   if (!isOpen || projects.length === 0) return null;
 
   const getGalleryImages = (project) => {
@@ -658,7 +676,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const galleryImages = getGalleryImages(currentProject);
 
   const modalContent = (
-    <div 
+    <div
       ref={modalRef}
       className={`modal-overlay ${styles.modalOverlay}`}
       onClick={handleOverlayClick}
@@ -674,7 +692,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         boxSizing: 'border-box'
       }}
     >
-      <button 
+      <button
         onClick={handleClose}
         style={{
           position: 'fixed',
@@ -726,8 +744,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             {currentProject.tags?.join(' • ') || 'PROJECT'}
           </div>
 
-          <h1 
-            data-reveal 
+          <h1
+            data-reveal
             data-focus-target
             tabIndex="-1"
             style={{
@@ -755,7 +773,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }}>
                 {currentProject.subtitle || currentProject.description}
               </h2>
-              
+
               <p style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -834,7 +852,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                   }}>
                     Go Live
                   </h3>
-                  <a 
+                  <a
                     href={currentProject.projectUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -868,7 +886,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           boxSizing: 'border-box'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            <div 
+            <div
               ref={firstImageRef}
               style={{
                 width: '100%',
@@ -892,7 +910,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 WebkitBackfaceVisibility: 'hidden',
                 backfaceVisibility: 'hidden',
               }}>
-                <img 
+                <img
                   src={galleryImages[0]}
                   alt={`${currentProject.title} - Gallery 1`}
                   style={{
@@ -919,7 +937,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 position: 'relative',
                 boxSizing: 'border-box'
               }}>
-                <img 
+                <img
                   src={imageSrc}
                   alt={`${currentProject.title} - Gallery ${i + 2}`}
                   style={{
@@ -953,7 +971,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             <button
               className="modal-navigation-button"
               onClick={goToPrevious}
-              disabled={animRef.current.isAnimating}
+              disabled={isAnimatingState}
               style={{
                 width: '50%',
                 height: '100%',
@@ -966,19 +984,19 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 gap: '0.5rem',
                 textAlign: 'right',
                 border: 'none',
-                cursor: animRef.current.isAnimating ? 'wait' : 'pointer',
+                cursor: isAnimatingState ? 'wait' : 'pointer',
                 overflow: 'hidden',
                 transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                opacity: animRef.current.isAnimating ? 0.6 : 1,
-                pointerEvents: animRef.current.isAnimating ? 'none' : 'auto'
+                opacity: isAnimatingState ? 0.6 : 1,
+                pointerEvents: isAnimatingState ? 'none' : 'auto'
               }}
               onMouseEnter={(e) => {
-                if (animRef.current.isAnimating) return;
+                if (isAnimatingState) return;
                 const button = e.currentTarget;
                 const title = button.querySelector('h2');
                 const label = button.querySelector('span:first-child');
                 const tags = button.querySelector('span:last-child');
-                
+
                 if (title) title.style.transform = 'scale(1.2)';
                 if (label) label.style.transform = 'translateY(-0.5rem)';
                 if (tags) tags.style.transform = 'translateY(0.5rem)';
@@ -988,7 +1006,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 const title = button.querySelector('h2');
                 const label = button.querySelector('span:first-child');
                 const tags = button.querySelector('span:last-child');
-                
+
                 if (title) title.style.transform = 'scale(1)';
                 if (label) label.style.transform = 'translateY(0)';
                 if (tags) tags.style.transform = 'translateY(0)';
@@ -1005,7 +1023,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }}>
                 Previous project
               </span>
-              
+
               <h2 style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -1020,7 +1038,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }}>
                 {prevProject.title}
               </h2>
-              
+
               <span style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -1040,7 +1058,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               position: 'relative',
               overflow: 'hidden'
             }}>
-              <img 
+              <img
                 src={prevProject.image}
                 alt={prevProject.title}
                 style={{
@@ -1066,7 +1084,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               position: 'relative',
               overflow: 'hidden'
             }}>
-              <img 
+              <img
                 src={nextProject.image}
                 alt={nextProject.title}
                 style={{
@@ -1083,7 +1101,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             <button
               className="modal-navigation-button"
               onClick={goToNext}
-              disabled={animRef.current.isAnimating}
+              disabled={isAnimatingState}
               style={{
                 width: '50%',
                 height: '100%',
@@ -1096,19 +1114,19 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 gap: '0.5rem',
                 textAlign: 'left',
                 border: 'none',
-                cursor: animRef.current.isAnimating ? 'wait' : 'pointer',
+                cursor: isAnimatingState ? 'wait' : 'pointer',
                 overflow: 'hidden',
                 transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                opacity: animRef.current.isAnimating ? 0.6 : 1,
-                pointerEvents: animRef.current.isAnimating ? 'none' : 'auto'
+                opacity: isAnimatingState ? 0.6 : 1,
+                pointerEvents: isAnimatingState ? 'none' : 'auto'
               }}
               onMouseEnter={(e) => {
-                if (animRef.current.isAnimating) return;
+                if (isAnimatingState) return;
                 const button = e.currentTarget;
                 const title = button.querySelector('h2');
                 const label = button.querySelector('span:first-child');
                 const tags = button.querySelector('span:last-child');
-                
+
                 if (title) title.style.transform = 'scale(1.2)';
                 if (label) label.style.transform = 'translateY(-0.5rem)';
                 if (tags) tags.style.transform = 'translateY(0.5rem)';
@@ -1118,7 +1136,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 const title = button.querySelector('h2');
                 const label = button.querySelector('span:first-child');
                 const tags = button.querySelector('span:last-child');
-                
+
                 if (title) title.style.transform = 'scale(1)';
                 if (label) label.style.transform = 'translateY(0)';
                 if (tags) tags.style.transform = 'translateY(0)';
@@ -1135,7 +1153,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }}>
                 Next project
               </span>
-              
+
               <h2 style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
@@ -1150,7 +1168,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               }}>
                 {nextProject.title}
               </h2>
-              
+
               <span style={{
                 color: 'var(--neutral-light)',
                 fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
