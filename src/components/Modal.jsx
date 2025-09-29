@@ -12,6 +12,31 @@ const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
 const nextPaint = () =>
   new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
 
+const ensureScrollTop = async (el, attempts = 6) => {
+  if (!el) return;
+  for (let i = 0; i < attempts; i++) {
+    // força o topo
+    el.scrollTop = 0;
+    // aguarda repaints que possam ocorrer por mudanças de layout
+    await nextPaint();
+    // se já estiver no topo, pronto
+    if (el.scrollTop === 0) return;
+  }
+  // tentativa final
+  el.scrollTop = 0;
+};
+
+const safeFocus = (el) => {
+  if (!el || typeof el.focus !== 'function') return;
+  try {
+    el.focus({ preventScroll: true });
+  } catch (err) {
+    console.error('❌ navigateTo error:', err);
+    // navegadores antigos não suportam options
+    el.focus();
+  }
+};
+
 // waitForTransition unchanged (robust)
 const waitForTransition = (el, timeout = 800, property = 'opacity') => {
   return new Promise((resolve) => {
@@ -203,7 +228,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         }
         setTimeout(() => {
           const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-          if (title && typeof title.focus === 'function') title.focus();
+          safeFocus(title);
         }, 20);
         // Reset flags antes de sair
         setAnimating(false);
@@ -232,7 +257,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         new Promise(r => setTimeout(r, 1000))
       ]);
 
-      console.log('🔄 Swapping content to index:', targetIndex);
+      // 🔄 Swapping content to index:
       if (!isMountedRef.current) return;
       setCurrentIndex(targetIndex);
       await nextPaint();
@@ -242,10 +267,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       setFadingState('visible');
       await nextPaint();
 
+      // <-- NOVO: garantir snap para top depois da troca (corrige drift causado por reflow/transitions)
+      await ensureScrollTop(modal);
+
       if (!modalRef.current) {
         console.warn('⚠️ Modal ref lost after swap');
         return;
       }
+
       const newContentEl = modal.querySelector(`.${styles.modalContent}`);
       if (!newContentEl) {
         console.warn('⚠️ New content element not found');
@@ -254,29 +283,18 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
       const fadeInResult = await waitForTransition(newContentEl, 700, 'opacity');
       console.log('Fade-in result:', fadeInResult);
-      console.log('🔍 DOM STATE CHECK:', {
-        currentIndex,
-        projectTitle: (projects[currentIndex] && projects[currentIndex].title) || undefined,
-        heroTitle: modal.querySelector('.modal-hero h1')?.textContent,
-        fadingState,
-        modalContentOpacity: window.getComputedStyle(newContentEl).opacity
-      });
 
-      console.log('🎭 Revealing hero');
+      // revelar hero (mesma lógica sua)
       const hero = modal.querySelector('.modal-hero');
       if (hero) {
         hero.classList.remove('modal-hero--visible');
         setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
       }
 
-      console.log('✅ Navigation completed successfully');
-
+      // definir foco no título sem causar scroll
       setTimeout(() => {
         const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
-        if (title && typeof title.focus === 'function') {
-          console.log('🎯 Focus set on title');
-          title.focus();
-        }
+        safeFocus(title);
       }, 320);
 
     } catch (err) {
@@ -349,8 +367,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         setAnimating(false);
         animRef.current.suppressScroll = false;
 
-        if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
-          prevFocusRef.current.focus();
+        if (prevFocusRef.current) {
+          safeFocus(prevFocusRef.current);
         }
 
         closeTimersRef.current = { hide: null, overlay: null, raf: null };
@@ -374,8 +392,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         setAnimating(false);
         animRef.current.suppressScroll = false;
 
-        if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
-          prevFocusRef.current.focus();
+        if (prevFocusRef.current) {
+          safeFocus(prevFocusRef.current);
         }
 
         closeTimersRef.current = { hide: null, overlay: null, raf: null };
@@ -388,8 +406,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     if (isOpen) {
       prevFocusRef.current = document.activeElement;
     } else {
-      if (prevFocusRef.current && typeof prevFocusRef.current.focus === 'function') {
-        prevFocusRef.current.focus();
+      if (prevFocusRef.current) {
+        safeFocus(prevFocusRef.current);
       }
     }
   }, [isOpen]);
@@ -461,7 +479,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
         const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
         if (closeButton) {
-          focusTimeoutRef.id = window.setTimeout(() => closeButton.focus(), overlayDuration + 150);
+          focusTimeoutRef.id = window.setTimeout(() => safeFocus(closeButton), overlayDuration + 150);
         }
       } else {
         releaseTimeoutRef.id = window.setTimeout(() => {
