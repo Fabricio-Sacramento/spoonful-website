@@ -264,6 +264,97 @@ overflow: hidden;
 display: inline-block;
 }
 
+/* ================================= */
+/* STATEMENT SECTION */
+/* ================================= */
+
+/* Seção base - CLS prevention */
+#statement {
+  position: relative;
+  min-height: 100vh;
+  contain: layout; /* Isola reflows */
+  content-visibility: auto; /* Performance boost */
+}
+
+/* Texto principal - reserva espaço antes da font */
+.statement-text {
+  color: var(--primary-red);
+  text-align: center;
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 15.4375rem; /* ~247px */
+  font-style: normal;
+  font-weight: 900;
+  line-height: 11.25rem; /* ~180px */
+  letter-spacing: 0.15438rem;
+  text-transform: uppercase;
+  margin: 0;
+  min-height: 11.25rem; /* Previne CLS */
+  will-change: contents;
+  
+  /* Garante rendering suave durante scramble */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Caracteres temporários durante scramble */
+.statement-text .dud {
+  color: var(--neutral-light);
+  opacity: 0.3;
+  transition: opacity 0.15s ease;
+}
+
+/* ================================= */
+/* RESPONSIVE - STATEMENT */
+/* ================================= */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .statement-text {
+    font-size: 10.8063rem; /* 70% do original */
+    line-height: 7.875rem;
+    letter-spacing: 0.10806rem;
+    min-height: 7.875rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .statement-text {
+    font-size: 7.7188rem; /* 50% do original */
+    line-height: 5.625rem;
+    letter-spacing: 0.07719rem;
+    min-height: 5.625rem;
+    padding: 0 1rem; /* Respira nas laterais */
+  }
+}
+
+/* Extra small */
+@media (max-width: 375px) {
+  .statement-text {
+    font-size: 5.4031rem; /* 35% do original */
+    line-height: 3.9375rem;
+    letter-spacing: 0.05403rem;
+    min-height: 3.9375rem;
+  }
+}
+
+/* ================================= */
+/* REDUCED MOTION SUPPORT */
+/* ================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .statement-text {
+    /* Sem animações, apenas texto estático */
+    will-change: auto;
+  }
+  
+  .statement-text .dud {
+    /* Sem transições */
+    transition: none;
+  }
+}
+
 /* ----------------------------- */
 /* 5) HEADINGS                   */
 /* ----------------------------- */
