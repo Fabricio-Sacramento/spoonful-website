@@ -214,7 +214,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
         height: '100vh',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'var(--neutral-normal)',
+        backgroundColor: 'var(--primary-red)',
         contain: 'layout',
         contentVisibility: 'auto'
       }}
@@ -233,7 +233,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
           ref={textRef}
           className="statement-text"
           style={{
-            color: 'var(--primary-red)',
+            color: 'var(--neutral-light)',
             textAlign: 'center',
             fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
             fontSize: '15.4375rem',

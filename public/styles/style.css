@@ -278,7 +278,7 @@ display: inline-block;
 
 /* Texto principal - reserva espaço antes da font */
 .statement-text {
-  color: var(--primary-red);
+  color: var(--neutral-light);
   text-align: center;
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-size: 15.4375rem; /* ~247px */
@@ -300,7 +300,7 @@ display: inline-block;
 /* Caracteres temporários durante scramble */
 .statement-text .dud {
   color: var(--neutral-light);
-  opacity: 0.3;
+  opacity: 1;
   transition: opacity 0.15s ease;
 }
 
