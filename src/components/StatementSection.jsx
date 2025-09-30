@@ -1,8 +1,7 @@
 // src/components/StatementSection.jsx
-// Statement section com text scramble effect e safeguards de produção
+// Statement section com GSAP ScrollTrigger integration e loop contínuo
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
 import TextScramble from '../utils/text-scramble.js';
 
 const PHRASES = [
@@ -13,17 +12,13 @@ const PHRASES = [
   'KNOWLEDGE'
 ];
 
-const REPLAY_COOLDOWN = 500; // ms entre replays
 const PHRASE_DELAY = 800; // ms entre frases
-const FONT_TIMEOUT = 3000; // timeout para font loading
 
-const StatementSection = forwardRef(({ disabled = false }, ref) => {
+const StatementSection = forwardRef((props, ref) => {
   const textRef = useRef(null);
   const scrambleRef = useRef(null);
-  const observerRef = useRef(null);
   const isMountedRef = useRef(true);
   const isPlayingRef = useRef(false);
-  const lastPlayTimeRef = useRef(0);
   const phraseIndexRef = useRef(0);
   const cycleTimeoutRef = useRef(null);
 
@@ -41,24 +36,16 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
   }));
 
   /**
-   * Inicia ciclo de frases
+   * Inicia ciclo infinito de frases
    */
   const startCycle = async () => {
     if (!isMountedRef.current) return;
     if (isPlayingRef.current) return;
-    
-    // Debounce: previne replays rápidos
-    const now = Date.now();
-    if (now - lastPlayTimeRef.current < REPLAY_COOLDOWN) {
-      console.log('🔒 Statement: Replay bloqueado (cooldown)');
-      return;
-    }
 
     isPlayingRef.current = true;
-    lastPlayTimeRef.current = now;
     phraseIndexRef.current = 0;
 
-    console.log('🎬 Statement: Iniciando ciclo');
+    console.log('🎬 Statement: Iniciando loop contínuo');
 
     await playNextPhrase();
   };
@@ -67,7 +54,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
    * Para ciclo em progresso
    */
   const stopCycle = () => {
-    console.log('⏹️ Statement: Parando ciclo');
+    console.log('⏹️ Statement: Parando loop');
     isPlayingRef.current = false;
     
     if (cycleTimeoutRef.current) {
@@ -81,7 +68,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
   };
 
   /**
-   * Toca próxima frase no ciclo
+   * Toca próxima frase no ciclo (loop infinito)
    */
   const playNextPhrase = async () => {
     if (!isMountedRef.current || !isPlayingRef.current) return;
@@ -95,16 +82,16 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
 
       phraseIndexRef.current++;
 
-      // Se ainda há frases, agenda próxima
-      if (phraseIndexRef.current < PHRASES.length) {
-        cycleTimeoutRef.current = setTimeout(() => {
-          playNextPhrase();
-        }, PHRASE_DELAY);
-      } else {
-        // Ciclo completo
-        console.log('✅ Statement: Ciclo completo');
-        isPlayingRef.current = false;
+      // Loop infinito: reseta ao final das frases
+      if (phraseIndexRef.current >= PHRASES.length) {
+        phraseIndexRef.current = 0;
       }
+
+      // Sempre agenda próxima frase (loop contínuo)
+      cycleTimeoutRef.current = setTimeout(() => {
+        playNextPhrase();
+      }, PHRASE_DELAY);
+
     } catch (err) {
       // Promise cancelada é esperado durante cleanup
       if (err.message !== 'TextScramble cancelled') {
@@ -114,15 +101,15 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
     }
   };
 
-  // Setup inicial
+  // Setup inicial: TextScramble + Event Listeners GSAP
   useEffect(() => {
-    // Guard: disabled ou reduced motion
+    // Guard: reduced motion
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
-    if (disabled || prefersReducedMotion) {
-      console.log('ℹ️ Statement: Scramble desabilitado');
+    if (prefersReducedMotion) {
+      console.log('ℹ️ Statement: Scramble desabilitado (reduced motion)');
       if (textRef.current) {
         textRef.current.innerText = PHRASES.join(' / ');
       }
@@ -135,54 +122,28 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
     scrambleRef.current = new TextScramble(textRef.current);
     console.log('🎯 Statement: TextScramble criado');
 
-    // Setup Intersection Observer
-    const handleIntersection = (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          console.log('👁️ Statement: Entrou na viewport');
-          
-          // Aguarda fonts antes do primeiro play
-          let fontReady = false;
-          const fontTimeoutId = setTimeout(() => {
-            if (!fontReady && isMountedRef.current) {
-              console.warn('⏰ Statement: Font timeout - iniciando mesmo assim');
-              startCycle();
-            }
-          }, FONT_TIMEOUT);
-
-          document.fonts.ready.then(() => {
-            fontReady = true;
-            clearTimeout(fontTimeoutId);
-            if (isMountedRef.current) {
-              console.log('✅ Statement: Fonts prontas');
-              startCycle();
-            }
-          });
-        } else {
-          console.log('👁️ Statement: Saiu da viewport');
-          stopCycle();
-        }
-      });
+    // Event Listeners para comunicação com GSAP ScrollTrigger
+    const handleStart = () => {
+      console.log('📍 Statement: GSAP event received - starting loop');
+      startCycle();
     };
 
-    observerRef.current = new IntersectionObserver(handleIntersection, {
-      root: null,
-      rootMargin: '0px 0px -20% 0px',
-      threshold: 0
-    });
+    const handleStop = () => {
+      console.log('📍 Statement: GSAP event received - stopping loop');
+      stopCycle();
+    };
 
-    observerRef.current.observe(textRef.current);
-    console.log('👁️ Statement: Observer ativo');
+    window.addEventListener('statement:start', handleStart);
+    window.addEventListener('statement:stop', handleStop);
+    console.log('📍 Statement: Event listeners registrados');
 
     // Cleanup
     return () => {
       console.log('🧹 Statement: Cleanup iniciado');
       isMountedRef.current = false;
-      
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
-      }
+
+      window.removeEventListener('statement:start', handleStart);
+      window.removeEventListener('statement:stop', handleStop);
 
       stopCycle();
 
@@ -193,7 +154,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
 
       console.log('✅ Statement: Cleanup completo');
     };
-  }, [disabled]);
+  }, []);
 
   // Cleanup de timers no unmount
   useEffect(() => {
@@ -214,7 +175,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
         height: '100vh',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'var(--primary-red)',
+        backgroundColor: 'var(--neutral-normal)',
         contain: 'layout',
         contentVisibility: 'auto'
       }}
@@ -233,7 +194,7 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
           ref={textRef}
           className="statement-text"
           style={{
-            color: 'var(--neutral-light)',
+            color: 'var(--primary-red)',
             textAlign: 'center',
             fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
             fontSize: '15.4375rem',
@@ -255,9 +216,5 @@ const StatementSection = forwardRef(({ disabled = false }, ref) => {
 });
 
 StatementSection.displayName = 'StatementSection';
-
-StatementSection.propTypes = {
-  disabled: PropTypes.bool
-};
 
 export default StatementSection;

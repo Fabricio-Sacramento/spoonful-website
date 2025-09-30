@@ -2,11 +2,12 @@
 // ADICIONAR imports e montagem do StatementSection
 
 import ReactDOM from 'react-dom/client';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CanvasApp from './components/CanvasApp.jsx';
 import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
 import CustomCursor from './components/CustomCursor.jsx';
-import StatementSection from './components/StatementSection.jsx'; // ← NOVO
+import StatementSection from './components/StatementSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 
 // 1) Monta o canvas 3D inicial
@@ -46,18 +47,23 @@ if (window.location.hash === '#debug') {
     status: () => canvasController.getStatus()
   };
 
-  // Debug Statement ← NOVO
+  // Debug Statement ← ATUALIZADO
   window.debugStatement = {
-    start: () => {
-      const section = document.querySelector('#statement');
-      if (section?.__reactProps$) {
-        console.log('Statement ref not exposed - use IO trigger');
-      }
+    trigger: () => {
+      console.log('🧪 Debug: Disparando statement:start');
+      window.dispatchEvent(new CustomEvent('statement:start'));
     },
-    isVisible: () => {
-      const section = document.querySelector('#statement');
-      const rect = section?.getBoundingClientRect();
-      return rect ? rect.top < window.innerHeight && rect.bottom > 0 : false;
+    stop: () => {
+      console.log('🧪 Debug: Disparando statement:stop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+    },
+    checkScrollTrigger: () => {
+      const triggers = ScrollTrigger.getAll();
+      const statementTrigger = triggers.find(t => 
+        t.trigger?.id === 'statement'
+      );
+      console.log('Statement ScrollTrigger:', statementTrigger);
+      return statementTrigger;
     }
   };
 }

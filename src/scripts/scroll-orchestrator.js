@@ -273,6 +273,49 @@ function setupTestimonialsSection() {
 }
 
 // -----------------------------
+// STATEMENT SECTION - Pin + Loop
+// -----------------------------
+function setupStatementSection() {
+  const section = document.querySelector('#statement');
+  
+  if (!section) {
+    console.log('Statement section not found');
+    return;
+  }
+  
+  console.log('Setting up Statement section...');
+  
+  // ScrollTrigger: Pin da seção com comunicação para React
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top top',
+    end: '+=100', // 1 scroll completo
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1,
+    refreshPriority: 1, // Menor prioridade (após Hero e What We Do)
+    invalidateOnRefresh: true,
+    // markers: true, // Descomente para debug
+    onEnter: () => {
+      console.log('📍 Statement: Pinned - iniciando loop');
+      window.dispatchEvent(new CustomEvent('statement:start'));
+    },
+    onLeave: () => {
+      console.log('📍 Statement: Unpinned - parando loop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+    },
+    onEnterBack: () => {
+      console.log('📍 Statement: Re-entered - iniciando loop');
+      window.dispatchEvent(new CustomEvent('statement:start'));
+    },
+    onLeaveBack: () => {
+      console.log('📍 Statement: Left back - parando loop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+    }
+  });
+}
+
+// -----------------------------
 // 6) Utilitários (CORRIGIDOS)
 // -----------------------------
 
@@ -345,7 +388,7 @@ window.addEventListener('load', () => {
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    //setupWorkSectionKinetic();
+    setupStatementSection(); // Setup do Statement antes dos Testimonials
     setupTestimonialsSection();
   });
   
