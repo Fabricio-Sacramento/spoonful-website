@@ -289,7 +289,7 @@ function setupStatementSection() {
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
-    end: '+=100', // 1 scroll completo
+    end: '+=600', // 1 scroll completo
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
