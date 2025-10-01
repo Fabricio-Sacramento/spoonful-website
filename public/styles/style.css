@@ -274,6 +274,7 @@ display: inline-block;
   min-height: 100vh;
   contain: layout; /* Isola reflows */
   content-visibility: auto; /* Performance boost */
+  z-index: 2;
 }
 
 /* Texto principal - reserva espaço antes da font */

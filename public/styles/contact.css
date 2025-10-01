@@ -1,0 +1,274 @@
+/* src/styles/contact.css */
+
+/* ================================= */
+/* CONTACT SECTION - BASE */
+/* ================================= */
+#contact {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--neutral-normal);
+  display: flex;
+  flex-direction: column;
+  z-index: 1; /* Atrás do Statement (z-index: 2) */
+}
+
+/* Container Principal */
+.contact-container {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  padding: 4rem;
+  flex: 1;
+}
+
+/* ================================= */
+/* PLACEHOLDER - Preserva espaço quando Contact fica fixed */
+/* ================================= */
+.contact-placeholder {
+  display: block;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.contact--fixed {
+  /* Marcador de estado */
+}
+
+/* ================================= */
+/* LEFT SIDE - CTA */
+/* ================================= */
+.contact-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex-shrink: 0;
+  max-width: 575px;
+}
+
+.contact-cta__text {
+  color: var(--neutral-light);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 2.625rem; /* 42px */
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.84px;
+  margin: 0;
+}
+
+.contact-cta__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background-color: var(--primary-green);
+  color: var(--neutral-normal);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-start;
+}
+
+.contact-cta__button:hover {
+  background-color: #15d688;
+}
+
+.contact-cta__button svg {
+  width: 24px;
+  height: 24px;
+  color: var(--neutral-normal);
+}
+
+/* ================================= */
+/* SEPARATOR */
+/* ================================= */
+.contact-separator {
+  width: 2px;
+  height: 100%;
+  background-color: var(--neutral-dark);
+  flex-shrink: 0;
+}
+
+/* ================================= */
+/* RIGHT SIDE - FORM */
+/* ================================= */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 609px;
+}
+
+.contact-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.contact-form__input,
+.contact-form__textarea {
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--primary-green);
+  color: var(--neutral-light);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 1.625rem; /* 26px */
+  font-weight: 200;
+  letter-spacing: 0.52px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.contact-form__input::placeholder,
+.contact-form__textarea::placeholder {
+  color: #8a8a8a;
+}
+
+.contact-form__input:focus,
+.contact-form__textarea:focus {
+  border-bottom-color: var(--primary-green);
+}
+
+.contact-form__textarea {
+  min-height: 112px;
+  resize: none;
+  padding-top: 0.5rem;
+}
+
+.contact-form__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.25rem 2.8125rem;
+  background: transparent;
+  border: 1px solid var(--primary-green);
+  border-radius: 10px;
+  color: var(--neutral-light);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-start;
+}
+
+.contact-form__submit:hover:not(:disabled) {
+  background-color: rgba(25, 239, 153, 0.1);
+}
+
+.contact-form__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contact-form__submit svg {
+  width: 24px;
+  height: 24px;
+  color: var(--primary-green);
+}
+
+/* ================================= */
+/* BOTTOM - LET'S TALK HEADLINE */
+/* ================================= */
+.contact-headline {
+  padding: 1rem 4rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+.contact-headline__text {
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 27.75rem; /* 444px */
+  font-weight: 900;
+  line-height: 11.25rem; /* 180px */
+  letter-spacing: -8.88px;
+  margin: 0;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--primary-green);
+  text-transform: uppercase;
+}
+
+/* ================================= */
+/* RESPONSIVE */
+/* ================================= */
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .contact-container {
+    flex-direction: column;
+    gap: 3rem;
+    padding: 3rem 2rem;
+  }
+
+  .contact-separator {
+    width: 100%;
+    height: 2px;
+  }
+
+  .contact-cta {
+    max-width: 100%;
+  }
+
+  .contact-cta__text {
+    font-size: 2rem;
+  }
+
+  .contact-form {
+    max-width: 100%;
+  }
+
+  .contact-headline__text {
+    font-size: 18rem;
+    line-height: 8rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .contact-container {
+    padding: 2rem 1rem;
+  }
+
+  .contact-cta__text {
+    font-size: 1.5rem;
+  }
+
+  .contact-cta__button {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .contact-form__input,
+  .contact-form__textarea {
+    font-size: 1.25rem;
+  }
+
+  .contact-form__submit {
+    font-size: 1rem;
+    padding: 1rem 2rem;
+  }
+
+  .contact-headline {
+    padding: 1rem;
+  }
+
+  .contact-headline__text {
+    font-size: 8rem;
+    line-height: 4rem;
+    letter-spacing: -4px;
+  }
+}

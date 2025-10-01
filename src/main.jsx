@@ -1,6 +1,4 @@
 // src/main.jsx
-// ADICIONAR imports e montagem do StatementSection
-
 import ReactDOM from 'react-dom/client';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CanvasApp from './components/CanvasApp.jsx';
@@ -8,21 +6,26 @@ import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
 import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
+import ContactSection from './components/ContactSection.jsx'; // ← NOVO
 import canvasController from './utils/canvas-performance-controller.js';
 
-// 1) Monta o canvas 3D inicial
+// 1) Canvas 3D
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
 root3D.render(<CanvasApp />);
 
-// 2) Monta Work Section
+// 2) Work Section
 const workRoot = ReactDOM.createRoot(document.getElementById('work-mount-point'));
 workRoot.render(<WorkSection />);
 
-// 3) Monta Statement Section ← NOVO
+// 3) Statement Section
 const statementRoot = ReactDOM.createRoot(document.getElementById('statement'));
 statementRoot.render(<StatementSection />);
 
-// 4) Monta Custom Cursor
+// 4) Contact Section ← NOVO
+const contactRoot = ReactDOM.createRoot(document.getElementById('contact'));
+contactRoot.render(<ContactSection />);
+
+// 5) Custom Cursor
 const cursorDiv = document.createElement('div');
 cursorDiv.id = 'custom-cursor-mount';
 document.body.appendChild(cursorDiv);
@@ -30,7 +33,7 @@ document.body.appendChild(cursorDiv);
 const cursorRoot = ReactDOM.createRoot(cursorDiv);
 cursorRoot.render(<CustomCursor />);
 
-// 5) Inicializa Canvas Performance Controller
+// 6) Canvas Performance Controller
 window.addEventListener('load', () => {
   setTimeout(() => {
     canvasController.init(root3D, <CanvasApp />);
@@ -38,7 +41,7 @@ window.addEventListener('load', () => {
   }, 600);
 });
 
-// Debug helpers
+// Debug helpers (mantidos)
 if (window.location.hash === '#debug') {
   window.debugCanvas = {
     controller: canvasController,
@@ -47,7 +50,6 @@ if (window.location.hash === '#debug') {
     status: () => canvasController.getStatus()
   };
 
-  // Debug Statement ← ATUALIZADO
   window.debugStatement = {
     trigger: () => {
       console.log('🧪 Debug: Disparando statement:start');

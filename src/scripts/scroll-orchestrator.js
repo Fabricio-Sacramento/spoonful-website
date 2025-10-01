@@ -1,10 +1,9 @@
-// src/scroll-orchestrator.js
+// src/scripts/scroll-orchestrator.js
 // CORREÇÃO CIRÚRGICA - Mantém animações originais, corrige bugs específicos
 
 import Splitting from 'splitting';
 import 'splitting/dist/splitting.css';
 import gsap from 'gsap';
-//import KineticWorkScroll from './kinetic-work-scroll.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -14,9 +13,6 @@ let heroCharsByLine = [];
 let heroAllChars = [];
 let clipRects = [];
 let aboutChars = [];
-
-// CORREÇÃO #1: Removido isHeroAnimationComplete (dependência circular)
-// As animações agora são independentes
 
 // -----------------------------
 // 1) Preparação: Splitting e gsap.set
@@ -31,7 +27,7 @@ function prepareSplitting() {
   const aboutSplits = Splitting({ target: '#about-us .text-back', by: 'chars' });
   aboutChars = aboutSplits.flatMap(r => r.chars);
 
-  // Perspectiva no Hero (MANTIDA ORIGINAL)
+  // Perspectiva no Hero
   heroAllChars.forEach(char => {
     gsap.set(char.parentNode, { 
       perspective: 1000,
@@ -43,7 +39,7 @@ function prepareSplitting() {
     });
   });
 
-  // Perspectiva no About Us (MANTIDA ORIGINAL)
+  // Perspectiva no About Us
   aboutChars.forEach(char => 
     gsap.set(char.parentNode, { perspective: 1000 })
   );
@@ -56,10 +52,10 @@ function prepareSplitting() {
 }
 
 // -----------------------------
-// 2) Animação de entrada do Hero ao carregar a página (MANTIDA ORIGINAL)
+// 2) Animação de entrada do Hero ao carregar a página
 // -----------------------------
 function animateHeroEntry() {
-  // Estado inicial dos caracteres (MANTIDO ORIGINAL)
+  // Estado inicial dos caracteres
   gsap.set(heroAllChars, {
     opacity: 0,
     rotationX: -90,
@@ -67,16 +63,14 @@ function animateHeroEntry() {
     transformOrigin: '50% 0%'
   });
 
-  // Timeline de entrada (MANTIDA ORIGINAL - apenas removida dependência)
+  // Timeline de entrada
   const entryTl = gsap.timeline({
     onComplete: () => {
       console.log('Hero entry animation complete');
-      // CORREÇÃO: Removida dependência circular
-      // Animações de scroll já estão configuradas independentemente
     }
   });
 
-  // Animação por linha (MANTIDA ORIGINAL)
+  // Animação por linha
   heroCharsByLine.forEach((chars, i) => {
     entryTl.to(chars, {
       opacity: 1,
@@ -93,7 +87,7 @@ function animateHeroEntry() {
 }
 
 // -----------------------------
-// 3) Timeline unificada para Hero + About Us atrelada ao scroll (CORRIGIDA)
+// 3) Timeline unificada para Hero + About Us atrelada ao scroll
 // -----------------------------
 function initHeroAboutTimeline() {
   const wrapper = document.querySelector('.intro-wrapper');
@@ -104,7 +98,7 @@ function initHeroAboutTimeline() {
     return;
   }
 
-  // Estados iniciais para About Us (MANTIDOS ORIGINAIS)
+  // Estados iniciais para About Us
   gsap.set(aboutChars, {
     scaleY: 0,
     opacity: 0,
@@ -113,7 +107,7 @@ function initHeroAboutTimeline() {
 
   console.log('Creating hero/about timeline...');
 
-  // CORREÇÃO #2: Timeline principal com refreshPriority para evitar conflitos
+  // Timeline principal
   const mainTl = gsap.timeline({
     scrollTrigger: {
       trigger: wrapper,
@@ -124,22 +118,19 @@ function initHeroAboutTimeline() {
       pinSpacing: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
-      refreshPriority: 3, // CORREÇÃO: Prioridade alta para evitar conflitos
-      // markers: true // Descomente para debug
+      refreshPriority: 3,
       onLeave: () => {
-        // CORREÇÃO: Prepara próxima seção suavemente
         gsap.set(whatWeDo, { autoAlpha: 1 });
       }
     }
   });
 
-  // ANIMAÇÕES MANTIDAS EXATAMENTE ORIGINAIS
   mainTl
     .addLabel('start')
-    .addLabel('heroExit', 0.3) // Hero começa a sair em 30% do scroll
-    .addLabel('aboutEnter', 0.5) // About entra em 50% do scroll
+    .addLabel('heroExit', 0.3)
+    .addLabel('aboutEnter', 0.5)
     
-    // ===== SAÍDA DO HERO (ORIGINAL) =====
+    // Saída do Hero
     .to(
       heroAllChars,
       {
@@ -157,7 +148,7 @@ function initHeroAboutTimeline() {
       'heroExit'
     )
     
-    // Clip-path do Hero (ORIGINAL)
+    // Clip-path do Hero
     .to(
       clipRects,
       {
@@ -169,7 +160,7 @@ function initHeroAboutTimeline() {
       'heroExit+=0.1'
     )
     
-    // ===== ENTRADA DO ABOUT US (ORIGINAL) =====
+    // Entrada do About Us
     .to(
       aboutChars,
       {
@@ -185,14 +176,14 @@ function initHeroAboutTimeline() {
       'aboutEnter'
     )
     
-    // Pausa para leitura do About Us (ORIGINAL)
+    // Pausa para leitura
     .to({}, { duration: 0.6 }, '+=0');
 
   console.log('Hero/About timeline created successfully');
 }
 
 // -----------------------------
-// 4) Setup da seção What We Do (CORRIGIDA)
+// 4) Setup da seção What We Do
 // -----------------------------
 function setupWhatWeDoSection() {
   const section = document.querySelector('#what-we-do');
@@ -209,7 +200,7 @@ function setupWhatWeDoSection() {
   // Estado inicial: conteúdo invisível
   gsap.set(rows, { opacity: 0, y: 50 });
   
-  // ScrollTrigger 1: Animação do conteúdo (quando topo passa pelo centro)
+  // ScrollTrigger 1: Animação do conteúdo
   ScrollTrigger.create({
     trigger: section,
     start: 'top center',
@@ -231,11 +222,11 @@ function setupWhatWeDoSection() {
     }
   });
   
-  // ScrollTrigger 2: Pin da seção (pausa para leitura)
+  // ScrollTrigger 2: Pin da seção
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
-    end: '+=200', // 2 wheel scrolls de pausa
+    end: '+=200',
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
@@ -249,15 +240,93 @@ function setupWhatWeDoSection() {
 }
 
 // -----------------------------
-// 5) WORK – scroll horizontal com clamp e pin estável (CORRIGIDA)
+// 5) Statement Section - Pin + Loop + Contact Control
 // -----------------------------
-// function setupWorkSectionKinetic() {
-//  console.log('🎬 Iniciando setup da seção Work com Kinetic Scroll...');
-//  const kinetic = new KineticWorkScroll();
-//  kinetic.init();
-//  window.workKineticInstance = kinetic;
-//}
+function setupStatementSection() {
+  const section = document.querySelector('#statement');
+  const contact = document.querySelector('#contact');
+  
+  if (!section) {
+    console.log('Statement section not found');
+    return;
+  }
+  
+  console.log('Setting up Statement section...');
+  
+  // ScrollTrigger: Pin da seção + controle do Contact
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top top',
+    end: '+=600',
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1,
+    refreshPriority: 1,
+    invalidateOnRefresh: true,
+    
+    onEnter: () => {
+      console.log('📍 Statement: Pinned - iniciando loop');
+      window.dispatchEvent(new CustomEvent('statement:start'));
+      
+      if (contact) {
+        gsap.set(contact, {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          zIndex: 1
+        });
+        console.log('📍 Contact: Fixed (atrás do Statement)');
+      }
+    },
+    
+    onLeave: () => {
+      console.log('📍 Statement: Unpinned - parando loop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+      
+      if (contact) {
+        gsap.set(contact, {
+          position: 'relative',
+          clearProps: 'top,left,width'
+        });
+        console.log('📍 Contact: Revelado (relative)');
+      }
+    },
+    
+    onEnterBack: () => {
+      console.log('📍 Statement: Re-entered - iniciando loop');
+      window.dispatchEvent(new CustomEvent('statement:start'));
+      
+      if (contact) {
+        gsap.set(contact, {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          zIndex: 1
+        });
+        console.log('📍 Contact: Fixed novamente');
+      }
+    },
+    
+    onLeaveBack: () => {
+      console.log('📍 Statement: Left back - parando loop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+      
+      if (contact) {
+        gsap.set(contact, {
+          position: 'relative',
+          clearProps: 'top,left,width'
+        });
+        console.log('📍 Contact: Relative novamente');
+      }
+    }
+  });
+}
 
+// -----------------------------
+// 6) Testimonials Section
+// -----------------------------
 function setupTestimonialsSection() {
   const section = document.querySelector('#testimonials');
   if (!section) return;
@@ -273,53 +342,8 @@ function setupTestimonialsSection() {
 }
 
 // -----------------------------
-// STATEMENT SECTION - Pin + Loop
+// 7) Utilitários
 // -----------------------------
-function setupStatementSection() {
-  const section = document.querySelector('#statement');
-  
-  if (!section) {
-    console.log('Statement section not found');
-    return;
-  }
-  
-  console.log('Setting up Statement section...');
-  
-  // ScrollTrigger: Pin da seção com comunicação para React
-  ScrollTrigger.create({
-    trigger: section,
-    start: 'top top',
-    end: '+=600', // 1 scroll completo
-    pin: true,
-    pinSpacing: true,
-    anticipatePin: 1,
-    refreshPriority: 1, // Menor prioridade (após Hero e What We Do)
-    invalidateOnRefresh: true,
-    // markers: true, // Descomente para debug
-    onEnter: () => {
-      console.log('📍 Statement: Pinned - iniciando loop');
-      window.dispatchEvent(new CustomEvent('statement:start'));
-    },
-    onLeave: () => {
-      console.log('📍 Statement: Unpinned - parando loop');
-      window.dispatchEvent(new CustomEvent('statement:stop'));
-    },
-    onEnterBack: () => {
-      console.log('📍 Statement: Re-entered - iniciando loop');
-      window.dispatchEvent(new CustomEvent('statement:start'));
-    },
-    onLeaveBack: () => {
-      console.log('📍 Statement: Left back - parando loop');
-      window.dispatchEvent(new CustomEvent('statement:stop'));
-    }
-  });
-}
-
-// -----------------------------
-// 6) Utilitários (CORRIGIDOS)
-// -----------------------------
-
-// CORREÇÃO #5: Smart Refresh - evita múltiplos refreshes desnecessários
 let refreshScheduled = false;
 
 function smartRefresh() {
@@ -358,7 +382,7 @@ function resetAnimations() {
 }
 
 // -----------------------------
-// 7) Inicialização (CORRIGIDA)
+// 8) Inicialização
 // -----------------------------
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM loaded - preparing splitting...');
@@ -377,25 +401,17 @@ window.addEventListener('load', () => {
   const viewport = window.innerHeight;
   wrapper.style.height = `${viewport}px`;
 
-  // CORREÇÃO #6: Setup independente das animações
-  // Não há mais dependência circular
-  
-  // Inicia animação de entrada do Hero
   animateHeroEntry();
   
-  // Setup todas as seções de scroll independentemente
-  // Pequeno delay para garantir que o DOM está pronto
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    setupStatementSection(); // Setup do Statement antes dos Testimonials
+    setupStatementSection();
     setupTestimonialsSection();
   });
   
-  // CORREÇÃO #7: Um único refresh inteligente
   gsap.delayedCall(0.5, smartRefresh);
   
-  // Listener para resize (OTIMIZADO)
   const handleResize = debounce(() => {
     console.log('Handling resize...');
     const newViewport = window.innerHeight;
@@ -407,7 +423,7 @@ window.addEventListener('load', () => {
 });
 
 // -----------------------------
-// 8) Debug mode (MANTIDO ORIGINAL)
+// 9) Debug mode
 // -----------------------------
 if (window.location.hash === '#debug') {
   ScrollTrigger.defaults({ markers: true });
@@ -422,14 +438,13 @@ if (window.location.hash === '#debug') {
   };
 }
 
-// Export (MANTIDO ORIGINAL)
+// Export
 export { smartRefresh as refreshScrollTriggers, resetAnimations };
 
-// Disponibilizar para debug
+// Debug Kinetic
 window.debugKinetic = () => {
   console.log('Kinetic debug info:', {
     workSection: document.querySelector('#work'),
     workTrack: document.querySelector('.work-track'),
-    // outros dados relevantes
   });
 };
