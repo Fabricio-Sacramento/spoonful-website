@@ -5,7 +5,7 @@
 .statement-contact-wrapper {
   position: relative;
   width: 100%;
-  height: 200vh; /* espaço para subir statement: 2x viewport */
+  height: 100vh; /* <-- usar 1x viewport, o ScrollTrigger criará o espaço do pin */
   overflow: hidden; /* evita flashing */
 }
 

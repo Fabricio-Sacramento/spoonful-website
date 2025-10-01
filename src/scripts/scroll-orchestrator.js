@@ -282,9 +282,15 @@ function setupTestimonialsSection() {
 // -----------------------------
 function setupStatementSection() {
   const section = document.querySelector('#statement');
-  
   if (!section) {
     console.log('Statement section not found');
+    return;
+  }
+
+  // SE HOUVER WRAPPER, não pinne o #statement individualmente para evitar nested pins
+  if (document.querySelector('.statement-contact-wrapper')) {
+    console.log('Statement wrapper detectado — pulando pin individual do #statement para evitar conflitos.');
+    // Ainda podemos registrar listeners se necessário, mas delegamos pin/loop control ao wrapper.
     return;
   }
   
