@@ -329,9 +329,6 @@ function setupStatementSection() {
 // -----------------------------
 // STATEMENT → CONTACT TRANSITION
 // -----------------------------
-// SUBSTITUIR A FUNÇÃO setupStatementContactTransition() COMPLETA
-// Adicionar após setupStatementSection() (linha ~340)
-// Guard global para evitar múltiplas inits
 if (!window.__statementContact) window.__statementContact = {};
 
 function setupStatementContactTransition() {

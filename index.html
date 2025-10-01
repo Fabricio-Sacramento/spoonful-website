@@ -86,11 +86,15 @@
 <!-- WORK Section -->
 <div id="work-mount-point"></div>
 
-<!-- STATEMENT Section -->
-<section id="statement"></section>
-
-<!-- CONTACT Section -->
-<section id="contact"></section>
+<!-- STATEMENT + CONTACT WRAPPER -->
+<div class="statement-contact-wrapper">
+  <section id="statement" class="statement-layer" aria-label="Statement">
+    <!-- React monta conteúdo aqui -->
+  </section>
+  <section id="contact" class="contact-layer" aria-hidden="true" aria-label="Contact">
+    <!-- React monta conteúdo aqui -->
+  </section>
+</div>
 
 <!-- Bundle React/Vite -->
 <script type="module" src="/src/main.jsx"></script>
