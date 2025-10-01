@@ -331,7 +331,6 @@ function setupStatementSection() {
 // -----------------------------
 // SUBSTITUIR A FUNÇÃO setupStatementContactTransition() COMPLETA
 // Adicionar após setupStatementSection() (linha ~340)
-
 // Guard global para evitar múltiplas inits
 if (!window.__statementContact) window.__statementContact = {};
 
@@ -355,8 +354,8 @@ function setupStatementContactTransition() {
   if (window.__statementContact.trigger && typeof window.__statementContact.trigger.kill === 'function') {
     try {
       window.__statementContact.trigger.kill();
-    } catch { 
-      /* ignore */ 
+    } catch {
+      // Ignora erros de cleanup
     }
     window.__statementContact.trigger = null;
   }
