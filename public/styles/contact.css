@@ -1,0 +1,153 @@
+/* ================================= */
+/* STATEMENT + CONTACT WRAPPER       */
+/* ================================= */
+
+.statement-contact-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200vh; /* espaço para subir statement: 2x viewport */
+  overflow: hidden; /* evita flashing */
+}
+
+/* layers absolutely stacked */
+.statement-layer,
+.contact-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Statement em cima (GPU transform) */
+.statement-layer {
+  z-index: 5;
+  background-color: var(--primary-red);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Contact por baixo — sempre visível, mas não-interativo até liberado */
+.contact-layer {
+  z-index: 0;
+  background-color: var(--primary-blue);
+  opacity: 1; /* permanece opaca conforme brief */
+  pointer-events: none;
+}
+
+.contact-layer[aria-hidden="false"] {
+  pointer-events: auto;
+}
+
+/* ================================= */
+/* CONTACT CONTENT                   */
+/* ================================= */
+
+.contact-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Título principal */
+.contact-heading {
+  color: var(--neutral-light);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 7.75rem;
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: 0.155rem;
+  text-transform: uppercase;
+  margin: 0;
+  will-change: opacity, transform;
+}
+
+/* ================================= */
+/* REVEAL ANIMATION (opcional)       */
+/* ================================= */
+
+.contact-layer [data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition-property: opacity, transform;
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: opacity, transform;
+}
+
+.contact-layer--revealed [data-reveal] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+@media (max-width: 1023px) {
+  .contact-heading {
+    font-size: 5.425rem;
+    letter-spacing: 0.10855rem;
+  }
+  
+  .contact-content {
+    padding: 3rem 1.5rem;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .contact-heading {
+    font-size: 3.875rem;
+    letter-spacing: 0.07775rem;
+  }
+  
+  .contact-content {
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .contact-heading {
+    font-size: 2.7125rem;
+    letter-spacing: 0.05425rem;
+  }
+}
+
+/* ================================= */
+/* REDUCED MOTION SUPPORT            */
+/* ================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-layer [data-reveal] {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ================================= */
+/* ACCESSIBILITY                     */
+/* ================================= */
+
+@media (prefers-contrast: high) {
+  .contact-layer {
+    border-top: 2px solid var(--neutral-light);
+  }
+}
+
+.contact-layer a:focus-visible,
+.contact-layer button:focus-visible {
+  outline: 3px solid var(--primary-green);
+  outline-offset: 4px;
+  border-radius: 4px;
+}

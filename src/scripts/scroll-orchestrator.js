@@ -6,6 +6,11 @@ import 'splitting/dist/splitting.css';
 import gsap from 'gsap';
 //import KineticWorkScroll from './kinetic-work-scroll.js';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { 
+  setContactInteractivity, 
+  focusFirstContactElement,
+  revealContactElements 
+} from '../utils/contact-interactivity.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -316,6 +321,141 @@ function setupStatementSection() {
 }
 
 // -----------------------------
+// STATEMENT → CONTACT TRANSITION
+// -----------------------------
+// SUBSTITUIR A FUNÇÃO setupStatementContactTransition() COMPLETA
+// Adicionar após setupStatementSection() (linha ~340)
+
+// Guard global para evitar múltiplas inits
+if (!window.__statementContact) window.__statementContact = {};
+
+function setupStatementContactTransition() {
+  // Se já inicializado, retorna trigger salvo
+  if (window.__statementContact.initialized) {
+    console.warn('setupStatementContactTransition: já inicializado — pulando nova criação.');
+    return window.__statementContact.trigger;
+  }
+
+  const wrapper = document.querySelector('.statement-contact-wrapper');
+  const statementLayer = document.querySelector('.statement-layer');
+  const contactLayer = document.querySelector('.contact-layer');
+
+  if (!wrapper || !statementLayer || !contactLayer) {
+    console.warn('setupStatementContactTransition: elementos não encontrados');
+    return null;
+  }
+
+  // Kill trigger antigo se existir (safety)
+  if (window.__statementContact.trigger && typeof window.__statementContact.trigger.kill === 'function') {
+    try {
+      window.__statementContact.trigger.kill();
+    } catch { 
+      /* ignore */ 
+    }
+    window.__statementContact.trigger = null;
+  }
+
+  console.log('🎬 Setting up Statement → Contact transition...');
+
+  // Estado inicial via GSAP (apenas transforms)
+  gsap.set(statementLayer, { y: 0 });
+  // Contact já está opacity:1 por CSS, bloqueado via aria + pointer-events através da função
+  setContactInteractivity(false);
+
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
+  if (prefersReducedMotion) {
+    console.log('⚡ Reduced motion - transição instantânea');
+    
+    const t = ScrollTrigger.create({
+      id: 'stmt-contact-reduced',
+      trigger: wrapper,
+      start: 'top top',
+      end: 'top top+=1',
+      onEnter: () => {
+        gsap.set(statementLayer, { yPercent: -100 });
+        setContactInteractivity(true);
+        window.dispatchEvent(new CustomEvent('statement:stop'));
+        revealContactElements();
+      },
+      onLeaveBack: () => {
+        gsap.set(statementLayer, { yPercent: 0 });
+        setContactInteractivity(false);
+        window.dispatchEvent(new CustomEvent('statement:start'));
+      }
+    });
+    
+    window.__statementContact.initialized = true;
+    window.__statementContact.trigger = t;
+    
+    console.log('✅ Statement → Contact (reduced motion) configured');
+    return t;
+  }
+
+  // Timeline Normal
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      id: 'stmt-contact-tl',
+      trigger: wrapper,
+      start: 'top top',
+      end: '+=100%', // usa 100% do viewport (compatível com height:200vh)
+      pin: true,
+      scrub: 1,
+      anticipatePin: 1,
+      refreshPriority: 0,
+      invalidateOnRefresh: true,
+
+      onEnter: () => {
+        console.log('📍 Statement/Contact: onEnter');
+        window.dispatchEvent(new CustomEvent('statement:stop'));
+      },
+
+      onLeave: () => {
+        console.log('📍 Statement/Contact: onLeave - habilitando Contact');
+        setContactInteractivity(true);
+        revealContactElements();
+        focusFirstContactElement();
+      },
+
+      onEnterBack: () => {
+        console.log('📍 Statement/Contact: onEnterBack - bloqueando Contact');
+        setContactInteractivity(false);
+        contactLayer.classList.remove('contact-layer--revealed');
+      },
+
+      onLeaveBack: () => {
+        console.log('📍 Statement/Contact: onLeaveBack');
+        window.dispatchEvent(new CustomEvent('statement:start'));
+      }
+    }
+  });
+
+  tl.to(statementLayer, { y: '-100%', ease: 'none', duration: 1 }, 0);
+
+  // Salva referência para evitar re-criação
+  window.__statementContact.initialized = true;
+  window.__statementContact.trigger = tl.scrollTrigger;
+
+  // DEBUG: log triggers ativos
+  console.log('✅ Statement → Contact transition configured');
+  console.log('ScrollTriggers ativos:', ScrollTrigger.getAll().map(t => t.vars.id || 'unnamed'));
+
+  return tl.scrollTrigger;
+}
+
+// Hot Module Replacement cleanup (apenas para desenvolvimento Vite)
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    console.log('🔥 HMR: limpando Statement/Contact trigger');
+    const t = window.__statementContact?.trigger;
+    if (t && typeof t.kill === 'function') {
+      t.kill();
+    }
+    window.__statementContact = {};
+  });
+}
+
+// -----------------------------
 // 6) Utilitários (CORRIGIDOS)
 // -----------------------------
 
@@ -388,7 +528,8 @@ window.addEventListener('load', () => {
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    setupStatementSection(); // Setup do Statement antes dos Testimonials
+    setupStatementSection();
+    setupStatementContactTransition(); // Setup da transição Statement → Contact
     setupTestimonialsSection();
   });
   
@@ -418,7 +559,13 @@ if (window.location.hash === '#debug') {
     aboutChars: () => aboutChars,
     refresh: smartRefresh,
     reset: resetAnimations,
-    timeline: () => ScrollTrigger.getAll()
+    timeline: () => ScrollTrigger.getAll(),
+    contact: {
+      enable: () => setContactInteractivity(true),
+      disable: () => setContactInteractivity(false),
+      focus: () => focusFirstContactElement(),
+      reveal: () => revealContactElements()
+    }
   };
 }
 
