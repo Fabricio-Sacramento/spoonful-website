@@ -215,17 +215,7 @@ z-index: 2;
 background: transparent;
 clip-path: url(#heroClip);
 }
-.hero-content {
-margin: 0;
-padding: 0;
-position: relative;
-z-index: 1;
-text-align: left;
-display: flex;
-flex-direction: column;
-justify-content: center;
-pointer-events: none;
-}
+.hero-content {margin: 0;padding: 2rem;position: relative;z-index: 1;text-align: left;display: flex;flex-direction: column;justify-content: center;pointer-events: none;}
 /* Garante que, ao rotacionar em 3D, a face traseira dos chars seja visÃ­vel */
 .hero-content .char {
 -webkit-backface-visibility: visible;
