@@ -7,8 +7,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   setContactInteractivity, 
-  focusFirstContactElement,
-  revealContactElements 
+  focusFirstContactElement
 } from '../utils/contact-interactivity.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -244,121 +243,138 @@ function setupTestimonialsSection() {
 }
 
 // -----------------------------
-// STATEMENT → CONTACT TRANSITION
+// STATEMENT SECTION (standalone - caso não tenha wrapper)
 // -----------------------------
-if (!window.__statementContact) window.__statementContact = {};
-
-function setupStatementContactTransition() {
-  if (window.__statementContact.initialized) {
-    console.warn('setupStatementContactTransition: já inicializado');
-    return window.__statementContact.trigger;
+function setupStatementSection() {
+  // Se wrapper existe, delega para setupStatementContactTransition
+  if (document.querySelector('.statement-contact-wrapper')) {
+    console.log('Statement wrapper detected - delegando para setupStatementContactTransition()');
+    return;
   }
+  
+  const section = document.querySelector('#statement');
+  
+  if (!section) {
+    console.log('Statement section not found');
+    return;
+  }
+  
+  console.log('Setting up Statement section (standalone)...');
+  
+  ScrollTrigger.create({
+    id: 'statement-pin',
+    trigger: section,
+    start: 'top top',
+    end: '+=600',
+    pin: true,
+    pinSpacing: true,
+    anticipatePin: 1,
+    refreshPriority: 1,
+    invalidateOnRefresh: true,
+    
+    onEnter: () => {
+      console.log('📍 Statement: Pinned - iniciando loop');
+      window.dispatchEvent(new CustomEvent('statement:start'));
+    },
+    
+    onLeave: () => {
+      console.log('📍 Statement: Unpinned - parando loop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+    },
+    
+    onEnterBack: () => {
+      console.log('📍 Statement: Re-entered - iniciando loop');
+      window.dispatchEvent(new CustomEvent('statement:start'));
+    },
+    
+    onLeaveBack: () => {
+      console.log('📍 Statement: Left back - parando loop');
+      window.dispatchEvent(new CustomEvent('statement:stop'));
+    }
+  });
+}
 
+// -----------------------------
+// STATEMENT → CONTACT TRANSITION (com timeline como Hero/About)
+// -----------------------------
+function setupStatementContactTransition() {
   const wrapper = document.querySelector('.statement-contact-wrapper');
   const statementLayer = document.querySelector('.statement-layer');
   const contactLayer = document.querySelector('.contact-layer');
-
-  if (!wrapper || !statementLayer || !contactLayer) {
-    console.warn('setupStatementContactTransition: elementos não encontrados');
-    return null;
-  }
-
-  if (window.__statementContact.trigger?.kill) {
-    try {
-      window.__statementContact.trigger.kill();
-    } catch {
-      // ignore
-    }
-    window.__statementContact.trigger = null;
-  }
-
-  console.log('🎬 Setting up Statement → Contact transition...');
-
-  gsap.set(statementLayer, { y: 0 });
-  setContactInteractivity(false);
-
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
-  if (prefersReducedMotion) {
-    const t = ScrollTrigger.create({
-      id: 'stmt-contact-reduced',
-      trigger: wrapper,
-      start: 'top top',
-      end: 'top top+=1',
-      onEnter: () => {
-        gsap.set(statementLayer, { yPercent: -100 });
-        setContactInteractivity(true);
-        window.dispatchEvent(new CustomEvent('statement:stop'));
-        contactLayer.classList.add('contact--revealed');
-      },
-      onLeaveBack: () => {
-        gsap.set(statementLayer, { yPercent: 0 });
-        setContactInteractivity(false);
-        contactLayer.classList.remove('contact--revealed');
-        window.dispatchEvent(new CustomEvent('statement:start'));
-      }
-    });
-    
-    window.__statementContact.initialized = true;
-    window.__statementContact.trigger = t;
-    return t;
+  if (!wrapper || !statementLayer || !contactLayer) {
+    console.warn('Statement/Contact wrapper não encontrado');
+    return;
   }
-
-  const tl = gsap.timeline({
+  
+  console.log('🎬 Setting up Statement → Contact transition...');
+  
+  // Estado inicial
+  setContactInteractivity(false);
+  
+  // Timeline com scrub (igual Hero/About)
+  const mainTl = gsap.timeline({
     scrollTrigger: {
-      id: 'stmt-contact-tl',
+      id: 'statement-contact-tl',
       trigger: wrapper,
       start: 'top top',
-      end: () => `+=${window.innerHeight * 2}`, // 2 scrolls de duração
-      pin: true,
+      end: () => `+=${window.innerHeight * 2}`, // 2 scrolls
       scrub: 1,
+      pin: true,
+      pinSpacing: true,
       anticipatePin: 1,
-      refreshPriority: 0,
       invalidateOnRefresh: true,
-
+      refreshPriority: 0,
+      
       onEnter: () => {
         console.log('📍 Statement: Pinned - iniciando loop');
         window.dispatchEvent(new CustomEvent('statement:start'));
       },
-
+      
+      onUpdate: (self) => {
+        // Para o loop quando começa a subir (50% do scroll)
+        if (self.progress > 0.5 && self.direction === 1) {
+          window.dispatchEvent(new CustomEvent('statement:stop'));
+        }
+      },
+      
       onLeave: () => {
-        console.log('📍 Statement: Unpinned - parando loop + habilitando Contact');
+        console.log('📍 Statement saiu - habilitando Contact');
         window.dispatchEvent(new CustomEvent('statement:stop'));
         setContactInteractivity(true);
         contactLayer.classList.add('contact--revealed');
         focusFirstContactElement();
       },
-
+      
       onEnterBack: () => {
-        console.log('📍 Statement: Re-entered - bloqueando Contact + reiniciando loop');
+        console.log('📍 Voltando para Statement');
         setContactInteractivity(false);
         contactLayer.classList.remove('contact--revealed');
         window.dispatchEvent(new CustomEvent('statement:start'));
       },
-
+      
       onLeaveBack: () => {
-        console.log('📍 Statement: Left back - parando loop');
+        console.log('📍 Statement: saiu voltando');
         window.dispatchEvent(new CustomEvent('statement:stop'));
       }
     }
   });
-
-  tl.to(statementLayer, { y: '-100%', ease: 'none', duration: 1 }, 0);
-
-  window.__statementContact.initialized = true;
-  window.__statementContact.trigger = tl.scrollTrigger;
-
+  
+  // Animação: Statement sobe (igual Hero sai)
+  mainTl
+    .addLabel('start')
+    .addLabel('statementExit', 0.5) // Statement começa a sair em 50%
+    .to(
+      statementLayer,
+      {
+        y: '-100%',
+        ease: 'power2.inOut',
+        duration: 0.5
+      },
+      'statementExit'
+    );
+  
   console.log('✅ Statement → Contact transition configured');
-  return tl.scrollTrigger;
-}
-
-// HMR cleanup
-if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    const t = window.__statementContact?.trigger;
-    if (t?.kill) t.kill();
-    window.__statementContact = {};
-  });
 }
 
 // -----------------------------
@@ -426,7 +442,8 @@ window.addEventListener('load', () => {
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    setupStatementContactTransition();
+    setupStatementSection(); // Checa wrapper e delega se necessário
+    setupStatementContactTransition(); // Timeline statement/contact
     setupTestimonialsSection();
   });
   
@@ -458,8 +475,7 @@ if (window.location.hash === '#debug') {
     contact: {
       enable: () => setContactInteractivity(true),
       disable: () => setContactInteractivity(false),
-      focus: () => focusFirstContactElement(),
-      reveal: () => revealContactElements()
+      focus: () => focusFirstContactElement()
     }
   };
 }
