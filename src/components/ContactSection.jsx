@@ -1,6 +1,8 @@
 // src/components/ContactSection.jsx
 // Contact section com conteúdo real do Figma
 
+import LetsTalkSVG from '../assets/images/lets_talk.svg?react';
+
 const ContactSection = () => {
   return (
     <section className="contact-section" aria-label="Contact">
@@ -11,11 +13,9 @@ const ContactSection = () => {
           Book a brief 15-minute call to talk about your project or, send us your message.
         </p>
         
-        <a 
-          href="https://calendly.com/your-link" 
+        <button 
           className="contact-cta-button"
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={() => window.open('https://calendly.com/your-link', '_blank', 'noopener,noreferrer')}
           aria-label="Schedule a meeting with us"
           data-reveal
         >
@@ -31,22 +31,22 @@ const ContactSection = () => {
               fill="currentColor"
             />
           </svg>
-        </a>
+        </button>
         
-        <a 
-          href="mailto:contact@spoonful.com.br" 
+        <button 
           className="contact-email"
+          onClick={() => window.location.href = 'mailto:contact@spoonful.com.br'}
           aria-label="Send us an email"
           data-reveal
         >
           contact@spoonful.com.br
-        </a>
+        </button>
       </div>
       
-      {/* Título gigante inferior */}
-      <h1 className="contact-title" aria-label="Let's talk" data-reveal>
-        Lets talk
-      </h1>
+      {/* SVG Let's talk */}
+      <div className="contact-title" aria-label="Let's talk" data-reveal>
+        <LetsTalkSVG />
+      </div>
       
     </section>
   );

@@ -54,7 +54,7 @@
 .contact-section {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: 100vh;
   width: 100%;
   padding: 4rem;
@@ -64,8 +64,10 @@
 .contact-content-top {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   gap: 4rem;
   max-width: 575px;
+  margin-bottom: 4rem;
 }
 
 .contact-description {
@@ -92,19 +94,37 @@
   font-weight: 400;
   letter-spacing: 0.8px;
   color: var(--neutral-normal);
-  text-decoration: none;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: color 0.4s ease;
   width: fit-content;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.contact-cta-button::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background-color: var(--primary-red);
+  transition: height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: -1;
+  border-radius: 10px;
+}
+
+.contact-cta-button:hover::before {
+  height: 100%;
 }
 
 .contact-cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(25, 239, 153, 0.3);
+  color: var(--neutral-light);
 }
 
 .contact-cta-button:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 .calendar-icon {
@@ -121,24 +141,65 @@
   text-transform: uppercase;
   color: var(--primary-green);
   text-decoration: none;
-  transition: opacity 0.3s ease;
   margin: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.contact-email::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-green);
+  transform: translateX(-100%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-email:hover::after {
+  transform: translateX(0);
 }
 
 .contact-email:hover {
-  opacity: 0.8;
+  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes glitch {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
 }
 
 .contact-title {
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 27.75rem;
-  font-weight: 900;
-  line-height: 0.405;
-  letter-spacing: -8.88px;
-  text-transform: lowercase;
-  color: var(--neutral-light);
-  margin: 0;
-  white-space: nowrap;
+  width: 100%;
+  height: auto;
+  margin: 4rem 0 0 0;
+  display: block;
+}
+
+.contact-title svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* ================================= */
@@ -146,15 +207,13 @@
 /* ================================= */
 
 .contact-layer [data-reveal] {
-  opacity: 0;
-  transform: translateY(12px);
-  transition-property: opacity, transform;
-  transition-duration: 420ms;
+  transform: translateY(40px);
+  transition-property: transform;
+  transition-duration: 600ms;
   transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .contact-layer.contact--revealed [data-reveal] {
-  opacity: 1;
   transform: translateY(0);
 }
 
@@ -194,8 +253,7 @@
   }
   
   .contact-title {
-    font-size: 19.425rem;
-    letter-spacing: -6.216px;
+    margin: 3rem 0 0 0;
   }
 }
 
@@ -232,9 +290,7 @@
   }
   
   .contact-title {
-    font-size: 13.875rem;
-    letter-spacing: -4.44px;
-    line-height: 0.5;
+    margin: 2rem 0 0 0;
   }
 }
 
@@ -260,8 +316,7 @@
   }
   
   .contact-title {
-    font-size: 9.7125rem;
-    letter-spacing: -3.108px;
+    margin: 1.5rem 0 0 0;
   }
 }
 
@@ -272,13 +327,23 @@
 @media (prefers-reduced-motion: reduce) {
   .contact-layer [data-reveal] {
     transition: none;
-    opacity: 1;
     transform: none;
   }
   
-  .contact-cta-button,
-  .contact-email {
+  .contact-cta-button {
     transition: none;
+  }
+  
+  .contact-cta-button::before {
+    transition: none;
+  }
+  
+  .contact-email::after {
+    transition: none;
+  }
+  
+  .contact-email:hover {
+    animation: none;
   }
 }
 
@@ -292,9 +357,12 @@
   }
 }
 
-.contact-layer a:focus-visible,
-.contact-layer button:focus-visible {
-  outline: 3px solid var(--primary-green);
-  outline-offset: 4px;
-  border-radius: 4px;
+.contact-layer a,
+.contact-layer button {
+  outline: none;
+}
+
+.contact-layer a:focus,
+.contact-layer button:focus {
+  outline: none;
 }
