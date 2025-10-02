@@ -4,9 +4,9 @@
   position: relative;
   height: 100vh;
   max-height: 100vh;
-  overflow: hidden;              /* unificado (era visible em um bloco) */
+  overflow: hidden;
   z-index: 1;
-  align-items: flex-start;       /* override do layout da seção */
+  align-items: flex-start;
 }
 
 .container-full {
@@ -20,14 +20,14 @@
   justify-content: center;
   align-items: flex-start;
   flex: 1;
-  height: 100vh;                 /* unificado (preferível ao 100%) */
+  height: 100vh;
   max-height: 100vh;
   overflow-y: auto;
 
   /* esconder scrollbar mantendo rolagem */
-  -ms-overflow-style: none;      /* IE/Edge */
-  padding-right: 20px;           /* compensa a largura da scrollbar */
-  margin-right: -20px;           /* realinha o conteúdo */
+  -ms-overflow-style: none;
+  padding-right: 20px;
+  margin-right: -20px;
   box-sizing: content-box;
 }
 
@@ -45,10 +45,10 @@
 .what-we-do__row {
   display: flex;
   align-items: center;
-  gap: var(--space-24);
+  gap: 0;
   padding: 0 var(--space-32) 0 var(--space-16);
   flex: 1;
-  min-height: calc(100vh / 6);   /* 6 rows iguais */
+  min-height: calc(100vh / 6);
   max-height: calc(100vh / 6);
   border-bottom: 2px solid var(--neutral-normal);
   position: relative;
@@ -64,7 +64,7 @@
 .what-we-do__row::before {
   content: '';
   position: absolute;
-  inset: 0 0 0 0;                /* equivale a left/right/bottom/top: 0 */
+  inset: 0 0 0 0;
   height: 100%;
   background-color: var(--primary-red);
   transform: translateY(100%);
@@ -112,21 +112,136 @@
   margin: 0;
 }
 
-/* Responsividade */
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+/* Desktop Large: 1920px+ */
+@media (min-width: 1920px) {
+  /* Mantém valores base - sem alterações necessárias */
+}
+
+/* Desktop Padrão: 1440px - 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .what-we-do__title {
+  color: var(--neutral-normal);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 6.0rem;
+  font-weight: 900;
+  letter-spacing: 0.155rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.what-we-do__description {
+  color: var(--neutral-normal);
+  flex: 1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.0rem;
+  font-weight: 400;
+  letter-spacing: 0.05rem;
+  margin: 0;
+}
+}
+
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .what-we-do__title {
+    font-size: 5.0rem;
+    letter-spacing: 0.135rem;
+  }
+
+  .what-we-do__description {
+    font-size: 0.75rem;
+    letter-spacing: 0.0475rem;
+  }
+}
+
+/* Tablet Landscape: 835px - 1023px */
+@media (min-width: 835px) and (max-width: 1023px) {
+  .what-we-do__title {
+    font-size: 4.15rem;
+    letter-spacing: 0.115rem;
+  }
+
+  .what-we-do__description {
+    font-size: 0.9rem;
+    letter-spacing: 0.045rem;
+  }
+}
+
+/* Tablet Portrait: 600px - 834px */
 @media (max-width: 834px) {
+  .what-we-do__row {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-8) var(--space-8);
+  }
+
+  .what-we-do__title {
+    font-size: 4.75rem;
+    line-height: 5.5rem;
+    letter-spacing: 0.095rem;
+  }
+
+  .what-we-do__description {
+    font-size: 1.0625rem;
+    letter-spacing: 0.0425rem;
+  }
+}
+
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
   .what-we-do__row {
     flex-direction: column;
     padding: var(--space-24) var(--space-16);
   }
+
   .what-we-do__title {
-    font-size: 4.75rem;
-    letter-spacing: 0.095rem;
+    font-size: 3.40625rem;
+    letter-spacing: 0.068125rem;
+  }
+
+  .what-we-do__description {
+    font-size: 1rem;
+    letter-spacing: 0.04rem;
   }
 }
 
-@media (max-width: 375px) {
+/* Mobile Padrão: 376px - 479px */
+@media (max-width: 479px) {
+  .what-we-do__row {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-8) var(--space-8);
+    gap: 0;
+  }
+
   .what-we-do__title {
-    font-size: 2.0625rem;
+    font-size: 2.3rem;
+    letter-spacing: 0.05469rem;
+  }
+
+  .what-we-do__description {
+    font-size: 0.85rem;
+    letter-spacing: 0.03875rem;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
+@media (max-width: 375px) {
+  .what-we-do__row {
+    flex-direction: column;
+    padding: var(--space-8) var(--space-8);
+  }
+
+  .what-we-do__title {
+    font-size: 1.9rem;
     letter-spacing: 0.04125rem;
+  }
+
+  .what-we-do__description {
+    font-size: 0.65rem;
+    letter-spacing: 0.0375rem;
   }
 }
