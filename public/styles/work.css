@@ -73,7 +73,7 @@
   object-position: center;
 }
 
-/* Tags - CORRIGIDO */
+/* Tags */
 .work-card__tag {
   color: #FFF;
   text-align: center;
@@ -101,7 +101,7 @@
   padding: 3rem;
 }
 
-/* Descrição do projeto - CORRIGIDA */
+/* Descrição do projeto */
 .work-card__description {
   color: #FFF;
   text-align: center;
@@ -115,8 +115,83 @@
 }
 
 /* ================================= */
-/* TABLET LAYOUT - 70% reduction */
+/* RESPONSIVE                        */
 /* ================================= */
+
+/* Desktop Large: 1920px+ */
+@media (min-width: 1920px) {
+  /* Mantém valores base - sem alterações necessárias */
+}
+
+/* Desktop Padrão: 1440px - 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .work-card__tag {
+  color: #FFF;
+  text-align: center;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 0.9rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 2.5rem;
+  letter-spacing: 0.1125rem;
+  margin: 0;
+}
+
+/* Título do projeto */
+.work-card__title {
+  color: #FFF;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 5.5rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 5rem;
+  letter-spacing: 0.115rem;
+  margin: 0;
+  padding: 3rem;
+}
+
+.work-card__description {
+  color: #FFF;
+  text-align: center;
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 1.4rem;
+  font-style: normal;
+  font-weight: 100;
+  line-height: normal;
+  letter-spacing: 0.1875rem;
+  margin: 0;
+}
+}
+
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .work-intro-title {
+    font-size: 11.58641rem;
+    letter-spacing: 0.11586rem;
+  }
+
+  .work-card__tag {
+    font-size: 0.6rem;
+    line-height: 2.165rem;
+    letter-spacing: 0.09735rem;
+  }
+
+  .work-card__title {
+    font-size: 3.625rem;
+    line-height: 4.135rem;
+    letter-spacing: 0.0995rem;
+  }
+
+  .work-card__description {
+    font-size: 1.2665rem;
+    letter-spacing: 0.162rem;
+    padding: 0 2.5rem;
+  }
+}
+
+/* Tablet Landscape: 768px - 1023px */
 @media (max-width: 1023px) and (min-width: 768px) {
   .work-intro-title {
     font-size: 7.77569rem;
@@ -139,26 +214,24 @@
   }
 
   .work-card__tag {
-    font-size: 0.7875rem; /* 1.125 * 0.7 */
-    line-height: 1.75rem; /* 2.5 * 0.7 */
-    letter-spacing: 0.07875rem; /* 0.1125 * 0.7 */
+    font-size: 0.7875rem;
+    line-height: 1.75rem;
+    letter-spacing: 0.07875rem;
   }
 
   .work-card__title {
-    font-size: 4.025rem; /* 5.75 * 0.7 */
-    line-height: 3.5rem; /* 5 * 0.7 */
-    letter-spacing: 0.0805rem; /* 0.115 * 0.7 */
+    font-size: 4.025rem;
+    line-height: 3.5rem;
+    letter-spacing: 0.0805rem;
   }
 
   .work-card__description {
-    font-size: 1.3125rem; /* 1.875 * 0.7 */
-    letter-spacing: 0.13125rem; /* 0.1875 * 0.7 */
+    font-size: 1.3125rem;
+    letter-spacing: 0.13125rem;
   }
 }
 
-/* ================================= */
-/* MOBILE LAYOUT - 50% reduction */
-/* ================================= */
+/* Tablet Portrait: 600px - 767px */
 @media (max-width: 767px) {
   #work {
     height: auto !important;
@@ -209,19 +282,224 @@
   }
 
   .work-card__tag {
-    font-size: 0.5625rem; /* 1.125 * 0.5 */
-    line-height: 1.25rem; /* 2.5 * 0.5 */
-    letter-spacing: 0.05625rem; /* 0.1125 * 0.5 */
+    font-size: 0.5625rem;
+    line-height: 1.25rem;
+    letter-spacing: 0.05625rem;
   }
 
   .work-card__title {
-    font-size: 2.875rem; /* 5.75 * 0.5 */
-    line-height: 2.5rem; /* 5 * 0.5 */
-    letter-spacing: 0.0575rem; /* 0.115 * 0.5 */
+    font-size: 2.875rem;
+    line-height: 2.5rem;
+    letter-spacing: 0.0575rem;
   }
 
   .work-card__description {
-    font-size: 0.9375rem; /* 1.875 * 0.5 */
-    letter-spacing: 0.09375rem; /* 0.1875 * 0.5 */
+    font-size: 0.9375rem;
+    letter-spacing: 0.09375rem;
+  }
+}
+
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
+  #work {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .work-track {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+  }
+
+  .work-intro-title {
+    font-size: 7.77569rem;
+    letter-spacing: 0.07775rem;
+  }
+
+  .work-card {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+  }
+
+  .work-card--project {
+    flex-direction: column !important;
+  }
+
+  .work-card__image-section {
+    width: 100% !important;
+    height: 50vh !important;
+  }
+
+  .work-card__content-section {
+    width: 100% !important;
+    height: 50vh !important;
+    padding: 4rem 0 !important;
+  }
+
+  .work-card__tags {
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 0.5rem 1.5rem !important;
+    align-self: stretch;
+    flex-wrap: wrap;
+  }
+
+  .work-card__tag {
+    font-size: 0.5625rem;
+    line-height: 1.25rem;
+    letter-spacing: 0.05625rem;
+  }
+
+  .work-card__title {
+    font-size: 2.875rem;
+    line-height: 2.5rem;
+    letter-spacing: 0.0575rem;
+  }
+
+  .work-card__description {
+    font-size: 0.9375rem;
+    letter-spacing: 0.09375rem;
+  }
+}
+
+/* Mobile Padrão: 360px - 479px */
+@media (max-width: 479px) {
+  #work {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .work-track {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+  }
+
+  .work-intro-title {
+    font-size: 7.0rem;
+    letter-spacing: 0.07775rem;
+  }
+
+  .work-card {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+  }
+
+  .work-card--project {
+    flex-direction: column !important;
+  }
+
+  .work-card__image-section {
+    width: 100% !important;
+    height: 50vh !important;
+  }
+
+  .work-card__content-section {
+    width: 100% !important;
+    height: 50vh !important;
+    padding: 4rem 0 !important;
+  }
+
+  .work-card__tags {
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 0.5rem 1.5rem !important;
+    align-self: stretch;
+    flex-wrap: wrap;
+  }
+
+  .work-card__tag {
+    font-size: 0.6rem;
+    line-height: 1.25rem;
+    letter-spacing: 0.05625rem;
+  }
+
+  .work-card__title {
+    font-size: 2.875rem;
+    line-height: 2.5rem;
+    letter-spacing: 0.0575rem;
+  }
+
+  .work-card__description {
+    font-size: 0.9375rem;
+    letter-spacing: 0.09375rem;
+    padding: 0 1rem;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
+@media (max-width: 375px) {
+  #work {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .work-track {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+  }
+
+  .work-intro-title {
+    font-size: 5.77569rem;
+    letter-spacing: 0.07775rem;
+  }
+
+  .work-card {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+  }
+
+  .work-card--project {
+    flex-direction: column !important;
+  }
+
+  .work-card__image-section {
+    width: 100% !important;
+    height: 50vh !important;
+  }
+
+  .work-card__content-section {
+    width: 100% !important;
+    height: 50vh !important;
+    padding: 4rem 0 !important;
+  }
+
+  .work-card__tags {
+    display: flex !important;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 0.5rem 1.5rem !important;
+    align-self: stretch;
+    flex-wrap: wrap;
+  }
+
+  .work-card__tag {
+    font-size: 0.5625rem;
+    line-height: 1.25rem;
+    letter-spacing: 0.05625rem;
+  }
+
+  .work-card__title {
+    font-size: 2.3rem;
+    line-height: 2.0rem;
+    letter-spacing: 0.0575rem;
+  }
+
+  .work-card__description {
+    font-size: 0.9375rem;
+    letter-spacing: 0.09375rem;
   }
 }
