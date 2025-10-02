@@ -10,12 +10,12 @@ const ContactSection = () => {
       {/* Conteúdo superior */}
       <div className="contact-content-top">
         <p className="contact-description" data-reveal>
-          Book a brief 15-minute call to talk about your project or, send us your message.
+          Book a brief 25-minute call to talk about your project or send us a message.
         </p>
         
         <button 
           className="contact-cta-button"
-          onClick={() => window.open('https://calendly.com/your-link', '_blank', 'noopener,noreferrer')}
+          onClick={() => window.open('https://calendar.app.google/tDSVuyR6ffDSqu817', '_blank', 'noopener,noreferrer')}
           aria-label="Schedule a meeting with us"
           data-reveal
         >
@@ -35,11 +35,11 @@ const ContactSection = () => {
         
         <button 
           className="contact-email"
-          onClick={() => window.location.href = 'mailto:contact@spoonful.com.br'}
+          onClick={() => window.location.href = 'mailto:fabricio@spoonful.com.br'}
           aria-label="Send us an email"
           data-reveal
         >
-          contact@spoonful.com.br
+          fabricio@spoonful.com.br
         </button>
       </div>
       
