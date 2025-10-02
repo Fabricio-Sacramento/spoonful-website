@@ -221,6 +221,54 @@
 /* RESPONSIVE                        */
 /* ================================= */
 
+/* Desktop Large: 1920px+ */
+@media (min-width: 1920px) {
+  /* Mantém valores base - sem alterações necessárias */
+}
+
+/* Desktop Padrão: 1440px - 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  /* Mantém valores base - sem alterações necessárias */
+}
+
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .contact-section {
+    padding: 3.5rem;
+  }
+  
+  .contact-content-top {
+    gap: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .contact-description {
+    font-size: 2.7rem;
+    letter-spacing: 0.74px;
+  }
+  
+  .contact-cta-button {
+    font-size: 1.125rem;
+    padding: 0.9375rem 1.875rem;
+    gap: 1.375rem;
+  }
+  
+  .calendar-icon {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .contact-email {
+    font-size: 2.2rem;
+    letter-spacing: 0.7px;
+  }
+  
+  .contact-title {
+    margin: 3.5rem 0 0 0;
+  }
+}
+
+/* Tablet Landscape: 768px - 1023px */
 @media (max-width: 1023px) {
   .contact-section {
     padding: 3rem 2rem;
@@ -232,7 +280,7 @@
   }
   
   .contact-description {
-    font-size: 2rem;
+    font-size: 4rem;
     letter-spacing: 0.64px;
   }
   
@@ -250,6 +298,8 @@
   .contact-email {
     font-size: 2rem;
     letter-spacing: 0.64px;
+    text-align: left;
+    padding-left: 0.8rem;
   }
   
   .contact-title {
@@ -257,6 +307,7 @@
   }
 }
 
+/* Tablet Portrait: 600px - 767px */
 @media (max-width: 767px) {
   .contact-section {
     padding: 2rem 1.5rem;
@@ -294,13 +345,84 @@
   }
 }
 
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
+  .contact-section {
+    padding: 2rem 1.5rem;
+  }
+  
+  .contact-content-top {
+    gap: 2.5rem;
+  }
+  
+  .contact-description {
+    font-size: 1.625rem;
+    letter-spacing: 0.52px;
+    line-height: 1.2;
+  }
+  
+  .contact-cta-button {
+    font-size: 1.0625rem;
+    padding: 0.8125rem 1.625rem;
+    gap: 1.125rem;
+  }
+  
+  .calendar-icon {
+    width: 19px;
+    height: 19px;
+  }
+  
+  .contact-email {
+    font-size: 1.625rem;
+    letter-spacing: 0.52px;
+  }
+  
+  .contact-title {
+    margin: 2.5rem 0 0 0;
+  }
+}
+
+/* Mobile Padrão: 360px - 479px */
+@media (max-width: 479px) {
+  .contact-section {
+    padding: 1.75rem 1.25rem;
+  }
+  
+  .contact-description {
+    font-size: 2.375rem;
+    letter-spacing: 0.44px;
+    line-height: 1.0;
+  }
+  
+  .contact-cta-button {
+    font-size: 0.9375rem;
+    padding: 0.6875rem 1.375rem;
+    gap: 0.875rem;
+  }
+  
+  .calendar-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .contact-email {
+    font-size: 1.3125rem;
+    letter-spacing: 0.42px;
+  }
+  
+  .contact-title {
+    margin: 2rem 0 0 0;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
 @media (max-width: 375px) {
   .contact-section {
     padding: 1.5rem 1rem;
   }
   
   .contact-description {
-    font-size: 1.25rem;
+    font-size: 1.65rem;
     letter-spacing: 0.4px;
   }
   
