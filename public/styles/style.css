@@ -360,16 +360,7 @@ display: inline-block;
 /* ----------------------------- */
 
 /* Headings */
-.heading-large {
-color: var(--neutral-light);
-font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-font-weight: 900;
-font-size: 120px;
-line-height: 0.75;
-letter-spacing: -3px;
-margin: 0;
-z-index: 1;
-}
+.heading-large {color: var(--neutral-light);font-family: 'Neue Haas Grotesk Display Pro', sans-serif;font-weight: 900;font-size: 110px;line-height: 0.75;letter-spacing: -3px;margin: 0;z-index: 1;}
 .heading-medium {
 color: var(--primary-light);
 font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
