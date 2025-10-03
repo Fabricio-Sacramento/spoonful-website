@@ -22,8 +22,6 @@
   flex: 1;
   height: 100vh;
   max-height: 100vh;
-  overflow-y: auto;
-
   /* esconder scrollbar mantendo rolagem */
   -ms-overflow-style: none;
   padding-right: 20px;

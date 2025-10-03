@@ -212,7 +212,7 @@ function setupWhatWeDoSection() {
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
-    end: '+=200',
+    end: '+=600',
     pin: true,
     pinSpacing: true,
     anticipatePin: 1,
