@@ -190,7 +190,7 @@ function setupWhatWeDoSection() {
   
   ScrollTrigger.create({
     trigger: section,
-    start: 'top center',
+    start: 'top top',
     once: true,
     refreshPriority: 2,
     invalidateOnRefresh: true,
@@ -201,7 +201,7 @@ function setupWhatWeDoSection() {
         gsap.to(rows, {
           y: 0,
           opacity: 1,
-          stagger: 0.15,
+          stagger: 0.25,
           duration: 0.8,
           ease: 'power3.out'
         });
