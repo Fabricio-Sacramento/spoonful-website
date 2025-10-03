@@ -15,14 +15,10 @@ const nextPaint = () =>
 const ensureScrollTop = async (el, attempts = 6) => {
   if (!el) return;
   for (let i = 0; i < attempts; i++) {
-    // força o topo
     el.scrollTop = 0;
-    // aguarda repaints que possam ocorrer por mudanças de layout
     await nextPaint();
-    // se já estiver no topo, pronto
     if (el.scrollTop === 0) return;
   }
-  // tentativa final
   el.scrollTop = 0;
 };
 
@@ -32,12 +28,10 @@ const safeFocus = (el) => {
     el.focus({ preventScroll: true });
   } catch (err) {
     console.error('❌ navigateTo error:', err);
-    // navegadores antigos não suportam options
     el.focus();
   }
 };
 
-// waitForTransition unchanged (robust)
 const waitForTransition = (el, timeout = 800, property = 'opacity') => {
   return new Promise((resolve) => {
     if (!el) return resolve({ via: 'no-element' });
@@ -84,13 +78,10 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
   const [fadingState, setFadingState] = useState('visible');
 
-  // animRef stays for imperative logic (suppressScroll etc.)
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
-  // mirror animating into state so UI re-renders
   const [isAnimatingState, setIsAnimatingState] = useState(false);
   const setAnimating = useCallback((val) => {
     animRef.current.isAnimating = !!val;
-    // only update state when different (avoid unnecessary renders)
     setIsAnimatingState(prev => (prev === !!val ? prev : !!val));
   }, []);
 
@@ -198,7 +189,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     if (!modal) return;
 
     const preferReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // set both ref and state via helper
     setAnimating(true);
     animRef.current.suppressScroll = true;
 
@@ -230,7 +220,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
           safeFocus(title);
         }, 20);
-        // Reset flags antes de sair
         setAnimating(false);
         animRef.current.suppressScroll = false;
         return;
@@ -257,7 +246,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         new Promise(r => setTimeout(r, 1000))
       ]);
 
-      // 🔄 Swapping content to index:
       if (!isMountedRef.current) return;
       setCurrentIndex(targetIndex);
       await nextPaint();
@@ -267,7 +255,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       setFadingState('visible');
       await nextPaint();
 
-      // <-- NOVO: garantir snap para top depois da troca (corrige drift causado por reflow/transitions)
       await ensureScrollTop(modal);
 
       if (!modalRef.current) {
@@ -284,14 +271,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       const fadeInResult = await waitForTransition(newContentEl, 700, 'opacity');
       console.log('Fade-in result:', fadeInResult);
 
-      // revelar hero (mesma lógica sua)
       const hero = modal.querySelector('.modal-hero');
       if (hero) {
         hero.classList.remove('modal-hero--visible');
         setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
       }
 
-      // definir foco no título sem causar scroll
       setTimeout(() => {
         const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
         safeFocus(title);
@@ -380,7 +365,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       modal.classList.remove('modal-overlay--visible');
 
       closeTimersRef.current.hide = window.setTimeout(() => {
-        // Hero cleanup completo
         const hero = modal.querySelector('.modal-hero');
         if (hero) {
           hero.classList.remove('modal-hero--visible', 'modal-hero--hiding');
@@ -412,14 +396,12 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
   }, [isOpen]);
 
-  // When modal closes ensure visible flags and anim state are reset
   useEffect(() => {
     if (!isOpen) {
       console.log('🧹 Modal closed - resetting all state');
       if (isMountedRef.current) {
         setFadingState('visible');
       }
-      // Reset animation flags (both ref and state)
       setAnimating(false);
       animRef.current.suppressScroll = false;
     }
@@ -712,26 +694,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     >
       <button
         onClick={handleClose}
-        style={{
-          position: 'fixed',
-          top: '2rem',
-          right: '2rem',
-          width: '48px',
-          height: '48px',
-          background: 'rgba(235, 235, 235, 0.1)',
-          border: 'none',
-          borderRadius: '50%',
-          color: 'var(--neutral-light)',
-          fontSize: '1.5rem',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10001,
-          transition: 'background-color 0.2s ease'
-        }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(235, 235, 235, 0.2)'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(235, 235, 235, 0.1)'}
+        className="modal-close-button"
         aria-label="Fechar modal"
       >
         ×
@@ -751,14 +714,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           gap: '0.5rem',
           overflow: 'hidden'
         }}>
-          <div data-reveal style={{
-            color: 'var(--primary-green)',
-            fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-            fontSize: '1.125rem',
-            fontWeight: '600',
-            letterSpacing: '0.045rem',
-            textTransform: 'capitalize'
-          }}>
+          <div data-reveal className="modal-hero-tags">
             {currentProject.tags?.join(' • ') || 'PROJECT'}
           </div>
 
@@ -766,91 +722,37 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             data-reveal
             data-focus-target
             tabIndex="-1"
-            style={{
-              color: 'var(--neutral-light)',
-              fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-              fontSize: '7.75rem',
-              fontWeight: '900',
-              letterSpacing: '0.155rem',
-              margin: 0,
-              outline: 'none'
-            }}
+            className="modal-hero-title"
           >
             {currentProject.title}
           </h1>
 
           <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
             <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h2 style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.375rem',
-                fontWeight: '600',
-                letterSpacing: '0.055rem',
-                margin: 0
-              }}>
+              <h2 className="modal-hero-subtitle">
                 {currentProject.subtitle || currentProject.description}
               </h2>
 
-              <p style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.25rem',
-                fontWeight: '200',
-                letterSpacing: '0.0625rem',
-                margin: 0
-              }}>
+              <p className="modal-hero-description">
                 {currentProject.fullDescription || currentProject.description}
               </p>
             </div>
 
             <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <div>
-                <h3 style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.0625rem',
-                  fontWeight: '600',
-                  letterSpacing: '0.0425rem',
-                  textTransform: 'capitalize',
-                  margin: '0 0 0.5rem 0'
-                }}>
+                <h3 className="modal-stack-label">
                   Design Stack
                 </h3>
-                <p style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.25rem',
-                  fontWeight: '200',
-                  letterSpacing: '0.0625rem',
-                  textTransform: 'capitalize',
-                  margin: 0
-                }}>
+                <p className="modal-stack-value">
                   {currentProject.designStack || 'Brand Strategy, UI/UX, Development'}
                 </p>
               </div>
 
               <div>
-                <h3 style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.0625rem',
-                  fontWeight: '600',
-                  letterSpacing: '0.0425rem',
-                  textTransform: 'capitalize',
-                  margin: '0 0 0.5rem 0'
-                }}>
+                <h3 className="modal-stack-label">
                   Tech Stack
                 </h3>
-                <p style={{
-                  color: 'var(--neutral-light)',
-                  fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                  fontSize: '1.25rem',
-                  fontWeight: '200',
-                  letterSpacing: '0.0625rem',
-                  textTransform: 'capitalize',
-                  margin: 0
-                }}>
+                <p className="modal-stack-value">
                   {currentProject.techStack || 'React • Node.js • MongoDB'}
                 </p>
               </div>
@@ -859,31 +761,14 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             <div style={{ flex: '1' }}>
               {currentProject.projectUrl && (
                 <div>
-                  <h3 style={{
-                    color: 'var(--neutral-light)',
-                    fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                    fontSize: '1.0625rem',
-                    fontWeight: '600',
-                    letterSpacing: '0.0425rem',
-                    textTransform: 'capitalize',
-                    margin: '0 0 0.5rem 0'
-                  }}>
+                  <h3 className="modal-stack-label">
                     Go Live
                   </h3>
                   <a
                     href={currentProject.projectUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      color: 'var(--primary-green)',
-                      fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                      fontSize: '1.25rem',
-                      fontWeight: '400',
-                      letterSpacing: '0.0625rem',
-                      textTransform: 'capitalize',
-                      textDecoration: 'none',
-                      cursor: 'pointer'
-                    }}
+                    className="modal-link"
                     onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
                     onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
                   >
@@ -1030,42 +915,17 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 if (tags) tags.style.transform = 'translateY(0)';
               }}
             >
-              <span style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '2.8125rem',
-                fontWeight: '100',
-                letterSpacing: '0.9px',
-                lineHeight: '1.3',
-                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-              }}>
+              <span className="modal-nav-label">
                 Previous project
               </span>
 
-              <h2 style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '6.25rem',
-                fontWeight: '900',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                lineHeight: '0.8',
-                margin: 0,
-                transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
+              <h2 className="modal-nav-title" style={{
                 transformOrigin: 'right center'
               }}>
                 {prevProject.title}
               </h2>
 
-              <span style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.3125rem',
-                fontWeight: '400',
-                letterSpacing: '0.84px',
-                textTransform: 'uppercase',
-                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-              }}>
+              <span className="modal-nav-tags">
                 {prevProject.tags?.join(' • ') || 'PROJECT'}
               </span>
             </button>
@@ -1160,42 +1020,17 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 if (tags) tags.style.transform = 'translateY(0)';
               }}
             >
-              <span style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '2.8125rem',
-                fontWeight: '100',
-                letterSpacing: '0.9px',
-                lineHeight: '1.3',
-                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-              }}>
+              <span className="modal-nav-label">
                 Next project
               </span>
 
-              <h2 style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '6.25rem',
-                fontWeight: '900',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                lineHeight: '0.8',
-                margin: 0,
-                transition: 'transform 420ms cubic-bezier(0.16, 1, 0.3, 1)',
+              <h2 className="modal-nav-title" style={{
                 transformOrigin: 'left center'
               }}>
                 {nextProject.title}
               </h2>
 
-              <span style={{
-                color: 'var(--neutral-light)',
-                fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-                fontSize: '1.3125rem',
-                fontWeight: '400',
-                letterSpacing: '0.84px',
-                textTransform: 'uppercase',
-                transition: 'transform 360ms cubic-bezier(0.16, 1, 0.3, 1)'
-              }}>
+              <span className="modal-nav-tags">
                 {nextProject.tags?.join(' • ') || 'PROJECT'}
               </span>
             </button>
