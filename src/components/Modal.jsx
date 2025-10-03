@@ -727,7 +727,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             {currentProject.title}
           </h1>
 
-          <div data-reveal style={{ display: 'flex', width: '100%', gap: '2rem' }}>
+          <div data-reveal className="modal-hero-content-wrapper">
             <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h2 className="modal-hero-subtitle">
                 {currentProject.subtitle || currentProject.description}
@@ -791,15 +791,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
             <div
               ref={firstImageRef}
-              style={{
-                width: '100%',
-                height: 'calc(100vh - 1rem)',
-                padding: 0,
-                overflow: 'hidden',
-                position: 'relative',
-                transformOrigin: 'center bottom',
-                boxSizing: 'border-box'
-              }}
+              className="modal-gallery-image-first"
             >
               <div style={{
                 position: 'absolute',
@@ -829,17 +821,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             </div>
 
             {galleryImages.slice(1).map((imageSrc, i) => (
-              <div key={i + 1} style={{
-                width: '100%',
-                height: '100vh',
-                marginLeft: 0,
-                marginRight: 0,
-                padding: 0,
-                borderRadius: '0',
-                overflow: 'hidden',
-                position: 'relative',
-                boxSizing: 'border-box'
-              }}>
+              <div key={i + 1} className="modal-gallery-image">
                 <img
                   src={imageSrc}
                   alt={`${currentProject.title} - Gallery ${i + 2}`}
@@ -866,30 +848,15 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           position: 'relative',
           zIndex: 2
         }}>
-          <div style={{
-            height: '50vh',
-            display: 'flex',
-            width: '100%'
-          }}>
+          <div className="modal-nav-row">
             <button
-              className="modal-navigation-button"
+              className="modal-nav-button-wrapper"
               onClick={goToPrevious}
               disabled={isAnimatingState}
               style={{
-                width: '50%',
-                height: '100%',
-                backgroundColor: 'var(--primary-red)',
-                padding: '2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
                 alignItems: 'flex-end',
-                gap: '0.5rem',
                 textAlign: 'right',
-                border: 'none',
                 cursor: isAnimatingState ? 'wait' : 'pointer',
-                overflow: 'hidden',
-                transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                 opacity: isAnimatingState ? 0.6 : 1,
                 pointerEvents: isAnimatingState ? 'none' : 'auto'
               }}
@@ -930,12 +897,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               </span>
             </button>
 
-            <div style={{
-              width: '50%',
-              height: '100%',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
+            <div className="modal-nav-image-wrapper">
               <img
                 src={prevProject.image}
                 alt={prevProject.title}
@@ -951,17 +913,8 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             </div>
           </div>
 
-          <div style={{
-            height: '50vh',
-            display: 'flex',
-            width: '100%'
-          }}>
-            <div style={{
-              width: '50%',
-              height: '100%',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
+          <div className="modal-nav-row">
+            <div className="modal-nav-image-wrapper">
               <img
                 src={nextProject.image}
                 alt={nextProject.title}
@@ -977,24 +930,13 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
             </div>
 
             <button
-              className="modal-navigation-button"
+              className="modal-nav-button-wrapper"
               onClick={goToNext}
               disabled={isAnimatingState}
               style={{
-                width: '50%',
-                height: '100%',
-                backgroundColor: 'var(--primary-red)',
-                padding: '2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
                 alignItems: 'flex-start',
-                gap: '0.5rem',
                 textAlign: 'left',
-                border: 'none',
                 cursor: isAnimatingState ? 'wait' : 'pointer',
-                overflow: 'hidden',
-                transition: 'all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                 opacity: isAnimatingState ? 0.6 : 1,
                 pointerEvents: isAnimatingState ? 'none' : 'auto'
               }}

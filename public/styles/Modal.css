@@ -132,6 +132,69 @@
 }
 
 /* ================================= */
+/* MODAL LAYOUT - STRUCTURAL         */
+/* ================================= */
+
+/* Hero Content Wrapper */
+.modal-hero-content-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+}
+
+/* Gallery Images */
+.modal-gallery-image {
+  width: 100%;
+  height: 100vh;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.modal-gallery-image-first {
+  width: 100%;
+  height: calc(100vh - 1rem);
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  transform-origin: center bottom;
+  box-sizing: border-box;
+}
+
+/* Navigation Rows */
+.modal-nav-row {
+  height: 50vh;
+  display: flex;
+  width: 100%;
+}
+
+.modal-nav-button-wrapper {
+  width: 50%;
+  height: 100%;
+  background-color: var(--primary-red);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 380ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.modal-nav-image-wrapper {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ================================= */
 /* RESPONSIVE                        */
 /* ================================= */
 
@@ -142,134 +205,64 @@
 
 /* Desktop Padrão: 1440px - 1919px */
 @media (min-width: 1440px) and (max-width: 1919px) {
-  /* Hero Section */
-.modal-hero-tags {
-  color: var(--primary-green);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: 0.045rem;
-  text-transform: capitalize;
-  line-height: 1rem;
-}
+  .modal-hero-tags {
+    font-size: 1.125rem;
+    letter-spacing: 0.045rem;
+    line-height: 1rem;
+  }
 
-.modal-hero-title {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 7.75rem;
-  font-weight: 900;
-  letter-spacing: 0.155rem;
-  margin: 0;
-  outline: none;
-}
+  .modal-hero-title {
+    font-size: 6.75rem;
+    letter-spacing: 0.155rem;
+  }
 
-.modal-hero-subtitle {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1.375rem;
-  font-weight: 600;
-  letter-spacing: 0.055rem;
-  margin: 0;
-}
+  .modal-hero-subtitle {
+    font-size: 1.375rem;
+    letter-spacing: 0.055rem;
+  }
 
-.modal-hero-description {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1.0rem;
-  line-height: 1.6rem;
-  font-weight: 200;
-  letter-spacing: 0.0625rem;
-  margin: 0;
-}
+  .modal-hero-description {
+    font-size: 1.0rem;
+    line-height: 1.6rem;
+    letter-spacing: 0.0625rem;
+  }
 
-.modal-stack-label {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: 0.0425rem;
-  text-transform: capitalize;
-  margin: 0 0 0.5rem 0;
-}
+  .modal-stack-label {
+    font-size: 1.0625rem;
+    letter-spacing: 0.0425rem;
+  }
 
-.modal-stack-value {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 0.9rem;
-  line-height: 1.6rem;
-  font-weight: 200;
-  letter-spacing: 0.0625rem;
-  text-transform: capitalize;
-  margin: 0;
-}
+  .modal-stack-value {
+    font-size: 0.9rem;
+    line-height: 1.6rem;
+    letter-spacing: 0.0625rem;
+  }
 
-.modal-link {
-  color: var(--primary-green);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 400;
-  letter-spacing: 0.0625rem;
-  text-transform: capitalize;
-  text-decoration: none;
-  cursor: pointer;
-}
+  .modal-link {
+    font-size: 1.25rem;
+    letter-spacing: 0.0625rem;
+  }
 
-/* Navigation Section */
-.modal-nav-label {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 2.8125rem;
-  font-weight: 100;
-  letter-spacing: 0.9px;
-  line-height: 1.3;
-  transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+  .modal-nav-label {
+    font-size: 2.3rem;
+    letter-spacing: 0.9px;
+  }
 
-.modal-nav-title {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 6.25rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  line-height: 0.8;
-  margin: 0;
-  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+  .modal-nav-title {
+    font-size: 4.9rem;
+    letter-spacing: 2px;
+  }
 
-.modal-nav-tags {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1.3125rem;
-  font-weight: 400;
-  letter-spacing: 0.84px;
-  text-transform: uppercase;
-  transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+  .modal-nav-tags {
+    font-size: 1rem;
+    letter-spacing: 0.84px;
+  }
 
-/* Close Button */
-.modal-close-button {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  width: 48px;
-  height: 48px;
-  background: rgba(235, 235, 235, 0.1);
-  border: none;
-  border-radius: 50%;
-  color: var(--neutral-light);
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10001;
-  transition: background-color 0.2s ease;
-}
-
-.modal-close-button:hover {
-  background-color: rgba(235, 235, 235, 0.2);
-}
+  .modal-close-button {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
 }
 
 /* Laptop: 1024px - 1439px */
@@ -280,7 +273,7 @@
   }
 
   .modal-hero-title {
-    font-size: 6.75rem;
+    font-size: 5.75rem;
     letter-spacing: 0.135rem;
   }
 
@@ -317,12 +310,12 @@
   }
 
   .modal-nav-title {
-    font-size: 4.46875rem;
+    font-size: 3.46875rem;
     letter-spacing: 1.75px;
   }
 
   .modal-nav-tags {
-    font-size: 1.15625rem;
+    font-size: 0.8rem;
     letter-spacing: 0.74px;
   }
 
@@ -390,6 +383,22 @@
     height: 40px;
     font-size: 1.25rem;
   }
+
+  /* Layout adjustments */
+  .modal-hero-content-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .modal-gallery-image {
+    height: 60vh;
+    min-height: 60vh;
+  }
+
+  .modal-gallery-image-first {
+    height: 60vh;
+    min-height: 60vh;
+  }
 }
 
 /* Tablet Portrait: 600px - 767px */
@@ -450,6 +459,38 @@
     width: 36px;
     height: 36px;
     font-size: 1.125rem;
+  }
+
+  /* Layout adjustments */
+  .modal-hero-content-wrapper {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .modal-gallery-image {
+    height: 50vh;
+    min-height: 50vh;
+  }
+
+  .modal-gallery-image-first {
+    height: 50vh;
+    min-height: 50vh;
+  }
+
+  .modal-nav-row {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .modal-nav-button-wrapper {
+    width: 100%;
+    height: 50vh;
+    padding: 1.5rem;
+  }
+
+  .modal-nav-image-wrapper {
+    width: 100%;
+    height: 50vh;
   }
 }
 
@@ -512,6 +553,38 @@
     height: 32px;
     font-size: 1rem;
   }
+
+  /* Layout adjustments */
+  .modal-hero-content-wrapper {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .modal-gallery-image {
+    height: 40vh;
+    min-height: 40vh;
+  }
+
+  .modal-gallery-image-first {
+    height: 40vh;
+    min-height: 40vh;
+  }
+
+  .modal-nav-row {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .modal-nav-button-wrapper {
+    width: 100%;
+    height: 40vh;
+    padding: 1.25rem;
+  }
+
+  .modal-nav-image-wrapper {
+    width: 100%;
+    height: 40vh;
+  }
 }
 
 /* Mobile Padrão: 360px - 479px */
@@ -533,6 +606,7 @@
 
   .modal-hero-description {
     font-size: 0.75rem;
+    line-height: 1rem;
     letter-spacing: 0.0375rem;
   }
 
@@ -572,6 +646,38 @@
     width: 32px;
     height: 32px;
     font-size: 1rem;
+  }
+
+  /* Layout adjustments */
+  .modal-hero-content-wrapper {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-gallery-image {
+    height: 35vh;
+    min-height: 35vh;
+  }
+
+  .modal-gallery-image-first {
+    height: 35vh;
+    min-height: 35vh;
+  }
+
+  .modal-nav-row {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .modal-nav-button-wrapper {
+    width: 100%;
+    height: 35vh;
+    padding: 1rem;
+  }
+
+  .modal-nav-image-wrapper {
+    width: 100%;
+    height: 35vh;
   }
 }
 
@@ -633,5 +739,37 @@
     width: 28px;
     height: 28px;
     font-size: 0.875rem;
+  }
+
+  /* Layout adjustments */
+  .modal-hero-content-wrapper {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .modal-gallery-image {
+    height: 30vh;
+    min-height: 30vh;
+  }
+
+  .modal-gallery-image-first {
+    height: 30vh;
+    min-height: 30vh;
+  }
+
+  .modal-nav-row {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .modal-nav-button-wrapper {
+    width: 100%;
+    height: 30vh;
+    padding: 0.75rem;
+  }
+
+  .modal-nav-image-wrapper {
+    width: 100%;
+    height: 30vh;
   }
 }
