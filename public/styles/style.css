@@ -608,7 +608,8 @@ body.custom-cursor-active * {
 #what-we-do,
 #statement,
 #contact,
-.work-card--project {
+.work-card--project,
+.modal-overlay {
   cursor: auto;
 }
 
@@ -626,7 +627,8 @@ body.custom-cursor-active * {
   #what-we-do,
   #statement,
   #contact,
-  .work-card--project {
+  .work-card--project,
+  .modal-overlay {
     cursor: auto;
   }
   
@@ -635,7 +637,8 @@ body.custom-cursor-active * {
   #what-we-do *,
   #statement *,
   #contact *,
-  .work-card--project * {
+  .work-card--project *,
+  .modal-overlay * {
     cursor: auto !important;
   }
 }

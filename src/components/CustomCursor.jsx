@@ -84,7 +84,7 @@ const CustomCursor = () => {
       { selector: '#what-we-do', text: '', type: 'default' },
       { selector: '#statement', text: '', type: 'default' },
       { selector: '#contact', text: '', type: 'default' },
-      { selector: '.modal', text: '', type: 'default' }
+      { selector: '.modal-overlay', text: '', type: 'default' }
     ];
 
     const cleanupFunctions = [];
