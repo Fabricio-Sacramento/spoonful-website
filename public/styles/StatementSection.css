@@ -1,0 +1,113 @@
+/* ================================= */
+/* STATEMENT SECTION - BASE          */
+/* ================================= */
+
+#statement {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--primary-red);
+  contain: layout;
+  content-visibility: auto;
+}
+
+.statement-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.statement-text {
+  color: var(--neutral-light);
+  text-align: center;
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 15.4375rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 11.25rem;
+  letter-spacing: 0.15438rem;
+  text-transform: uppercase;
+  margin: 0;
+  min-height: 11.25rem;
+  will-change: contents;
+}
+
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+/* Desktop Large: 1920px+ */
+@media (min-width: 1920px) {
+  /* Mantém valores base - sem alterações necessárias */
+}
+
+/* Desktop Padrão: 1440px - 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  /* Mantém valores base - sem alterações necessárias */
+}
+
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .statement-text {
+    font-size: 13.125rem;
+    line-height: 9.5625rem;
+    letter-spacing: 0.13125rem;
+    min-height: 9.5625rem;
+  }
+}
+
+/* Tablet Landscape: 768px - 1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .statement-text {
+    font-size: 10.8125rem;
+    line-height: 7.875rem;
+    letter-spacing: 0.108125rem;
+    min-height: 7.875rem;
+  }
+}
+
+/* Tablet Portrait: 600px - 767px */
+@media (max-width: 767px) {
+  .statement-text {
+    font-size: 7.71875rem;
+    line-height: 5.625rem;
+    letter-spacing: 0.077188rem;
+    min-height: 5.625rem;
+  }
+}
+
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
+  .statement-text {
+    font-size: 6.1875rem;
+    line-height: 4.5rem;
+    letter-spacing: 0.061875rem;
+    min-height: 4.5rem;
+  }
+}
+
+/* Mobile Padrão: 360px - 479px */
+@media (max-width: 479px) {
+  .statement-text {
+    font-size: 4.65625rem;
+    line-height: 3.375rem;
+    letter-spacing: 0.046563rem;
+    min-height: 3.375rem;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
+@media (max-width: 375px) {
+  .statement-text {
+    font-size: 3.859375rem;
+    line-height: 2.8125rem;
+    letter-spacing: 0.038594rem;
+    min-height: 2.8125rem;
+  }
+}

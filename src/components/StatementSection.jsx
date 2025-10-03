@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import TextScramble from '../utils/text-scramble.js';
+import '../../public/styles/StatementSection.css';
 
 const PHRASES = [
   'DESIGN',
@@ -166,48 +167,9 @@ const StatementSection = forwardRef((props, ref) => {
   }, []);
 
   return (
-    <section
-      id="statement"
-      style={{
-        display: 'flex',
-        width: '100%',
-        minHeight: '100vh',
-        height: '100vh',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'var(--primary-red)',
-        contain: 'layout',
-        contentVisibility: 'auto'
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '0.625rem',
-          flex: '1 0 0',
-          alignSelf: 'stretch'
-        }}
-      >
-        <h1
-          ref={textRef}
-          className="statement-text"
-          style={{
-            color: 'var(--neutral-light)',
-            textAlign: 'center',
-            fontFamily: 'Neue Haas Grotesk Display Pro, sans-serif',
-            fontSize: '15.4375rem',
-            fontStyle: 'normal',
-            fontWeight: '900',
-            lineHeight: '11.25rem',
-            letterSpacing: '0.15438rem',
-            textTransform: 'uppercase',
-            margin: 0,
-            minHeight: '11.25rem',
-            willChange: 'contents'
-          }}
-        >
+    <section id="statement">
+      <div className="statement-container">
+        <h1 ref={textRef} className="statement-text">
           {/* Texto inicial vazio - será preenchido pelo scramble */}
         </h1>
       </div>
