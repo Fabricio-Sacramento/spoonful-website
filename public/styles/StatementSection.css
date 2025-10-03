@@ -27,7 +27,7 @@
   color: var(--neutral-light);
   text-align: center;
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 15.4375rem;
+  font-size: 12.4375rem;
   font-style: normal;
   font-weight: 900;
   line-height: 11.25rem;
@@ -55,7 +55,7 @@
 /* Laptop: 1024px - 1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .statement-text {
-    font-size: 13.125rem;
+    font-size: 8.125rem;
     line-height: 9.5625rem;
     letter-spacing: 0.13125rem;
     min-height: 9.5625rem;
@@ -65,7 +65,7 @@
 /* Tablet Landscape: 768px - 1023px */
 @media (max-width: 1023px) and (min-width: 768px) {
   .statement-text {
-    font-size: 10.8125rem;
+    font-size: 6.8125rem;
     line-height: 7.875rem;
     letter-spacing: 0.108125rem;
     min-height: 7.875rem;
@@ -95,7 +95,7 @@
 /* Mobile Padrão: 360px - 479px */
 @media (max-width: 479px) {
   .statement-text {
-    font-size: 4.65625rem;
+    font-size: 3.65625rem;
     line-height: 3.375rem;
     letter-spacing: 0.046563rem;
     min-height: 3.375rem;
@@ -105,7 +105,7 @@
 /* Mobile Small: 375px e abaixo */
 @media (max-width: 375px) {
   .statement-text {
-    font-size: 3.859375rem;
+    font-size: 2.8rem;
     line-height: 2.8125rem;
     letter-spacing: 0.038594rem;
     min-height: 2.8125rem;

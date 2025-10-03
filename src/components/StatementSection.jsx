@@ -3,7 +3,6 @@
 
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import TextScramble from '../utils/text-scramble.js';
-import '../../public/styles/StatementSection.css';
 
 const PHRASES = [
   'DESIGN',

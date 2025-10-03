@@ -45,7 +45,7 @@
 .what-we-do__row {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 1rem;
   padding: 0 var(--space-32) 0 var(--space-16);
   flex: 1;
   min-height: calc(100vh / 6);
@@ -126,7 +126,7 @@
   .what-we-do__title {
   color: var(--neutral-normal);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 6.0rem;
+  font-size: 7rem;
   font-weight: 900;
   letter-spacing: 0.155rem;
   text-transform: uppercase;
