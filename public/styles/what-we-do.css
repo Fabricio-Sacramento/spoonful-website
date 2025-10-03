@@ -147,12 +147,12 @@
 /* Laptop: 1024px - 1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .what-we-do__title {
-    font-size: 5.0rem;
-    letter-spacing: 0.135rem;
+    font-size: 5.5rem;
+    letter-spacing: 0;
   }
 
   .what-we-do__description {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     letter-spacing: 0.0475rem;
   }
 }
@@ -219,6 +219,7 @@
 
   .what-we-do__title {
     font-size: 2.3rem;
+    line-height: 3rem;
     letter-spacing: 0.05469rem;
   }
 
@@ -237,6 +238,7 @@
 
   .what-we-do__title {
     font-size: 1.9rem;
+    line-height: 2.2rem;
     letter-spacing: 0.04125rem;
   }
 
