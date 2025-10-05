@@ -1,0 +1,94 @@
+/* CustomCursor.css - Arquitetura Simples */
+
+/* ================================= */
+/* ESCONDE CURSOR NATIVO GLOBALMENTE */
+/* ================================= */
+
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}
+
+/* ================================= */
+/* CURSOR CUSTOMIZADO BASE           */
+/* ================================= */
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 80px;
+  background: var(--primary-red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 99999;
+  transform-origin: center center;
+  will-change: transform;
+  transition: width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* ================================= */
+/* VARIANTES DO CURSOR               */
+/* ================================= */
+
+/* Hero - vermelho grande com texto */
+.custom-cursor--hero {
+  width: 80px;
+  height: 80px;
+  background: var(--primary-red);
+}
+
+/* Work Cards - verde grande com texto */
+.custom-cursor--work {
+  width: 80px;
+  height: 80px;
+  background: var(--primary-green);
+}
+
+/* Default - verde pequeno sem texto */
+.custom-cursor--default {
+  width: 17px;
+  height: 17px;
+  background: var(--primary-green);
+  -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* ================================= */
+/* TEXTO DO CURSOR                   */
+/* ================================= */
+
+.custom-cursor__text {
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  color: #FFF;
+  margin: 0;
+  text-align: center;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ================================= */
+/* MOBILE - DESABILITA               */
+/* ================================= */
+
+@media (max-width: 1023px) {
+  .custom-cursor {
+    display: none !important;
+  }
+  
+  body.custom-cursor-active,
+  body.custom-cursor-active * {
+    cursor: auto !important;
+  }
+}
