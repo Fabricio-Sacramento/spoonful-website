@@ -207,6 +207,7 @@ const WorkSection = () => {
           <article 
             key={project.id}
             className="work-card work-card--project"
+            data-cursor="view" // ← ADICIONAR ESTA LINHA
             onClick={() => openModal(project)}
             style={{
               display: 'flex',
