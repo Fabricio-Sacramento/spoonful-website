@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CanvasApp from './components/CanvasApp.jsx';
 import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
-import CustomCursor from './components/CustomCursor.jsx';
+//import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
@@ -27,14 +27,6 @@ statementRoot.render(<StatementSection />);
 // 4) Monta Contact Section ← NOVO
 const contactRoot = ReactDOM.createRoot(document.getElementById('contact'));
 contactRoot.render(<ContactSection />);
-
-// 5) Monta Custom Cursor
-const cursorDiv = document.createElement('div');
-cursorDiv.id = 'custom-cursor-mount';
-document.body.appendChild(cursorDiv);
-
-const cursorRoot = ReactDOM.createRoot(cursorDiv);
-cursorRoot.render(<CustomCursor />);
 
 // 6) Inicializa Canvas Performance Controller
 window.addEventListener('load', () => {
