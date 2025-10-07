@@ -78,6 +78,18 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
   const [fadingState, setFadingState] = useState('visible');
 
+  useEffect(() => {
+    if (isOpen) {
+      // Força cursor VIEW quando modal abre
+      console.log('🎬 Modal opened - forcing cursor VIEW');
+      window.dispatchEvent(new CustomEvent('modal:open'));
+    } else {
+      // Restaura cursor quando modal fecha
+      console.log('🎬 Modal closed - restoring cursor');
+      window.dispatchEvent(new CustomEvent('modal:close'));
+    }
+  }, [isOpen]);
+
   const animRef = useRef({ isAnimating: false, suppressScroll: false });
   const [isAnimatingState, setIsAnimatingState] = useState(false);
   const setAnimating = useCallback((val) => {

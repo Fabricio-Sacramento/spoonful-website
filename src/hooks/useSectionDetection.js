@@ -1,5 +1,5 @@
 // src/hooks/useSectionDetection.js
-// CORRIGIDO: Sem overlap - transição limpa Hero → About
+// ✅ CORRIGIDO: Detecção precisa Hero → About com wrapper absolute
 
 import { useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -37,11 +37,12 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         return false;
       }
 
-      // ✅ CORRIGIDO: Sem overlap - transição em 40%
+      // ✅ CORRIGIDO: Hero termina quando o wrapper sai 50% da viewport
+      // About começa quando Hero termina (sem gap)
       const heroTrigger = ScrollTrigger.create({
         trigger: wrapper,
         start: 'top top',
-        end: '40% top',
+        end: '50% top', // Hero visible nos primeiros 50% do wrapper
         onEnter: () => {
           if (activeSection.current === 'hero') return;
           console.log('📍 Hero ENTERED');
@@ -55,17 +56,18 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
           onSectionChange('hero', CURSOR_STATES.DRAG_ME);
         },
         onLeave: () => {
-          console.log('📍 Hero LEFT');
+          console.log('📍 Hero LEFT → Transitioning to About');
         }
       });
 
       const aboutTrigger = ScrollTrigger.create({
         trigger: wrapper,
-        start: '40% top', // ✅ Começa exatamente onde Hero termina
+        start: '50% top', // About começa exatamente quando Hero sai
         end: 'bottom top',
         onEnter: () => {
+          // Bloqueia se VIEW (modal aberto)
           if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-            console.log('🔒 About blocked - VIEW');
+            console.log('🔒 About blocked - VIEW active');
             return;
           }
           if (activeSection.current === 'about-us') return;
@@ -74,24 +76,16 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
           onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
         },
         onEnterBack: () => {
-          if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-            return;
-          }
+          if (getCurrentCursorState() === CURSOR_STATES.VIEW) return;
           if (activeSection.current === 'about-us') return;
           console.log('📍 About Us ENTERED BACK');
           activeSection.current = 'about-us';
           onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
-        },
-        onLeave: () => {
-          console.log('📍 About LEFT');
-        },
-        onLeaveBack: () => {
-          console.log('📍 About LEFT BACK');
         }
       });
 
       scrollTriggersRef.current = [heroTrigger, aboutTrigger];
-      console.log('✅ ScrollTrigger OK (Hero: 0-40%, About: 40-100%)');
+      console.log('✅ ScrollTrigger OK (Hero: 0-50%, About: 50-100%)');
       return true;
     };
 
@@ -105,7 +99,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       retryCount++;
     }, 300);
 
-    // IO para seções normais
+    // IntersectionObserver para seções normais (What We Do, Work, etc)
     const sectionsForIO = [
       document.getElementById('what-we-do'),
       document.getElementById('work'),
@@ -114,12 +108,12 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
     ].filter(Boolean);
 
     if (sectionsForIO.length > 0) {
-      console.log(`🎯 IO: ${sectionsForIO.length} sections`);
+      console.log(`🎯 IO: Observing ${sectionsForIO.length} sections`);
     }
 
     const observerConfig = {
       threshold: [0, 0.5, 1],
-      rootMargin: '-40% 0px -40% 0px'
+      rootMargin: '-10% 0px -10% 0px'
     };
 
     const handleIntersection = (entries) => {
@@ -129,8 +123,9 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         
         if (!sectionId) return;
 
+        // Bloqueia se VIEW (modal/card hover)
         if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-          console.log(`🔒 ${sectionId} blocked - VIEW`);
+          console.log(`🔒 ${sectionId} blocked - VIEW active`);
           return;
         }
 
@@ -141,7 +136,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
           const targetState = SECTION_STATE_MAP[sectionId];
 
           if (targetState) {
-            console.log(`📍 ${sectionId} (IO)`);
+            console.log(`📍 ${sectionId} ENTERED (IO)`);
             onSectionChange(sectionId, targetState);
           }
         }
@@ -157,7 +152,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       observerRef.current.observe(section);
     });
 
-    console.log('✅ IO OK');
+    console.log('✅ IntersectionObserver initialized');
 
     return () => {
       clearInterval(setupInterval);
@@ -166,7 +161,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
-      console.log('🧹 Detection cleaned');
+      console.log('🧹 Section detection cleaned');
     };
   }, [onSectionChange, getCurrentCursorState]);
 

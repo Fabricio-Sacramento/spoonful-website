@@ -1,34 +1,25 @@
-/* ================================= */
-/* CUSTOM CURSOR - DESIGN SYSTEM    */
-/* ================================= */
-
-/* Design tokens integrados */
+/* public/styles/cursor.css */
 :root {
   --cursor-size-base: 120px;
   --cursor-size-dot: 17px;
   --cursor-accent: var(--primary-green);
   --cursor-bg: var(--neutral-light);
-  --cursor-scale: 1;
+  /* ❌ REMOVIDO: --cursor-scale (agora é nativo via GSAP) */
 }
 
-/* Container do cursor - transform-only animations */
 .custom-cursor {
-  /* Propriedades fixas - NÃO animadas */
+  /* Propriedades fixas */
   width: var(--cursor-size-base);
   height: var(--cursor-size-base);
   border-radius: 50%;
   pointer-events: none;
   
-  /* ✅ CORRIGIDO: Prefixo -webkit- para Safari */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   
-  /* Visual base */
   background-color: var(--cursor-accent);
-  
-  /* Blend mode opcional - efeito contrast */
   mix-blend-mode: difference;
   
   /* Performance */
@@ -36,18 +27,14 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   
-  /* Transform via CSS variable (animado por GSAP) */
-  transform: translate(-50%, -50%) 
-             scale(var(--cursor-scale)) 
-             translateZ(0);
+  /* ✅ CORRIGIDO: Transform sem var() - GSAP controla scale diretamente */
+  transform: translate(-50%, -50%) translateZ(0);
   
-  /* Layout interno */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Texto interno do cursor */
 .cursor-text {
   color: var(--neutral-normal);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
@@ -58,34 +45,26 @@
   text-align: center;
   pointer-events: none;
   
-  /* ✅ CORRIGIDO: Prefixo -webkit- para Safari */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
   
-  /* Animado via GSAP */
   opacity: 0;
   transition: opacity 0.3s ease;
   
-  /* Anti-alias para texto pequeno */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* ================================= */
-/* RESPONSIVE                        */
-/* ================================= */
-
-/* Desktop Large: 1920px+ */
+/* Responsive, accessibility, debug mantidos iguais */
 @media (min-width: 1920px) {
   .cursor-text {
     font-size: 1.125rem;
   }
 }
 
-/* Laptop: 1024px - 1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   :root {
     --cursor-size-base: 100px;
@@ -96,25 +75,18 @@
   }
 }
 
-/* Tablet e abaixo: cursor desabilitado via JS */
 @media (max-width: 1023px) {
   .custom-cursor {
     display: none !important;
   }
 }
 
-/* ================================= */
-/* ACCESSIBILITY                     */
-/* ================================= */
-
-/* Desabilita cursor se reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .custom-cursor {
     display: none !important;
   }
 }
 
-/* High contrast mode */
 @media (prefers-contrast: high) {
   .custom-cursor {
     mix-blend-mode: normal;
@@ -122,11 +94,6 @@
   }
 }
 
-/* ================================= */
-/* DEBUG MODE                        */
-/* ================================= */
-
-/* Adicione #debug na URL para visualizar bounds */
 body[data-debug] .custom-cursor {
   border: 2px dashed rgba(255, 0, 0, 0.5);
   mix-blend-mode: normal;

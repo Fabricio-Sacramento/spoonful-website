@@ -1,6 +1,4 @@
 // src/components/CustomCursor.jsx
-// CORRIGIDO: Remove duplicação de updateCursorVisual
-
 import { useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useCursorFSM, CURSOR_STATES } from '../hooks/useCursorFSM';
@@ -13,7 +11,6 @@ const CustomCursor = () => {
   const xToRef = useRef(null);
   const yToRef = useRef(null);
   const isMountedRef = useRef(true);
-  const isUpdatingRef = useRef(false); // ✅ NOVO: previne duplicação
 
   const { currentState, transition, getStateConfig, getCurrentState } = useCursorFSM();
 
@@ -29,16 +26,9 @@ const CustomCursor = () => {
     return isTouch || prefersReducedMotion;
   }, []);
 
+  // ✅ CORRIGIDO: Anima scale diretamente, não via CSS variable
   const updateCursorVisual = useCallback(() => {
     if (!cursorRef.current || !isMountedRef.current) return;
-    
-    // ✅ CORRIGIDO: Previne updates simultâneos
-    if (isUpdatingRef.current) {
-      console.log('⏸️ Update já em progresso, ignorando');
-      return;
-    }
-    
-    isUpdatingRef.current = true;
 
     const config = getStateConfig();
     const cursor = cursorRef.current;
@@ -50,21 +40,13 @@ const CustomCursor = () => {
       showText: config.showText
     });
 
-    // Anima scale
+    // ✅ Anima scale com GSAP diretamente no transform
     gsap.to(cursor, {
+      scale: config.scale,
       duration: 0.4,
       ease: 'back.out(1.7)',
       overwrite: 'auto',
-      onUpdate: function() {
-        const progress = this.progress();
-        const currentScale = parseFloat(cursor.style.getPropertyValue('--cursor-scale')) || 1;
-        const targetScale = config.scale;
-        const newScale = currentScale + (targetScale - currentScale) * progress;
-        cursor.style.setProperty('--cursor-scale', newScale);
-      },
       onComplete: () => {
-        cursor.style.setProperty('--cursor-scale', config.scale);
-        isUpdatingRef.current = false; // ✅ Libera para próximo update
         console.log(`✅ Scale complete: ${config.scale}`);
       }
     });
@@ -117,6 +99,7 @@ const CustomCursor = () => {
   useSectionDetection(handleSectionChange, getCurrentState);
   useCardHover(handleCardHover);
 
+  // ✅ CORRIGIDO: useEffect único com toda a lógica de setup
   useEffect(() => {
     if (shouldDisable()) {
       console.log('🚫 Custom cursor disabled');
@@ -129,7 +112,8 @@ const CustomCursor = () => {
     document.body.appendChild(cursor);
     console.log('✅ Custom cursor mounted');
 
-    cursor.style.setProperty('--cursor-scale', 1);
+    // Set inicial com scale nativo
+    gsap.set(cursor, { scale: 1 });
 
     xToRef.current = gsap.quickTo(cursor, 'x', {
       duration: 0.3,
@@ -141,6 +125,7 @@ const CustomCursor = () => {
       ease: 'power3'
     });
 
+    // Mouse handlers
     const handleMouseMove = (e) => {
       if (!isMountedRef.current) return;
       xToRef.current(e.clientX);
@@ -161,29 +146,48 @@ const CustomCursor = () => {
       if (!cursor || !isMountedRef.current) return;
       gsap.to(cursor, {
         opacity: 1,
-        scale: 1,
+        scale: getStateConfig().scale,
         duration: 0.3,
         ease: 'power2.out'
       });
     };
 
+    // Modal handlers
+    const handleModalOpen = () => {
+      console.log('🎬 Modal open event - forcing VIEW');
+      transition(CURSOR_STATES.VIEW, true);
+      updateCursorVisual();
+    };
+
+    const handleModalClose = () => {
+      console.log('🎬 Modal close event - restoring to GREEN_DOT');
+      transition(CURSOR_STATES.GREEN_DOT, true);
+      updateCursorVisual();
+    };
+
+    // Registra todos os listeners
     window.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', handleMouseEnter);
+    window.addEventListener('modal:open', handleModalOpen);
+    window.addEventListener('modal:close', handleModalClose);
 
+    // Inicializa visual após mount
     setTimeout(() => {
       if (isMountedRef.current) {
         updateCursorVisual();
       }
     }, 100);
 
+    // ✅ CLEANUP completo
     return () => {
       isMountedRef.current = false;
-      isUpdatingRef.current = false;
       
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
+      window.removeEventListener('modal:open', handleModalOpen);
+      window.removeEventListener('modal:close', handleModalClose);
       
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
@@ -191,12 +195,12 @@ const CustomCursor = () => {
       
       console.log('🧹 Custom cursor unmounted');
     };
-  }, [shouldDisable, updateCursorVisual]);
+  }, [shouldDisable, updateCursorVisual, getStateConfig, transition]);
 
-  // ✅ REMOVIDO: Este useEffect estava causando duplicação
-  // useEffect(() => {
-  //   updateCursorVisual();
-  // }, [currentState, updateCursorVisual]);
+  // Reage a mudanças de estado
+  useEffect(() => {
+    updateCursorVisual();
+  }, [currentState, updateCursorVisual]);
 
   if (shouldDisable()) {
     return null;
@@ -214,7 +218,7 @@ const CustomCursor = () => {
         height: '120px',
         pointerEvents: 'none',
         zIndex: 99999,
-        transform: 'translate(-50%, -50%) scale(var(--cursor-scale, 1)) translateZ(0)',
+        transform: 'translate(-50%, -50%) translateZ(0)',
         willChange: 'transform',
         opacity: 1
       }}
