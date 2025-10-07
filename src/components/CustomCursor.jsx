@@ -70,12 +70,18 @@ const CustomCursor = () => {
 
   // Handler: mudança de seção (IO)
   const handleSectionChange = useCallback((sectionId, targetState) => {
+    console.log(`🎯 handleSectionChange called: ${sectionId} → ${targetState}`);
+    console.log(`   Current state: ${getCurrentState()}`);
+    
     const success = transition(targetState);
     
     if (success && isMountedRef.current) {
+      console.log(`   ✅ Transition successful, updating visual`);
       updateCursorVisual();
+    } else {
+      console.log(`   ❌ Transition blocked by FSM`);
     }
-  }, [transition, updateCursorVisual]);
+  }, [transition, updateCursorVisual, getCurrentState]);
 
   // Handler: hover em cards
   const handleCardHover = useCallback((isHovering) => {
