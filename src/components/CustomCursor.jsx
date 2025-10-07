@@ -152,8 +152,10 @@ const CustomCursor = () => {
     };
 
     const handleModalOpen = () => {
-      console.log('🎬 Modal open event - forcing VIEW');
-      transition(CURSOR_STATES.VIEW, true);
+      console.log('🎬 Modal open event - setting GREEN_DOT for modal UI');
+      // Garante que dentro do modal o cursor fique no ponto verde (17px).
+      // Usamos force=true porque queremos garantir estado mesmo vindo de VIEW.
+      transition(CURSOR_STATES.GREEN_DOT, true);
       updateCursorVisual();
     };
 
