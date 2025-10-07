@@ -11,6 +11,7 @@ const CustomCursor = () => {
   const xToRef = useRef(null);
   const yToRef = useRef(null);
   const isMountedRef = useRef(true);
+  const mousePositionRef = useRef({ x: 0, y: 0 });
 
   const { currentState, transition, getStateConfig, getCurrentState } = useCursorFSM();
 
@@ -26,7 +27,6 @@ const CustomCursor = () => {
     return isTouch || prefersReducedMotion;
   }, []);
 
-  // ✅ CORRIGIDO: Anima scale diretamente, não via CSS variable
   const updateCursorVisual = useCallback(() => {
     if (!cursorRef.current || !isMountedRef.current) return;
 
@@ -40,7 +40,6 @@ const CustomCursor = () => {
       showText: config.showText
     });
 
-    // ✅ Anima scale com GSAP diretamente no transform
     gsap.to(cursor, {
       scale: config.scale,
       duration: 0.4,
@@ -51,7 +50,6 @@ const CustomCursor = () => {
       }
     });
 
-    // Atualiza texto
     if (text) {
       if (config.showText) {
         text.textContent = config.text;
@@ -99,7 +97,6 @@ const CustomCursor = () => {
   useSectionDetection(handleSectionChange, getCurrentState);
   useCardHover(handleCardHover);
 
-  // ✅ CORRIGIDO: useEffect único com toda a lógica de setup
   useEffect(() => {
     if (shouldDisable()) {
       console.log('🚫 Custom cursor disabled');
@@ -112,7 +109,6 @@ const CustomCursor = () => {
     document.body.appendChild(cursor);
     console.log('✅ Custom cursor mounted');
 
-    // Set inicial com scale nativo
     gsap.set(cursor, { scale: 1 });
 
     xToRef.current = gsap.quickTo(cursor, 'x', {
@@ -125,9 +121,10 @@ const CustomCursor = () => {
       ease: 'power3'
     });
 
-    // Mouse handlers
     const handleMouseMove = (e) => {
       if (!isMountedRef.current) return;
+      mousePositionRef.current.x = e.clientX;
+      mousePositionRef.current.y = e.clientY;
       xToRef.current(e.clientX);
       yToRef.current(e.clientY);
     };
@@ -152,7 +149,6 @@ const CustomCursor = () => {
       });
     };
 
-    // Modal handlers
     const handleModalOpen = () => {
       console.log('🎬 Modal open event - forcing VIEW');
       transition(CURSOR_STATES.VIEW, true);
@@ -165,21 +161,38 @@ const CustomCursor = () => {
       updateCursorVisual();
     };
 
-    // Registra todos os listeners
+    const handleModalRedetect = () => {
+      console.log('🔍 Re-detecting hover after modal close');
+      
+      requestAnimationFrame(() => {
+        const { x, y } = mousePositionRef.current;
+        const elementUnderMouse = document.elementFromPoint(x, y);
+        
+        const cardUnderMouse = elementUnderMouse?.closest('[data-cursor="view"]');
+        
+        if (cardUnderMouse) {
+          console.log('✅ Card detected under mouse - switching to VIEW');
+          transition(CURSOR_STATES.VIEW);
+          updateCursorVisual();
+        } else {
+          console.log('✅ No card under mouse - staying GREEN_DOT');
+        }
+      });
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', handleMouseEnter);
     window.addEventListener('modal:open', handleModalOpen);
     window.addEventListener('modal:close', handleModalClose);
+    window.addEventListener('modal:redetect-hover', handleModalRedetect);
 
-    // Inicializa visual após mount
     setTimeout(() => {
       if (isMountedRef.current) {
         updateCursorVisual();
       }
     }, 100);
 
-    // ✅ CLEANUP completo
     return () => {
       isMountedRef.current = false;
       
@@ -188,6 +201,7 @@ const CustomCursor = () => {
       document.removeEventListener('mouseenter', handleMouseEnter);
       window.removeEventListener('modal:open', handleModalOpen);
       window.removeEventListener('modal:close', handleModalClose);
+      window.removeEventListener('modal:redetect-hover', handleModalRedetect);
       
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
@@ -197,7 +211,6 @@ const CustomCursor = () => {
     };
   }, [shouldDisable, updateCursorVisual, getStateConfig, transition]);
 
-  // Reage a mudanças de estado
   useEffect(() => {
     updateCursorVisual();
   }, [currentState, updateCursorVisual]);

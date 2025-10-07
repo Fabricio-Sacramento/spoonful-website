@@ -1,32 +1,22 @@
 // src/hooks/useCardHover.js
-// CORRIGIDO: Detecção robusta de entrada/saída de cards
+// ✅ CORRIGIDO: Detecta work-track em vez de cards individuais
 
 import { useEffect, useCallback, useRef } from 'react';
 
 export const useCardHover = (onCardHover) => {
-  const hoveredCardRef = useRef(null);
   const isHoveringRef = useRef(false);
 
-  const handleMouseOver = useCallback((e) => {
-    const card = e.target.closest('[data-cursor="view"]');
-    
-    if (card && !isHoveringRef.current) {
-      hoveredCardRef.current = card;
+  const handleMouseEnter = useCallback(() => {
+    if (!isHoveringRef.current) {
       isHoveringRef.current = true;
-      console.log('🎯 Card hover START');
+      console.log('🎯 Work section hover START');
       onCardHover(true);
     }
   }, [onCardHover]);
 
-  const handleMouseOut = useCallback((e) => {
-    // ✅ CORRIGIDO: Checa se realmente saiu do card
-    const card = e.target.closest('[data-cursor="view"]');
-    const relatedTarget = e.relatedTarget;
-    
-    // Se hoveredCard existe E (não há card OU relatedTarget não está dentro do card)
-    if (hoveredCardRef.current && (!card || !hoveredCardRef.current.contains(relatedTarget))) {
-      console.log('👋 Card hover END');
-      hoveredCardRef.current = null;
+  const handleMouseLeave = useCallback(() => {
+    if (isHoveringRef.current) {
+      console.log('👋 Work section hover END');
       isHoveringRef.current = false;
       onCardHover(false);
     }
@@ -38,22 +28,24 @@ export const useCardHover = (onCardHover) => {
       'ontouchstart' in window;
     
     if (isTouchDevice) {
-      console.log('📱 Card hover disabled');
+      console.log('📱 Work section hover disabled');
       return;
     }
 
-    const checkWorkSection = () => {
-      const workSection = document.getElementById('work');
+    const attachListeners = () => {
+      // ✅ MUDANÇA CRÍTICA: Detecta o container, não os cards
+      const workSection = document.querySelector('#work');
       
       if (!workSection) {
-        console.log('⏳ Waiting for Work section...');
+        console.log('⏳ Work section not found yet...');
         return false;
       }
 
-      workSection.addEventListener('mouseover', handleMouseOver);
-      workSection.addEventListener('mouseout', handleMouseOut);
+      // ✅ mouseenter/mouseleave no container pai
+      workSection.addEventListener('mouseenter', handleMouseEnter);
+      workSection.addEventListener('mouseleave', handleMouseLeave);
       
-      console.log('✅ Card hover detection initialized');
+      console.log('✅ Work section hover detection initialized');
       return true;
     };
 
@@ -61,7 +53,7 @@ export const useCardHover = (onCardHover) => {
     const maxRetries = 10;
     
     const initInterval = setInterval(() => {
-      if (checkWorkSection() || retryCount >= maxRetries) {
+      if (attachListeners() || retryCount >= maxRetries) {
         clearInterval(initInterval);
       }
       retryCount++;
@@ -70,18 +62,16 @@ export const useCardHover = (onCardHover) => {
     return () => {
       clearInterval(initInterval);
       
-      const workSection = document.getElementById('work');
+      const workSection = document.querySelector('#work');
       if (workSection) {
-        workSection.removeEventListener('mouseover', handleMouseOver);
-        workSection.removeEventListener('mouseout', handleMouseOut);
-        console.log('🧹 Card hover cleaned up');
+        workSection.removeEventListener('mouseenter', handleMouseEnter);
+        workSection.removeEventListener('mouseleave', handleMouseLeave);
       }
       
-      // Reset refs no cleanup
-      hoveredCardRef.current = null;
+      console.log('🧹 Work section hover cleaned up');
       isHoveringRef.current = false;
     };
-  }, [handleMouseOver, handleMouseOut]);
+  }, [handleMouseEnter, handleMouseLeave]);
 };
 
 export default useCardHover;

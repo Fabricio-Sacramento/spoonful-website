@@ -79,14 +79,20 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const [fadingState, setFadingState] = useState('visible');
 
   useEffect(() => {
-    if (isOpen) {
-      // Força cursor VIEW quando modal abre
-      console.log('🎬 Modal opened - forcing cursor VIEW');
-      window.dispatchEvent(new CustomEvent('modal:open'));
+  if (isOpen) {
+    // Força cursor VIEW quando modal abre
+    console.log('🎬 Modal opened - forcing cursor VIEW');
+    window.dispatchEvent(new CustomEvent('modal:open'));
     } else {
-      // Restaura cursor quando modal fecha
-      console.log('🎬 Modal closed - restoring cursor');
+      // ✅ NOVO: Re-detecta posição do mouse ao fechar
+      console.log('🎬 Modal closed - re-detecting mouse position');
       window.dispatchEvent(new CustomEvent('modal:close'));
+      
+      // Aguarda um frame para garantir que o DOM está estável
+      requestAnimationFrame(() => {
+        // Dispara evento customizado para forçar re-detecção
+        window.dispatchEvent(new CustomEvent('modal:redetect-hover'));
+      });
     }
   }, [isOpen]);
 

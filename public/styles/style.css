@@ -490,10 +490,6 @@ z-index: 1;
 /* RESPONSIVE                        */
 /* ================================= */
 
-/* Desktop Large: 1920px+ */
-@media (min-width: 1920px) {
-  /* Mantém valores base - sem alterações necessárias */
-}
 
 /* Desktop Padrão: 1440px - 1919px */
 @media (min-width: 1440px) and (max-width: 1919px) {
