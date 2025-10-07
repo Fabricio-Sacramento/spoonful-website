@@ -1,22 +1,29 @@
 // src/hooks/useCardHover.js
-// ✅ CORRIGIDO: Detecta work-track em vez de cards individuais
+// ✅ CORRIGIDO: Detecta .work-track + bloqueia eventos durante modal
 
 import { useEffect, useCallback, useRef } from 'react';
 
 export const useCardHover = (onCardHover) => {
   const isHoveringRef = useRef(false);
+  const isModalOpenRef = useRef(false);
 
   const handleMouseEnter = useCallback(() => {
     if (!isHoveringRef.current) {
       isHoveringRef.current = true;
-      console.log('🎯 Work section hover START');
+      console.log('🎯 Work track hover START');
       onCardHover(true);
     }
   }, [onCardHover]);
 
   const handleMouseLeave = useCallback(() => {
+    // Ignora mouseleave se modal está aberto
+    if (isModalOpenRef.current) {
+      console.log('🔒 Work track hover END blocked - modal is open');
+      return;
+    }
+    
     if (isHoveringRef.current) {
-      console.log('👋 Work section hover END');
+      console.log('👋 Work track hover END');
       isHoveringRef.current = false;
       onCardHover(false);
     }
@@ -28,24 +35,38 @@ export const useCardHover = (onCardHover) => {
       'ontouchstart' in window;
     
     if (isTouchDevice) {
-      console.log('📱 Work section hover disabled');
+      console.log('📱 Work track hover disabled');
       return;
     }
 
+    // Listeners para modal
+    const handleModalOpen = () => {
+      console.log('🔒 Modal opened - blocking work track hover events');
+      isModalOpenRef.current = true;
+    };
+
+    const handleModalClose = () => {
+      console.log('🔓 Modal closed - allowing work track hover events');
+      isModalOpenRef.current = false;
+    };
+
     const attachListeners = () => {
-      // ✅ MUDANÇA CRÍTICA: Detecta o container, não os cards
-      const workSection = document.querySelector('#work');
+      // Detecta .work-track (área real dos cards)
+      const workTrack = document.querySelector('.work-track');
       
-      if (!workSection) {
-        console.log('⏳ Work section not found yet...');
+      if (!workTrack) {
+        console.log('⏳ Work track not found yet...');
         return false;
       }
 
-      // ✅ mouseenter/mouseleave no container pai
-      workSection.addEventListener('mouseenter', handleMouseEnter);
-      workSection.addEventListener('mouseleave', handleMouseLeave);
+      workTrack.addEventListener('mouseenter', handleMouseEnter);
+      workTrack.addEventListener('mouseleave', handleMouseLeave);
       
-      console.log('✅ Work section hover detection initialized');
+      // Registra listeners do modal
+      window.addEventListener('modal:open', handleModalOpen);
+      window.addEventListener('modal:close', handleModalClose);
+      
+      console.log('✅ Work track hover detection initialized');
       return true;
     };
 
@@ -62,14 +83,18 @@ export const useCardHover = (onCardHover) => {
     return () => {
       clearInterval(initInterval);
       
-      const workSection = document.querySelector('#work');
-      if (workSection) {
-        workSection.removeEventListener('mouseenter', handleMouseEnter);
-        workSection.removeEventListener('mouseleave', handleMouseLeave);
+      const workTrack = document.querySelector('.work-track');
+      if (workTrack) {
+        workTrack.removeEventListener('mouseenter', handleMouseEnter);
+        workTrack.removeEventListener('mouseleave', handleMouseLeave);
       }
       
-      console.log('🧹 Work section hover cleaned up');
+      window.removeEventListener('modal:open', handleModalOpen);
+      window.removeEventListener('modal:close', handleModalClose);
+      
+      console.log('🧹 Work track hover cleaned up');
       isHoveringRef.current = false;
+      isModalOpenRef.current = false;
     };
   }, [handleMouseEnter, handleMouseLeave]);
 };

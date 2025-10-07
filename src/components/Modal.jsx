@@ -87,12 +87,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       // ✅ NOVO: Re-detecta posição do mouse ao fechar
       console.log('🎬 Modal closed - re-detecting mouse position');
       window.dispatchEvent(new CustomEvent('modal:close'));
-      
-      // Aguarda um frame para garantir que o DOM está estável
-      requestAnimationFrame(() => {
-        // Dispara evento customizado para forçar re-detecção
-        window.dispatchEvent(new CustomEvent('modal:redetect-hover'));
-      });
     }
   }, [isOpen]);
 

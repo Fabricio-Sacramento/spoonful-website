@@ -123,8 +123,10 @@ const CustomCursor = () => {
 
     const handleMouseMove = (e) => {
       if (!isMountedRef.current) return;
-      mousePositionRef.current.x = e.clientX;
-      mousePositionRef.current.y = e.clientY;
+      
+      // Armazena posição para re-detecção
+      mousePositionRef.current = { x: e.clientX, y: e.clientY };
+      
       xToRef.current(e.clientX);
       yToRef.current(e.clientY);
     };
@@ -156,27 +158,27 @@ const CustomCursor = () => {
     };
 
     const handleModalClose = () => {
-      console.log('🎬 Modal close event - restoring to GREEN_DOT');
-      transition(CURSOR_STATES.GREEN_DOT, true);
-      updateCursorVisual();
-    };
+      console.log('🎬 Modal close event - re-evaluating hover AFTER modal removed');
 
-    const handleModalRedetect = () => {
-      console.log('🔍 Re-detecting hover after modal close');
-      
+      // ✅ Double RAF: aguarda modal sair do DOM
       requestAnimationFrame(() => {
-        const { x, y } = mousePositionRef.current;
-        const elementUnderMouse = document.elementFromPoint(x, y);
-        
-        const cardUnderMouse = elementUnderMouse?.closest('[data-cursor="view"]');
-        
-        if (cardUnderMouse) {
-          console.log('✅ Card detected under mouse - switching to VIEW');
-          transition(CURSOR_STATES.VIEW);
-          updateCursorVisual();
-        } else {
-          console.log('✅ No card under mouse - staying GREEN_DOT');
-        }
+        requestAnimationFrame(() => {
+          const { x, y } = mousePositionRef.current;
+          const elementUnderMouse = document.elementFromPoint(x, y);
+
+          // Busca #work (não data-cursor, pois removemos dos cards)
+          const workSection = elementUnderMouse?.closest('#work');
+
+          if (workSection) {
+            console.log('✅ Work section detected under mouse AFTER modal closed - switching to VIEW');
+            transition(CURSOR_STATES.VIEW); // Sem force - transição natural
+            updateCursorVisual();
+          } else {
+            console.log('✅ Not over work section AFTER modal closed - setting GREEN_DOT');
+            transition(CURSOR_STATES.GREEN_DOT, true); // Force apenas no fallback
+            updateCursorVisual();
+          }
+        });
       });
     };
 
@@ -185,7 +187,6 @@ const CustomCursor = () => {
     document.addEventListener('mouseenter', handleMouseEnter);
     window.addEventListener('modal:open', handleModalOpen);
     window.addEventListener('modal:close', handleModalClose);
-    window.addEventListener('modal:redetect-hover', handleModalRedetect);
 
     setTimeout(() => {
       if (isMountedRef.current) {
@@ -201,7 +202,6 @@ const CustomCursor = () => {
       document.removeEventListener('mouseenter', handleMouseEnter);
       window.removeEventListener('modal:open', handleModalOpen);
       window.removeEventListener('modal:close', handleModalClose);
-      window.removeEventListener('modal:redetect-hover', handleModalRedetect);
       
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
