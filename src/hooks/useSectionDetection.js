@@ -1,6 +1,4 @@
 // src/hooks/useSectionDetection.js
-// ✅ CORRIGIDO: Detecção precisa Hero → About com wrapper absolute
-
 import { useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CURSOR_STATES } from './useCursorFSM';
@@ -30,62 +28,76 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
     }
 
     const setupAnimatedSections = () => {
-      const wrapper = document.querySelector('.intro-wrapper');
+      const heroSection = document.querySelector('#hero');
+      const aboutSection = document.querySelector('#about-us');
       
-      if (!wrapper) {
-        console.warn('⚠️ intro-wrapper not found');
+      if (!heroSection || !aboutSection) {
+        console.warn('⚠️ Hero or About section not found');
         return false;
       }
 
-      // ✅ CORRIGIDO: Hero termina quando o wrapper sai 50% da viewport
-      // About começa quando Hero termina (sem gap)
+      // ✅ HERO: Trigger explícito na própria seção
       const heroTrigger = ScrollTrigger.create({
-        trigger: wrapper,
-        start: 'top top',
-        end: '50% top', // Hero visible nos primeiros 50% do wrapper
+        trigger: heroSection, // Trigger direto no #hero
+        start: 'top top',     // Hero entra quando topo atinge topo da viewport
+        end: 'bottom top',    // Hero sai quando base atinge topo da viewport
+        
         onEnter: () => {
           if (activeSection.current === 'hero') return;
-          console.log('📍 Hero ENTERED');
+          console.log('📍 Hero ENTERED (explicit trigger)');
           activeSection.current = 'hero';
           onSectionChange('hero', CURSOR_STATES.DRAG_ME);
         },
+        
         onEnterBack: () => {
           if (activeSection.current === 'hero') return;
-          console.log('📍 Hero ENTERED BACK');
+          console.log('📍 Hero ENTERED BACK (explicit trigger)');
           activeSection.current = 'hero';
           onSectionChange('hero', CURSOR_STATES.DRAG_ME);
         },
+        
         onLeave: () => {
-          console.log('📍 Hero LEFT → Transitioning to About');
+          console.log('📍 Hero LEFT (explicit trigger)');
         }
       });
 
+      // ✅ ABOUT: Trigger explícito na própria seção
       const aboutTrigger = ScrollTrigger.create({
-        trigger: wrapper,
-        start: '50% top', // About começa exatamente quando Hero sai
-        end: 'bottom top',
+        trigger: aboutSection, // Trigger direto no #about-us
+        start: 'top top',      // About entra quando topo atinge topo da viewport
+        end: 'bottom top',     // About sai quando base atinge topo da viewport
+        
         onEnter: () => {
-          // Bloqueia se VIEW (modal aberto)
+          // Bloqueia se VIEW (modal/card hover)
           if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
             console.log('🔒 About blocked - VIEW active');
             return;
           }
           if (activeSection.current === 'about-us') return;
-          console.log('📍 About Us ENTERED');
+          console.log('📍 About Us ENTERED (explicit trigger)');
           activeSection.current = 'about-us';
           onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
         },
+        
         onEnterBack: () => {
           if (getCurrentCursorState() === CURSOR_STATES.VIEW) return;
           if (activeSection.current === 'about-us') return;
-          console.log('📍 About Us ENTERED BACK');
+          console.log('📍 About Us ENTERED BACK (explicit trigger)');
           activeSection.current = 'about-us';
           onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
+        },
+        
+        onLeave: () => {
+          console.log('📍 About LEFT (explicit trigger)');
+        },
+        
+        onLeaveBack: () => {
+          console.log('📍 About LEFT BACK (explicit trigger)');
         }
       });
 
       scrollTriggersRef.current = [heroTrigger, aboutTrigger];
-      console.log('✅ ScrollTrigger OK (Hero: 0-50%, About: 50-100%)');
+      console.log('✅ ScrollTrigger OK (explicit per-section triggers)');
       return true;
     };
 
