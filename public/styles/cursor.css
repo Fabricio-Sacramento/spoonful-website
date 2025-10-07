@@ -1,6 +1,6 @@
 /* public/styles/cursor.css */
 :root {
-  --cursor-size-base: 120px;
+  --cursor-size-base: 60px;
   --cursor-size-dot: 17px;
   --cursor-accent: var(--primary-green);
   --cursor-bg: var(--neutral-light);
@@ -38,7 +38,7 @@
 .cursor-text {
   color: var(--neutral-normal);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.05rem;
   text-transform: uppercase;
@@ -59,11 +59,7 @@
 }
 
 /* Responsive, accessibility, debug mantidos iguais */
-@media (min-width: 1920px) {
-  .cursor-text {
-    font-size: 1.125rem;
-  }
-}
+
 
 @media (min-width: 1024px) and (max-width: 1439px) {
   :root {
