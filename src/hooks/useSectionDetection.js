@@ -1,11 +1,10 @@
 // src/hooks/useSectionDetection.js
-// Detecção híbrida: ScrollTrigger para seções animadas + IO para resto
+// CORRIGIDO: Sem overlap - transição limpa Hero → About
 
 import { useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CURSOR_STATES } from './useCursorFSM';
 
-// Mapeamento de seções para estados do cursor
 const SECTION_STATE_MAP = {
   'hero': CURSOR_STATES.DRAG_ME,
   'about-us': CURSOR_STATES.GREEN_DOT,
@@ -15,102 +14,87 @@ const SECTION_STATE_MAP = {
   'contact': CURSOR_STATES.GREEN_DOT
 };
 
-/**
- * Hook para detectar mudanças de seção
- * Usa ScrollTrigger para Hero/About (animados) + IO para resto
- * 
- * @param {Function} onSectionChange - Callback(sectionId, cursorState)
- * @param {Function} getCurrentCursorState - Função que retorna estado atual do cursor
- */
 export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
   const observerRef = useRef(null);
   const activeSection = useRef('hero');
   const scrollTriggersRef = useRef([]);
 
   useEffect(() => {
-    // Guard: detecta touch devices
     const isTouchDevice = 
       window.matchMedia('(pointer: coarse)').matches ||
       'ontouchstart' in window;
     
     if (isTouchDevice) {
-      console.log('📱 Section detection disabled - touch device');
+      console.log('📱 Section detection disabled');
       return;
     }
 
-    // ==========================================
-    // PARTE 1: ScrollTrigger para Hero/About
-    // ==========================================
-    
     const setupAnimatedSections = () => {
       const wrapper = document.querySelector('.intro-wrapper');
       
       if (!wrapper) {
-        console.warn('⚠️ intro-wrapper not found - retrying...');
+        console.warn('⚠️ intro-wrapper not found');
         return false;
       }
 
-      // ScrollTrigger para HERO (início do scroll)
+      // ✅ CORRIGIDO: Sem overlap - transição em 40%
       const heroTrigger = ScrollTrigger.create({
         trigger: wrapper,
         start: 'top top',
-        end: '30% top', // Hero visível nos primeiros 30% do wrapper
+        end: '40% top',
         onEnter: () => {
-          console.log('📍 Hero ENTERED (ScrollTrigger)');
-          if (activeSection.current !== 'hero') {
-            activeSection.current = 'hero';
-            onSectionChange('hero', CURSOR_STATES.DRAG_ME);
-          }
+          if (activeSection.current === 'hero') return;
+          console.log('📍 Hero ENTERED');
+          activeSection.current = 'hero';
+          onSectionChange('hero', CURSOR_STATES.DRAG_ME);
         },
         onEnterBack: () => {
-          console.log('📍 Hero ENTERED BACK (ScrollTrigger)');
-          if (activeSection.current !== 'hero') {
-            activeSection.current = 'hero';
-            onSectionChange('hero', CURSOR_STATES.DRAG_ME);
-          }
+          if (activeSection.current === 'hero') return;
+          console.log('📍 Hero ENTERED BACK');
+          activeSection.current = 'hero';
+          onSectionChange('hero', CURSOR_STATES.DRAG_ME);
+        },
+        onLeave: () => {
+          console.log('📍 Hero LEFT');
         }
       });
 
-      // ScrollTrigger para ABOUT US (meio/fim do scroll do wrapper)
       const aboutTrigger = ScrollTrigger.create({
         trigger: wrapper,
-        start: '30% top', // About aparece depois de 30% do wrapper
+        start: '40% top', // ✅ Começa exatamente onde Hero termina
         end: 'bottom top',
         onEnter: () => {
-          console.log('📍 About Us ENTERED (ScrollTrigger)');
-          
-          // Ignora se VIEW está ativo
           if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-            console.log('🔒 About transition blocked - VIEW priority');
+            console.log('🔒 About blocked - VIEW');
             return;
           }
-          
-          if (activeSection.current !== 'about-us') {
-            activeSection.current = 'about-us';
-            onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
-          }
+          if (activeSection.current === 'about-us') return;
+          console.log('📍 About Us ENTERED');
+          activeSection.current = 'about-us';
+          onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
         },
         onEnterBack: () => {
-          console.log('📍 About Us ENTERED BACK (ScrollTrigger)');
-          
           if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-            console.log('🔒 About transition blocked - VIEW priority');
             return;
           }
-          
-          if (activeSection.current !== 'about-us') {
-            activeSection.current = 'about-us';
-            onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
-          }
+          if (activeSection.current === 'about-us') return;
+          console.log('📍 About Us ENTERED BACK');
+          activeSection.current = 'about-us';
+          onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
+        },
+        onLeave: () => {
+          console.log('📍 About LEFT');
+        },
+        onLeaveBack: () => {
+          console.log('📍 About LEFT BACK');
         }
       });
 
       scrollTriggersRef.current = [heroTrigger, aboutTrigger];
-      console.log('✅ ScrollTrigger detection for Hero/About initialized');
+      console.log('✅ ScrollTrigger OK (Hero: 0-40%, About: 40-100%)');
       return true;
     };
 
-    // Retry para garantir que wrapper está montado
     let retryCount = 0;
     const maxRetries = 10;
     
@@ -121,10 +105,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       retryCount++;
     }, 300);
 
-    // ==========================================
-    // PARTE 2: IO para seções normais (What We Do, Work, Statement, Contact)
-    // ==========================================
-
+    // IO para seções normais
     const sectionsForIO = [
       document.getElementById('what-we-do'),
       document.getElementById('work'),
@@ -132,22 +113,15 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       document.querySelector('.contact-layer')
     ].filter(Boolean);
 
-    if (sectionsForIO.length === 0) {
-      console.warn('⚠️ No sections found for IO detection');
-      return;
+    if (sectionsForIO.length > 0) {
+      console.log(`🎯 IO: ${sectionsForIO.length} sections`);
     }
 
-    console.log(`🎯 Observing ${sectionsForIO.length} sections via IO:`, 
-      sectionsForIO.map(s => s.id || s.className)
-    );
-
-    // Configuração otimizada do Observer
     const observerConfig = {
       threshold: [0, 0.5, 1],
-      rootMargin: '-40% 0px -40% 0px' // Ajustado para trigger mais cedo
+      rootMargin: '-40% 0px -40% 0px'
     };
 
-    // Callback do Observer
     const handleIntersection = (entries) => {
       entries.forEach(entry => {
         const sectionId = entry.target.id || 
@@ -155,56 +129,44 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         
         if (!sectionId) return;
 
-        // Ignora se VIEW está ativo (prioridade de hover em cards)
-        const currentCursorState = getCurrentCursorState();
-        if (currentCursorState === CURSOR_STATES.VIEW) {
-          console.log(`🔒 Section change blocked - VIEW priority (${sectionId})`);
+        if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
+          console.log(`🔒 ${sectionId} blocked - VIEW`);
           return;
         }
 
-        // Trigger quando seção atinge >50% de visibilidade
         if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          // Evita re-triggers da mesma seção
           if (activeSection.current === sectionId) return;
 
           activeSection.current = sectionId;
           const targetState = SECTION_STATE_MAP[sectionId];
 
           if (targetState) {
-            console.log(`📍 Section entered (IO): ${sectionId} → ${targetState}`);
+            console.log(`📍 ${sectionId} (IO)`);
             onSectionChange(sectionId, targetState);
           }
         }
       });
     };
 
-    // Cria observer
     observerRef.current = new IntersectionObserver(
       handleIntersection,
       observerConfig
     );
 
-    // Observa seções normais
     sectionsForIO.forEach(section => {
       observerRef.current.observe(section);
     });
 
-    console.log('✅ IO detection for normal sections initialized');
+    console.log('✅ IO OK');
 
-    // Cleanup
     return () => {
       clearInterval(setupInterval);
-      
-      // Limpa ScrollTriggers
       scrollTriggersRef.current.forEach(st => st.kill());
       scrollTriggersRef.current = [];
-      
-      // Limpa IO
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
-      
-      console.log('🧹 Section detection cleaned up');
+      console.log('🧹 Detection cleaned');
     };
   }, [onSectionChange, getCurrentCursorState]);
 

@@ -1,5 +1,5 @@
 // src/components/CustomCursor.jsx
-// Custom cursor com FSM, GSAP quickTo e Intersection Observer
+// CORRIGIDO: Remove duplicação de updateCursorVisual
 
 import { useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
@@ -8,45 +8,65 @@ import { useSectionDetection } from '../hooks/useSectionDetection';
 import { useCardHover } from '../hooks/useCardHover';
 
 const CustomCursor = () => {
-  // Refs
   const cursorRef = useRef(null);
   const cursorTextRef = useRef(null);
   const xToRef = useRef(null);
   const yToRef = useRef(null);
   const isMountedRef = useRef(true);
+  const isUpdatingRef = useRef(false); // ✅ NOVO: previne duplicação
 
-  // FSM para gerenciar estados
   const { currentState, transition, getStateConfig, getCurrentState } = useCursorFSM();
 
-  // Guards: desabilita cursor se necessário
   const shouldDisable = useCallback(() => {
-    // Touch devices
     const isTouch = 
       window.matchMedia('(pointer: coarse)').matches ||
       'ontouchstart' in window ||
       navigator.maxTouchPoints > 0;
     
-    // Reduced motion
     const prefersReducedMotion = 
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     return isTouch || prefersReducedMotion;
   }, []);
 
-  // Atualiza visual do cursor baseado no estado FSM
   const updateCursorVisual = useCallback(() => {
     if (!cursorRef.current || !isMountedRef.current) return;
+    
+    // ✅ CORRIGIDO: Previne updates simultâneos
+    if (isUpdatingRef.current) {
+      console.log('⏸️ Update já em progresso, ignorando');
+      return;
+    }
+    
+    isUpdatingRef.current = true;
 
     const config = getStateConfig();
     const cursor = cursorRef.current;
     const text = cursorTextRef.current;
 
-    // Anima scale via CSS variable (transform-only)
+    console.log(`🎨 Updating cursor:`, {
+      state: getCurrentState(),
+      scale: config.scale,
+      showText: config.showText
+    });
+
+    // Anima scale
     gsap.to(cursor, {
-      '--cursor-scale': config.scale,
       duration: 0.4,
       ease: 'back.out(1.7)',
-      overwrite: 'auto'
+      overwrite: 'auto',
+      onUpdate: function() {
+        const progress = this.progress();
+        const currentScale = parseFloat(cursor.style.getPropertyValue('--cursor-scale')) || 1;
+        const targetScale = config.scale;
+        const newScale = currentScale + (targetScale - currentScale) * progress;
+        cursor.style.setProperty('--cursor-scale', newScale);
+      },
+      onComplete: () => {
+        cursor.style.setProperty('--cursor-scale', config.scale);
+        isUpdatingRef.current = false; // ✅ Libera para próximo update
+        console.log(`✅ Scale complete: ${config.scale}`);
+      }
     });
 
     // Atualiza texto
@@ -62,61 +82,55 @@ const CustomCursor = () => {
         gsap.to(text, {
           opacity: 0,
           duration: 0.2,
-          ease: 'power2.in'
+          ease: 'power2.in',
+          onComplete: () => {
+            text.textContent = '';
+          }
         });
       }
     }
-  }, [getStateConfig]);
+  }, [getStateConfig, getCurrentState]);
 
-  // Handler: mudança de seção (IO)
   const handleSectionChange = useCallback((sectionId, targetState) => {
-    console.log(`🎯 handleSectionChange called: ${sectionId} → ${targetState}`);
-    console.log(`   Current state: ${getCurrentState()}`);
+    console.log(`🎯 Section: ${sectionId} → ${targetState}`);
     
     const success = transition(targetState);
     
     if (success && isMountedRef.current) {
-      console.log(`   ✅ Transition successful, updating visual`);
+      console.log(`✅ Transition OK`);
       updateCursorVisual();
-    } else {
-      console.log(`   ❌ Transition blocked by FSM`);
     }
-  }, [transition, updateCursorVisual, getCurrentState]);
+  }, [transition, updateCursorVisual]);
 
-  // Handler: hover em cards
   const handleCardHover = useCallback((isHovering) => {
+    console.log(`🎴 Card: ${isHovering}`);
+    
     if (isHovering) {
       const success = transition(CURSOR_STATES.VIEW);
       if (success) updateCursorVisual();
     } else {
-      // Volta para GREEN_DOT (sempre permitido de VIEW)
       const success = transition(CURSOR_STATES.GREEN_DOT);
       if (success) updateCursorVisual();
     }
   }, [transition, updateCursorVisual]);
 
-  // Inicializa Intersection Observer
   useSectionDetection(handleSectionChange, getCurrentState);
-
-  // Inicializa detecção de hover em cards
   useCardHover(handleCardHover);
 
-  // Setup inicial do cursor
   useEffect(() => {
-    // Guard: desabilita cursor se necessário
     if (shouldDisable()) {
-      console.log('🚫 Custom cursor disabled (touch/reduced-motion)');
+      console.log('🚫 Custom cursor disabled');
       return;
     }
 
     const cursor = cursorRef.current;
     if (!cursor) return;
 
-    // Append como último elemento do body (z-index máximo)
     document.body.appendChild(cursor);
     console.log('✅ Custom cursor mounted');
 
-    // Setup GSAP quickTo para performance máxima
+    cursor.style.setProperty('--cursor-scale', 1);
+
     xToRef.current = gsap.quickTo(cursor, 'x', {
       duration: 0.3,
       ease: 'power3'
@@ -127,19 +141,14 @@ const CustomCursor = () => {
       ease: 'power3'
     });
 
-    // Mouse move handler
     const handleMouseMove = (e) => {
       if (!isMountedRef.current) return;
-      
-      // GSAP quickTo: performance otimizada
       xToRef.current(e.clientX);
       yToRef.current(e.clientY);
     };
 
-    // Mouse leave viewport: estaciona cursor
     const handleMouseLeave = () => {
       if (!cursor || !isMountedRef.current) return;
-      
       gsap.to(cursor, {
         opacity: 0,
         scale: 0.8,
@@ -148,10 +157,8 @@ const CustomCursor = () => {
       });
     };
 
-    // Mouse enter viewport: reativa cursor
     const handleMouseEnter = () => {
       if (!cursor || !isMountedRef.current) return;
-      
       gsap.to(cursor, {
         opacity: 1,
         scale: 1,
@@ -160,17 +167,19 @@ const CustomCursor = () => {
       });
     };
 
-    // Registra listeners
     window.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', handleMouseEnter);
 
-    // Estado inicial visual
-    updateCursorVisual();
+    setTimeout(() => {
+      if (isMountedRef.current) {
+        updateCursorVisual();
+      }
+    }, 100);
 
-    // Cleanup rigoroso
     return () => {
       isMountedRef.current = false;
+      isUpdatingRef.current = false;
       
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
@@ -184,12 +193,11 @@ const CustomCursor = () => {
     };
   }, [shouldDisable, updateCursorVisual]);
 
-  // Atualiza visual quando estado FSM muda
-  useEffect(() => {
-    updateCursorVisual();
-  }, [currentState, updateCursorVisual]);
+  // ✅ REMOVIDO: Este useEffect estava causando duplicação
+  // useEffect(() => {
+  //   updateCursorVisual();
+  // }, [currentState, updateCursorVisual]);
 
-  // Guard: não renderiza se desabilitado
   if (shouldDisable()) {
     return null;
   }
