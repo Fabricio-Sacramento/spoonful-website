@@ -9,6 +9,7 @@ import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
+import AboutSection from './components/AboutSection';
 
 // 1) Monta o canvas 3D inicial
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
@@ -25,6 +26,12 @@ statementRoot.render(<StatementSection />);
 // 4) Monta Contact Section
 const contactRoot = ReactDOM.createRoot(document.getElementById('contact'));
 contactRoot.render(<ContactSection />);
+
+// 4.5) Monta About Section ← NOVO
+const aboutRoot = ReactDOM.createRoot(
+  document.getElementById('about-mount-point')
+);
+aboutRoot.render(<AboutSection />);
 
 // 5) Monta Custom Cursor ← NOVO
 const cursorContainer = document.createElement('div');
