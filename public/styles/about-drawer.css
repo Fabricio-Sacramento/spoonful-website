@@ -37,6 +37,7 @@
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
+  align-items: center;
 }
 
 /* Botão fechar */
@@ -69,7 +70,7 @@
 
 /* Conteúdo interno */
 .about-drawer-content {
-  width: 100%;
+  width: 80%;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;

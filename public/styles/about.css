@@ -29,7 +29,6 @@
   width: 100%;
   min-height: 361px;
   align-items: flex-end;
-  border-bottom: 1px solid #212121;
 }
 
 .about-photo-column {
@@ -64,10 +63,11 @@
 .about-intro {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   padding: 1rem;
   flex: 1;
   justify-content: flex-end;
+  border-bottom: 1px solid #212121;
 }
 
 .about-label {
@@ -76,17 +76,17 @@
   font-size: 1.25rem;
   font-weight: 400;
   letter-spacing: 0.0125rem;
-  line-height: 6.25rem;
+  line-height: 2.25rem;
   margin: 0;
 }
 
 .about-title {
-  color: var(--neutral-light);
+  color: var(--primary-red);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-size: 4.3125rem;
   font-weight: 900;
   letter-spacing: 0.043125rem;
-  line-height: 6.25rem;
+  line-height: 3.25rem;
   margin: 0;
 }
 
@@ -104,7 +104,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
   padding-left: 284px;
 }
 
@@ -112,6 +112,7 @@
 .about-link-wrapper {
   padding: 1rem;
   border-bottom: 1px solid #212121;
+  border-left: 1px solid #212121;
 }
 
 .about-linkedin-link {
@@ -133,6 +134,8 @@
 /* Bio Text */
 .about-bio {
   padding: 1rem;
+  border-bottom: 1px solid #212121;
+  border-left: 1px solid #212121;
 }
 
 .about-bio-text {
@@ -151,7 +154,7 @@
   flex-direction: column;
   gap: 2rem;
   padding: 1rem;
-  border-bottom: 1px solid #212121;
+  border-left: 1px solid #212121;
 }
 
 .about-brands-header {
