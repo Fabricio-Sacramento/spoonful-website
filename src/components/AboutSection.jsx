@@ -6,22 +6,25 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 // Temporary placeholder images - replace with your actual assets
-const profileImage = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop";
+const profileImage = new URL('../assets/images/Me-4.jpg', import.meta.url).href;
 const brandLogos = [
-  "https://via.placeholder.com/113x70/333/fff?text=Nike",
-  "https://via.placeholder.com/113x70/333/fff?text=Disney",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+3",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+4",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+5",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+6",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+7",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+8",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+9",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+10",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+11",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+12",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+13",
-  "https://via.placeholder.com/113x70/333/fff?text=Brand+14"
+  new URL('../assets/images/clientes/nike.png', import.meta.url).href,
+  new URL('../assets/images/clientes/disney.png', import.meta.url).href,
+  new URL('../assets/images/clientes/ray-ban.png', import.meta.url).href,
+  new URL('../assets/images/clientes/N1-Logo_Brahma.png', import.meta.url).href,
+  new URL('../assets/images/clientes/multishow.png', import.meta.url).href,
+  new URL('../assets/images/clientes/hb-munchen.png', import.meta.url).href,
+  new URL('../assets/images/clientes/festival-do-rio.png', import.meta.url).href,
+  new URL('../assets/images/clientes/art-rio.png', import.meta.url).href,
+  new URL('../assets/images/clientes/colortil.png', import.meta.url).href,
+  new URL('../assets/images/clientes/woohoo.png', import.meta.url).href,
+  new URL('../assets/images/clientes/pettrus-logo.png', import.meta.url).href,
+  new URL('../assets/images/clientes/abmn.png', import.meta.url).href,
+  new URL('../assets/images/clientes/beep.png', import.meta.url).href,
+  new URL('../assets/images/clientes/vizcaya.png', import.meta.url).href,
+  new URL('../assets/images/clientes/tvz-logo.png', import.meta.url).href,
+  new URL('../assets/images/clientes/noo.png', import.meta.url).href,
+  new URL('../assets/images/clientes/agir.png', import.meta.url).href,
 ];
 
 const AboutSection = () => {
