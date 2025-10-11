@@ -10,6 +10,7 @@ import ContactSection from './components/ContactSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
 import AboutSection from './components/AboutSection';
+import TempNavButton from './components/TempNavButton';
 
 // 1) Monta o canvas 3D inicial
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
@@ -32,6 +33,12 @@ const aboutRoot = ReactDOM.createRoot(
   document.getElementById('about-mount-point')
 );
 aboutRoot.render(<AboutSection />);
+
+const tempNavRoot = ReactDOM.createRoot(
+     document.createElement('div')
+   );
+   document.body.appendChild(tempNavRoot._internalRoot.containerInfo);
+   tempNavRoot.render(<TempNavButton />);
 
 // 5) Monta Custom Cursor ← NOVO
 const cursorContainer = document.createElement('div');
