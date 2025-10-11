@@ -104,7 +104,7 @@ const AboutSection = () => {
             {/* Bio Text */}
             <div className="about-bio" data-fade>
               <p className="about-bio-text">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                Experienced Senior UX/UI Designer and Lead with over 15 years of expertise in branding, user-centered design, and digital product development. Known for leading cross-functional teams, improving user engagement through strategic design, and delivering data-driven solutions that meet both user and business goals. Proven success in fast-paced environments, particularly within startups, where I have led design initiatives and contributed to significant user growth and retention. Recognized for impactful work that optimizes UX/UI, boosts conversion rates, and elevates brand presence.
               </p>
             </div>
 
