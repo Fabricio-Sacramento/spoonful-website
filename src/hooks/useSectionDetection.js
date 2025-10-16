@@ -10,6 +10,8 @@ const SECTION_STATE_MAP = {
   'work': CURSOR_STATES.GREEN_DOT,
   'statement': CURSOR_STATES.GREEN_DOT,
   'contact': CURSOR_STATES.GREEN_DOT
+  // ✅ MANTIDO: Não há referências a seção About estática (#about)
+  // ✅ CORRETO: about-us é diferente da seção About removida
 };
 
 export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
@@ -29,7 +31,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
 
     const setupAnimatedSections = () => {
       const heroSection = document.querySelector('#hero');
-      const aboutSection = document.querySelector('#about-us');
+      const aboutSection = document.querySelector('#about-us'); // ✅ CORRETO: about-us ≠ about
       
       if (!heroSection || !aboutSection) {
         console.warn('⚠️ Hero or About section not found');
@@ -61,7 +63,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         }
       });
 
-      // ✅ ABOUT: Trigger explícito na própria seção
+      // ✅ ABOUT-US: Trigger explícito na própria seção (diferente da seção About removida)
       const aboutTrigger = ScrollTrigger.create({
         trigger: aboutSection, // Trigger direto no #about-us
         start: 'top top',      // About entra quando topo atinge topo da viewport

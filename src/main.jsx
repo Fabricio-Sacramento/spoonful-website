@@ -4,12 +4,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CanvasApp from './components/CanvasApp.jsx';
 import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
-import CustomCursor from './components/CustomCursor.jsx'; // ← ADICIONAR
+import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
-import AboutSection from './components/AboutSection';
+// ❌ REMOVIDO: import AboutSection from './components/AboutSection';
 import TempNavButton from './components/TempNavButton';
 
 // 1) Monta o canvas 3D inicial
@@ -28,26 +28,27 @@ statementRoot.render(<StatementSection />);
 const contactRoot = ReactDOM.createRoot(document.getElementById('contact'));
 contactRoot.render(<ContactSection />);
 
-// 4.5) Monta About Section ← NOVO
-const aboutRoot = ReactDOM.createRoot(
-  document.getElementById('about-mount-point')
-);
-aboutRoot.render(<AboutSection />);
+// ❌ REMOVIDO: About Section estática
+// const aboutRoot = ReactDOM.createRoot(
+//   document.getElementById('about-mount-point')
+// );
+// aboutRoot.render(<AboutSection />);
 
+// 5) Monta TempNavButton (mantém funcionalidade do overlay)
 const tempNavRoot = ReactDOM.createRoot(
      document.createElement('div')
    );
    document.body.appendChild(tempNavRoot._internalRoot.containerInfo);
    tempNavRoot.render(<TempNavButton />);
 
-// 5) Monta Custom Cursor ← NOVO
+// 6) Monta Custom Cursor
 const cursorContainer = document.createElement('div');
 cursorContainer.id = 'cursor-root';
 document.body.appendChild(cursorContainer);
 const cursorRoot = ReactDOM.createRoot(cursorContainer);
 cursorRoot.render(<CustomCursor />);
 
-// 6) Inicializa Canvas Performance Controller
+// 7) Inicializa Canvas Performance Controller
 window.addEventListener('load', () => {
   setTimeout(() => {
     canvasController.init(root3D, <CanvasApp />);
@@ -110,7 +111,7 @@ if (window.location.hash === '#debug') {
     }
   };
   
-  // Debug Custom Cursor ← NOVO
+  // Debug Custom Cursor
   window.debugCursor = {
     getState: () => {
       const cursor = document.querySelector('.custom-cursor');
