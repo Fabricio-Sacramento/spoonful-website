@@ -136,6 +136,7 @@ const NavMenu = () => {
           }, 0.3)
           
           // Step 2: What We Do (48 → 96), resto vai para 48
+          .set(movingItems.slice(1, 2), { y: 48 }, 0.6) // What We Do vai para posição do About Us
           .set(movingItems.slice(2), { y: 48 }, 0.6) // Work até About Me vão para posição do About Us
           .to(movingItems.slice(1, 2), { // só What We Do
             y: 96,
@@ -145,6 +146,7 @@ const NavMenu = () => {
           }, 0.6)
           
           // Step 3: Work (96 → 144), resto vai para 96
+          .set(movingItems.slice(2, 3), { y: 96 }, 0.9) // Work vai para posição do What We Do
           .set(movingItems.slice(3), { y: 96 }, 0.9) // Statement até About Me vão para posição do What We Do
           .to(movingItems.slice(2, 3), { // só Work
             y: 144,
@@ -154,6 +156,7 @@ const NavMenu = () => {
           }, 0.9)
           
           // Step 4: Statement (144 → 192), resto vai para 144
+          .set(movingItems.slice(3, 4), { y: 144 }, 1.2) // Statement vai para posição do Work
           .set(movingItems.slice(4), { y: 144 }, 1.2) // Contact + About Me vão para posição do Work
           .to(movingItems.slice(3, 4), { // só Statement
             y: 192,
@@ -163,6 +166,7 @@ const NavMenu = () => {
           }, 1.2)
           
           // Step 5: Contact (192 → 240), About Me vai para 192
+          .set(movingItems.slice(4, 5), { y: 192 }, 1.5) // Contact vai para posição do Statement
           .set(movingItems.slice(5), { y: 192 }, 1.5) // About Me vai para posição do Statement
           .to(movingItems.slice(4, 5), { // só Contact
             y: 240,
@@ -172,6 +176,7 @@ const NavMenu = () => {
           }, 1.5)
           
           // Step 6: About Me (240 → 288)
+          .set(movingItems.slice(5, 6), { y: 240 }, 1.8) // About Me vai para posição do Contact
           .to(movingItems.slice(5, 6), { // só About Me
             y: 288,
             duration: 0.3,
