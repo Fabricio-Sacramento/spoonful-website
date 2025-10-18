@@ -109,33 +109,30 @@ const NavMenu = () => {
       openTl.current = gsap.timeline({
         onStart: () => {
           console.log('🎬 Animação OPEN iniciada');
-          console.log('Items refs:', items.length);
-          items.forEach((item, i) => {
-            console.log(`Item ${i}:`, item, 'y atual:', gsap.getProperty(item, 'y'));
-          });
         }
       });
 
+      // ✅ Items que vão se mover (About Us em diante - índices 1-6)
+      const movingItems = items.slice(1); // Pula Home (index 0)
+
       if (prefersReducedMotion) {
-        // Reduced motion: sem animações
         gsap.set(logo, { x: -135 });
-        items.forEach((item, i) => {
-          gsap.set(item, { y: (i + 1) * 56 }); // 40px height + 16px gap
+        movingItems.forEach((item, i) => {
+          gsap.set(item, { y: (i + 1) * 56 });
         });
       } else {
         openTl.current
-          // 1. Logo desloca para esquerda (revela Home)
+          // 1. Logo desloca para esquerda (revela Home que está fixo em y:0)
           .to(logo, {
-            x: -135, // Desloca para esquerda
+            x: -135,
             duration: 0.5,
             ease: 'power3.out',
-            onComplete: () => console.log('✅ Logo deslocado')
+            onComplete: () => console.log('✅ Home revelado (fixo em y:0)')
           }, 0)
-          // 2. Cascata: itens descem um por um
-          .to(items, {
+          // 2. Cascata: About Us..About Me descem (Home NÃO se move)
+          .to(movingItems, {
             y: (index) => {
-              const targetY = (index + 1) * 56;
-              console.log(`Item ${index} vai para y:`, targetY);
+              const targetY = (index + 1) * 56; // About Us→56, What We Do→112...
               return targetY;
             },
             duration: 0.5,
@@ -290,31 +287,37 @@ const NavMenu = () => {
           Spoonful
         </div>
 
-        {/* ITENS (z-index: 1 - atrás da logo, empilhados) */}
+        {/* ITENS (z-index decrescente: 9, 8, 7...) */}
         <ul
           ref={listRef}
           id="nav-menu-list"
           className="nav-menu-list"
           role="navigation"
         >
-          {NAV_ITEMS.map((item, index) => (
-            <li key={item.id} style={{ position: 'relative', height: 0 }}>
-              <a
-                ref={el => itemsRef.current[index] = el}
-                href={item.href || '#'}
-                className={`nav-menu-item ${
-                  activeSection === item.id ? 'active' : ''
-                }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleItemClick(item);
-                }}
-                aria-current={activeSection === item.id ? 'page' : undefined}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
+          {NAV_ITEMS.map((item, index) => {
+            // Z-index: Home=9, About Us=8, What We Do=7...
+            const zIndex = 9 - index;
+            
+            return (
+              <li key={item.id} style={{ position: 'relative', height: 0 }}>
+                <a
+                  ref={el => itemsRef.current[index] = el}
+                  href={item.href || '#'}
+                  className={`nav-menu-item ${
+                    activeSection === item.id ? 'active' : ''
+                  }`}
+                  style={{ zIndex }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleItemClick(item);
+                  }}
+                  aria-current={activeSection === item.id ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
