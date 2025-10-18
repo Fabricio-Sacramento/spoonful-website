@@ -130,59 +130,59 @@ const NavMenu = () => {
           .set(movingItems.slice(1), { y: 0 }, 0.3) // What We Do até About Me ficam na âncora
           .to(movingItems.slice(0, 1), { // só About Us
             y: 48,
-            duration: 0.3,
+            duration: 0.18,
             ease: 'power3.out',
             onComplete: () => console.log('✅ About Us revelado')
           }, 0.3)
           
           // Step 2: What We Do (48 → 96), resto vai para 48
-          .set(movingItems.slice(1, 2), { y: 48 }, 0.6) // What We Do vai para posição do About Us
-          .set(movingItems.slice(2), { y: 48 }, 0.6) // Work até About Me vão para posição do About Us
+          .set(movingItems.slice(1, 2), { y: 48 }, 0.45) // What We Do vai para posição do About Us
+          .set(movingItems.slice(2), { y: 48 }, 0.45) // Work até About Me vão para posição do About Us
           .to(movingItems.slice(1, 2), { // só What We Do
             y: 96,
-            duration: 0.3,
+            duration: 0.18,
             ease: 'power3.out',
             onComplete: () => console.log('✅ What We Do revelado')
-          }, 0.6)
+          }, 0.45)
           
           // Step 3: Work (96 → 144), resto vai para 96
-          .set(movingItems.slice(2, 3), { y: 96 }, 0.9) // Work vai para posição do What We Do
-          .set(movingItems.slice(3), { y: 96 }, 0.9) // Statement até About Me vão para posição do What We Do
+          .set(movingItems.slice(2, 3), { y: 96 }, 0.6) // Work vai para posição do What We Do
+          .set(movingItems.slice(3), { y: 96 }, 0.6) // Statement até About Me vão para posição do What We Do
           .to(movingItems.slice(2, 3), { // só Work
             y: 144,
-            duration: 0.3,
+            duration: 0.18,
             ease: 'power3.out',
             onComplete: () => console.log('✅ Work revelado')
-          }, 0.9)
+          }, 0.6)
           
           // Step 4: Statement (144 → 192), resto vai para 144
-          .set(movingItems.slice(3, 4), { y: 144 }, 1.2) // Statement vai para posição do Work
-          .set(movingItems.slice(4), { y: 144 }, 1.2) // Contact + About Me vão para posição do Work
+          .set(movingItems.slice(3, 4), { y: 144 }, 0.75) // Statement vai para posição do Work
+          .set(movingItems.slice(4), { y: 144 }, 0.75) // Contact + About Me vão para posição do Work
           .to(movingItems.slice(3, 4), { // só Statement
             y: 192,
-            duration: 0.3,
+            duration: 0.18,
             ease: 'power3.out',
             onComplete: () => console.log('✅ Statement revelado')
-          }, 1.2)
+          }, 0.75)
           
           // Step 5: Contact (192 → 240), About Me vai para 192
-          .set(movingItems.slice(4, 5), { y: 192 }, 1.5) // Contact vai para posição do Statement
-          .set(movingItems.slice(5), { y: 192 }, 1.5) // About Me vai para posição do Statement
+          .set(movingItems.slice(4, 5), { y: 192 }, 0.9) // Contact vai para posição do Statement
+          .set(movingItems.slice(5), { y: 192 }, 0.9) // About Me vai para posição do Statement
           .to(movingItems.slice(4, 5), { // só Contact
             y: 240,
-            duration: 0.3,
+            duration: 0.18,
             ease: 'power3.out',
             onComplete: () => console.log('✅ Contact revelado')
-          }, 1.5)
+          }, 0.9)
           
           // Step 6: About Me (240 → 288)
-          .set(movingItems.slice(5, 6), { y: 240 }, 1.8) // About Me vai para posição do Contact
+          .set(movingItems.slice(5, 6), { y: 240 }, 1.05) // About Me vai para posição do Contact
           .to(movingItems.slice(5, 6), { // só About Me
             y: 288,
-            duration: 0.3,
+            duration: 0.18,
             ease: 'power3.out',
             onComplete: () => console.log('✅ About Me revelado - ÂNCORA COMPLETA!')
-          }, 1.8);
+          }, 1.05);
       }
 
       console.log('📂 Nav Menu: Aberto');
@@ -199,43 +199,60 @@ const NavMenu = () => {
         gsap.set(items, { opacity: 0 });
       } else {
         openTl.current
-          // ✅ REVERSO DA CORTINA - grupos sobem sequencialmente
-          .to(movingItems.slice(5), { // About Me sobe primeiro
+          // ✅ LÓGICA REVERSA DA ÂNCORA - cada item sobe individualmente (ACELERADA)
+          
+          // Step 1: About Me (288 → 240), Contact vai para 240
+          .set(movingItems.slice(4, 5), { y: 240 }, 0) // Contact vai para posição do About Me
+          .to(movingItems.slice(5, 6), { // só About Me
             y: 240,
-            duration: 0.3,
-            ease: 'power2.in'
+            duration: 0.18,
+            ease: 'power2.in',
+            onComplete: () => console.log('✅ About Me recolhido')
           }, 0)
           
-          .to(movingItems.slice(4), { // Contact + About Me sobem
+          // Step 2: Contact (240 → 192), Statement vai para 192
+          .set(movingItems.slice(3, 4), { y: 192 }, 0.15) // Statement vai para posição do Contact
+          .to(movingItems.slice(4, 5), { // só Contact
             y: 192,
-            duration: 0.3,
-            ease: 'power2.in'
-          }, 0.1)
+            duration: 0.18,
+            ease: 'power2.in',
+            onComplete: () => console.log('✅ Contact recolhido')
+          }, 0.15)
           
-          .to(movingItems.slice(3), { // Statement + Contact + About Me sobem
+          // Step 3: Statement (192 → 144), Work vai para 144
+          .set(movingItems.slice(2, 3), { y: 144 }, 0.3) // Work vai para posição do Statement
+          .to(movingItems.slice(3, 4), { // só Statement
             y: 144,
-            duration: 0.3,
-            ease: 'power2.in'
-          }, 0.2)
-          
-          .to(movingItems.slice(2), { // Work + Statement + Contact + About Me sobem
-            y: 96,
-            duration: 0.3,
-            ease: 'power2.in'
+            duration: 0.18,
+            ease: 'power2.in',
+            onComplete: () => console.log('✅ Statement recolhido')
           }, 0.3)
           
-          .to(movingItems.slice(1), { // What We Do + todos atrás sobem
-            y: 48,
-            duration: 0.3,
-            ease: 'power2.in'
-          }, 0.4)
-          
-          .to(movingItems.slice(0), { // About Us + todos atrás sobem (todos empilhados)
-            y: 0,
-            duration: 0.3,
+          // Step 4: Work (144 → 96), What We Do vai para 96
+          .set(movingItems.slice(1, 2), { y: 96 }, 0.45) // What We Do vai para posição do Work
+          .to(movingItems.slice(2, 3), { // só Work
+            y: 96,
+            duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ Cortina fechada - todos empilhados')
-          }, 0.5)
+            onComplete: () => console.log('✅ Work recolhido')
+          }, 0.45)
+          
+          // Step 5: What We Do (96 → 48), About Us vai para 48
+          .set(movingItems.slice(0, 1), { y: 48 }, 0.6) // About Us vai para posição do What We Do
+          .to(movingItems.slice(1, 2), { // só What We Do
+            y: 48,
+            duration: 0.18,
+            ease: 'power2.in',
+            onComplete: () => console.log('✅ What We Do recolhido')
+          }, 0.6)
+          
+          // Step 6: About Us (48 → 0) - volta para âncora
+          .to(movingItems.slice(0, 1), { // só About Us
+            y: 0,
+            duration: 0.18,
+            ease: 'power2.in',
+            onComplete: () => console.log('✅ About Us recolhido - ÂNCORA REVERSA COMPLETA!')
+          }, 0.75)
           
           .to(logo, {
             x: 0,
@@ -244,7 +261,7 @@ const NavMenu = () => {
             onComplete: () => console.log('✅ Logo voltou')
           }, 0.3)
           
-          .set(items, { opacity: 0 }, 1.1); // ← Timing ajustado para nova duração
+          .set(items, { opacity: 0 }, 0.93); // ← Timing ajustado: 0.75 + 0.18 = 0.93s
       }
 
       console.log('📁 Nav Menu: Fechado');
