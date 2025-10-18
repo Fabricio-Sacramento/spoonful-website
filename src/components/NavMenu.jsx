@@ -49,16 +49,17 @@ const NavMenu = () => {
 
     if (!logo || !toggle) return;
 
-    // ✅ CRÍTICO: Estado inicial dos itens (empilhados, visíveis, y=0)
+    // ✅ CRÍTICO: Itens começam INVISÍVEIS (opacity: 0)
+    // Só ficam visíveis quando menu abre
     gsap.set(items, { 
       y: 0, 
-      opacity: 1,
-      visibility: 'visible'
+      opacity: 0, // ← Invisíveis no início
+      visibility: 'visible' // Mas não display:none
     });
 
-    console.log('🎬 Nav Menu: Itens inicializados:', items.length);
+    console.log('🎬 Nav Menu: Itens inicializados (invisíveis):', items.length);
 
-    // Estado inicial: fora da tela
+    // Estado inicial: logo e burger fora da tela
     gsap.set(logo, { x: 200, opacity: 0 });
     gsap.set(toggle, { x: 100, opacity: 0 });
 
@@ -71,15 +72,15 @@ const NavMenu = () => {
         x: 0,
         opacity: 1,
         duration: 1.2,
-        ease: 'elastic.out(1, 0.6)', // Elastic overshoot
+        ease: 'elastic.out(1, 0.6)',
       }, 0)
-      // Hamburger entra depois (mais direto)
+      // Hamburger entra depois
       .to(toggle, {
         x: 0,
         opacity: 1,
         duration: 0.6,
         ease: 'power3.out'
-      }, 0.4); // Começa 0.4s depois do logo
+      }, 0.4);
 
     console.log('🎬 Nav Menu: Animação de entrada iniciada');
 
@@ -116,25 +117,25 @@ const NavMenu = () => {
       const movingItems = items.slice(1); // Pula Home (index 0)
 
       if (prefersReducedMotion) {
+        gsap.set(items, { opacity: 1 }); // Todos visíveis instantâneo
         gsap.set(logo, { x: -135 });
         movingItems.forEach((item, i) => {
           gsap.set(item, { y: (i + 1) * 56 });
         });
       } else {
         openTl.current
-          // 1. Logo desloca para esquerda (revela Home que está fixo em y:0)
+          // 1. INSTANTÂNEO: Todos os botões ficam visíveis (sem fade)
+          .set(items, { opacity: 1 }, 0)
+          // 2. Logo desloca para esquerda (revela Home que já está visível)
           .to(logo, {
             x: -135,
             duration: 0.5,
             ease: 'power3.out',
-            onComplete: () => console.log('✅ Home revelado (fixo em y:0)')
+            onComplete: () => console.log('✅ Home revelado (já estava opacity:1)')
           }, 0)
-          // 2. Cascata: About Us..About Me descem (Home NÃO se move)
+          // 3. Cascata: About Us..About Me descem (SÓ MOVIMENTO, sem fade)
           .to(movingItems, {
-            y: (index) => {
-              const targetY = (index + 1) * 56; // About Us→56, What We Do→112...
-              return targetY;
-            },
+            y: (index) => (index + 1) * 56,
             duration: 0.5,
             stagger: 0.08,
             ease: 'power3.out',

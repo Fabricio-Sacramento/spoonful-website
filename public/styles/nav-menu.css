@@ -9,8 +9,8 @@
 
 .nav-menu-container {
   position: fixed;
-  top: 0.25rem; /* 4px */
-  right: 0.25rem; /* 4px */
+  top: 0.5rem; /* 8px */
+  right: 0.5rem; /* 8px */
   z-index: 9999;
   
   display: flex;
@@ -60,9 +60,8 @@
   align-items: center;
   gap: 0.25rem; /* 4px */
   
-  border-radius: 0.25rem; /* 4px */
+  border-radius: 0.35rem; /* 4px */
   background: var(--neutral-normal);
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
   
   /* Text */
   color: var(--primary-red);
@@ -101,15 +100,14 @@
   padding: 0.75rem 0.5rem; /* 12px 8px */
   justify-content: center;
   align-items: center;
-  gap: 0.25rem; /* 4px */
-  
-  border-radius: 0.25rem; /* 4px */
+  gap: 0.5rem; /* 8px */
+
+  border-radius: 0.35rem; /* 4px */
   background: var(--neutral-normal);
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
   border: none;
   
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
   
   /* Performance */
   will-change: transform;
@@ -119,12 +117,10 @@
 
 .nav-menu-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.3);
 }
 
 .nav-menu-toggle:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
 }
 
 /* ================================= */
@@ -184,7 +180,7 @@
   align-items: center;
   gap: 0.25rem; /* 4px */
   
-  border-radius: 0.25rem; /* 4px */
+  border-radius: 0.35rem; /* 4px */
   /* ✅ REMOVIDO: box-shadow */
   
   /* Text */
@@ -228,7 +224,6 @@
   background: var(--neutral-normal);
   color: var(--primary-green);
   transform: translateY(-2px);
-  box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* ACTIVE STATE (Vermelho - página atual) */
