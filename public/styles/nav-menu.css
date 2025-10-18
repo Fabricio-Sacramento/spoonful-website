@@ -14,9 +14,9 @@
   z-index: 9999;
   
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1rem; /* 16px - spacing entre elementos na cascata */
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.5rem; /* 8px entre logo e hamburger */
   
   /* Performance */
   will-change: transform;
@@ -26,21 +26,32 @@
 }
 
 /* ================================= */
+/* STACK CONTAINER (Logo + Itens)    */
+/* ================================= */
+
+.nav-menu-stack {
+  position: relative; /* ✅ Container para empilhamento */
+  width: 7.9375rem; /* 127px - mesmo width dos itens */
+  height: 2.5rem; /* 40px - altura base */
+  flex-shrink: 0;
+}
+
+/* ================================= */
 /* LAYOUT HORIZONTAL (CLOSED STATE)  */
 /* ================================= */
 
-.nav-menu-horizontal {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem; /* 8px entre logo e hamburger */
-}
+/* ✅ REMOVIDO: Não precisa mais desta seção */
+/* O stack container já gerencia o layout */
 
 /* ================================= */
 /* FRAME LOGO                        */
 /* ================================= */
 
 .nav-menu-logo {
+  position: absolute; /* ✅ MUDADO: absolute para empilhar */
+  top: 0;
+  left: 0;
+  
   display: flex;
   width: 7.9375rem; /* 127px */
   height: 2.5rem; /* 40px */
@@ -62,11 +73,20 @@
   text-transform: capitalize;
   line-height: 1;
   
+  /* Z-index: acima de todos os botões */
+  z-index: 10;
+  
   /* Transição para animação */
   transition: transform 420ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: default;
   -webkit-user-select: none;
+  -moz-user-select: none; 
   user-select: none;
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* ================================= */
@@ -151,6 +171,10 @@
 /* ================================= */
 
 .nav-menu-item {
+  position: absolute; /* ✅ MUDADO: absolute para empilhar */
+  top: 0;
+  left: 0;
+  
   display: flex;
   width: 7.9375rem; /* 127px */
   height: 2.5rem; /* 40px */
@@ -171,12 +195,20 @@
   text-transform: capitalize;
   line-height: 1;
   
+  /* Z-index: atrás da logo */
+  z-index: 1;
+  
+  /* ✅ CRÍTICO: Visíveis desde o início, apenas posicionados atrás */
+  opacity: 1;
+  visibility: visible;
+  
   /* Transição */
-  transition: all 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background-color 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              color 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
   
   /* Performance */
-  will-change: background-color, color, transform;
+  will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
@@ -215,39 +247,20 @@
 /* LISTA DE NAVEGAÇÃO (CASCATA)      */
 /* ================================= */
 
-.nav-menu-list {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1rem; /* 16px entre botões */
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  
-  /* Inicialmente escondido (GSAP controla) */
-  opacity: 0;
-  pointer-events: none;
-}
-
-.nav-menu-list.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
+/* ✅ REMOVIDO: Lista agora está inline no stack, não precisa de positioning especial */
 
 /* ================================= */
 /* ESTADOS DE ANIMAÇÃO (GSAP)        */
 /* ================================= */
 
-/* Estado inicial dos itens (antes do stagger) */
-.nav-menu-item {
-  opacity: 0;
-  transform: translateY(-20px);
-}
+/* Estado inicial dos itens */
 
-/* Quando menu abre (GSAP adiciona classe) */
-.nav-menu-container.open .nav-menu-item {
-  opacity: 1;
-  transform: translateY(0);
+
+/* Lista wrapper (não precisa mais de opacity control) */
+.nav-menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 /* ================================= */

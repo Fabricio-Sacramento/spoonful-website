@@ -45,8 +45,18 @@ const NavMenu = () => {
 
     const logo = logoRef.current;
     const toggle = toggleRef.current;
+    const items = itemsRef.current.filter(Boolean);
 
     if (!logo || !toggle) return;
+
+    // ✅ CRÍTICO: Estado inicial dos itens (empilhados, visíveis, y=0)
+    gsap.set(items, { 
+      y: 0, 
+      opacity: 1,
+      visibility: 'visible'
+    });
+
+    console.log('🎬 Nav Menu: Itens inicializados:', items.length);
 
     // Estado inicial: fora da tela
     gsap.set(logo, { x: 200, opacity: 0 });
@@ -83,10 +93,9 @@ const NavMenu = () => {
   // ================================
   useEffect(() => {
     const logo = logoRef.current;
-    const list = listRef.current;
     const items = itemsRef.current.filter(Boolean);
 
-    if (!logo || !list || items.length === 0) return;
+    if (!logo || items.length === 0) return;
 
     // Kill timeline anterior se existir
     if (openTl.current) openTl.current.kill();
@@ -97,31 +106,42 @@ const NavMenu = () => {
 
     if (isOpen) {
       // ============ ABERTURA ============
-      openTl.current = gsap.timeline();
+      openTl.current = gsap.timeline({
+        onStart: () => {
+          console.log('🎬 Animação OPEN iniciada');
+          console.log('Items refs:', items.length);
+          items.forEach((item, i) => {
+            console.log(`Item ${i}:`, item, 'y atual:', gsap.getProperty(item, 'y'));
+          });
+        }
+      });
 
       if (prefersReducedMotion) {
         // Reduced motion: sem animações
-        gsap.set(logo, { x: -135 }); // Move logo para revelar Home
-        gsap.set(list, { opacity: 1, pointerEvents: 'auto' });
-        gsap.set(items, { opacity: 1, y: 0 });
+        gsap.set(logo, { x: -135 });
+        items.forEach((item, i) => {
+          gsap.set(item, { y: (i + 1) * 56 }); // 40px height + 16px gap
+        });
       } else {
-        // Animação normal
         openTl.current
           // 1. Logo desloca para esquerda (revela Home)
           .to(logo, {
-            x: -135, // 127px (width do item) + 8px gap
+            x: -135, // Desloca para esquerda
             duration: 0.5,
-            ease: 'power3.out'
+            ease: 'power3.out',
+            onComplete: () => console.log('✅ Logo deslocado')
           }, 0)
-          // 2. Lista fica visível
-          .set(list, { opacity: 1, pointerEvents: 'auto' }, 0.2)
-          // 3. Cascata dos itens (top-to-bottom)
+          // 2. Cascata: itens descem um por um
           .to(items, {
-            opacity: 1,
-            y: 0,
+            y: (index) => {
+              const targetY = (index + 1) * 56;
+              console.log(`Item ${index} vai para y:`, targetY);
+              return targetY;
+            },
             duration: 0.5,
-            stagger: 0.08, // 80ms entre cada item
-            ease: 'power3.out'
+            stagger: 0.08,
+            ease: 'power3.out',
+            onComplete: () => console.log('✅ Cascata completa')
           }, 0.3);
       }
 
@@ -132,23 +152,18 @@ const NavMenu = () => {
 
       if (prefersReducedMotion) {
         // Reduced motion: sem animações
-        gsap.set(items, { opacity: 0, y: -20 });
-        gsap.set(list, { opacity: 0, pointerEvents: 'none' });
+        gsap.set(items, { y: 0 });
         gsap.set(logo, { x: 0 });
       } else {
-        // Animação reversa
         openTl.current
-          // 1. Itens sobem (bottom-to-top)
+          // 1. Itens sobem (cascata reversa)
           .to([...items].reverse(), {
-            opacity: 0,
-            y: -20,
+            y: 0,
             duration: 0.4,
             stagger: 0.06, // 60ms entre cada
             ease: 'power2.in'
           }, 0)
-          // 2. Lista esconde
-          .set(list, { opacity: 0, pointerEvents: 'none' }, 0.5)
-          // 3. Logo volta para posição original
+          // 2. Logo volta para posição original
           .to(logo, {
             x: 0,
             duration: 0.5,
@@ -268,87 +283,87 @@ const NavMenu = () => {
       className={`nav-menu-container ${isOpen ? 'open' : ''}`}
       aria-label="Main navigation"
     >
-      {/* LAYOUT HORIZONTAL (Logo + Hamburger) */}
-      <div className="nav-menu-horizontal">
-        {/* LOGO */}
+      {/* STACK: Logo + Todos os itens empilhados (mesma posição) */}
+      <div className="nav-menu-stack">
+        {/* LOGO (z-index: 10 - acima de tudo) */}
         <div ref={logoRef} className="nav-menu-logo">
           Spoonful
         </div>
 
-        {/* HAMBURGER / X TOGGLE */}
-        <button
-          ref={toggleRef}
-          className="nav-menu-toggle"
-          onClick={handleToggle}
-          aria-expanded={isOpen}
-          aria-controls="nav-menu-list"
-          aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
+        {/* ITENS (z-index: 1 - atrás da logo, empilhados) */}
+        <ul
+          ref={listRef}
+          id="nav-menu-list"
+          className="nav-menu-list"
+          role="navigation"
         >
-          <svg
-            className="nav-menu-icon"
-            width="28"
-            height="24"
-            viewBox="0 0 28 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <line
-              className="nav-menu-icon-line"
-              x1="4"
-              y1="4"
-              x2="24"
-              y2="4"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            <line
-              className="nav-menu-icon-line"
-              x1="4"
-              y1="12"
-              x2="24"
-              y2="12"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            <line
-              className="nav-menu-icon-line"
-              x1="4"
-              y1="20"
-              x2="24"
-              y2="20"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
+          {NAV_ITEMS.map((item, index) => (
+            <li key={item.id} style={{ position: 'relative', height: 0 }}>
+              <a
+                ref={el => itemsRef.current[index] = el}
+                href={item.href || '#'}
+                className={`nav-menu-item ${
+                  activeSection === item.id ? 'active' : ''
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleItemClick(item);
+                }}
+                aria-current={activeSection === item.id ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {/* LISTA DE NAVEGAÇÃO (CASCATA) */}
-      <ul
-        ref={listRef}
-        id="nav-menu-list"
-        className="nav-menu-list"
-        role="navigation"
+      {/* HAMBURGER / X TOGGLE */}
+      <button
+        ref={toggleRef}
+        className="nav-menu-toggle"
+        onClick={handleToggle}
+        aria-expanded={isOpen}
+        aria-controls="nav-menu-list"
+        aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
       >
-        {NAV_ITEMS.map((item, index) => (
-          <li key={item.id}>
-            <a
-              ref={el => itemsRef.current[index] = el}
-              href={item.href || '#'}
-              className={`nav-menu-item ${
-                activeSection === item.id ? 'active' : ''
-              }`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleItemClick(item);
-              }}
-              aria-current={activeSection === item.id ? 'page' : undefined}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+        <svg
+          className="nav-menu-icon"
+          width="28"
+          height="24"
+          viewBox="0 0 28 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <line
+            className="nav-menu-icon-line"
+            x1="4"
+            y1="4"
+            x2="24"
+            y2="4"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+          <line
+            className="nav-menu-icon-line"
+            x1="4"
+            y1="12"
+            x2="24"
+            y2="12"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+          <line
+            className="nav-menu-icon-line"
+            x1="4"
+            y1="20"
+            x2="24"
+            y2="20"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
     </nav>
   );
 };
