@@ -1,4 +1,6 @@
-// src/main.jsx
+// src/main.jsx - ATUALIZADO
+// Substitui TempNavButton por NavMenu + mantém AboutDrawer
+
 import ReactDOM from 'react-dom/client';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import CanvasApp from './components/CanvasApp.jsx';
@@ -9,8 +11,11 @@ import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
-// ❌ REMOVIDO: import AboutSection from './components/AboutSection';
-import TempNavButton from './components/TempNavButton';
+
+// ✅ NOVOS IMPORTS
+import NavWithDrawer from './components/NavWithDrawer.jsx'; // ✅ MOVIDO PARA ARQUIVO SEPARADO
+
+// ❌ REMOVIDO: import TempNavButton from './components/TempNavButton';
 
 // 1) Monta o canvas 3D inicial
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
@@ -28,18 +33,12 @@ statementRoot.render(<StatementSection />);
 const contactRoot = ReactDOM.createRoot(document.getElementById('contact'));
 contactRoot.render(<ContactSection />);
 
-// ❌ REMOVIDO: About Section estática
-// const aboutRoot = ReactDOM.createRoot(
-//   document.getElementById('about-mount-point')
-// );
-// aboutRoot.render(<AboutSection />);
-
-// 5) Monta TempNavButton (mantém funcionalidade do overlay)
-const tempNavRoot = ReactDOM.createRoot(
-     document.createElement('div')
-   );
-   document.body.appendChild(tempNavRoot._internalRoot.containerInfo);
-   tempNavRoot.render(<TempNavButton />);
+// 5) Monta NavMenu + AboutDrawer
+const navRoot = ReactDOM.createRoot(
+  document.createElement('div')
+);
+document.body.appendChild(navRoot._internalRoot.containerInfo);
+navRoot.render(<NavWithDrawer />);
 
 // 6) Monta Custom Cursor
 const cursorContainer = document.createElement('div');
@@ -130,6 +129,19 @@ if (window.location.hash === '#debug') {
     },
     disable: () => {
       document.body.setAttribute('data-cursor-disabled', 'true');
+    }
+  };
+
+  // ✅ Debug NavMenu (NOVO)
+  window.debugNav = {
+    getState: () => {
+      const container = document.querySelector('.nav-menu-container');
+      return {
+        exists: !!container,
+        isOpen: container?.classList.contains('open'),
+        items: document.querySelectorAll('.nav-menu-item').length,
+        activeItem: document.querySelector('.nav-menu-item.active')?.textContent
+      };
     }
   };
   

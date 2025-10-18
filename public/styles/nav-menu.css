@@ -1,0 +1,301 @@
+/* ================================= */
+/* NAV MENU - SPOONFUL                */
+/* Design System Integration         */
+/* ================================= */
+
+/* ================================= */
+/* CONTAINER PRINCIPAL               */
+/* ================================= */
+
+.nav-menu-container {
+  position: fixed;
+  top: 0.25rem; /* 4px */
+  right: 0.25rem; /* 4px */
+  z-index: 9999;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem; /* 16px - spacing entre elementos na cascata */
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* ================================= */
+/* LAYOUT HORIZONTAL (CLOSED STATE)  */
+/* ================================= */
+
+.nav-menu-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem; /* 8px entre logo e hamburger */
+}
+
+/* ================================= */
+/* FRAME LOGO                        */
+/* ================================= */
+
+.nav-menu-logo {
+  display: flex;
+  width: 7.9375rem; /* 127px */
+  height: 2.5rem; /* 40px */
+  padding: 0.75rem 1rem; /* 12px 16px */
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  
+  border-radius: 0.25rem; /* 4px */
+  background: var(--neutral-normal);
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  
+  /* Text */
+  color: var(--primary-red);
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 1.5rem; /* 24px */
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: capitalize;
+  line-height: 1;
+  
+  /* Transição para animação */
+  transition: transform 420ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ================================= */
+/* BURGER BUTTON                     */
+/* ================================= */
+
+.nav-menu-toggle {
+  display: flex;
+  width: 2.75rem; /* 44px */
+  height: 2.5rem; /* 40px */
+  padding: 0.75rem 0.5rem; /* 12px 8px */
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  
+  border-radius: 0.25rem; /* 4px */
+  background: var(--neutral-normal);
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  border: none;
+  
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.nav-menu-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu-toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ================================= */
+/* BURGER ICON (SVG)                 */
+/* ================================= */
+
+.nav-menu-icon {
+  display: flex;
+  width: 1.75rem; /* 28px */
+  height: 1.5rem; /* 24px */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4375rem; /* 7px */
+  flex-shrink: 0;
+  position: relative;
+}
+
+.nav-menu-icon-line {
+  width: 1.25rem; /* 20px */
+  height: 0;
+  stroke-width: 4px;
+  stroke: var(--primary-red);
+  stroke-linecap: round;
+  transition: all 360ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center;
+}
+
+/* Animação Hamburger → X */
+.nav-menu-toggle[aria-expanded="true"] .nav-menu-icon-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-menu-toggle[aria-expanded="true"] .nav-menu-icon-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.nav-menu-toggle[aria-expanded="true"] .nav-menu-icon-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ================================= */
+/* MENU ITEMS (NAVIGATION LINKS)     */
+/* ================================= */
+
+.nav-menu-item {
+  display: flex;
+  width: 7.9375rem; /* 127px */
+  height: 2.5rem; /* 40px */
+  padding: 0.75rem 1rem; /* 12px 16px */
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  
+  border-radius: 0.25rem; /* 4px */
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  
+  /* Text */
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 1rem; /* 16px */
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-transform: capitalize;
+  line-height: 1;
+  
+  /* Transição */
+  transition: all 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  
+  /* Performance */
+  will-change: background-color, color, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ================================= */
+/* ESTADOS DOS MENU ITEMS            */
+/* ================================= */
+
+/* DEFAULT STATE (Verde) */
+.nav-menu-item {
+  background: var(--primary-green);
+  color: var(--neutral-normal);
+}
+
+/* HOVER STATE (Cinza escuro com texto verde) */
+.nav-menu-item:hover {
+  background: var(--neutral-normal);
+  color: var(--primary-green);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ACTIVE STATE (Vermelho - página atual) */
+.nav-menu-item.active {
+  background: var(--primary-red);
+  color: var(--neutral-light);
+}
+
+.nav-menu-item.active:hover {
+  background: var(--primary-red);
+  color: var(--neutral-light);
+  /* Mantém estilo active mesmo no hover */
+}
+
+/* ================================= */
+/* LISTA DE NAVEGAÇÃO (CASCATA)      */
+/* ================================= */
+
+.nav-menu-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem; /* 16px entre botões */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+  /* Inicialmente escondido (GSAP controla) */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav-menu-list.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ================================= */
+/* ESTADOS DE ANIMAÇÃO (GSAP)        */
+/* ================================= */
+
+/* Estado inicial dos itens (antes do stagger) */
+.nav-menu-item {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* Quando menu abre (GSAP adiciona classe) */
+.nav-menu-container.open .nav-menu-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+/* Mobile: ajustes mínimos (menu já é híbrido) */
+@media (max-width: 767px) {
+  .nav-menu-container {
+    top: 0.5rem; /* 8px - mais espaço em mobile */
+    right: 0.5rem; /* 8px */
+  }
+  
+  .nav-menu-logo {
+    font-size: 1.25rem; /* 20px */
+  }
+  
+  .nav-menu-item {
+    font-size: 0.9375rem; /* 15px */
+  }
+}
+
+/* ================================= */
+/* ACCESSIBILITY                     */
+/* ================================= */
+
+/* Focus visible para navegação por teclado */
+.nav-menu-toggle:focus-visible,
+.nav-menu-item:focus-visible {
+  outline: 2px solid var(--primary-green);
+  outline-offset: 4px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu-logo,
+  .nav-menu-toggle,
+  .nav-menu-item,
+  .nav-menu-icon-line {
+    transition: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .nav-menu-logo,
+  .nav-menu-toggle,
+  .nav-menu-item {
+    border: 2px solid currentColor;
+  }
+}
