@@ -15,25 +15,22 @@ const NAV_ITEMS = [
   { id: 'work', label: 'Work', href: '#work', type: 'anchor' },
   { id: 'statement', label: 'Statement', href: '#statement', type: 'anchor' },
   { id: 'contact', label: 'Contact', href: '#contact', type: 'anchor' },
-  { id: 'about-me', label: 'About Me', href: null, type: 'overlay' } // Abre AboutDrawer
+  { id: 'about-me', label: 'About Me', href: null, type: 'overlay' }
 ];
 
 const NavMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   
-  // Refs para animação
   const containerRef = useRef(null);
   const logoRef = useRef(null);
   const toggleRef = useRef(null);
   const listRef = useRef(null);
   const itemsRef = useRef([]);
   
-  // Timeline refs
   const entryTl = useRef(null);
   const openTl = useRef(null);
   
-  // Flag de primeira renderização
   const hasEnteredRef = useRef(false);
 
   // ================================
@@ -49,32 +46,26 @@ const NavMenu = () => {
 
     if (!logo || !toggle) return;
 
-    // ✅ CRÍTICO: Itens começam INVISÍVEIS (opacity: 0)
-    // Só ficam visíveis quando menu abre
     gsap.set(items, { 
       y: 0, 
-      opacity: 0, // ← Invisíveis no início
-      visibility: 'visible' // Mas não display:none
+      opacity: 0,
+      visibility: 'visible'
     });
 
     console.log('🎬 Nav Menu: Itens inicializados (invisíveis):', items.length);
 
-    // Estado inicial: logo e burger fora da tela
     gsap.set(logo, { x: 200, opacity: 0 });
     gsap.set(toggle, { x: 100, opacity: 0 });
 
-    // Timeline de entrada
     entryTl.current = gsap.timeline({ delay: 0.5 });
 
     entryTl.current
-      // Logo entra com elastic easing
       .to(logo, {
         x: 0,
         opacity: 1,
         duration: 1.2,
         ease: 'elastic.out(1, 0.6)',
       }, 0)
-      // Hamburger entra depois
       .to(toggle, {
         x: 0,
         opacity: 1,
@@ -98,7 +89,6 @@ const NavMenu = () => {
 
     if (!logo || items.length === 0) return;
 
-    // Kill timeline anterior se existir
     if (openTl.current) openTl.current.kill();
 
     const prefersReducedMotion = window.matchMedia(
@@ -113,27 +103,23 @@ const NavMenu = () => {
         }
       });
 
-      // ✅ Items que vão se mover (About Us em diante - índices 1-6)
-      const movingItems = items.slice(1); // Pula Home (index 0)
+      const movingItems = items.slice(1);
 
       if (prefersReducedMotion) {
-        gsap.set(items, { opacity: 1 }); // Todos visíveis instantâneo
+        gsap.set(items, { opacity: 1 });
         gsap.set(logo, { x: -135 });
         movingItems.forEach((item, i) => {
           gsap.set(item, { y: (i + 1) * 56 });
         });
       } else {
         openTl.current
-          // 1. INSTANTÂNEO: Todos os botões ficam visíveis (sem fade)
           .set(items, { opacity: 1 }, 0)
-          // 2. Logo desloca para esquerda (revela Home que já está visível)
           .to(logo, {
             x: -135,
             duration: 0.5,
             ease: 'power3.out',
             onComplete: () => console.log('✅ Home revelado (já estava opacity:1)')
           }, 0)
-          // 3. Cascata: About Us..About Me descem (SÓ MOVIMENTO, sem fade)
           .to(movingItems, {
             y: (index) => (index + 1) * 56,
             duration: 0.5,
@@ -146,26 +132,36 @@ const NavMenu = () => {
       console.log('📂 Nav Menu: Aberto');
     } else {
       // ============ FECHAMENTO ============
-      openTl.current = gsap.timeline();
+      
+      const ensureHidden = () => {
+        gsap.set(items, { opacity: 0 });
+        console.log('✅ Botões invisíveis (fallback)');
+      };
+
+      openTl.current = gsap.timeline({
+        onComplete: ensureHidden
+      });
+
+      const movingItems = items.slice(1);
 
       if (prefersReducedMotion) {
-        // Reduced motion: sem animações
-        gsap.set(items, { y: 0 });
+        gsap.set(movingItems, { y: 0 });
         gsap.set(logo, { x: 0 });
+        gsap.set(items, { opacity: 0 });
       } else {
         openTl.current
-          // 1. Itens sobem (cascata reversa)
-          .to([...items].reverse(), {
+          .to([...movingItems].reverse(), {
             y: 0,
             duration: 0.4,
-            stagger: 0.06, // 60ms entre cada
-            ease: 'power2.in'
+            stagger: 0.06,
+            ease: 'power2.in',
+            onComplete: () => console.log('✅ Cascata recolhida')
           }, 0)
-          // 2. Logo volta para posição original
           .to(logo, {
             x: 0,
             duration: 0.5,
-            ease: 'power3.inOut'
+            ease: 'power3.inOut',
+            onComplete: () => console.log('✅ Logo voltou')
           }, 0.3);
       }
 
@@ -194,7 +190,6 @@ const NavMenu = () => {
       return;
     }
 
-    // Observador de interseção
     const observerOptions = {
       threshold: [0, 0.5, 1],
       rootMargin: '-10% 0px -10% 0px'
@@ -237,30 +232,25 @@ const NavMenu = () => {
   const handleItemClick = useCallback((item) => {
     console.log('🔗 Nav Menu: Click em', item.label);
 
-    // Fecha o menu
     setIsOpen(false);
 
     if (item.type === 'anchor' && item.href) {
-      // Scroll suave para seção
       const target = document.querySelector(item.href);
       if (target) {
-        // Delay para animação de fechamento
         setTimeout(() => {
           target.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
-        }, 600); // Aguarda menu fechar
+        }, 600);
       }
     } else if (item.type === 'overlay' && item.id === 'about-me') {
-      // Dispara evento para abrir AboutDrawer
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('nav:open-about-drawer'));
       }, 600);
     }
   }, []);
 
-  // Fecha com ESC
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -281,14 +271,11 @@ const NavMenu = () => {
       className={`nav-menu-container ${isOpen ? 'open' : ''}`}
       aria-label="Main navigation"
     >
-      {/* STACK: Logo + Todos os itens empilhados (mesma posição) */}
       <div className="nav-menu-stack">
-        {/* LOGO (z-index: 10 - acima de tudo) */}
         <div ref={logoRef} className="nav-menu-logo">
           Spoonful
         </div>
 
-        {/* ITENS (z-index decrescente: 9, 8, 7...) */}
         <ul
           ref={listRef}
           id="nav-menu-list"
@@ -296,7 +283,6 @@ const NavMenu = () => {
           role="navigation"
         >
           {NAV_ITEMS.map((item, index) => {
-            // Z-index: Home=9, About Us=8, What We Do=7...
             const zIndex = 9 - index;
             
             return (
@@ -322,7 +308,6 @@ const NavMenu = () => {
         </ul>
       </div>
 
-      {/* HAMBURGER / X TOGGLE */}
       <button
         ref={toggleRef}
         className="nav-menu-toggle"
