@@ -329,18 +329,37 @@ const NavMenu = () => {
     setIsOpen(false);
 
     if (item.type === 'anchor' && item.href) {
-      const target = document.querySelector(item.href);
-      if (target) {
-        setTimeout(() => {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
+      setTimeout(() => {
+        if (item.id === 'home') {
+          // Scroll para topo absoluto (ativa animação Hero)
+          window.scrollTo({ 
+            top: 0, 
+            behavior: 'smooth' 
           });
-        }, 600);
-      }
+          console.log('📍 Scroll: Topo absoluto (Home → Hero)');
+        } else if (item.id === 'contact') {
+          // Scroll para final absoluto (revela Contact na sobreposição)
+          window.scrollTo({ 
+            top: document.body.scrollHeight, 
+            behavior: 'smooth' 
+          });
+          console.log('📍 Scroll: Final absoluto (Contact sobreposição)');
+        } else {
+          // Comportamento normal para outras seções
+          const target = document.querySelector(item.href);
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+            console.log('📍 Scroll: Seção específica', item.href);
+          }
+        }
+      }, 600);
     } else if (item.type === 'overlay' && item.id === 'about-me') {
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('nav:open-about-drawer'));
+        console.log('📍 Overlay: About Me drawer aberto');
       }, 600);
     }
   }, []);
