@@ -131,16 +131,9 @@ const NavMenu = () => {
 
       console.log('📂 Nav Menu: Aberto');
     } else {
-      // ============ FECHAMENTO ============
-      
-      const ensureHidden = () => {
-        gsap.set(items, { opacity: 0 });
-        console.log('✅ Botões invisíveis (fallback)');
-      };
+      // ============ FECHAMENTO ============ 
 
-      openTl.current = gsap.timeline({
-        onComplete: ensureHidden
-      });
+      openTl.current = gsap.timeline(); // ← Sem onComplete
 
       const movingItems = items.slice(1);
 
@@ -162,7 +155,8 @@ const NavMenu = () => {
             duration: 0.5,
             ease: 'power3.inOut',
             onComplete: () => console.log('✅ Logo voltou')
-          }, 0.3);
+          }, 0.3)
+          .set(items, { opacity: 0 }, 1.2); // ← Timing exato: 0.3 + 0.5 = 0.8s
       }
 
       console.log('📁 Nav Menu: Fechado');
