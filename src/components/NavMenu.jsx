@@ -199,59 +199,54 @@ const NavMenu = () => {
         gsap.set(items, { opacity: 0 });
       } else {
         openTl.current
-          // ✅ LÓGICA REVERSA DA ÂNCORA - cada item sobe individualmente (ACELERADA)
+          // ✅ REAGRUPAMENTO PROGRESSIVO - grupos crescentes sobem juntos
           
-          // Step 1: About Me (288 → 240), Contact vai para 240
-          .set(movingItems.slice(4, 5), { y: 240 }, 0) // Contact vai para posição do About Me
+          // Step 1: About Me vai para trás do Contact (só 1 item)
           .to(movingItems.slice(5, 6), { // só About Me
             y: 240,
             duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ About Me recolhido')
+            onComplete: () => console.log('✅ About Me atrás do Contact')
           }, 0)
           
-          // Step 2: Contact (240 → 192), Statement vai para 192
-          .set(movingItems.slice(3, 4), { y: 192 }, 0.15) // Statement vai para posição do Contact
-          .to(movingItems.slice(4, 5), { // só Contact
+          // Step 2: About Me + Contact sobem para trás do Statement (2 itens juntos)
+          .to(movingItems.slice(4, 6), { // Contact + About Me
             y: 192,
             duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ Contact recolhido')
+            onComplete: () => console.log('✅ Contact + About Me atrás do Statement')
           }, 0.15)
           
-          // Step 3: Statement (192 → 144), Work vai para 144
-          .set(movingItems.slice(2, 3), { y: 144 }, 0.3) // Work vai para posição do Statement
-          .to(movingItems.slice(3, 4), { // só Statement
+          // Step 3: About Me + Contact + Statement sobem para trás do Work (3 itens juntos)
+          .to(movingItems.slice(3, 6), { // Statement + Contact + About Me
             y: 144,
             duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ Statement recolhido')
+            onComplete: () => console.log('✅ Statement + Contact + About Me atrás do Work')
           }, 0.3)
           
-          // Step 4: Work (144 → 96), What We Do vai para 96
-          .set(movingItems.slice(1, 2), { y: 96 }, 0.45) // What We Do vai para posição do Work
-          .to(movingItems.slice(2, 3), { // só Work
+          // Step 4: About Me + Contact + Statement + Work sobem para trás do What We Do (4 itens juntos)
+          .to(movingItems.slice(2, 6), { // Work + Statement + Contact + About Me
             y: 96,
             duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ Work recolhido')
+            onComplete: () => console.log('✅ Work + Statement + Contact + About Me atrás do What We Do')
           }, 0.45)
           
-          // Step 5: What We Do (96 → 48), About Us vai para 48
-          .set(movingItems.slice(0, 1), { y: 48 }, 0.6) // About Us vai para posição do What We Do
-          .to(movingItems.slice(1, 2), { // só What We Do
+          // Step 5: Todos (exceto About Us) sobem para trás do About Us (5 itens juntos)
+          .to(movingItems.slice(1, 6), { // What We Do + Work + Statement + Contact + About Me
             y: 48,
             duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ What We Do recolhido')
+            onComplete: () => console.log('✅ Todos atrás do About Us')
           }, 0.6)
           
-          // Step 6: About Us (48 → 0) - volta para âncora
-          .to(movingItems.slice(0, 1), { // só About Us
+          // Step 6: TODOS sobem para âncora (6 itens juntos)
+          .to(movingItems.slice(0, 6), { // About Us + What We Do + Work + Statement + Contact + About Me
             y: 0,
             duration: 0.18,
             ease: 'power2.in',
-            onComplete: () => console.log('✅ About Us recolhido - ÂNCORA REVERSA COMPLETA!')
+            onComplete: () => console.log('✅ REAGRUPAMENTO COMPLETO - todos na âncora!')
           }, 0.75)
           
           .to(logo, {
@@ -261,7 +256,7 @@ const NavMenu = () => {
             onComplete: () => console.log('✅ Logo voltou')
           }, 0.3)
           
-          .set(items, { opacity: 0 }, 0.93); // ← Timing ajustado: 0.75 + 0.18 = 0.93s
+          .set(items, { opacity: 0 }, 0.93); // ← Timing mantido: 0.75 + 0.18 = 0.93s
       }
 
       console.log('📁 Nav Menu: Fechado');
