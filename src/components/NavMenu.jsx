@@ -1,15 +1,14 @@
 // src/components/NavMenu.jsx
-// Menu de navegação com animações GSAP e detecção de seção ativa
+// ✅ FASE 3: Menu conectado ao PageStateController
+// Mantém animações GSAP + Remove detecção duplicada
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import pageStateController from '../utils/page-state-controller.js'; // ✅ NOVO IMPORT
 
 // Configuração dos itens do menu
 const NAV_ITEMS = [
-  { id: 'home', label: 'Home', href: '#hero', type: 'anchor' },
+  { id: 'hero', label: 'Home', href: '#hero', type: 'anchor' },
   { id: 'about-us', label: 'About Us', href: '#about-us', type: 'anchor' },
   { id: 'what-we-do', label: 'What We Do', href: '#what-we-do', type: 'anchor' },
   { id: 'work', label: 'Work', href: '#work', type: 'anchor' },
@@ -20,7 +19,7 @@ const NAV_ITEMS = [
 
 const NavMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
+  const [activeSection, setActiveSection] = useState('hero'); // ✅ MANTIDO: state local para UI
   
   const containerRef = useRef(null);
   const logoRef = useRef(null);
@@ -34,7 +33,46 @@ const NavMenu = () => {
   const hasEnteredRef = useRef(false);
 
   // ================================
-  // ANIMAÇÃO DE ENTRADA (Page Load)
+  // ✅ NOVO: CONEXÃO COM PAGESTATE CONTROLLER
+  // ================================
+  useEffect(() => {
+    console.log('🔗 NavMenu: Conectando ao PageStateController');
+    
+    // Escuta mudanças de seção do controller unificado
+    const unsubscribe = pageStateController.on('section-changed', (stateData) => {
+      const { section } = stateData;
+      
+      console.log('🔗 NavMenu: Seção recebida do controller:', section);
+      
+      // Mapeia seção para item do menu correspondente
+      let navSection = section;
+      
+      // Mapeamento específico se necessário
+      if (section === 'hero') navSection = 'hero';
+      if (section === 'contact') navSection = 'contact';
+      
+      // Atualiza estado local apenas se mudou
+      if (activeSection !== navSection) {
+        setActiveSection(navSection);
+        console.log('📍 NavMenu: Active section updated:', activeSection, '→', navSection);
+      }
+    });
+
+    // Sincronização inicial
+    const initialSection = pageStateController.getCurrentSection();
+    if (initialSection && initialSection !== activeSection) {
+      setActiveSection(initialSection);
+      console.log('🔄 NavMenu: Sincronização inicial:', initialSection);
+    }
+
+    return () => {
+      console.log('🧹 NavMenu: Desconectando do PageStateController');
+      unsubscribe();
+    };
+  }, [activeSection]); // Dependency necessária para mapear mudanças
+
+  // ================================
+  // ANIMAÇÃO DE ENTRADA (Page Load) - ✅ MANTIDO
   // ================================
   useEffect(() => {
     if (hasEnteredRef.current) return;
@@ -81,7 +119,7 @@ const NavMenu = () => {
   }, []);
 
   // ================================
-  // ANIMAÇÃO OPEN/CLOSE
+  // ANIMAÇÃO OPEN/CLOSE - ✅ MANTIDO
   // ================================
   useEffect(() => {
     const logo = logoRef.current;
@@ -268,56 +306,12 @@ const NavMenu = () => {
   }, [isOpen]);
 
   // ================================
-  // DETECÇÃO DE SEÇÃO ATIVA
+  // ❌ REMOVIDO: DETECÇÃO DE SEÇÃO ATIVA DUPLICADA
   // ================================
-  useEffect(() => {
-    const sections = NAV_ITEMS
-      .filter(item => item.type === 'anchor')
-      .map(item => ({
-        id: item.id,
-        element: document.querySelector(item.href)
-      }))
-      .filter(s => s.element);
-
-    if (sections.length === 0) {
-      console.warn('⚠️ Nav Menu: Nenhuma seção encontrada');
-      return;
-    }
-
-    const observerOptions = {
-      threshold: [0, 0.5, 1],
-      rootMargin: '-10% 0px -10% 0px'
-    };
-
-    const handleIntersection = (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          const section = sections.find(s => s.element === entry.target);
-          if (section) {
-            setActiveSection(section.id);
-          }
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(
-      handleIntersection,
-      observerOptions
-    );
-
-    sections.forEach(section => {
-      observer.observe(section.element);
-    });
-
-    console.log('👁️ Nav Menu: Observando', sections.length, 'seções');
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  // ✅ SUBSTITUÍDO por subscription ao PageStateController acima
 
   // ================================
-  // HANDLERS
+  // HANDLERS - ✅ MANTIDOS
   // ================================
   const handleToggle = useCallback(() => {
     setIsOpen(prev => !prev);
@@ -330,7 +324,7 @@ const NavMenu = () => {
 
     if (item.type === 'anchor' && item.href) {
       setTimeout(() => {
-        if (item.id === 'home') {
+        if (item.id === 'hero') {
           // Scroll para topo absoluto (ativa animação Hero)
           window.scrollTo({ 
             top: 0, 
@@ -376,7 +370,7 @@ const NavMenu = () => {
   }, [isOpen]);
 
   // ================================
-  // RENDER
+  // RENDER - ✅ MANTIDO
   // ================================
   return (
     <nav

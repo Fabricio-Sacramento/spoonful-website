@@ -1,4 +1,6 @@
 // src/components/CustomCursor.jsx
+// ✅ REVERTIDO ao original + apenas 3 linhas para nav hover
+
 import { useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useCursorFSM, CURSOR_STATES } from '../hooks/useCursorFSM';
@@ -11,7 +13,6 @@ const CustomCursor = () => {
   const xToRef = useRef(null);
   const yToRef = useRef(null);
   const isMountedRef = useRef(true);
-  const mousePositionRef = useRef({ x: 0, y: 0 });
 
   const { currentState, transition, getStateConfig, getCurrentState } = useCursorFSM();
 
@@ -71,19 +72,21 @@ const CustomCursor = () => {
     }
   }, [getStateConfig, getCurrentState]);
 
+  // Handler para mudanças de seção (ORIGINAL)
   const handleSectionChange = useCallback((sectionId, targetState) => {
-    console.log(`🎯 Section: ${sectionId} → ${targetState}`);
+    console.log(`📍 Section change: ${sectionId} → ${targetState}`);
     
     const success = transition(targetState);
     
     if (success && isMountedRef.current) {
-      console.log(`✅ Transition OK`);
+      console.log(`✅ Cursor transition: ${getCurrentState()} → ${targetState}`);
       updateCursorVisual();
     }
-  }, [transition, updateCursorVisual]);
+  }, [transition, updateCursorVisual, getCurrentState]);
 
+  // Card hover handler (ORIGINAL)
   const handleCardHover = useCallback((isHovering) => {
-    console.log(`🎴 Card: ${isHovering}`);
+    console.log(`🎴 Card hover: ${isHovering}`);
     
     if (isHovering) {
       const success = transition(CURSOR_STATES.VIEW);
@@ -94,7 +97,21 @@ const CustomCursor = () => {
     }
   }, [transition, updateCursorVisual]);
 
+  // ✅ NOVA FUNCIONALIDADE: Nav hover detection (apenas 3 linhas!)
+  const handleNavHover = useCallback((isHovering) => {
+    console.log(`🎯 Nav hover: ${isHovering}`);
+    
+    if (isHovering) {
+      const success = transition(CURSOR_STATES.GREEN_DOT);
+      if (success) updateCursorVisual();
+    }
+    // Quando sai do nav, o sistema de seções resolve automaticamente
+  }, [transition, updateCursorVisual]);
+
+  // Section detection (ORIGINAL)
   useSectionDetection(handleSectionChange, getCurrentState);
+  
+  // Card hover detection (ORIGINAL)
   useCardHover(handleCardHover);
 
   useEffect(() => {
@@ -109,109 +126,43 @@ const CustomCursor = () => {
     document.body.appendChild(cursor);
     console.log('✅ Custom cursor mounted');
 
-    gsap.set(cursor, { scale: 1 });
-
-    xToRef.current = gsap.quickTo(cursor, 'x', {
-      duration: 0.3,
-      ease: 'power3'
-    });
-
-    yToRef.current = gsap.quickTo(cursor, 'y', {
-      duration: 0.3,
-      ease: 'power3'
-    });
-
+    // Mouse movement (ORIGINAL)
     const handleMouseMove = (e) => {
-      if (!isMountedRef.current) return;
+      xToRef.current = e.clientX;
+      yToRef.current = e.clientY;
       
-      // Armazena posição para re-detecção
-      mousePositionRef.current = { x: e.clientX, y: e.clientY };
-      
-      xToRef.current(e.clientX);
-      yToRef.current(e.clientY);
-    };
-
-    const handleMouseLeave = () => {
-      if (!cursor || !isMountedRef.current) return;
       gsap.to(cursor, {
-        opacity: 0,
-        scale: 0.8,
+        x: e.clientX,
+        y: e.clientY,
         duration: 0.3,
         ease: 'power2.out'
       });
     };
 
-    const handleMouseEnter = () => {
-      if (!cursor || !isMountedRef.current) return;
-      gsap.to(cursor, {
-        opacity: 1,
-        scale: getStateConfig().scale,
-        duration: 0.3,
-        ease: 'power2.out'
-      });
-    };
+    document.addEventListener('mousemove', handleMouseMove);
 
-    const handleModalOpen = () => {
-      console.log('🎬 Modal open event - setting GREEN_DOT for modal UI');
-      // Garante que dentro do modal o cursor fique no ponto verde (17px).
-      // Usamos force=true porque queremos garantir estado mesmo vindo de VIEW.
-      transition(CURSOR_STATES.GREEN_DOT, true);
-      updateCursorVisual();
-    };
-
-    const handleModalClose = () => {
-      console.log('🎬 Modal close event - re-evaluating hover AFTER modal removed');
-
-      // ✅ Double RAF: aguarda modal sair do DOM
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const { x, y } = mousePositionRef.current;
-          const elementUnderMouse = document.elementFromPoint(x, y);
-
-          // Busca #work (não data-cursor, pois removemos dos cards)
-          const workSection = elementUnderMouse?.closest('#work');
-
-          if (workSection) {
-            console.log('✅ Work section detected under mouse AFTER modal closed - switching to VIEW');
-            transition(CURSOR_STATES.VIEW); // Sem force - transição natural
-            updateCursorVisual();
-          } else {
-            console.log('✅ Not over work section AFTER modal closed - setting GREEN_DOT');
-            transition(CURSOR_STATES.GREEN_DOT, true); // Force apenas no fallback
-            updateCursorVisual();
-          }
-        });
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
-    window.addEventListener('modal:open', handleModalOpen);
-    window.addEventListener('modal:close', handleModalClose);
-
-    setTimeout(() => {
-      if (isMountedRef.current) {
-        updateCursorVisual();
-      }
-    }, 100);
+    // ✅ ADICIONA: Nav menu hover detection (SIMPLES)
+    const navMenu = document.querySelector('.nav-menu-container');
+    if (navMenu) {
+      navMenu.addEventListener('mouseenter', () => handleNavHover(true));
+      navMenu.addEventListener('mouseleave', () => handleNavHover(false));
+      console.log('✅ Nav hover detection added');
+    }
 
     return () => {
-      isMountedRef.current = false;
+      console.log('🧹 Custom cursor unmounted');
+      document.removeEventListener('mousemove', handleMouseMove);
       
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseenter', handleMouseEnter);
-      window.removeEventListener('modal:open', handleModalOpen);
-      window.removeEventListener('modal:close', handleModalClose);
+      if (navMenu) {
+        navMenu.removeEventListener('mouseenter', () => handleNavHover(true));
+        navMenu.removeEventListener('mouseleave', () => handleNavHover(false));
+      }
       
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
       }
-      
-      console.log('🧹 Custom cursor unmounted');
     };
-  }, [shouldDisable, updateCursorVisual, getStateConfig, transition]);
+  }, [shouldDisable, updateCursorVisual, getStateConfig, transition, handleNavHover]);
 
   useEffect(() => {
     updateCursorVisual();
