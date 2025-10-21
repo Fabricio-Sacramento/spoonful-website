@@ -1,5 +1,5 @@
 // src/components/NavMenu.jsx
-// Menu de navegação com animações GSAP e detecção de seção ativa
+// Menu de navegação com detecção absoluta para seções sobrepostas
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
@@ -34,7 +34,213 @@ const NavMenu = () => {
   const hasEnteredRef = useRef(false);
 
   // ================================
-  // ANIMAÇÃO DE ENTRADA (Page Load)
+  // DETECÇÃO ABSOLUTA DE POSIÇÃO
+  // ================================
+  const detectAbsolutePosition = useCallback(() => {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const maxScroll = documentHeight - windowHeight;
+    
+    // TOPO ABSOLUTO: Hero (0-50px de tolerância)
+    if (scrollY <= 50) {
+      return 'home';
+    }
+    
+    // FINAL ABSOLUTO: Contact (últimos 50px)
+    if (scrollY >= maxScroll - 50) {
+      return 'contact';
+    }
+    
+    // ZONA HERO/ABOUT-US: Primeira viewport (até 100vh)
+    if (scrollY <= windowHeight) {
+      // Se está na primeira metade, é Hero
+      if (scrollY <= windowHeight * 0.5) {
+        return 'home';
+      }
+      // Segunda metade da primeira viewport = About Us
+      return 'about-us';
+    }
+    
+    // ZONA STATEMENT/CONTACT: Última viewport antes do final absoluto
+    const secondLastViewport = maxScroll - windowHeight;
+    if (scrollY >= secondLastViewport) {
+      // Se está na primeira metade da penúltima viewport, é Statement
+      if (scrollY <= secondLastViewport + (windowHeight * 0.5)) {
+        return 'statement';
+      }
+      // Segunda metade = Contact
+      return 'contact';
+    }
+    
+    // SEÇÕES INTERMEDIÁRIAS: mantém detecção atual
+    return null; // Deixa IntersectionObserver decidir
+  }, []);
+
+  // ================================
+  // NAVEGAÇÃO CONDICIONAL
+  // ================================
+  const handleSmartNavigation = useCallback((targetItem) => {
+    const currentPosition = detectAbsolutePosition();
+    
+    console.log('🧭 Smart Navigation:', {
+      from: currentPosition,
+      to: targetItem.id,
+      currentScroll: window.scrollY
+    });
+    
+    // CASO 1: Hero → About Us (scroll 1 viewport para baixo)
+    if (currentPosition === 'home' && targetItem.id === 'about-us') {
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+      console.log('📍 Hero → About Us: Scroll 1 viewport');
+      return;
+    }
+    
+    // CASO 2: Statement → Contact (scroll para final absoluto)
+    if (currentPosition === 'statement' && targetItem.id === 'contact') {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+      console.log('📍 Statement → Contact: Scroll para final');
+      return;
+    }
+    
+    // CASO 3: Contact → Statement (volta 1 viewport)
+    if (currentPosition === 'contact' && targetItem.id === 'statement') {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({
+        top: maxScroll - window.innerHeight,
+        behavior: 'smooth'
+      });
+      console.log('📍 Contact → Statement: Volta 1 viewport');
+      return;
+    }
+    
+    // CASO 4: About Us → Hero (volta para topo absoluto)
+    if (currentPosition === 'about-us' && targetItem.id === 'home') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      console.log('📍 About Us → Hero: Topo absoluto');
+      return;
+    }
+    
+    // CASOS NORMAIS: navegação padrão
+    if (targetItem.id === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (targetItem.id === 'contact') {
+      window.scrollTo({ 
+        top: document.documentElement.scrollHeight, 
+        behavior: 'smooth' 
+      });
+    } else if (targetItem.href) {
+      const target = document.querySelector(targetItem.href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    console.log('📍 Navegação padrão para:', targetItem.id);
+  }, [detectAbsolutePosition]);
+
+  // ================================
+  // DETECÇÃO DE SEÇÃO ATIVA MELHORADA
+  // ================================
+  useEffect(() => {
+    let isDetecting = true;
+    
+    const updateActiveSection = () => {
+      if (!isDetecting) return;
+      
+      const absolutePosition = detectAbsolutePosition();
+      
+      if (absolutePosition) {
+        // Posição absoluta detectada (Hero, About Us na zona Hero, Statement/Contact)
+        if (activeSection !== absolutePosition) {
+          setActiveSection(absolutePosition);
+          console.log('📍 Seção ativa (absoluta):', absolutePosition);
+        }
+        return;
+      }
+      
+      // Para seções intermediárias, usa IntersectionObserver (implementado abaixo)
+    };
+    
+    // Detecção em scroll (throttled)
+    let scrollTimeout;
+    const handleScroll = () => {
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        updateActiveSection();
+        scrollTimeout = null;
+      }, 16); // ~60fps
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Detecção inicial
+    updateActiveSection();
+    
+    return () => {
+      isDetecting = false;
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [activeSection, detectAbsolutePosition]);
+
+  // ================================
+  // INTERSECTION OBSERVER PARA SEÇÕES INTERMEDIÁRIAS
+  // ================================
+  useEffect(() => {
+    const intermediateSections = [
+      { id: 'what-we-do', element: document.querySelector('#what-we-do') },
+      { id: 'work', element: document.querySelector('#work') }
+    ].filter(s => s.element);
+
+    if (intermediateSections.length === 0) return;
+
+    const observerOptions = {
+      threshold: [0.5],
+      rootMargin: '-20% 0px -20% 0px'
+    };
+
+    const handleIntersection = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const section = intermediateSections.find(s => s.element === entry.target);
+          if (section) {
+            const absolutePosition = detectAbsolutePosition();
+            
+            // Só atualiza se não estivermos em zona de sobreposição
+            if (!absolutePosition) {
+              setActiveSection(section.id);
+              console.log('📍 Seção ativa (IO):', section.id);
+            }
+          }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+    
+    intermediateSections.forEach(section => {
+      observer.observe(section.element);
+    });
+
+    console.log('👁️ IO observando seções intermediárias:', intermediateSections.length);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [detectAbsolutePosition]);
+
+  // ================================
+  // ANIMAÇÃO DE ENTRADA (mantida igual)
   // ================================
   useEffect(() => {
     if (hasEnteredRef.current) return;
@@ -51,8 +257,6 @@ const NavMenu = () => {
       opacity: 0,
       visibility: 'visible'
     });
-
-    console.log('🎬 Nav Menu: Itens inicializados (invisíveis):', items.length);
 
     gsap.set(logo, { x: 200, opacity: 0 });
     gsap.set(toggle, { x: 100, opacity: 0 });
@@ -73,15 +277,13 @@ const NavMenu = () => {
         ease: 'power3.out'
       }, 0.4);
 
-    console.log('🎬 Nav Menu: Animação de entrada iniciada');
-
     return () => {
       if (entryTl.current) entryTl.current.kill();
     };
   }, []);
 
   // ================================
-  // ANIMAÇÃO OPEN/CLOSE
+  // ANIMAÇÃO OPEN/CLOSE (mantida igual)
   // ================================
   useEffect(() => {
     const logo = logoRef.current;
@@ -96,14 +298,9 @@ const NavMenu = () => {
     ).matches;
 
     if (isOpen) {
-      // ============ ABERTURA - LÓGICA DA ÂNCORA ============
-      openTl.current = gsap.timeline({
-        onStart: () => {
-          console.log('🎬 Animação ÂNCORA iniciada');
-        }
-      });
+      openTl.current = gsap.timeline();
 
-      const movingItems = items.slice(1); // Todos exceto Home
+      const movingItems = items.slice(1);
 
       if (prefersReducedMotion) {
         gsap.set(items, { opacity: 1 });
@@ -112,7 +309,6 @@ const NavMenu = () => {
           gsap.set(item, { y: (i + 1) * 48 });
         });
       } else {
-        // ✅ TODOS EMPILHADOS NA ÂNCORA (posição do Home)
         gsap.set(movingItems, { y: 0 });
 
         openTl.current
@@ -120,76 +316,51 @@ const NavMenu = () => {
           .to(logo, {
             x: -135,
             duration: 0.5,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ Home revelado (âncora)')
+            ease: 'power3.out'
           }, 0)
-          
-          // ✅ MÁXIMA: posição inicial = posição final do anterior
-          
-          // Step 1: About Us (0 → 48), resto fica em 0
-          .set(movingItems.slice(1), { y: 0 }, 0.3) // What We Do até About Me ficam na âncora
-          .to(movingItems.slice(0, 1), { // só About Us
+          .set(movingItems.slice(1), { y: 0 }, 0.3)
+          .to(movingItems.slice(0, 1), {
             y: 48,
             duration: 0.18,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ About Us revelado')
+            ease: 'power3.out'
           }, 0.3)
-          
-          // Step 2: What We Do (48 → 96), resto vai para 48
-          .set(movingItems.slice(1, 2), { y: 48 }, 0.45) // What We Do vai para posição do About Us
-          .set(movingItems.slice(2), { y: 48 }, 0.45) // Work até About Me vão para posição do About Us
-          .to(movingItems.slice(1, 2), { // só What We Do
+          .set(movingItems.slice(1, 2), { y: 48 }, 0.45)
+          .set(movingItems.slice(2), { y: 48 }, 0.45)
+          .to(movingItems.slice(1, 2), {
             y: 96,
             duration: 0.18,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ What We Do revelado')
+            ease: 'power3.out'
           }, 0.45)
-          
-          // Step 3: Work (96 → 144), resto vai para 96
-          .set(movingItems.slice(2, 3), { y: 96 }, 0.6) // Work vai para posição do What We Do
-          .set(movingItems.slice(3), { y: 96 }, 0.6) // Statement até About Me vão para posição do What We Do
-          .to(movingItems.slice(2, 3), { // só Work
+          .set(movingItems.slice(2, 3), { y: 96 }, 0.6)
+          .set(movingItems.slice(3), { y: 96 }, 0.6)
+          .to(movingItems.slice(2, 3), {
             y: 144,
             duration: 0.18,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ Work revelado')
+            ease: 'power3.out'
           }, 0.6)
-          
-          // Step 4: Statement (144 → 192), resto vai para 144
-          .set(movingItems.slice(3, 4), { y: 144 }, 0.75) // Statement vai para posição do Work
-          .set(movingItems.slice(4), { y: 144 }, 0.75) // Contact + About Me vão para posição do Work
-          .to(movingItems.slice(3, 4), { // só Statement
+          .set(movingItems.slice(3, 4), { y: 144 }, 0.75)
+          .set(movingItems.slice(4), { y: 144 }, 0.75)
+          .to(movingItems.slice(3, 4), {
             y: 192,
             duration: 0.18,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ Statement revelado')
+            ease: 'power3.out'
           }, 0.75)
-          
-          // Step 5: Contact (192 → 240), About Me vai para 192
-          .set(movingItems.slice(4, 5), { y: 192 }, 0.9) // Contact vai para posição do Statement
-          .set(movingItems.slice(5), { y: 192 }, 0.9) // About Me vai para posição do Statement
-          .to(movingItems.slice(4, 5), { // só Contact
+          .set(movingItems.slice(4, 5), { y: 192 }, 0.9)
+          .set(movingItems.slice(5), { y: 192 }, 0.9)
+          .to(movingItems.slice(4, 5), {
             y: 240,
             duration: 0.18,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ Contact revelado')
+            ease: 'power3.out'
           }, 0.9)
-          
-          // Step 6: About Me (240 → 288)
-          .set(movingItems.slice(5, 6), { y: 240 }, 1.05) // About Me vai para posição do Contact
-          .to(movingItems.slice(5, 6), { // só About Me
+          .set(movingItems.slice(5, 6), { y: 240 }, 1.05)
+          .to(movingItems.slice(5, 6), {
             y: 288,
             duration: 0.18,
-            ease: 'power3.out',
-            onComplete: () => console.log('✅ About Me revelado - ÂNCORA COMPLETA!')
+            ease: 'power3.out'
           }, 1.05);
       }
-
-      console.log('📂 Nav Menu: Aberto');
     } else {
-      // ============ FECHAMENTO - CORTINA REVERSA ============
-      
-      openTl.current = gsap.timeline(); // ← Sem onComplete
+      openTl.current = gsap.timeline();
 
       const movingItems = items.slice(1);
 
@@ -199,122 +370,49 @@ const NavMenu = () => {
         gsap.set(items, { opacity: 0 });
       } else {
         openTl.current
-          // ✅ REAGRUPAMENTO PROGRESSIVO - grupos crescentes sobem juntos
-          
-          // Step 1: About Me vai para trás do Contact (só 1 item)
-          .to(movingItems.slice(5, 6), { // só About Me
+          .to(movingItems.slice(5, 6), {
             y: 240,
             duration: 0.18,
-            ease: 'power2.in',
-            onComplete: () => console.log('✅ About Me atrás do Contact')
+            ease: 'power2.in'
           }, 0)
-          
-          // Step 2: About Me + Contact sobem para trás do Statement (2 itens juntos)
-          .to(movingItems.slice(4, 6), { // Contact + About Me
+          .to(movingItems.slice(4, 6), {
             y: 192,
             duration: 0.18,
-            ease: 'power2.in',
-            onComplete: () => console.log('✅ Contact + About Me atrás do Statement')
+            ease: 'power2.in'
           }, 0.15)
-          
-          // Step 3: About Me + Contact + Statement sobem para trás do Work (3 itens juntos)
-          .to(movingItems.slice(3, 6), { // Statement + Contact + About Me
+          .to(movingItems.slice(3, 6), {
             y: 144,
             duration: 0.18,
-            ease: 'power2.in',
-            onComplete: () => console.log('✅ Statement + Contact + About Me atrás do Work')
+            ease: 'power2.in'
           }, 0.3)
-          
-          // Step 4: About Me + Contact + Statement + Work sobem para trás do What We Do (4 itens juntos)
-          .to(movingItems.slice(2, 6), { // Work + Statement + Contact + About Me
+          .to(movingItems.slice(2, 6), {
             y: 96,
             duration: 0.18,
-            ease: 'power2.in',
-            onComplete: () => console.log('✅ Work + Statement + Contact + About Me atrás do What We Do')
+            ease: 'power2.in'
           }, 0.45)
-          
-          // Step 5: Todos (exceto About Us) sobem para trás do About Us (5 itens juntos)
-          .to(movingItems.slice(1, 6), { // What We Do + Work + Statement + Contact + About Me
+          .to(movingItems.slice(1, 6), {
             y: 48,
             duration: 0.18,
-            ease: 'power2.in',
-            onComplete: () => console.log('✅ Todos atrás do About Us')
+            ease: 'power2.in'
           }, 0.6)
-          
-          // Step 6: TODOS sobem para âncora (6 itens juntos)
-          .to(movingItems.slice(0, 6), { // About Us + What We Do + Work + Statement + Contact + About Me
+          .to(movingItems.slice(0, 6), {
             y: 0,
             duration: 0.18,
-            ease: 'power2.in',
-            onComplete: () => console.log('✅ REAGRUPAMENTO COMPLETO - todos na âncora!')
+            ease: 'power2.in'
           }, 0.75)
-          
           .to(logo, {
             x: 0,
             duration: 0.5,
-            ease: 'power3.inOut',
-            onComplete: () => console.log('✅ Logo voltou')
+            ease: 'power3.inOut'
           }, 0.3)
-          
-          .set(items, { opacity: 0 }, 0.93); // ← Timing mantido: 0.75 + 0.18 = 0.93s
+          .set(items, { opacity: 0 }, 0.93);
       }
-
-      console.log('📁 Nav Menu: Fechado');
     }
 
     return () => {
       if (openTl.current) openTl.current.kill();
     };
   }, [isOpen]);
-
-  // ================================
-  // DETECÇÃO DE SEÇÃO ATIVA
-  // ================================
-  useEffect(() => {
-    const sections = NAV_ITEMS
-      .filter(item => item.type === 'anchor')
-      .map(item => ({
-        id: item.id,
-        element: document.querySelector(item.href)
-      }))
-      .filter(s => s.element);
-
-    if (sections.length === 0) {
-      console.warn('⚠️ Nav Menu: Nenhuma seção encontrada');
-      return;
-    }
-
-    const observerOptions = {
-      threshold: [0, 0.5, 1],
-      rootMargin: '-10% 0px -10% 0px'
-    };
-
-    const handleIntersection = (entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          const section = sections.find(s => s.element === entry.target);
-          if (section) {
-            setActiveSection(section.id);
-          }
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(
-      handleIntersection,
-      observerOptions
-    );
-
-    sections.forEach(section => {
-      observer.observe(section.element);
-    });
-
-    console.log('👁️ Nav Menu: Observando', sections.length, 'seções');
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   // ================================
   // HANDLERS
@@ -328,41 +426,16 @@ const NavMenu = () => {
 
     setIsOpen(false);
 
-    if (item.type === 'anchor' && item.href) {
+    if (item.type === 'anchor') {
       setTimeout(() => {
-        if (item.id === 'home') {
-          // Scroll para topo absoluto (ativa animação Hero)
-          window.scrollTo({ 
-            top: 0, 
-            behavior: 'smooth' 
-          });
-          console.log('📍 Scroll: Topo absoluto (Home → Hero)');
-        } else if (item.id === 'contact') {
-          // Scroll para final absoluto (revela Contact na sobreposição)
-          window.scrollTo({ 
-            top: document.body.scrollHeight, 
-            behavior: 'smooth' 
-          });
-          console.log('📍 Scroll: Final absoluto (Contact sobreposição)');
-        } else {
-          // Comportamento normal para outras seções
-          const target = document.querySelector(item.href);
-          if (target) {
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-            console.log('📍 Scroll: Seção específica', item.href);
-          }
-        }
+        handleSmartNavigation(item);
       }, 600);
     } else if (item.type === 'overlay' && item.id === 'about-me') {
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('nav:open-about-drawer'));
-        console.log('📍 Overlay: About Me drawer aberto');
       }, 600);
     }
-  }, []);
+  }, [handleSmartNavigation]);
 
   useEffect(() => {
     const handleEscape = (e) => {
