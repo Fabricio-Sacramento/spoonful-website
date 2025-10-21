@@ -30,7 +30,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       return;
     }
 
-    // ✅ NOVO: Nav menu hover detection
+    // ✅ NOVO: Nav menu hover detection + navegação programática
     const setupNavHoverDetection = () => {
       const navMenu = document.querySelector('.nav-menu-container');
       
@@ -51,21 +51,47 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         console.log('🎯 Nav hover: LEAVE - voltando para seção atual');
         isOverNavRef.current = false;
         
-        // Volta para o estado da seção atual
-        const currentSection = activeSection.current;
-        const targetState = SECTION_STATE_MAP[currentSection] || CURSOR_STATES.GREEN_DOT;
-        
-        onSectionChange(currentSection, targetState);
+        // ✅ DELAY: Aguarda navegação programática completar antes de detectar seção
+        setTimeout(() => {
+          if (!isOverNavRef.current) { // Confirma que ainda não estamos sobre nav
+            const currentSection = activeSection.current;
+            const targetState = SECTION_STATE_MAP[currentSection] || CURSOR_STATES.GREEN_DOT;
+            
+            console.log('🎯 Nav leave delayed - seção atual:', currentSection, '→', targetState);
+            onSectionChange(currentSection, targetState);
+          }
+        }, 100); // 100ms delay para aguardar scroll/navegação
+      };
+
+      // ✅ NOVO: Listener para navegação programática via menu
+      const handleProgrammaticNavigation = (event) => {
+        const { targetSection } = event.detail || {};
+        if (targetSection) {
+          console.log('🧭 Navegação programática detectada:', targetSection);
+          
+          // Atualiza seção ativa imediatamente
+          activeSection.current = targetSection;
+          
+          // Se não estivermos sobre nav, atualiza cursor também
+          if (!isOverNavRef.current) {
+            const targetState = SECTION_STATE_MAP[targetSection] || CURSOR_STATES.GREEN_DOT;
+            setTimeout(() => {
+              onSectionChange(targetSection, targetState);
+            }, 200); // Delay maior para aguardar scroll completar
+          }
+        }
       };
 
       navMenu.addEventListener('mouseenter', handleNavEnter);
       navMenu.addEventListener('mouseleave', handleNavLeave);
+      window.addEventListener('nav:programmatic-navigation', handleProgrammaticNavigation);
 
-      console.log('✅ Nav hover detection configurado');
+      console.log('✅ Nav hover detection + programmatic navigation configurado');
       
       return () => {
         navMenu.removeEventListener('mouseenter', handleNavEnter);
         navMenu.removeEventListener('mouseleave', handleNavLeave);
+        window.removeEventListener('nav:programmatic-navigation', handleProgrammaticNavigation);
       };
     };
 

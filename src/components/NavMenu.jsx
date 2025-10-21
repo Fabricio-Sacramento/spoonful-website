@@ -135,26 +135,13 @@ const NavMenu = () => {
       return;
     }
     
-    // CASO 3: Contact → Statement
+    // CASO 3: Contact → Statement (scroll 1 viewport para cima)
     if (currentPosition === 'contact' && targetItem.id === 'statement') {
-      const statementWrapper = document.querySelector('.statement-contact-wrapper');
-      if (statementWrapper) {
-        // Scroll para início do wrapper Statement
-        const wrapperRect = statementWrapper.getBoundingClientRect();
-        const wrapperTop = window.scrollY + wrapperRect.top;
-        window.scrollTo({
-          top: wrapperTop,
-          behavior: 'smooth'
-        });
-      } else {
-        // Fallback: volta 1 viewport
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        window.scrollTo({
-          top: maxScroll - window.innerHeight,
-          behavior: 'smooth'
-        });
-      }
-      console.log('📍 Contact → Statement: Scroll para início Statement');
+      window.scrollTo({
+        top: window.scrollY - window.innerHeight,
+        behavior: 'smooth'
+      });
+      console.log('Contact → Statement: Scroll 1 viewport para cima');
       return;
     }
     
@@ -498,6 +485,9 @@ const NavMenu = () => {
     setIsOpen(false);
 
     if (item.type === 'anchor') {
+      // ✅ SIMPLES: Atualiza seção ativa imediatamente quando clica
+      setActiveSection(item.id);
+      
       setTimeout(() => {
         handleSmartNavigation(item);
       }, 600);
