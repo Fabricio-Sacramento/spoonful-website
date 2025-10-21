@@ -1,4 +1,6 @@
 // src/components/CustomCursor.jsx
+// ATUALIZAÇÃO: Melhor responsividade para hover no nav menu
+
 import { useEffect, useRef, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useCursorFSM, CURSOR_STATES } from '../hooks/useCursorFSM';
@@ -42,7 +44,7 @@ const CustomCursor = () => {
 
     gsap.to(cursor, {
       scale: config.scale,
-      duration: 0.4,
+      duration: 0.3, // ✅ REDUZIDO: 0.4 → 0.3 para resposta mais rápida no nav
       ease: 'back.out(1.7)',
       overwrite: 'auto',
       onComplete: () => {
@@ -55,13 +57,13 @@ const CustomCursor = () => {
         text.textContent = config.text;
         gsap.to(text, {
           opacity: 1,
-          duration: 0.3,
+          duration: 0.2, // ✅ REDUZIDO: 0.3 → 0.2 para resposta mais rápida
           ease: 'power2.out'
         });
       } else {
         gsap.to(text, {
           opacity: 0,
-          duration: 0.2,
+          duration: 0.15, // ✅ REDUZIDO: 0.2 → 0.15
           ease: 'power2.in',
           onComplete: () => {
             text.textContent = '';
@@ -74,7 +76,14 @@ const CustomCursor = () => {
   const handleSectionChange = useCallback((sectionId, targetState) => {
     console.log(`🎯 Section: ${sectionId} → ${targetState}`);
     
-    const success = transition(targetState);
+    // ✅ NOVO: Prioridade especial para nav-hover
+    let success;
+    if (sectionId === 'nav-hover') {
+      // Force transition para nav hover (ignora FSM restrictions)
+      success = transition(targetState, true);
+    } else {
+      success = transition(targetState);
+    }
     
     if (success && isMountedRef.current) {
       console.log(`✅ Transition OK`);
@@ -112,19 +121,18 @@ const CustomCursor = () => {
     gsap.set(cursor, { scale: 1 });
 
     xToRef.current = gsap.quickTo(cursor, 'x', {
-      duration: 0.3,
+      duration: 0.25, // ✅ REDUZIDO: 0.3 → 0.25 para movimento mais responsivo
       ease: 'power3'
     });
 
     yToRef.current = gsap.quickTo(cursor, 'y', {
-      duration: 0.3,
+      duration: 0.25, // ✅ REDUZIDO: 0.3 → 0.25
       ease: 'power3'
     });
 
     const handleMouseMove = (e) => {
       if (!isMountedRef.current) return;
       
-      // Armazena posição para re-detecção
       mousePositionRef.current = { x: e.clientX, y: e.clientY };
       
       xToRef.current(e.clientX);
@@ -153,8 +161,6 @@ const CustomCursor = () => {
 
     const handleModalOpen = () => {
       console.log('🎬 Modal open event - setting GREEN_DOT for modal UI');
-      // Garante que dentro do modal o cursor fique no ponto verde (17px).
-      // Usamos force=true porque queremos garantir estado mesmo vindo de VIEW.
       transition(CURSOR_STATES.GREEN_DOT, true);
       updateCursorVisual();
     };
@@ -162,22 +168,30 @@ const CustomCursor = () => {
     const handleModalClose = () => {
       console.log('🎬 Modal close event - re-evaluating hover AFTER modal removed');
 
-      // ✅ Double RAF: aguarda modal sair do DOM
+      // Double RAF: aguarda modal sair do DOM
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const { x, y } = mousePositionRef.current;
           const elementUnderMouse = document.elementFromPoint(x, y);
 
-          // Busca #work (não data-cursor, pois removemos dos cards)
-          const workSection = elementUnderMouse?.closest('#work');
+          // ✅ NOVO: Checa se mouse está sobre nav menu
+          const navMenu = elementUnderMouse?.closest('.nav-menu-container');
+          if (navMenu) {
+            console.log('✅ Nav menu detected under mouse AFTER modal closed - GREEN_DOT');
+            transition(CURSOR_STATES.GREEN_DOT, true);
+            updateCursorVisual();
+            return;
+          }
 
+          // Busca #work
+          const workSection = elementUnderMouse?.closest('#work');
           if (workSection) {
-            console.log('✅ Work section detected under mouse AFTER modal closed - switching to VIEW');
-            transition(CURSOR_STATES.VIEW); // Sem force - transição natural
+            console.log('✅ Work section detected under mouse AFTER modal closed - VIEW');
+            transition(CURSOR_STATES.VIEW);
             updateCursorVisual();
           } else {
-            console.log('✅ Not over work section AFTER modal closed - setting GREEN_DOT');
-            transition(CURSOR_STATES.GREEN_DOT, true); // Force apenas no fallback
+            console.log('✅ Default state AFTER modal closed - GREEN_DOT');
+            transition(CURSOR_STATES.GREEN_DOT, true);
             updateCursorVisual();
           }
         });

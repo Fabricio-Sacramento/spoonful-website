@@ -1,4 +1,6 @@
 // src/hooks/useSectionDetection.js
+// CORREÇÃO: Cursor deve mudar para GREEN_DOT no hover do nav menu
+
 import { useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CURSOR_STATES } from './useCursorFSM';
@@ -10,14 +12,13 @@ const SECTION_STATE_MAP = {
   'work': CURSOR_STATES.GREEN_DOT,
   'statement': CURSOR_STATES.GREEN_DOT,
   'contact': CURSOR_STATES.GREEN_DOT
-  // ✅ MANTIDO: Não há referências a seção About estática (#about)
-  // ✅ CORRETO: about-us é diferente da seção About removida
 };
 
 export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
   const observerRef = useRef(null);
   const activeSection = useRef('hero');
   const scrollTriggersRef = useRef([]);
+  const isOverNavRef = useRef(false); // ✅ NOVO: Track hover no nav
 
   useEffect(() => {
     const isTouchDevice = 
@@ -29,33 +30,80 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       return;
     }
 
+    // ✅ NOVO: Nav menu hover detection
+    const setupNavHoverDetection = () => {
+      const navMenu = document.querySelector('.nav-menu-container');
+      
+      if (!navMenu) {
+        console.warn('⚠️ Nav menu não encontrado para hover detection');
+        return false;
+      }
+
+      const handleNavEnter = () => {
+        console.log('🎯 Nav hover: ENTER - forçando GREEN_DOT');
+        isOverNavRef.current = true;
+        
+        // Força GREEN_DOT independente da seção atual
+        onSectionChange('nav-hover', CURSOR_STATES.GREEN_DOT);
+      };
+
+      const handleNavLeave = () => {
+        console.log('🎯 Nav hover: LEAVE - voltando para seção atual');
+        isOverNavRef.current = false;
+        
+        // Volta para o estado da seção atual
+        const currentSection = activeSection.current;
+        const targetState = SECTION_STATE_MAP[currentSection] || CURSOR_STATES.GREEN_DOT;
+        
+        onSectionChange(currentSection, targetState);
+      };
+
+      navMenu.addEventListener('mouseenter', handleNavEnter);
+      navMenu.addEventListener('mouseleave', handleNavLeave);
+
+      console.log('✅ Nav hover detection configurado');
+      
+      return () => {
+        navMenu.removeEventListener('mouseenter', handleNavEnter);
+        navMenu.removeEventListener('mouseleave', handleNavLeave);
+      };
+    };
+
     const setupAnimatedSections = () => {
       const heroSection = document.querySelector('#hero');
-      const aboutSection = document.querySelector('#about-us'); // ✅ CORRETO: about-us ≠ about
+      const aboutSection = document.querySelector('#about-us');
       
       if (!heroSection || !aboutSection) {
         console.warn('⚠️ Hero or About section not found');
         return false;
       }
 
-      // ✅ HERO: Trigger explícito na própria seção
+      // HERO: Trigger explícito na própria seção
       const heroTrigger = ScrollTrigger.create({
-        trigger: heroSection, // Trigger direto no #hero
-        start: 'top top',     // Hero entra quando topo atinge topo da viewport
-        end: 'bottom top',    // Hero sai quando base atinge topo da viewport
+        trigger: heroSection,
+        start: 'top top',
+        end: 'bottom top',
         
         onEnter: () => {
           if (activeSection.current === 'hero') return;
           console.log('📍 Hero ENTERED (explicit trigger)');
           activeSection.current = 'hero';
-          onSectionChange('hero', CURSOR_STATES.DRAG_ME);
+          
+          // ✅ CRÍTICO: Só muda cursor se não estivermos sobre o nav
+          if (!isOverNavRef.current) {
+            onSectionChange('hero', CURSOR_STATES.DRAG_ME);
+          }
         },
         
         onEnterBack: () => {
           if (activeSection.current === 'hero') return;
           console.log('📍 Hero ENTERED BACK (explicit trigger)');
           activeSection.current = 'hero';
-          onSectionChange('hero', CURSOR_STATES.DRAG_ME);
+          
+          // ✅ CRÍTICO: Só muda cursor se não estivermos sobre o nav
+          if (!isOverNavRef.current) {
+            onSectionChange('hero', CURSOR_STATES.DRAG_ME);
+          }
         },
         
         onLeave: () => {
@@ -63,16 +111,16 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         }
       });
 
-      // ✅ ABOUT-US: Trigger explícito na própria seção (diferente da seção About removida)
+      // ABOUT-US: Trigger explícito na própria seção
       const aboutTrigger = ScrollTrigger.create({
-        trigger: aboutSection, // Trigger direto no #about-us
-        start: 'top top',      // About entra quando topo atinge topo da viewport
-        end: 'bottom top',     // About sai quando base atinge topo da viewport
+        trigger: aboutSection,
+        start: 'top top',
+        end: 'bottom top',
         
         onEnter: () => {
-          // Bloqueia se VIEW (modal/card hover)
-          if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-            console.log('🔒 About blocked - VIEW active');
+          // Bloqueia se VIEW (modal/card hover) OU se sobre nav
+          if (getCurrentCursorState() === CURSOR_STATES.VIEW || isOverNavRef.current) {
+            console.log('🔒 About blocked - VIEW active ou nav hover');
             return;
           }
           if (activeSection.current === 'about-us') return;
@@ -82,7 +130,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         },
         
         onEnterBack: () => {
-          if (getCurrentCursorState() === CURSOR_STATES.VIEW) return;
+          if (getCurrentCursorState() === CURSOR_STATES.VIEW || isOverNavRef.current) return;
           if (activeSection.current === 'about-us') return;
           console.log('📍 About Us ENTERED BACK (explicit trigger)');
           activeSection.current = 'about-us';
@@ -103,6 +151,10 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       return true;
     };
 
+    // Setup nav hover primeiro
+    const navCleanup = setupNavHoverDetection();
+    
+    // Setup seções animadas
     let retryCount = 0;
     const maxRetries = 10;
     
@@ -113,7 +165,7 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       retryCount++;
     }, 300);
 
-    // IntersectionObserver para seções normais (What We Do, Work, etc)
+    // IntersectionObserver para seções normais
     const sectionsForIO = [
       document.getElementById('what-we-do'),
       document.getElementById('work'),
@@ -137,9 +189,9 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         
         if (!sectionId) return;
 
-        // Bloqueia se VIEW (modal/card hover)
-        if (getCurrentCursorState() === CURSOR_STATES.VIEW) {
-          console.log(`🔒 ${sectionId} blocked - VIEW active`);
+        // ✅ NOVO: Bloqueia se VIEW, modal ou hover no nav
+        if (getCurrentCursorState() === CURSOR_STATES.VIEW || isOverNavRef.current) {
+          console.log(`🔒 ${sectionId} blocked - VIEW active ou nav hover`);
           return;
         }
 
@@ -174,6 +226,9 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       scrollTriggersRef.current = [];
       if (observerRef.current) {
         observerRef.current.disconnect();
+      }
+      if (navCleanup) {
+        navCleanup();
       }
       console.log('🧹 Section detection cleaned');
     };
