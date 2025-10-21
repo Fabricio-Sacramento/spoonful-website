@@ -1,5 +1,5 @@
 // src/components/NavMenu.jsx
-// Menu de navegação com detecção absoluta para seções sobrepostas
+// CORREÇÃO: Statement "agarrando" no Work
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
@@ -7,7 +7,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Configuração dos itens do menu
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '#hero', type: 'anchor' },
   { id: 'about-us', label: 'About Us', href: '#about-us', type: 'anchor' },
@@ -34,7 +33,7 @@ const NavMenu = () => {
   const hasEnteredRef = useRef(false);
 
   // ================================
-  // DETECÇÃO ABSOLUTA DE POSIÇÃO
+  // DETECÇÃO ABSOLUTA MELHORADA
   // ================================
   const detectAbsolutePosition = useCallback(() => {
     const scrollY = window.scrollY;
@@ -47,38 +46,64 @@ const NavMenu = () => {
       return 'home';
     }
     
-    // FINAL ABSOLUTO: Contact (últimos 50px)
-    if (scrollY >= maxScroll - 50) {
+    // FINAL ABSOLUTO: Contact (últimos 100px - aumentei tolerância)
+    if (scrollY >= maxScroll - 100) {
       return 'contact';
     }
     
     // ZONA HERO/ABOUT-US: Primeira viewport (até 100vh)
     if (scrollY <= windowHeight) {
-      // Se está na primeira metade, é Hero
       if (scrollY <= windowHeight * 0.5) {
         return 'home';
       }
-      // Segunda metade da primeira viewport = About Us
       return 'about-us';
     }
     
-    // ZONA STATEMENT/CONTACT: Última viewport antes do final absoluto
-    const secondLastViewport = maxScroll - windowHeight;
-    if (scrollY >= secondLastViewport) {
-      // Se está na primeira metade da penúltima viewport, é Statement
-      if (scrollY <= secondLastViewport + (windowHeight * 0.5)) {
-        return 'statement';
+    // ✅ NOVA LÓGICA: DETECÇÃO BASEADA EM ELEMENTOS REAIS
+    
+    // Verifica se Statement wrapper está visível e ativo
+    const statementWrapper = document.querySelector('.statement-contact-wrapper');
+    if (statementWrapper) {
+      const wrapperRect = statementWrapper.getBoundingClientRect();
+      const wrapperTop = scrollY + wrapperRect.top;
+      const wrapperBottom = wrapperTop + statementWrapper.offsetHeight;
+      
+      // Se estamos dentro do wrapper Statement/Contact
+      if (scrollY >= wrapperTop - 100 && scrollY <= wrapperBottom + 100) {
+        // Dentro do wrapper, verifica se Contact está revelado
+        const contactLayer = document.querySelector('.contact-layer');
+        const isContactRevealed = contactLayer?.getAttribute('aria-hidden') === 'false' ||
+                                 contactLayer?.classList.contains('contact--revealed');
+        
+        if (isContactRevealed) {
+          return 'contact';
+        } else {
+          return 'statement';
+        }
       }
-      // Segunda metade = Contact
-      return 'contact';
     }
     
-    // SEÇÕES INTERMEDIÁRIAS: mantém detecção atual
-    return null; // Deixa IntersectionObserver decidir
+    // ✅ FALLBACK: DETECÇÃO POR POSIÇÃO RELATIVA MAIS CONSERVADORA
+    
+    // Se estamos nos últimos 30% da página, provavelmente Statement/Contact
+    const lastThirdStart = maxScroll * 0.7;
+    if (scrollY >= lastThirdStart) {
+      // Dentro do último terço, verifica posição mais específica
+      const statementZoneEnd = maxScroll - (windowHeight * 0.3);
+      
+      if (scrollY <= statementZoneEnd) {
+        return 'statement';
+      } else {
+        return 'contact';
+      }
+    }
+    
+    // SEÇÕES INTERMEDIÁRIAS: deixa IntersectionObserver decidir
+    return null;
   }, []);
 
   // ================================
-  // NAVEGAÇÃO CONDICIONAL
+  // NAVEGAÇÃO CONDICIONAL (mantida igual)
   // ================================
   const handleSmartNavigation = useCallback((targetItem) => {
     const currentPosition = detectAbsolutePosition();
@@ -86,10 +111,11 @@ const NavMenu = () => {
     console.log('🧭 Smart Navigation:', {
       from: currentPosition,
       to: targetItem.id,
-      currentScroll: window.scrollY
+      currentScroll: window.scrollY,
+      documentHeight: document.documentElement.scrollHeight
     });
     
-    // CASO 1: Hero → About Us (scroll 1 viewport para baixo)
+    // CASO 1: Hero → About Us
     if (currentPosition === 'home' && targetItem.id === 'about-us') {
       window.scrollTo({
         top: window.innerHeight,
@@ -99,7 +125,7 @@ const NavMenu = () => {
       return;
     }
     
-    // CASO 2: Statement → Contact (scroll para final absoluto)
+    // CASO 2: Statement → Contact
     if (currentPosition === 'statement' && targetItem.id === 'contact') {
       window.scrollTo({
         top: document.documentElement.scrollHeight,
@@ -109,24 +135,53 @@ const NavMenu = () => {
       return;
     }
     
-    // CASO 3: Contact → Statement (volta 1 viewport)
+    // CASO 3: Contact → Statement
     if (currentPosition === 'contact' && targetItem.id === 'statement') {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      window.scrollTo({
-        top: maxScroll - window.innerHeight,
-        behavior: 'smooth'
-      });
-      console.log('📍 Contact → Statement: Volta 1 viewport');
+      const statementWrapper = document.querySelector('.statement-contact-wrapper');
+      if (statementWrapper) {
+        // Scroll para início do wrapper Statement
+        const wrapperRect = statementWrapper.getBoundingClientRect();
+        const wrapperTop = window.scrollY + wrapperRect.top;
+        window.scrollTo({
+          top: wrapperTop,
+          behavior: 'smooth'
+        });
+      } else {
+        // Fallback: volta 1 viewport
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        window.scrollTo({
+          top: maxScroll - window.innerHeight,
+          behavior: 'smooth'
+        });
+      }
+      console.log('📍 Contact → Statement: Scroll para início Statement');
       return;
     }
     
-    // CASO 4: About Us → Hero (volta para topo absoluto)
+    // CASO 4: About Us → Hero
     if (currentPosition === 'about-us' && targetItem.id === 'home') {
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
       console.log('📍 About Us → Hero: Topo absoluto');
+      return;
+    }
+    
+    // ✅ NOVO: NAVEGAÇÃO ESPECÍFICA PARA STATEMENT
+    if (targetItem.id === 'statement') {
+      const statementWrapper = document.querySelector('.statement-contact-wrapper');
+      if (statementWrapper) {
+        // Scroll para início do wrapper Statement
+        statementWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        // Fallback: busca seção Statement diretamente
+        const statementSection = document.querySelector('#statement');
+        if (statementSection) {
+          statementSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+      console.log('📍 Navegação direta para Statement');
       return;
     }
     
@@ -149,7 +204,7 @@ const NavMenu = () => {
   }, [detectAbsolutePosition]);
 
   // ================================
-  // DETECÇÃO DE SEÇÃO ATIVA MELHORADA
+  // DETECÇÃO COM DEBUG MELHORADO
   // ================================
   useEffect(() => {
     let isDetecting = true;
@@ -160,15 +215,19 @@ const NavMenu = () => {
       const absolutePosition = detectAbsolutePosition();
       
       if (absolutePosition) {
-        // Posição absoluta detectada (Hero, About Us na zona Hero, Statement/Contact)
         if (activeSection !== absolutePosition) {
+          console.log('📍 Mudança de seção:', {
+            de: activeSection,
+            para: absolutePosition,
+            scroll: window.scrollY,
+            maxScroll: document.documentElement.scrollHeight - window.innerHeight
+          });
           setActiveSection(absolutePosition);
-          console.log('📍 Seção ativa (absoluta):', absolutePosition);
         }
         return;
       }
       
-      // Para seções intermediárias, usa IntersectionObserver (implementado abaixo)
+      // Para seções intermediárias, IntersectionObserver decide
     };
     
     // Detecção em scroll (throttled)
@@ -178,7 +237,7 @@ const NavMenu = () => {
       scrollTimeout = setTimeout(() => {
         updateActiveSection();
         scrollTimeout = null;
-      }, 16); // ~60fps
+      }, 16);
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -194,7 +253,7 @@ const NavMenu = () => {
   }, [activeSection, detectAbsolutePosition]);
 
   // ================================
-  // INTERSECTION OBSERVER PARA SEÇÕES INTERMEDIÁRIAS
+  // INTERSECTION OBSERVER MAIS ESPECÍFICO
   // ================================
   useEffect(() => {
     const intermediateSections = [
@@ -205,8 +264,8 @@ const NavMenu = () => {
     if (intermediateSections.length === 0) return;
 
     const observerOptions = {
-      threshold: [0.5],
-      rootMargin: '-20% 0px -20% 0px'
+      threshold: [0.6], // Aumentei threshold para ser mais específico
+      rootMargin: '-15% 0px -15% 0px' // Reduzi margem para evitar conflitos
     };
 
     const handleIntersection = (entries) => {
@@ -216,10 +275,18 @@ const NavMenu = () => {
           if (section) {
             const absolutePosition = detectAbsolutePosition();
             
-            // Só atualiza se não estivermos em zona de sobreposição
-            if (!absolutePosition) {
+            // ✅ CRÍTICO: Só atualiza se não estivermos em zona de sobreposição
+            // E se não estivermos próximos ao Statement/Contact
+            const scrollY = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const nearStatement = scrollY >= maxScroll * 0.7; // Últimos 30%
+            
+            if (!absolutePosition && !nearStatement) {
+              console.log('📍 IO detectou:', section.id, '(scroll:', scrollY, ')');
               setActiveSection(section.id);
-              console.log('📍 Seção ativa (IO):', section.id);
+            } else {
+              console.log('📍 IO bloqueado para:', section.id, 
+                         '(absoluto:', absolutePosition, ', nearStatement:', nearStatement, ')');
             }
           }
         }
@@ -232,7 +299,8 @@ const NavMenu = () => {
       observer.observe(section.element);
     });
 
-    console.log('👁️ IO observando seções intermediárias:', intermediateSections.length);
+    console.log('👁️ IO configurado com threshold 0.6 para seções:', 
+                intermediateSections.map(s => s.id));
 
     return () => {
       observer.disconnect();
@@ -240,8 +308,30 @@ const NavMenu = () => {
   }, [detectAbsolutePosition]);
 
   // ================================
-  // ANIMAÇÃO DE ENTRADA (mantida igual)
+  // DEBUG HELPER (remover em produção)
   // ================================
+  useEffect(() => {
+    if (window.location.hash === '#debug') {
+      window.debugNavMenu = {
+        getCurrentSection: () => activeSection,
+        detectPosition: detectAbsolutePosition,
+        getScrollInfo: () => ({
+          scrollY: window.scrollY,
+          maxScroll: document.documentElement.scrollHeight - window.innerHeight,
+          statementWrapper: document.querySelector('.statement-contact-wrapper')?.getBoundingClientRect(),
+          contactRevealed: document.querySelector('.contact-layer')?.getAttribute('aria-hidden') === 'false'
+        })
+      };
+      
+      console.log('🐛 Debug NavMenu disponível em window.debugNavMenu');
+    }
+  }, [activeSection, detectAbsolutePosition]);
+
+  // ================================
+  // RESTO DO CÓDIGO (mantido igual)
+  // ================================
+  
+  // Animação de entrada
   useEffect(() => {
     if (hasEnteredRef.current) return;
     hasEnteredRef.current = true;
@@ -252,30 +342,15 @@ const NavMenu = () => {
 
     if (!logo || !toggle) return;
 
-    gsap.set(items, { 
-      y: 0, 
-      opacity: 0,
-      visibility: 'visible'
-    });
-
+    gsap.set(items, { y: 0, opacity: 0, visibility: 'visible' });
     gsap.set(logo, { x: 200, opacity: 0 });
     gsap.set(toggle, { x: 100, opacity: 0 });
 
     entryTl.current = gsap.timeline({ delay: 0.5 });
 
     entryTl.current
-      .to(logo, {
-        x: 0,
-        opacity: 1,
-        duration: 1.2,
-        ease: 'elastic.out(1, 0.6)',
-      }, 0)
-      .to(toggle, {
-        x: 0,
-        opacity: 1,
-        duration: 0.6,
-        ease: 'power3.out'
-      }, 0.4);
+      .to(logo, { x: 0, opacity: 1, duration: 1.2, ease: 'elastic.out(1, 0.6)' }, 0)
+      .to(toggle, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.4);
 
     return () => {
       if (entryTl.current) entryTl.current.kill();
@@ -414,16 +489,12 @@ const NavMenu = () => {
     };
   }, [isOpen]);
 
-  // ================================
-  // HANDLERS
-  // ================================
   const handleToggle = useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
 
   const handleItemClick = useCallback((item) => {
     console.log('🔗 Nav Menu: Click em', item.label);
-
     setIsOpen(false);
 
     if (item.type === 'anchor') {
@@ -443,14 +514,11 @@ const NavMenu = () => {
         setIsOpen(false);
       }
     };
-
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
-  // ================================
-  // RENDER
-  // ================================
+  // RENDER (mantido igual)
   return (
     <nav
       ref={containerRef}
@@ -462,12 +530,7 @@ const NavMenu = () => {
           Spoonful
         </div>
 
-        <ul
-          ref={listRef}
-          id="nav-menu-list"
-          className="nav-menu-list"
-          role="navigation"
-        >
+        <ul ref={listRef} id="nav-menu-list" className="nav-menu-list" role="navigation">
           {NAV_ITEMS.map((item, index) => {
             const zIndex = 9 - index;
             
@@ -476,9 +539,7 @@ const NavMenu = () => {
                 <a
                   ref={el => itemsRef.current[index] = el}
                   href={item.href || '#'}
-                  className={`nav-menu-item ${
-                    activeSection === item.id ? 'active' : ''
-                  }`}
+                  className={`nav-menu-item ${activeSection === item.id ? 'active' : ''}`}
                   style={{ zIndex }}
                   onClick={(e) => {
                     e.preventDefault();
@@ -502,41 +563,10 @@ const NavMenu = () => {
         aria-controls="nav-menu-list"
         aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
       >
-        <svg
-          className="nav-menu-icon"
-          width="28"
-          height="24"
-          viewBox="0 0 28 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <line
-            className="nav-menu-icon-line"
-            x1="4"
-            y1="4"
-            x2="24"
-            y2="4"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          <line
-            className="nav-menu-icon-line"
-            x1="4"
-            y1="12"
-            x2="24"
-            y2="12"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          <line
-            className="nav-menu-icon-line"
-            x1="4"
-            y1="20"
-            x2="24"
-            y2="20"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
+        <svg className="nav-menu-icon" width="28" height="24" viewBox="0 0 28 24" fill="none">
+          <line className="nav-menu-icon-line" x1="4" y1="4" x2="24" y2="4" strokeWidth="4" strokeLinecap="round" />
+          <line className="nav-menu-icon-line" x1="4" y1="12" x2="24" y2="12" strokeWidth="4" strokeLinecap="round" />
+          <line className="nav-menu-icon-line" x1="4" y1="20" x2="24" y2="20" strokeWidth="4" strokeLinecap="round" />
         </svg>
       </button>
     </nav>
