@@ -1,0 +1,144 @@
+/* ================================= */
+/* PRELOADER - SPOONFUL              */
+/* ================================= */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--neutral-normal); /* #373737 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  
+  /* Performance */
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ================================= */
+/* LOADER BAR (LEFT → RIGHT)         */
+/* ================================= */
+
+.preloader__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: var(--primary-red); /* #F5163C */
+  transition: width 0.1s linear;
+  will-change: width;
+  z-index: 1;
+}
+
+/* ================================= */
+/* CURTAINS (RED SPLIT)              */
+/* ================================= */
+
+.preloader__curtain {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: var(--primary-red);
+  will-change: transform;
+}
+
+.preloader__curtain--left {
+  left: 0;
+  z-index: 2;
+  transform-origin: left center;
+}
+
+.preloader__curtain--right {
+  right: 0;
+  z-index: 2;
+  transform-origin: right center;
+}
+
+/* ================================= */
+/* LOGO (SPOONFUL)                   */
+/* ================================= */
+
+.preloader__logo {
+  position: relative;
+  z-index: 3;
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0;
+  
+  /* Gradient wipe (red → white durante loading) */
+  background: linear-gradient(
+    to right,
+    var(--neutral-light) 0%,          /* #EBEBEB */
+    var(--neutral-light) var(--fill, 0%),
+    var(--primary-red) var(--fill, 0%),
+    var(--primary-red) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  will-change: contents;
+}
+
+/* ================================= */
+/* CHARS SETUP (Splitting)           */
+/* ================================= */
+
+.preloader__logo .char {
+  display: inline-block;
+  -webkit-backface-visibility: visible;
+  backface-visibility: visible;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+/* Tablet: 768px - 1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .preloader__logo {
+    font-size: clamp(2.5rem, 9vw, 6rem);
+  }
+}
+
+/* Mobile: < 768px */
+@media (max-width: 767px) {
+  .preloader__logo {
+    font-size: clamp(2rem, 12vw, 4rem);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ================================= */
+/* ACCESSIBILITY                     */
+/* ================================= */
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .preloader__logo .char,
+  .preloader__curtain,
+  .preloader__fill {
+    transition: none !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .preloader {
+    border: 2px solid var(--neutral-light);
+  }
+  
+  .preloader__logo {
+    -webkit-text-fill-color: var(--neutral-light);
+    background: none;
+  }
+}

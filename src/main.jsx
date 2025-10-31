@@ -1,53 +1,68 @@
-// src/main.jsx - ATUALIZADO
-// Substitui TempNavButton por NavMenu + mantém AboutDrawer
-
+// src/main.jsx
 import ReactDOM from 'react-dom/client';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Components
+import AppRoot from './AppRoot.jsx'; // ← MUDOU AQUI
 import CanvasApp from './components/CanvasApp.jsx';
-import './scripts/scroll-orchestrator.js';
 import WorkSection from './components/WorkSection.jsx';
 import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
+import NavWithDrawer from './components/NavWithDrawer.jsx';
+
+// Utils
+import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
 
-// ✅ NOVOS IMPORTS
-import NavWithDrawer from './components/NavWithDrawer.jsx'; // ✅ MOVIDO PARA ARQUIVO SEPARADO
+// ================================
+// RENDER APP ROOT (Preloader)
+// ================================
+const rootElement = document.createElement('div');
+rootElement.id = 'app-root';
+document.body.appendChild(rootElement);
 
-// ❌ REMOVIDO: import TempNavButton from './components/TempNavButton';
+const appRoot = ReactDOM.createRoot(rootElement);
+appRoot.render(<AppRoot />); // ← MUDOU AQUI
 
-// 1) Monta o canvas 3D inicial
+// ================================
+// MONTA COMPONENTES EXISTENTES
+// (resto igual, sem mudanças)
+// ================================
+
+// 1) Canvas 3D
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
 root3D.render(<CanvasApp />);
 
-// 2) Monta Work Section
+// 2) Work Section
 const workRoot = ReactDOM.createRoot(document.getElementById('work-mount-point'));
 workRoot.render(<WorkSection />);
 
-// 3) Monta Statement Section
+// 3) Statement Section
 const statementRoot = ReactDOM.createRoot(document.getElementById('statement'));
 statementRoot.render(<StatementSection />);
 
-// 4) Monta Contact Section
+// 4) Contact Section
 const contactRoot = ReactDOM.createRoot(document.getElementById('contact'));
 contactRoot.render(<ContactSection />);
 
-// 5) Monta NavMenu + AboutDrawer
-const navRoot = ReactDOM.createRoot(
-  document.createElement('div')
-);
-document.body.appendChild(navRoot._internalRoot.containerInfo);
+// 5) Nav + Drawer
+const navContainer = document.createElement('div');
+document.body.appendChild(navContainer);
+const navRoot = ReactDOM.createRoot(navContainer);
 navRoot.render(<NavWithDrawer />);
 
-// 6) Monta Custom Cursor
+// 6) Custom Cursor
 const cursorContainer = document.createElement('div');
 cursorContainer.id = 'cursor-root';
 document.body.appendChild(cursorContainer);
 const cursorRoot = ReactDOM.createRoot(cursorContainer);
 cursorRoot.render(<CustomCursor />);
 
-// 7) Inicializa Canvas Performance Controller
+// ================================
+// CANVAS PERFORMANCE CONTROLLER
+// ================================
 window.addEventListener('load', () => {
   setTimeout(() => {
     canvasController.init(root3D, <CanvasApp />);
@@ -55,7 +70,9 @@ window.addEventListener('load', () => {
   }, 600);
 });
 
-// Debug helpers
+// ================================
+// DEBUG HELPERS (igual antes)
+// ================================
 if (window.location.hash === '#debug') {
   window.debugCanvas = {
     controller: canvasController,
@@ -84,12 +101,8 @@ if (window.location.hash === '#debug') {
   };
   
   window.debugContact = {
-    enable: () => {
-      setContactInteractivity(true);
-    },
-    disable: () => {
-      setContactInteractivity(false);
-    },
+    enable: () => setContactInteractivity(true),
+    disable: () => setContactInteractivity(false),
     checkStatus: () => {
       const layer = document.querySelector('.contact-layer');
       return {
@@ -99,18 +112,9 @@ if (window.location.hash === '#debug') {
         revealed: layer?.classList.contains('contact-layer--revealed'),
         interactiveElements: layer?.querySelectorAll('a, button, input, textarea').length
       };
-    },
-    checkScrollTrigger: () => {
-      const triggers = ScrollTrigger.getAll();
-      const contactTrigger = triggers.find(t => 
-        t.vars?.trigger?.classList?.contains('statement-contact-wrapper')
-      );
-      console.log('Contact ScrollTrigger:', contactTrigger);
-      return contactTrigger;
     }
   };
   
-  // Debug Custom Cursor
   window.debugCursor = {
     getState: () => {
       const cursor = document.querySelector('.custom-cursor');
@@ -120,19 +124,11 @@ if (window.location.hash === '#debug') {
         position: cursor ? {
           x: cursor.style.left,
           y: cursor.style.top
-        } : null,
-        scale: getComputedStyle(cursor)?.getPropertyValue('--cursor-scale')
+        } : null
       };
-    },
-    enable: () => {
-      document.body.removeAttribute('data-cursor-disabled');
-    },
-    disable: () => {
-      document.body.setAttribute('data-cursor-disabled', 'true');
     }
   };
 
-  // ✅ Debug NavMenu (NOVO)
   window.debugNav = {
     getState: () => {
       const container = document.querySelector('.nav-menu-container');
@@ -145,6 +141,23 @@ if (window.location.hash === '#debug') {
     }
   };
   
-  // Ativa border debug visual
+  window.debugPreloader = {
+    forceShow: () => {
+      const preloader = document.querySelector('.preloader');
+      if (preloader) preloader.style.display = 'flex';
+    },
+    forceHide: () => {
+      const preloader = document.querySelector('.preloader');
+      if (preloader) preloader.style.display = 'none';
+    },
+    checkAssets: () => {
+      return {
+        canvas: !!document.querySelector('#root canvas'),
+        canvasWidth: document.querySelector('#root canvas')?.width,
+        fontsReady: document.fonts.status
+      };
+    }
+  };
+  
   document.body.setAttribute('data-debug', 'true');
 }
