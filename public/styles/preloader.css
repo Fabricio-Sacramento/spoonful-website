@@ -1,120 +1,126 @@
+/* public/styles/preloader.css */
 /* ================================= */
-/* PRELOADER - SPOONFUL              */
+/* PRELOADER - SPLIT CURTAIN DESIGN  */
 /* ================================= */
 
 .preloader {
   position: fixed;
   inset: 0;
-  z-index: 10000;
-  background: var(--neutral-normal); /* #373737 */
+  z-index: 99999;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
   overflow: hidden;
+  pointer-events: auto;
   
   /* Performance */
-  will-change: opacity;
+  will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 /* ================================= */
-/* LOADER BAR (LEFT → RIGHT)         */
-/* ================================= */
-
-.preloader__fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 0;
-  background: var(--primary-red); /* #F5163C */
-  transition: width 0.1s linear;
-  will-change: width;
-  z-index: 1;
-}
-
-/* ================================= */
-/* CURTAINS (RED SPLIT)              */
+/* CURTAINS (50% cada)               */
 /* ================================= */
 
 .preloader__curtain {
-  position: absolute;
-  top: 0;
-  height: 100%;
+  position: relative;
   width: 50%;
-  background: var(--primary-red);
+  height: 100vh;
+  background-color: var(--primary-red);
+  
+  /* Performance */
   will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
+/* Cortina esquerda: contém logo */
 .preloader__curtain--left {
-  left: 0;
-  z-index: 2;
-  transform-origin: left center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Cortina direita: sem conteúdo adicional */
 .preloader__curtain--right {
-  right: 0;
-  z-index: 2;
-  transform-origin: right center;
+  background-color: var(--primary-red); /* ← ADICIONADO para não ficar vazio */
 }
 
 /* ================================= */
-/* LOGO (SPOONFUL)                   */
+/* LOGO (só na cortina esquerda)     */
 /* ================================= */
 
 .preloader__logo {
-  position: relative;
-  z-index: 3;
+  color: var(--neutral-light);
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: clamp(3rem, 10vw, 8rem);
+  font-size: 8rem;
   font-weight: 900;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
   margin: 0;
   
-  /* Gradient wipe (red → white durante loading) */
-  background: linear-gradient(
-    to right,
-    var(--neutral-light) 0%,          /* #EBEBEB */
-    var(--neutral-light) var(--fill, 0%),
-    var(--primary-red) var(--fill, 0%),
-    var(--primary-red) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  /* 3D Transform (IGUAL HERO) */
+  transform-style: preserve-3d;
+  perspective: 1000px;
   
-  will-change: contents;
+  /* Anti-aliasing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* ================================= */
-/* CHARS SETUP (Splitting)           */
-/* ================================= */
-
+/* Chars do Splitting (IGUAL HERO) */
 .preloader__logo .char {
   display: inline-block;
-  -webkit-backface-visibility: visible;
-  backface-visibility: visible;
-  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
+  backface-visibility: visible;
 }
 
 /* ================================= */
 /* RESPONSIVE                        */
 /* ================================= */
 
-/* Tablet: 768px - 1023px */
-@media (max-width: 1023px) and (min-width: 768px) {
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
   .preloader__logo {
-    font-size: clamp(2.5rem, 9vw, 6rem);
+    font-size: 7rem;
   }
 }
 
-/* Mobile: < 768px */
+/* Tablet Landscape: 768px - 1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .preloader__logo {
+    font-size: 6rem;
+  }
+}
+
+/* Tablet Portrait: 600px - 767px */
 @media (max-width: 767px) {
   .preloader__logo {
-    font-size: clamp(2rem, 12vw, 4rem);
-    letter-spacing: -0.01em;
+    font-size: 4.5rem;
+  }
+}
+
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
+  .preloader__logo {
+    font-size: 3.5rem;
+  }
+}
+
+/* Mobile Padrão: 360px - 479px */
+@media (max-width: 479px) {
+  .preloader__logo {
+    font-size: 2.8rem;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
+@media (max-width: 375px) {
+  .preloader__logo {
+    font-size: 2.4rem;
   }
 }
 
@@ -122,23 +128,16 @@
 /* ACCESSIBILITY                     */
 /* ================================= */
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .preloader__logo .char,
-  .preloader__curtain,
-  .preloader__fill {
+  .preloader__curtain {
     transition: none !important;
+    animation: none !important;
   }
 }
 
-/* High contrast mode */
 @media (prefers-contrast: high) {
   .preloader {
     border: 2px solid var(--neutral-light);
-  }
-  
-  .preloader__logo {
-    -webkit-text-fill-color: var(--neutral-light);
-    background: none;
   }
 }

@@ -12,6 +12,7 @@ const Preloader = ({ onComplete }) => {
   const [canvasReady, setCanvasReady] = useState(false);
   const [fontsReady, setFontsReady] = useState(false);
 
+  const preloaderRef = useRef(null);
   const logoRef = useRef(null);
   const curtainLeftRef = useRef(null);
   const curtainRightRef = useRef(null);
@@ -22,10 +23,10 @@ const Preloader = ({ onComplete }) => {
     window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
   // ==========================================
-  // 1) SPLITTING SETUP + estado inicial GSAP
+  // 1) SPLITTING SETUP
   // ==========================================
   useEffect(() => {
-    const currentLogo = logoRef.current; // ← captura ref estável
+    const currentLogo = logoRef.current;
     if (!currentLogo) return;
 
     const results = Splitting({
@@ -36,7 +37,6 @@ const Preloader = ({ onComplete }) => {
     if (results[0]) {
       charsRef.current = results[0].chars;
 
-      // Setup 3D transform e estado inicial
       charsRef.current.forEach((char) => {
         gsap.set(char.parentNode, {
           perspective: 1000,
@@ -44,7 +44,7 @@ const Preloader = ({ onComplete }) => {
         });
         gsap.set(char, {
           transformStyle: 'preserve-3d',
-          backfaceVisibility: 'hidden', // evita artefatos ao rotacionar
+          backfaceVisibility: 'visible', // ← IGUAL HERO!
           opacity: 1,
           rotationX: 0,
           z: 0,
@@ -52,10 +52,8 @@ const Preloader = ({ onComplete }) => {
       });
     }
 
-    // Estado inicial das cortinas
     gsap.set([curtainLeftRef.current, curtainRightRef.current], { x: 0 });
 
-    // Cleanup do Splitting (remove spans) usando a ref capturada
     return () => {
       if (currentLogo) {
         currentLogo.innerHTML = BRAND_TEXT;
@@ -65,7 +63,7 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 2) FAKE PROGRESS (throttle via rAF)
+  // 2) FAKE PROGRESS
   // ==========================================
   useEffect(() => {
     const obj = { v: 0 };
@@ -95,7 +93,7 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 3) CANVAS CHECK (evento + fallback)
+  // 3) CANVAS CHECK
   // ==========================================
   useEffect(() => {
     const markReady = () => {
@@ -106,7 +104,6 @@ const Preloader = ({ onComplete }) => {
     const handleCanvasReady = () => markReady();
     window.addEventListener('canvas:ready', handleCanvasReady, { once: true });
 
-    // Fallback rápido: checa DOM
     const ok = () => {
       const c = document.querySelector('#root canvas');
       return c && c.width > 0;
@@ -142,7 +139,7 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 4) FONTS CHECK (aguarda fontes críticas)
+  // 4) FONTS CHECK
   // ==========================================
   useEffect(() => {
     let timeoutId;
@@ -155,17 +152,15 @@ const Preloader = ({ onComplete }) => {
       }
     };
 
-    // Se suportado, aguarde apenas a fonte crítica
     const tryLoadCritical = async () => {
       try {
         if (document.fonts?.load) {
-          // Ajuste o weight/style conforme a sua família/font-face
-          await document.fonts.load('700 1rem "Neue Haas Grotesk Display Pro"');
+          await document.fonts.load('900 1rem "Neue Haas Grotesk Display Pro"');
         } else if (document.fonts?.ready) {
           await document.fonts.ready;
         }
       } catch {
-        // ignora erros e cai no done()
+        // ignora
       } finally {
         done();
       }
@@ -173,7 +168,6 @@ const Preloader = ({ onComplete }) => {
 
     tryLoadCritical();
 
-    // Timeout safety único
     timeoutId = setTimeout(() => {
       console.warn('⚠️ Fonts forçadas por timeout');
       done();
@@ -183,10 +177,13 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 5) ANIMATE EXIT (respeita reduced motion)
+  // 5) ANIMATE EXIT (IGUAL HERO!)
   // ==========================================
   const animateExit = useCallback(() => {
     if (prefersReduced) {
+      if (preloaderRef.current) {
+        preloaderRef.current.style.display = 'none';
+      }
       onComplete();
       return;
     }
@@ -194,48 +191,56 @@ const Preloader = ({ onComplete }) => {
     const tl = gsap.timeline({
       onComplete: () => {
         console.log('✅ Preloader complete!');
+        
+        if (preloaderRef.current) {
+          preloaderRef.current.style.display = 'none';
+        }
+        
         onComplete();
       },
     });
 
     tl.addLabel('start')
-      // FASE 1: Chars saem
+      // FASE 1: Chars saem (ROTAÇÃO IGUAL HERO)
       .to(
         charsRef.current,
         {
           opacity: 0,
-          rotationX: 90,
-          z: 200,
+          rotationX: 90,       // ← IGUAL HERO
+          z: 200,              // ← IGUAL HERO (positivo)
           transformOrigin: '50% 100%',
           ease: 'power2.inOut',
-          stagger: { each: 0.025, from: 'start' },
-          duration: 0.6,
+          stagger: { 
+            each: 0.015,       // ← IGUAL HERO
+            from: 'start' 
+          },
+          duration: 0.4,       // ← IGUAL HERO
         },
         'start'
       )
-      // FASE 2: Cortinas abrem (overlap)
+      // FASE 2: Cortinas se separam
       .to(
         curtainLeftRef.current,
         {
           x: '-100%',
-          duration: 1,
+          duration: 0.8,
           ease: 'power3.inOut',
         },
-        'start+=0.3'
+        'start+=0.3'          // ← Overlap com chars
       )
       .to(
         curtainRightRef.current,
         {
           x: '100%',
-          duration: 1,
+          duration: 0.8,
           ease: 'power3.inOut',
         },
-        'start+=0.3'
+        'start+=0.3'          // ← Mesmo timing
       );
   }, [onComplete, prefersReduced]);
 
   // ==========================================
-  // 6) EXIT TRIGGER (quando tudo pronto)
+  // 6) EXIT TRIGGER
   // ==========================================
   useEffect(() => {
     const allReady = fakeProgress >= 100 && canvasReady && fontsReady;
@@ -246,35 +251,34 @@ const Preloader = ({ onComplete }) => {
   }, [fakeProgress, canvasReady, fontsReady, animateExit]);
 
   // ==========================================
-  // 7) RENDER
+  // 7) RENDER (LAYOUT CORRETO)
   // ==========================================
   return (
     <div
+      ref={preloaderRef}
       className="preloader"
       role="progressbar"
       aria-label="Carregando"
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={fakeProgress}
-      // garante bloqueio de interação
-      style={{ pointerEvents: 'auto' }}
     >
-      {/* Loader bar */}
-      <div className="preloader__fill" style={{ width: `${fakeProgress}%` }} />
-
-      {/* Curtains */}
-      <div ref={curtainLeftRef} className="preloader__curtain preloader__curtain--left" />
-      <div ref={curtainRightRef} className="preloader__curtain preloader__curtain--right" />
-
-      {/* Logo com split text */}
-      <h1
-        ref={logoRef}
-        className="preloader__logo"
-        style={{ '--fill': `${fakeProgress}%` }}
-        data-splitting
+      {/* CORTINA ESQUERDA (com logo) */}
+      <div 
+        ref={curtainLeftRef} 
+        className="preloader__curtain preloader__curtain--left"
       >
-        {BRAND_TEXT}
-      </h1>
+        {/* Logo centralizado na cortina esquerda */}
+        <h1 ref={logoRef} className="preloader__logo" data-splitting>
+          {BRAND_TEXT}
+        </h1>
+      </div>
+
+      {/* CORTINA DIREITA (vazia, só vermelho) */}
+      <div 
+        ref={curtainRightRef} 
+        className="preloader__curtain preloader__curtain--right"
+      />
     </div>
   );
 };
