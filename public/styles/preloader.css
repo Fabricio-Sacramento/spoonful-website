@@ -7,14 +7,15 @@
   overflow: hidden;
 }
 
-/* BAIXO → ALTO */
+/* Ordem de camadas: baixo → alto */
 .preloader__background {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: var(--neutral-gray); /* tela inicial neutra */
+  background: var(--neutral-gray-dark, #111); /* seu neutral dark */
 }
 
+/* Barra que preenche a tela (faz o "fill" vermelho) */
 .preloader__loader-bar {
   position: absolute;
   left: 0;
@@ -29,51 +30,67 @@
   transform: translateZ(0);
 }
 
+/* Centro do logo */
 .preloader__center {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;      /* acima da barra durante loading */
+  display: grid;
+  place-items: center;
+  z-index: 10;  /* acima da barra durante loading */
   pointer-events: none;
 }
 
+/* Wrapper do logo para posicionar as duas camadas exatamente sobrepostas */
+.preloader__logo-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Base vermelha (sempre visível no início) */
 .preloader__logo {
   margin: 0;
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.1rem;
-  line-height: 1;
   font-size: clamp(48px, 12vw, 144px);
-  color: var(--primary-red);    /* vermelho sobre neutral */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  color: var(--primary-red);
 }
 
-/* Cortinas (entram só na saída) */
+/* Camada LIGHT sobreposta (revelada via clip-path) */
+.preloader__logo--light {
+  position: absolute;
+  inset: 0;
+  color: var(--neutral-light); /* branco */
+  /* começa 100% escondido pela direita */
+  clip-path: inset(0 100% 0 0);
+  will-change: clip-path, transform, opacity;
+}
+
+/* Cortinas (usadas só na saída) */
 .preloader__curtain {
   position: absolute;
   top: 0;
   width: 50%;
   height: 100%;
   background: var(--primary-red);
-  z-index: 20;       /* acima de tudo quando visíveis */
-  will-change: transform;
-  visibility: hidden;
+  z-index: 20;          /* por cima na fase de split */
+  will-change: transform, visibility;
+  visibility: hidden;   /* só ficam visíveis na saída */
 }
-.preloader__curtain--left  { left: 0;  transform: translateX(0); }
-.preloader__curtain--right { right: 0; transform: translateX(0); }
+.preloader__curtain--left  { left: 0;  transform: translateX(0%); }
+.preloader__curtain--right { right: 0; transform: translateX(0%); }
 
-/* Evita flash do conteúdo antes do preloader */
+/* Anti-flash global (reforço; também está inline no index.html) */
 html.preloading body { visibility: hidden; }
 html.preloading .preloader { visibility: visible; }
 
 @media (prefers-reduced-motion: reduce) {
-  .preloader__loader-bar,
-  .preloader__curtain {
+  .preloader__loader-bar, .preloader__curtain {
     transition: none !important;
     animation: none !important;
   }

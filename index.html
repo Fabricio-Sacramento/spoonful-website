@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fabricio Sacramento - Portfoio</title>
+<style>
+  html.preloading body { visibility: hidden; }
+  html.preloading .preloader { visibility: visible; }
+</style>
+<script>
+  // Garante a classe antes da app montar (evita flash de conteúdo)
+  (function(){ document.documentElement.classList.add('preloading'); })();
+</script>
 <link rel="stylesheet" type="text/css" href="/styles/style.css">
 <link rel="stylesheet" type="text/css" href="/styles/cursor.css">
 <link rel="stylesheet" type="text/css" href="/styles/what-we-do.css">

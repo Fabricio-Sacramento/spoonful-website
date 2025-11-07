@@ -1,7 +1,4 @@
 // src/components/Preloader.jsx
-// Preloader: neutral bg + SPOONFUL central (red) + barra suave
-// Saída: texto OUT → split curtains → remove overlay → dispara hero:animate-entry
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { gsap } from 'gsap';
@@ -11,23 +8,25 @@ const Preloader = ({ onComplete }) => {
   const [canvasReady, setCanvasReady] = useState(false);
   const [fontsReady, setFontsReady] = useState(false);
 
-  const preloaderRef = useRef(null);
-  const logoRef = useRef(null);
-  const loaderBarRef = useRef(null);
-  const curtainLeftRef = useRef(null);
-  const curtainRightRef = useRef(null);
+  const preloaderRef     = useRef(null);
+  const logoRedRef       = useRef(null);
+  const logoLightRef     = useRef(null);
+  const loaderBarRef     = useRef(null);
+  const curtainLeftRef   = useRef(null);
+  const curtainRightRef  = useRef(null);
 
   const prefersReduced =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
-  // 1) Setup inicial (z-order e estados)
+  // 1) Setup inicial
   useEffect(() => {
-    document.documentElement.classList.add('preloading'); // evita flash do conteúdo
+    document.documentElement.classList.add('preloading');
 
-    // Logo pronto para OUT 3D
-    if (logoRef.current) {
-      gsap.set(logoRef.current, {
+    // Estado inicial do logo (para OUT 3D depois)
+    const logoForOut = logoRedRef.current; // usamos a base para o OUT
+    if (logoForOut) {
+      gsap.set(logoForOut, {
         perspective: 1000,
         transformStyle: 'preserve-3d',
         transformOrigin: '50% 100%',
@@ -52,14 +51,24 @@ const Preloader = ({ onComplete }) => {
   // 2) Barra suave (visual)
   useEffect(() => {
     if (!loaderBarRef.current || prefersReduced) return;
-    gsap.fromTo(
-      loaderBarRef.current,
+    gsap.fromTo(loaderBarRef.current,
       { width: '0%' },
       { width: '100%', duration: 2, ease: 'power2.inOut' }
     );
   }, [prefersReduced]);
 
-  // 3) Fake progress lógico (para gating/ARIA)
+  // 3) Reveal do logo LIGHT (clip-path sincronizado)
+  useEffect(() => {
+    if (prefersReduced || !logoLightRef.current) return;
+
+    // Sincroniza com a barra (mesma duração)
+    gsap.fromTo(logoLightRef.current,
+      { clipPath: 'inset(0 100% 0 0)' },
+      { clipPath: 'inset(0 0% 0 0)', duration: 2, ease: 'power2.inOut' }
+    );
+  }, [prefersReduced]);
+
+  // 4) Fake progress lógico (gate)
   useEffect(() => {
     if (prefersReduced) {
       setFakeProgress(100);
@@ -75,62 +84,42 @@ const Preloader = ({ onComplete }) => {
     return () => t.kill();
   }, [prefersReduced]);
 
-  // 4) Canvas ready
+  // 5) Canvas ready
   useEffect(() => {
     const markReady = () => setCanvasReady(true);
     const ok = () => {
       const c = document.querySelector('#root canvas');
       return c && c.width > 0;
     };
-
     const onEvt = () => markReady();
     window.addEventListener('canvas:ready', onEvt, { once: true });
-
     if (ok()) markReady();
     else {
       const iv = setInterval(() => {
-        if (ok()) {
-          clearInterval(iv);
-          clearTimeout(to);
-          markReady();
-        }
+        if (ok()) { clearInterval(iv); clearTimeout(to); markReady(); }
       }, 100);
-      const to = setTimeout(() => {
-        console.warn('⚠️ Canvas timeout – forçando ready');
-        clearInterval(iv);
-        markReady();
-      }, 3000);
-      return () => {
-        clearInterval(iv);
-        clearTimeout(to);
-        window.removeEventListener('canvas:ready', onEvt);
-      };
+      const to = setTimeout(() => { console.warn('⚠️ Canvas timeout – forçando ready'); clearInterval(iv); markReady(); }, 3000);
+      return () => { clearInterval(iv); clearTimeout(to); window.removeEventListener('canvas:ready', onEvt); };
     }
-
     return () => window.removeEventListener('canvas:ready', onEvt);
   }, []);
 
-  // 5) Fonts ready (gate anti-FOIT)
+  // 6) Fonts ready
   useEffect(() => {
     let resolved = false;
     const done = () => { if (!resolved) { resolved = true; setFontsReady(true); } };
-
     (async () => {
       try {
-        if (document.fonts?.load) {
-          await document.fonts.load('900 8rem "Neue Haas Grotesk Display Pro"');
-        } else if (document.fonts?.ready) {
-          await document.fonts.ready;
-        }
-      } catch {/* ignore */}
+        if (document.fonts?.load) { await document.fonts.load('900 8rem "Neue Haas Grotesk Display Pro"'); }
+        else if (document.fonts?.ready) { await document.fonts.ready; }
+      } catch { /* ignore */ }
       finally { done(); }
     })();
-
     const to = setTimeout(() => { console.warn('⚠️ Fonts forçadas por timeout'); done(); }, 2000);
     return () => clearTimeout(to);
   }, []);
 
-  // 6) Saída coreografada
+  // 7) Saída coreografada
   const animateExit = useCallback(() => {
     const el = preloaderRef.current;
     if (!el) return;
@@ -158,10 +147,10 @@ const Preloader = ({ onComplete }) => {
     });
 
     tl.addLabel('start')
-      // mini pausa
-      .to({}, { duration: 0.25 }, 'start')
-      // texto OUT (mesma “sensação” do hero-out)
-      .to(logoRef.current, {
+      .to({}, { duration: 0.25 }, 'start') // pausa
+
+      // OUT no logo base (vermelho)
+      .to(logoRedRef.current, {
         opacity: 0,
         rotationX: 90,
         z: -200,
@@ -169,19 +158,20 @@ const Preloader = ({ onComplete }) => {
         ease: 'power2.in',
         duration: 0.55,
       }, 'start+=0.25')
-      // split
+
+      // Liga cortinas e faz split
       .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'start+=0.7')
       .to(curtainLeftRef.current,  { x: '-100%', duration: 0.9, ease: 'power3.inOut' }, 'start+=0.75')
       .to(curtainRightRef.current, { x: '100%',  duration: 0.9, ease: 'power3.inOut' }, 'start+=0.75');
   }, [onComplete, prefersReduced]);
 
-  // 7) Gate da saída
+  // 8) Gate da saída
   useEffect(() => {
     const allReady = fakeProgress >= 100 && canvasReady && fontsReady;
     if (allReady) animateExit();
   }, [fakeProgress, canvasReady, fontsReady, animateExit]);
 
-  // 8) Render
+  // 9) Render
   return (
     <div
       ref={preloaderRef}
@@ -192,12 +182,22 @@ const Preloader = ({ onComplete }) => {
       aria-valuemax={100}
       aria-valuenow={fakeProgress}
     >
+      {/* Fundo neutral */}
       <div className="preloader__background" />
+
+      {/* Logo central (camada dupla) */}
       <div className="preloader__center">
-        <h1 ref={logoRef} className="preloader__logo">SPOONFUL</h1>
+        <div className="preloader__logo-wrap">
+          <h1 ref={logoRedRef} className="preloader__logo">SPOONFUL</h1>
+          <h1 ref={logoLightRef} className="preloader__logo preloader__logo--light">SPOONFUL</h1>
+        </div>
       </div>
+
+      {/* Barra que preenche a tela */}
       <div ref={loaderBarRef} className="preloader__loader-bar" />
-      <div ref={curtainLeftRef} className="preloader__curtain preloader__curtain--left" />
+
+      {/* Cortinas para split */}
+      <div ref={curtainLeftRef}  className="preloader__curtain preloader__curtain--left" />
       <div ref={curtainRightRef} className="preloader__curtain preloader__curtain--right" />
     </div>
   );
