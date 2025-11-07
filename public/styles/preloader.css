@@ -1,20 +1,34 @@
-/* preloader.css */
-/* ================================= */
-/* PRELOADER - ESTRUTURA BASE       */
-/* ================================= */
+/* src/styles/preloader.css */
+/* Camadas e ordem de z-index garantidas para não cobrir o logo antes da hora */
 
 .preloader {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: var(--neutral-gray); /* tela inicial neutra */
-  display: flex; /* mantém cortinas lado a lado */
   overflow: hidden;
 }
 
-/* ================================= */
-/* OVERLAY CENTRAL (texto)           */
-/* ================================= */
+/* BAIXO → ALTO */
+.preloader__background {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--neutral-gray); /* tela inicial neutra */
+}
+
+.preloader__loader-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--primary-red);
+  z-index: 5;
+  will-change: width, transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
 
 .preloader__center {
   position: absolute;
@@ -22,95 +36,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;          /* prioridade máxima (container) */
-  pointer-events: none; /* não captura clique */
+  z-index: 10;        /* acima da barra durante o loading */
+  pointer-events: none;
 }
-
-/* ================================= */
-/* LOGO (SPOONFUL)                  */
-/* ================================= */
 
 .preloader__logo {
   margin: 0;
-  z-index: 11;          /* ainda mais alto que o container */
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.1rem;
   line-height: 1;
   font-size: clamp(48px, 12vw, 144px);
-  color: var(--neutral-light); /* branco - visível sobre qualquer fundo */
-
-  /* Animação 3D igual ao Hero */
-  transform-style: preserve-3d;
-  perspective: 1000px;
-  will-change: transform, opacity;
-
-  /* Suavização tipográfica */
+  color: var(--primary-red); /* sobre neutral */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* ================================= */
-/* LAYER 4: LOADER BAR (vermelho)    */
-/* ================================= */
-
-.preloader__loader-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 0%; /* animado até 100% via GSAP */
-  height: 100vh;
-  background-color: var(--primary-red);
-  z-index: 5; /* abaixo do logo */
-  
-  /* Performance */
-  will-change: transform, width;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-/* ================================= */
-/* CORTINAS (split)                  */
-/* ================================= */
-
+/* Cortinas (entram só na saída) */
 .preloader__curtain {
-  position: relative;
+  position: absolute;
+  top: 0;
   width: 50%;
   height: 100%;
-  background: transparent; /* inicialmente transparente */
+  background: var(--primary-red);
+  z-index: 20;         /* acima de tudo quando visíveis */
   will-change: transform;
+  visibility: hidden;  /* ficam escondidas até o split */
 }
 
-/* ================================= */
-/* CHARS (Splitting.js)              */
-/* ================================= */
+.preloader__curtain--left  { left: 0;  transform: translateX(0); }
+.preloader__curtain--right { right: 0; transform: translateX(0); }
 
-.preloader__logo .char {
-  display: inline-block;
-  transform-style: preserve-3d;
-  backface-visibility: visible;
-}
-
-/* Media queries removidas - usando clamp() para responsividade */
-
-/* ================================= */
-/* ACCESSIBILITY                     */
-/* ================================= */
-
+/* A11y */
 @media (prefers-reduced-motion: reduce) {
-  .preloader__logo .char,
-  .preloader__curtain,
-  .preloader__loader-bar {
+  .preloader__loader-bar,
+  .preloader__curtain {
     transition: none !important;
     animation: none !important;
   }
 }
 
-@media (prefers-contrast: high) {
-  .preloader {
-    border: 2px solid var(--neutral-light);
-  }
-}
+/* Opcional: evita flash do conteúdo antes do preloader */
+html.preloading body { visibility: hidden; }
+html.preloading .preloader { visibility: visible; }
