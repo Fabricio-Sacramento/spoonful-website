@@ -8,58 +8,56 @@
   inset: 0;
   z-index: 99999;
   display: flex;
-  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
   pointer-events: auto;
   
-  /* Performance */
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-/* ================================= */
-/* CURTAINS (50% cada)               */
-/* ================================= */
-
-.preloader__curtain {
-  position: relative;
-  width: 50%;
-  height: 100vh;
-  background-color: var(--primary-red);
+  /* Background inicial (cinza) será controlado por JS */
+  background-color: var(--neutral-normal);
   
   /* Performance */
-  will-change: transform;
+  will-change: background-color;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
 }
 
-/* Cortina esquerda: contém logo */
-.preloader__curtain--left {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* ================================= */
+/* LOADER BAR (vermelho, left → right) */
+/* ================================= */
 
-/* Cortina direita: sem conteúdo adicional */
-.preloader__curtain--right {
-  background-color: var(--primary-red); /* ← ADICIONADO para não ficar vazio */
+.preloader__loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: var(--primary-red);
+  z-index: 1;
+  
+  /* Performance */
+  will-change: width;
+  transition: none; /* Controlado por JS/state */
 }
 
 /* ================================= */
-/* LOGO (só na cortina esquerda)     */
+/* LOGO (centro, com clip-path trick) */
 /* ================================= */
 
 .preloader__logo {
-  color: var(--neutral-light);
+  position: relative;
+  z-index: 2;
+  
+  /* Tipografia */
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-size: 8rem;
   font-weight: 900;
   letter-spacing: 0.1rem;
   text-transform: uppercase;
   margin: 0;
+  
+  /* Base color: vermelho */
+  color: var(--primary-red);
   
   /* 3D Transform (IGUAL HERO) */
   transform-style: preserve-3d;
@@ -71,11 +69,56 @@
   text-rendering: optimizeLegibility;
 }
 
+/* ================================= */
+/* LOGO GRADIENT TRICK               */
+/* Vermelho → Branco via clip-path   */
+/* ================================= */
+
+.preloader__logo::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--neutral-light);
+  
+  /* Clip-path dinâmico baseado no --loader-progress */
+  clip-path: inset(0 calc(100% - var(--loader-progress, 0%)) 0 0);
+  
+  /* Performance */
+  will-change: clip-path;
+}
+
 /* Chars do Splitting (IGUAL HERO) */
 .preloader__logo .char {
   display: inline-block;
   transform-style: preserve-3d;
   backface-visibility: visible;
+}
+
+/* ================================= */
+/* CURTAINS (tela cheia, sobrepõe tudo) */
+/* ================================= */
+
+.preloader__curtain {
+  position: fixed;
+  top: 0;
+  width: 50%;
+  height: 100vh;
+  background-color: var(--primary-red);
+  z-index: 3; /* Acima do logo */
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.preloader__curtain--left {
+  left: 0;
+}
+
+.preloader__curtain--right {
+  right: 0;
 }
 
 /* ================================= */

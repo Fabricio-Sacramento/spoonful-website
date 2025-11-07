@@ -8,12 +8,13 @@ import 'splitting/dist/splitting.css';
 const BRAND_TEXT = 'SPOONFUL';
 
 const Preloader = ({ onComplete }) => {
-  const [fakeProgress, setFakeProgress] = useState(0);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [canvasReady, setCanvasReady] = useState(false);
   const [fontsReady, setFontsReady] = useState(false);
 
   const preloaderRef = useRef(null);
   const logoRef = useRef(null);
+  const loaderBarRef = useRef(null);
   const curtainLeftRef = useRef(null);
   const curtainRightRef = useRef(null);
   const charsRef = useRef([]);
@@ -44,15 +45,13 @@ const Preloader = ({ onComplete }) => {
         });
         gsap.set(char, {
           transformStyle: 'preserve-3d',
-          backfaceVisibility: 'visible', // ← IGUAL HERO!
+          backfaceVisibility: 'visible',
           opacity: 1,
           rotationX: 0,
           z: 0,
         });
       });
     }
-
-    gsap.set([curtainLeftRef.current, curtainRightRef.current], { x: 0 });
 
     return () => {
       if (currentLogo) {
@@ -63,7 +62,7 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 2) FAKE PROGRESS
+  // 2) FAKE PROGRESS (0-100%)
   // ==========================================
   useEffect(() => {
     const obj = { v: 0 };
@@ -80,7 +79,7 @@ const Preloader = ({ onComplete }) => {
           const rounded = Math.round(obj.v);
           if (rounded !== last) {
             last = rounded;
-            setFakeProgress(rounded);
+            setLoadProgress(rounded);
           }
         });
       },
@@ -177,7 +176,21 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 5) ANIMATE EXIT (IGUAL HERO!)
+  // 5) BACKGROUND FLIP (quando 100%)
+  // ==========================================
+  useEffect(() => {
+    if (loadProgress === 100 && preloaderRef.current) {
+      // FLIP: Cinza → Vermelho
+      gsap.to(preloaderRef.current, {
+        backgroundColor: 'var(--primary-red)',
+        duration: 0.3,
+        ease: 'power2.inOut',
+      });
+    }
+  }, [loadProgress]);
+
+  // ==========================================
+  // 6) ANIMATE EXIT
   // ==========================================
   const animateExit = useCallback(() => {
     if (prefersReduced) {
@@ -201,20 +214,20 @@ const Preloader = ({ onComplete }) => {
     });
 
     tl.addLabel('start')
-      // FASE 1: Chars saem (ROTAÇÃO IGUAL HERO)
+      // FASE 1: Chars saem (IGUAL HERO)
       .to(
         charsRef.current,
         {
           opacity: 0,
-          rotationX: 90,       // ← IGUAL HERO
-          z: 200,              // ← IGUAL HERO (positivo)
+          rotationX: 90,
+          z: 200,
           transformOrigin: '50% 100%',
           ease: 'power2.inOut',
           stagger: { 
-            each: 0.015,       // ← IGUAL HERO
+            each: 0.015,
             from: 'start' 
           },
-          duration: 0.4,       // ← IGUAL HERO
+          duration: 0.4,
         },
         'start'
       )
@@ -226,7 +239,7 @@ const Preloader = ({ onComplete }) => {
           duration: 0.8,
           ease: 'power3.inOut',
         },
-        'start+=0.3'          // ← Overlap com chars
+        'start+=0.3'
       )
       .to(
         curtainRightRef.current,
@@ -235,46 +248,62 @@ const Preloader = ({ onComplete }) => {
           duration: 0.8,
           ease: 'power3.inOut',
         },
-        'start+=0.3'          // ← Mesmo timing
+        'start+=0.3'
       );
   }, [onComplete, prefersReduced]);
 
   // ==========================================
-  // 6) EXIT TRIGGER
+  // 7) EXIT TRIGGER
   // ==========================================
   useEffect(() => {
-    const allReady = fakeProgress >= 100 && canvasReady && fontsReady;
+    const allReady = loadProgress >= 100 && canvasReady && fontsReady;
     if (allReady) {
       console.log('🎬 Iniciando exit animation');
-      animateExit();
+      // Small delay para garantir que flip visual completou
+      const timeoutId = setTimeout(() => {
+        animateExit();
+      }, 400);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [fakeProgress, canvasReady, fontsReady, animateExit]);
+  }, [loadProgress, canvasReady, fontsReady, animateExit]);
 
   // ==========================================
-  // 7) RENDER (LAYOUT CORRETO)
+  // 8) RENDER
   // ==========================================
   return (
     <div
       ref={preloaderRef}
       className="preloader"
-      role="progressbar"
-      aria-label="Carregando"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={fakeProgress}
+      style={{
+        backgroundColor: 'var(--neutral-normal)' // Inicial: cinza
+      }}
     >
-      {/* CORTINA ESQUERDA (com logo) */}
+      {/* Loader Bar (vermelho, left → right) */}
+      <div 
+        ref={loaderBarRef}
+        className="preloader__loader"
+        style={{ width: `${loadProgress}%` }}
+      />
+
+      {/* Logo (muda de vermelho → branco conforme loader passa) */}
+      <h1
+        ref={logoRef}
+        className="preloader__logo"
+        style={{
+          '--loader-progress': `${loadProgress}%`
+        }}
+        data-text={BRAND_TEXT}
+        data-splitting
+      >
+        {BRAND_TEXT}
+      </h1>
+
+      {/* Cortinas (sempre presentes, apenas x=0 inicial) */}
       <div 
         ref={curtainLeftRef} 
         className="preloader__curtain preloader__curtain--left"
-      >
-        {/* Logo centralizado na cortina esquerda */}
-        <h1 ref={logoRef} className="preloader__logo" data-splitting>
-          {BRAND_TEXT}
-        </h1>
-      </div>
-
-      {/* CORTINA DIREITA (vazia, só vermelho) */}
+      />
       <div 
         ref={curtainRightRef} 
         className="preloader__curtain preloader__curtain--right"
