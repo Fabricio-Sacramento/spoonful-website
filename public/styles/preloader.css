@@ -1,5 +1,4 @@
 /* src/styles/preloader.css */
-/* Camadas e ordem de z-index garantidas para não cobrir o logo antes da hora */
 
 .preloader {
   position: fixed;
@@ -36,7 +35,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;        /* acima da barra durante o loading */
+  z-index: 10;      /* acima da barra durante loading */
   pointer-events: none;
 }
 
@@ -48,7 +47,7 @@
   letter-spacing: 0.1rem;
   line-height: 1;
   font-size: clamp(48px, 12vw, 144px);
-  color: var(--primary-red); /* sobre neutral */
+  color: var(--primary-red);    /* vermelho sobre neutral */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -61,15 +60,17 @@
   width: 50%;
   height: 100%;
   background: var(--primary-red);
-  z-index: 20;         /* acima de tudo quando visíveis */
+  z-index: 20;       /* acima de tudo quando visíveis */
   will-change: transform;
-  visibility: hidden;  /* ficam escondidas até o split */
+  visibility: hidden;
 }
-
 .preloader__curtain--left  { left: 0;  transform: translateX(0); }
 .preloader__curtain--right { right: 0; transform: translateX(0); }
 
-/* A11y */
+/* Evita flash do conteúdo antes do preloader */
+html.preloading body { visibility: hidden; }
+html.preloading .preloader { visibility: visible; }
+
 @media (prefers-reduced-motion: reduce) {
   .preloader__loader-bar,
   .preloader__curtain {
@@ -77,7 +78,3 @@
     animation: none !important;
   }
 }
-
-/* Opcional: evita flash do conteúdo antes do preloader */
-html.preloading body { visibility: hidden; }
-html.preloading .preloader { visibility: visible; }
