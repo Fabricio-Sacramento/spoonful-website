@@ -1,6 +1,7 @@
 // src/components/Preloader.jsx
 // Preloader: neutral dark + SPOONFUL (red) central + loader-bar com wipe “seco” red→light
-// Saída: OUT nas duas camadas do logo → split (apaga neutral e barra) → revela site → hero:animate-entry
+// Saída: OUT nas duas camadas do logo → split (apaga neutral e barra) → revela site
+//        + hero:animate-entry DISPARADO NO INÍCIO DO SPLIT (cena já visível por trás)
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
@@ -29,6 +30,8 @@ const Preloader = ({ onComplete }) => {
   // 1) Setup inicial (sem FOUC e z-order)
   // ---------------------------------------
   useEffect(() => {
+    // Mantemos a classe 'preloading' apenas para sinalizar o estado;
+    // não vamos mais esconder o body inteiro.
     document.documentElement.classList.add('preloading');
 
     // Logo base (red) preparado para OUT
@@ -169,7 +172,7 @@ const Preloader = ({ onComplete }) => {
         ease: 'power2.out',
         onComplete: () => {
           el.style.display = 'none';
-          document.documentElement.classList.remove('preloading');
+          // NÃO removemos aqui a classe; deixamos o AppRoot cuidar disso se necessário
           window.dispatchEvent(new CustomEvent('hero:animate-entry'));
           onComplete();
         },
@@ -179,10 +182,8 @@ const Preloader = ({ onComplete }) => {
 
     const tl = gsap.timeline({
       onComplete: () => {
+        // Após split, removemos o overlay
         el.style.display = 'none';
-        document.documentElement.classList.remove('preloading');
-        // Ensina o Hero a entrar só depois do split
-        setTimeout(() => window.dispatchEvent(new CustomEvent('hero:animate-entry')), 80);
         onComplete();
       },
     });
@@ -203,6 +204,11 @@ const Preloader = ({ onComplete }) => {
 
       // --- SPLIT: tudo sincronizado no mesmo frame ---
       .addLabel('split', 'start+=0.7')
+
+      // 0) DISPARA O HERO *NO INÍCIO DO SPLIT* (adianta a cena por trás)
+      .call(() => {
+        window.dispatchEvent(new CustomEvent('hero:animate-entry'));
+      }, null, 'split')
 
       // 1) Cortinas ficam visíveis (cobrindo 100%)
       .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'split')
@@ -227,7 +233,7 @@ const Preloader = ({ onComplete }) => {
   }, [fakeProgress, canvasReady, fontsReady, animateExit]);
 
   // --------------
-  // 7) Render
+// 7) Render
   // --------------
   return (
     <div
