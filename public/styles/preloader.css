@@ -1,128 +1,100 @@
-/* public/styles/preloader.css */
+/* preloader.css */
 /* ================================= */
-/* PRELOADER - SPLIT CURTAIN DESIGN  */
+/* PRELOADER - ESTRUTURA BASE       */
 /* ================================= */
 
 .preloader {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  display: flex;
-  flex-direction: row;
+  background: var(--neutral-gray); /* tela inicial neutra */
+  display: flex; /* mantém cortinas lado a lado */
   overflow: hidden;
-  pointer-events: auto;
-  
-  /* Performance */
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 /* ================================= */
-/* CURTAINS (50% cada)               */
+/* OVERLAY CENTRAL (texto)           */
 /* ================================= */
 
-.preloader__curtain {
-  position: relative;
-  width: 50%;
-  height: 100vh;
-  background-color: var(--primary-red);
-  
-  /* Performance */
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  transform: translateZ(0);
-}
-
-/* Cortina esquerda: contém logo */
-.preloader__curtain--left {
+.preloader__center {
+  position: absolute;
+  inset: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-/* Cortina direita: sem conteúdo adicional */
-.preloader__curtain--right {
-  background-color: var(--primary-red); /* ← ADICIONADO para não ficar vazio */
+  justify-content: center;
+  z-index: 10;          /* prioridade máxima (container) */
+  pointer-events: none; /* não captura clique */
 }
 
 /* ================================= */
-/* LOGO (só na cortina esquerda)     */
+/* LOGO (SPOONFUL)                  */
 /* ================================= */
 
 .preloader__logo {
-  color: var(--neutral-light);
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 8rem;
-  font-weight: 900;
-  letter-spacing: 0.1rem;
-  text-transform: uppercase;
   margin: 0;
-  
-  /* 3D Transform (IGUAL HERO) */
+  z-index: 11;          /* ainda mais alto que o container */
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  line-height: 1;
+  font-size: clamp(48px, 12vw, 144px);
+  color: var(--neutral-light); /* branco - visível sobre qualquer fundo */
+
+  /* Animação 3D igual ao Hero */
   transform-style: preserve-3d;
   perspective: 1000px;
-  
-  /* Anti-aliasing */
+  will-change: transform, opacity;
+
+  /* Suavização tipográfica */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-/* Chars do Splitting (IGUAL HERO) */
+/* ================================= */
+/* LAYER 4: LOADER BAR (vermelho)    */
+/* ================================= */
+
+.preloader__loader-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0%; /* animado até 100% via GSAP */
+  height: 100vh;
+  background-color: var(--primary-red);
+  z-index: 5; /* abaixo do logo */
+  
+  /* Performance */
+  will-change: transform, width;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* ================================= */
+/* CORTINAS (split)                  */
+/* ================================= */
+
+.preloader__curtain {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background: transparent; /* inicialmente transparente */
+  will-change: transform;
+}
+
+/* ================================= */
+/* CHARS (Splitting.js)              */
+/* ================================= */
+
 .preloader__logo .char {
   display: inline-block;
   transform-style: preserve-3d;
   backface-visibility: visible;
 }
 
-/* ================================= */
-/* RESPONSIVE                        */
-/* ================================= */
-
-/* Laptop: 1024px - 1439px */
-@media (min-width: 1024px) and (max-width: 1439px) {
-  .preloader__logo {
-    font-size: 7rem;
-  }
-}
-
-/* Tablet Landscape: 768px - 1023px */
-@media (max-width: 1023px) and (min-width: 768px) {
-  .preloader__logo {
-    font-size: 6rem;
-  }
-}
-
-/* Tablet Portrait: 600px - 767px */
-@media (max-width: 767px) {
-  .preloader__logo {
-    font-size: 4.5rem;
-  }
-}
-
-/* Mobile Large: 480px - 599px */
-@media (max-width: 599px) {
-  .preloader__logo {
-    font-size: 3.5rem;
-  }
-}
-
-/* Mobile Padrão: 360px - 479px */
-@media (max-width: 479px) {
-  .preloader__logo {
-    font-size: 2.8rem;
-  }
-}
-
-/* Mobile Small: 375px e abaixo */
-@media (max-width: 375px) {
-  .preloader__logo {
-    font-size: 2.4rem;
-  }
-}
+/* Media queries removidas - usando clamp() para responsividade */
 
 /* ================================= */
 /* ACCESSIBILITY                     */
@@ -130,7 +102,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .preloader__logo .char,
-  .preloader__curtain {
+  .preloader__curtain,
+  .preloader__loader-bar {
     transition: none !important;
     animation: none !important;
   }

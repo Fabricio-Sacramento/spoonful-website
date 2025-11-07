@@ -1,11 +1,8 @@
 // src/components/Preloader.jsx
+// REFATORADO: Loader bar + mask reveal + exit sequence
 import { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { gsap } from 'gsap';
-import Splitting from 'splitting';
-import 'splitting/dist/splitting.css';
-
-const BRAND_TEXT = 'SPOONFUL';
 
 const Preloader = ({ onComplete }) => {
   const [fakeProgress, setFakeProgress] = useState(0);
@@ -14,56 +11,43 @@ const Preloader = ({ onComplete }) => {
 
   const preloaderRef = useRef(null);
   const logoRef = useRef(null);
+  const loaderBarRef = useRef(null);
   const curtainLeftRef = useRef(null);
   const curtainRightRef = useRef(null);
-  const charsRef = useRef([]);
 
   const prefersReduced =
     typeof window !== 'undefined' &&
     window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
   // ==========================================
-  // 1) SPLITTING SETUP
+  // 1) INITIAL SETUP
   // ==========================================
   useEffect(() => {
-    const currentLogo = logoRef.current;
-    if (!currentLogo) return;
+    const logo = logoRef.current;
+    if (!logo) return;
 
-    const results = Splitting({
-      target: currentLogo,
-      by: 'chars',
+    // Setup do logo 3D
+    gsap.set(logo, {
+      perspective: 1000,
+      transformStyle: 'preserve-3d',
+      transformOrigin: '50% 100%',
+      backfaceVisibility: 'visible',
+      opacity: 1,
+      rotationX: 0,
+      z: 0,
     });
 
-    if (results[0]) {
-      charsRef.current = results[0].chars;
-
-      charsRef.current.forEach((char) => {
-        gsap.set(char.parentNode, {
-          perspective: 1000,
-          transformStyle: 'preserve-3d',
-        });
-        gsap.set(char, {
-          transformStyle: 'preserve-3d',
-          backfaceVisibility: 'visible', // ← IGUAL HERO!
-          opacity: 1,
-          rotationX: 0,
-          z: 0,
-        });
-      });
-    }
-
-    gsap.set([curtainLeftRef.current, curtainRightRef.current], { x: 0 });
+    // Estado inicial das curtains (escondidas)
+    gsap.set(curtainLeftRef.current, { x: 0 });
+    gsap.set(curtainRightRef.current, { x: 0 });
 
     return () => {
-      if (currentLogo) {
-        currentLogo.innerHTML = BRAND_TEXT;
-      }
-      charsRef.current = [];
+      if (logo) logo.innerHTML = 'SPOONFUL';
     };
   }, []);
 
   // ==========================================
-  // 2) FAKE PROGRESS
+  // 2) FAKE PROGRESS (sincronizado com loader)
   // ==========================================
   useEffect(() => {
     const obj = { v: 0 };
@@ -72,7 +56,7 @@ const Preloader = ({ onComplete }) => {
 
     const tween = gsap.to(obj, {
       v: 100,
-      duration: 1.5,
+      duration: 2, // 2s de loading
       ease: 'power2.inOut',
       onUpdate: () => {
         cancelAnimationFrame(raf);
@@ -155,7 +139,7 @@ const Preloader = ({ onComplete }) => {
     const tryLoadCritical = async () => {
       try {
         if (document.fonts?.load) {
-          await document.fonts.load('900 1rem "Neue Haas Grotesk Display Pro"');
+          await document.fonts.load('900 8rem "Neue Haas Grotesk Display Pro"');
         } else if (document.fonts?.ready) {
           await document.fonts.ready;
         }
@@ -177,14 +161,44 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // ==========================================
-  // 5) ANIMATE EXIT (IGUAL HERO!)
+  // 5) LOADING BAR ANIMATION (sync com progress)
+  // ==========================================
+  useEffect(() => {
+  if (!loaderBarRef.current || !logoRef.current) return;
+
+    // Loader bar cresce da esquerda → direita
+    gsap.to(loaderBarRef.current, {
+      width: `${fakeProgress}%`,
+      duration: 0.1,
+      ease: 'none'
+    });
+
+    // Clip-path do light revela conforme loader passa
+    gsap.to(logoRef.current, {
+      clipPath: `inset(0 ${100 - fakeProgress}% 0 0)`,
+      duration: 0.1,
+      ease: 'none'
+    });
+
+  }, [fakeProgress]);
+
+  // ==========================================
+  // 6) ANIMATE EXIT
   // ==========================================
   const animateExit = useCallback(() => {
     if (prefersReduced) {
-      if (preloaderRef.current) {
-        preloaderRef.current.style.display = 'none';
-      }
-      onComplete();
+      // Reduced motion: fade simples
+      gsap.to(preloaderRef.current, {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.out',
+        onComplete: () => {
+          if (preloaderRef.current) {
+            preloaderRef.current.style.display = 'none';
+          }
+          onComplete();
+        }
+      });
       return;
     }
 
@@ -196,51 +210,62 @@ const Preloader = ({ onComplete }) => {
           preloaderRef.current.style.display = 'none';
         }
         
+        // Trigger Hero animation
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('hero:animate-entry'));
+        }, 100);
+        
         onComplete();
       },
     });
 
     tl.addLabel('start')
-      // FASE 1: Chars saem (ROTAÇÃO IGUAL HERO)
+      
+      // FASE 1: Pausa dramática (300ms)
+      .to({}, { duration: 0.3 })
+      
+      // FASE 2: Logo sai (600ms)
       .to(
-        charsRef.current,
+        logoRef.current,
         {
           opacity: 0,
-          rotationX: 90,       // ← IGUAL HERO
-          z: 200,              // ← IGUAL HERO (positivo)
+          rotationX: 90,
+          z: -200, // ✅ NEGATIVO (para trás)
           transformOrigin: '50% 100%',
           ease: 'power2.inOut',
-          stagger: { 
-            each: 0.015,       // ← IGUAL HERO
-            from: 'start' 
-          },
-          duration: 0.4,       // ← IGUAL HERO
+          duration: 0.6,
         },
-        'start'
+        'start+=0.3' // após pausa
       )
-      // FASE 2: Cortinas se separam
+      
+      // FASE 3: Curtains split (1.2s)
+      // Começa quando chars já saíram 70%
       .to(
         curtainLeftRef.current,
         {
           x: '-100%',
-          duration: 0.8,
-          ease: 'power3.inOut',
+          duration: 1.2,
+          ease: 'power3.out', // mais suave
         },
-        'start+=0.3'          // ← Overlap com chars
+        'start+=0.95' // 300ms pausa + 650ms chars
       )
       .to(
         curtainRightRef.current,
         {
           x: '100%',
-          duration: 0.8,
-          ease: 'power3.inOut',
+          duration: 1.2,
+          ease: 'power3.out',
         },
-        'start+=0.3'          // ← Mesmo timing
+        'start+=0.95' // mesmo timing
       );
+
+    // TOTAL: 300 (pausa) + 650 (chars maioria) + 1200 (curtains) ≈ 2.15s
+    // Overlap de ~450ms entre chars finais e curtains para fluidez
+
   }, [onComplete, prefersReduced]);
 
   // ==========================================
-  // 6) EXIT TRIGGER
+  // 7) EXIT TRIGGER
   // ==========================================
   useEffect(() => {
     const allReady = fakeProgress >= 100 && canvasReady && fontsReady;
@@ -251,7 +276,7 @@ const Preloader = ({ onComplete }) => {
   }, [fakeProgress, canvasReady, fontsReady, animateExit]);
 
   // ==========================================
-  // 7) RENDER (LAYOUT CORRETO)
+  // 8) RENDER
   // ==========================================
   return (
     <div
@@ -263,22 +288,18 @@ const Preloader = ({ onComplete }) => {
       aria-valuemax={100}
       aria-valuenow={fakeProgress}
     >
-      {/* CORTINA ESQUERDA (com logo) */}
-      <div 
-        ref={curtainLeftRef} 
-        className="preloader__curtain preloader__curtain--left"
-      >
-        {/* Logo centralizado na cortina esquerda */}
-        <h1 ref={logoRef} className="preloader__logo" data-splitting>
-          {BRAND_TEXT}
-        </h1>
+      {/* LAYER 1: Background cinza */}
+      <div className="preloader__background" />
+
+      <div className="preloader__center">
+        <h1 ref={logoRef} className="preloader__logo">SPOONFUL</h1>
       </div>
 
-      {/* CORTINA DIREITA (vazia, só vermelho) */}
-      <div 
-        ref={curtainRightRef} 
-        className="preloader__curtain preloader__curtain--right"
-      />
+      {/* LAYER 4: Loader bar */}
+      <div ref={loaderBarRef} className="preloader__loader-bar" />
+
+      <div ref={curtainLeftRef} className="preloader__curtain preloader__curtain--left" />
+      <div ref={curtainRightRef} className="preloader__curtain preloader__curtain--right" />
     </div>
   );
 };
