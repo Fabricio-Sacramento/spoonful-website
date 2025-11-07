@@ -69,6 +69,7 @@
   /* começa 100% escondido pela direita */
   clip-path: inset(0 100% 0 0);
   will-change: clip-path, transform, opacity;
+  transition: none !important;
 }
 
 /* Cortinas (usadas só na saída) */
@@ -81,6 +82,7 @@
   z-index: 20;          /* por cima na fase de split */
   will-change: transform, visibility;
   visibility: hidden;   /* só ficam visíveis na saída */
+  outline: 1px solid lime;
 }
 .preloader__curtain--left  { left: 0;  transform: translateX(0%); }
 .preloader__curtain--right { right: 0; transform: translateX(0%); }

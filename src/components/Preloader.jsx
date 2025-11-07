@@ -48,25 +48,39 @@ const Preloader = ({ onComplete }) => {
     };
   }, []);
 
-  // 2) Barra suave (visual)
+  // ORQUESTRAÇÃO DO LOADING (barra + mask do logo) — wipe duro, sem blur
   useEffect(() => {
-    if (!loaderBarRef.current || prefersReduced) return;
-    gsap.fromTo(loaderBarRef.current,
-      { width: '0%' },
-      { width: '100%', duration: 2, ease: 'power2.inOut' }
-    );
+    if (!loaderBarRef.current || !logoLightRef.current) return;
+
+    const setWidth = gsap.quickSetter(loaderBarRef.current, 'width', '%');
+    const setClip  = (v) => {
+      // clip-path acompanha exatamente a barra (wipe da esquerda → direita)
+      logoLightRef.current.style.clipPath = `inset(0 ${100 - v}% 0 0)`;
+    };
+
+    if (prefersReduced) {
+      setWidth(100);
+      setClip(100);
+      setFakeProgress(100);
+      return;
+    }
+
+    const state = { v: 0 };
+    const t = gsap.to(state, {
+      v: 100,
+      duration: 2,
+      ease: 'power2.inOut',
+      onUpdate: () => {
+        const p = Math.round(state.v);
+        setWidth(p);
+        setClip(p);
+        setFakeProgress(p);
+      }
+    });
+
+    return () => t.kill();
   }, [prefersReduced]);
 
-  // 3) Reveal do logo LIGHT (clip-path sincronizado)
-  useEffect(() => {
-    if (prefersReduced || !logoLightRef.current) return;
-
-    // Sincroniza com a barra (mesma duração)
-    gsap.fromTo(logoLightRef.current,
-      { clipPath: 'inset(0 100% 0 0)' },
-      { clipPath: 'inset(0 0% 0 0)', duration: 2, ease: 'power2.inOut' }
-    );
-  }, [prefersReduced]);
 
   // 4) Fake progress lógico (gate)
   useEffect(() => {
@@ -138,32 +152,37 @@ const Preloader = ({ onComplete }) => {
     }
 
     const tl = gsap.timeline({
-      onComplete: () => {
-        el.style.display = 'none';
-        document.documentElement.classList.remove('preloading');
-        setTimeout(() => window.dispatchEvent(new CustomEvent('hero:animate-entry')), 80);
-        onComplete();
-      },
-    });
+  onComplete: () => {
+    el.style.display = 'none';
+    document.documentElement.classList.remove('preloading');
+    setTimeout(() => window.dispatchEvent(new CustomEvent('hero:animate-entry')), 80);
+    onComplete();
+  },
+});
 
-    tl.addLabel('start')
-      .to({}, { duration: 0.25 }, 'start') // pausa
+  tl.addLabel('start')
+    // pequena pausa
+    .to({}, { duration: 0.25 }, 'start')
 
-      // OUT no logo base (vermelho)
-      .to(logoRedRef.current, {
-        opacity: 0,
-        rotationX: 90,
-        z: -200,
-        transformOrigin: '50% 100%',
-        ease: 'power2.in',
-        duration: 0.55,
-      }, 'start+=0.25')
+    // OUT nas DUAS camadas do logo (evita "piscar/voltar")
+    .to([logoRedRef.current, logoLightRef.current], {
+      opacity: 0,
+      rotationX: 90,
+      z: -200,
+      transformOrigin: '50% 100%',
+      ease: 'power2.in',
+      duration: 0.55,
+    }, 'start+=0.25')
 
-      // Liga cortinas e faz split
-      .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'start+=0.7')
-      .to(curtainLeftRef.current,  { x: '-100%', duration: 0.9, ease: 'power3.inOut' }, 'start+=0.75')
-      .to(curtainRightRef.current, { x: '100%',  duration: 0.9, ease: 'power3.inOut' }, 'start+=0.75');
-  }, [onComplete, prefersReduced]);
+    // antes do split: DESLIGA a loader bar para permitir que as cortinas revelem o site
+    .set(loaderBarRef.current, { display: 'none' }, 'start+=0.7')
+
+    // liga cortinas e faz o split (agora visível)
+    .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'start+=0.7')
+    .to(curtainLeftRef.current,  { x: '-100%', duration: 0.9, ease: 'power3.inOut' }, 'start+=0.75')
+    .to(curtainRightRef.current, { x: '100%',  duration: 0.9, ease: 'power3.inOut' }, 'start+=0.75');
+
+    }, [onComplete, prefersReduced]);
 
   // 8) Gate da saída
   useEffect(() => {
