@@ -82,7 +82,6 @@
   z-index: 20;          /* por cima na fase de split */
   will-change: transform, visibility;
   visibility: hidden;   /* só ficam visíveis na saída */
-  outline: 1px solid lime;
 }
 .preloader__curtain--left  { left: 0;  transform: translateX(0%); }
 .preloader__curtain--right { right: 0; transform: translateX(0%); }

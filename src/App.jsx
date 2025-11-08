@@ -6,6 +6,7 @@ import DynamicBackground from './components/DynamicBackground';
 import GlassCube from './components/GlassCube';
 import AppCanvasCleanupRegistrar from './components/AppCanvasCleanupRegistrar';
 import { OrbitControls } from '@react-three/drei';
+import FirstFrameBeacon from './canvas/FirstFrameBeacon';
 
 // ===================================================
 // CanvasReadySignal → Emite evento "canvas:ready"
@@ -46,6 +47,9 @@ const App = () => {
 
       {/* Adiciona o emissor do evento de readiness */}
       <CanvasReadySignal />
+
+      <FirstFrameBeacon />
+      
     </Canvas>
   );
 };

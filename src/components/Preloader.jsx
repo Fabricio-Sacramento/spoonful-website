@@ -165,6 +165,16 @@ const Preloader = ({ onComplete }) => {
     const el = preloaderRef.current;
     if (!el) return;
 
+    // Espera pelo primeiro frame do Hero (com timeout curto de segurança)
+    const waitHeroFirstFrame = () => new Promise((resolve) => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      const to = setTimeout(finish, 350); // fallback para não travar
+
+      const on = () => { clearTimeout(to); finish(); };
+      window.addEventListener('hero:first-frame', on, { once: true });
+    });
+
     if (prefersReduced) {
       gsap.to(el, {
         opacity: 0,
@@ -172,7 +182,7 @@ const Preloader = ({ onComplete }) => {
         ease: 'power2.out',
         onComplete: () => {
           el.style.display = 'none';
-          // NÃO removemos aqui a classe; deixamos o AppRoot cuidar disso se necessário
+          document.documentElement.classList.remove('preloading');
           window.dispatchEvent(new CustomEvent('hero:animate-entry'));
           onComplete();
         },
@@ -182,17 +192,17 @@ const Preloader = ({ onComplete }) => {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Após split, removemos o overlay
         el.style.display = 'none';
+        document.documentElement.classList.remove('preloading'); // libera o site
         onComplete();
       },
     });
 
     tl.addLabel('start')
-      // Pausa elegante
+      // pausa elegante
       .to({}, { duration: 0.25 }, 'start')
 
-      // OUT nas DUAS camadas (evita “piscar”)
+      // OUT nas duas camadas do logo (sem piscar)
       .to([logoRedRef.current, logoLightRef.current], {
         opacity: 0,
         rotationX: 90,
@@ -202,24 +212,24 @@ const Preloader = ({ onComplete }) => {
         duration: 0.55,
       }, 'start+=0.25')
 
-      // --- SPLIT: tudo sincronizado no mesmo frame ---
-      .addLabel('split', 'start+=0.7')
-
-      // 0) DISPARA O HERO *NO INÍCIO DO SPLIT* (adianta a cena por trás)
+      // PRIME: adianta o Hero antes do split
+      .addLabel('prime', 'start+=0.60')
       .call(() => {
         window.dispatchEvent(new CustomEvent('hero:animate-entry'));
-      }, null, 'split')
+      }, null, 'prime')
 
-      // 1) Cortinas ficam visíveis (cobrindo 100%)
+      // ✅ Gate real: só prossegue quando o Hero tiver pintado o 1º frame
+      .call(async () => { await waitHeroFirstFrame(); })
+
+      // SPLIT: agora é seguro abrir as cortinas e remover o fundo
+      .addLabel('split')
+      // 1) Cortinas visíveis e cobrindo 100%
       .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'split')
-
-      // 2) Desliga a loader bar (senão ela pinta o fundo por trás do split)
+      // 2) Desliga a loader bar (não precisamos mais dela)
       .set(loaderBarRef.current, { display: 'none' }, 'split')
-
-      // 3) Apaga o fundo neutral (para o “vão” entre as cortinas revelar o HERO)
+      // 3) Apaga o fundo neutral do preloader (o vão já mostra o Hero pintado)
       .set(backgroundRef.current, { autoAlpha: 0 }, 'split')
-
-      // 4) Move as cortinas para fora (revealing)
+      // 4) Abre cortinas
       .to(curtainLeftRef.current,  { x: '-100%', duration: 0.9, ease: 'power3.inOut' }, 'split+=0.05')
       .to(curtainRightRef.current, { x: '100%',  duration: 0.9, ease: 'power3.inOut' }, 'split+=0.05');
   }, [onComplete, prefersReduced]);
