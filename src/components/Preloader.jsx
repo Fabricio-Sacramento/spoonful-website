@@ -165,16 +165,6 @@ const Preloader = ({ onComplete }) => {
     const el = preloaderRef.current;
     if (!el) return;
 
-    // Espera pelo primeiro frame do Hero (com timeout curto de segurança)
-    const waitHeroFirstFrame = () => new Promise((resolve) => {
-      let done = false;
-      const finish = () => { if (!done) { done = true; resolve(); } };
-      const to = setTimeout(finish, 350); // fallback para não travar
-
-      const on = () => { clearTimeout(to); finish(); };
-      window.addEventListener('hero:first-frame', on, { once: true });
-    });
-
     if (prefersReduced) {
       gsap.to(el, {
         opacity: 0,
@@ -190,6 +180,17 @@ const Preloader = ({ onComplete }) => {
       return;
     }
 
+    // instala o listener ANTES, dispara o Hero e espera o 1º frame (ou 600 ms)
+    const waitAfterDispatch = () =>
+      new Promise((resolve) => {
+        let done = false;
+        const finish = () => { if (!done) { done = true; resolve(); } };
+        const to = setTimeout(finish, 100); // segurança
+        const on = () => { clearTimeout(to); finish(); };
+        window.addEventListener('hero:first-frame', on, { once: true });
+        window.dispatchEvent(new CustomEvent('hero:animate-entry'));
+      });
+
     const tl = gsap.timeline({
       onComplete: () => {
         el.style.display = 'none';
@@ -199,8 +200,8 @@ const Preloader = ({ onComplete }) => {
     });
 
     tl.addLabel('start')
-      // pausa elegante
-      .to({}, { duration: 0.25 }, 'start')
+      // pausa elegante (respiro visual)
+      .to({}, { duration: 0 }, 'start')
 
       // OUT nas duas camadas do logo (sem piscar)
       .to([logoRedRef.current, logoLightRef.current], {
@@ -210,29 +211,20 @@ const Preloader = ({ onComplete }) => {
         transformOrigin: '50% 100%',
         ease: 'power2.in',
         duration: 0.55,
-      }, 'start+=0.25')
+      }, 'start')
 
-      // PRIME: adianta o Hero antes do split
-      .addLabel('prime', 'start+=0.60')
-      .call(() => {
-        window.dispatchEvent(new CustomEvent('hero:animate-entry'));
-      }, null, 'prime')
+      // listener → dispatch hero → espera 1º frame
+      .call(async () => { await waitAfterDispatch(); })
 
-      // ✅ Gate real: só prossegue quando o Hero tiver pintado o 1º frame
-      .call(async () => { await waitHeroFirstFrame(); })
-
-      // SPLIT: agora é seguro abrir as cortinas e remover o fundo
+      // SPLIT: agora é seguro
       .addLabel('split')
-      // 1) Cortinas visíveis e cobrindo 100%
       .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'split')
-      // 2) Desliga a loader bar (não precisamos mais dela)
       .set(loaderBarRef.current, { display: 'none' }, 'split')
-      // 3) Apaga o fundo neutral do preloader (o vão já mostra o Hero pintado)
       .set(backgroundRef.current, { autoAlpha: 0 }, 'split')
-      // 4) Abre cortinas
       .to(curtainLeftRef.current,  { x: '-100%', duration: 0.9, ease: 'power3.inOut' }, 'split+=0.05')
       .to(curtainRightRef.current, { x: '100%',  duration: 0.9, ease: 'power3.inOut' }, 'split+=0.05');
   }, [onComplete, prefersReduced]);
+
 
   // ------------------------
   // 6) Gate para disparar saída
