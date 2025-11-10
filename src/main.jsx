@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 // Components
-import AppRoot from './AppRoot.jsx'; // ← MUDOU AQUI
 import CanvasApp from './components/CanvasApp.jsx';
 import WorkSection from './components/WorkSection.jsx';
 import CustomCursor from './components/CustomCursor.jsx';
@@ -15,16 +14,6 @@ import NavWithDrawer from './components/NavWithDrawer.jsx';
 import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
-
-// ================================
-// RENDER APP ROOT (Preloader)
-// ================================
-const rootElement = document.createElement('div');
-rootElement.id = 'app-root';
-document.body.appendChild(rootElement);
-
-const appRoot = ReactDOM.createRoot(rootElement);
-appRoot.render(<AppRoot />); // ← MUDOU AQUI
 
 // ================================
 // MONTA COMPONENTES EXISTENTES
