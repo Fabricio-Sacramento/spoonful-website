@@ -199,10 +199,7 @@ const Preloader = ({ onComplete }) => {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        el.style.display = 'none';
-        document.documentElement.classList.remove('preloading');
-        onComplete();
-        console.log('✅ Preloader complete');
+        console.log('✅ Preloader timeline complete');
       },
     });
 
@@ -252,7 +249,15 @@ const Preloader = ({ onComplete }) => {
         x: '100%', 
         duration: 0.9, 
         ease: 'power3.inOut' 
-      }, 'reveal');
+      }, 'reveal')
+
+      // ✅ CLEANUP: Remove preloader DEPOIS das cortinas abrirem
+      .call(() => {
+        el.style.display = 'none';
+        document.documentElement.classList.remove('preloading');
+        onComplete();
+        console.log('✅ Preloader complete');
+      });
 
   }, [onComplete, prefersReduced]);
 
