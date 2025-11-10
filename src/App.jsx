@@ -6,19 +6,19 @@ import DynamicBackground from './components/DynamicBackground';
 import GlassCube from './components/GlassCube';
 import AppCanvasCleanupRegistrar from './components/AppCanvasCleanupRegistrar';
 import { OrbitControls } from '@react-three/drei';
-import FirstFrameBeacon from './canvas/FirstFrameBeacon';
 
 // ===================================================
 // CanvasReadySignal → Emite evento "canvas:ready"
+// Simplificado - apenas notifica que renderizou 1 frame
 // ===================================================
 function CanvasReadySignal() {
   const { gl } = useThree();
 
   useEffect(() => {
-    // garante que o frame inicial foi renderizado
+    // Garante que o frame inicial foi renderizado
     requestAnimationFrame(() => {
       window.dispatchEvent(new Event('canvas:ready'));
-      console.log('📡 Evento "canvas:ready" emitido');
+      console.log('📡 Canvas ready event emitted');
     });
   }, [gl]);
 
@@ -27,7 +27,11 @@ function CanvasReadySignal() {
 
 const App = () => {
   return (
-    <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 50 }} shadows>
+    <Canvas 
+      frameloop="demand" 
+      camera={{ position: [0, 0, 5], fov: 50 }} 
+      shadows
+    >
       <AppCanvasCleanupRegistrar />
 
       <ambientLight intensity={1} />
@@ -45,11 +49,7 @@ const App = () => {
         dampingFactor={0.05}
       />
 
-      {/* Adiciona o emissor do evento de readiness */}
       <CanvasReadySignal />
-
-      <FirstFrameBeacon />
-      
     </Canvas>
   );
 };

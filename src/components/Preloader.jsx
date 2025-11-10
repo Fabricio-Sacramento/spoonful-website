@@ -1,7 +1,5 @@
 // src/components/Preloader.jsx
-// Preloader: neutral dark + SPOONFUL (red) central + loader-bar com wipe “seco” red→light
-// Saída: OUT nas duas camadas do logo → split (apaga neutral e barra) → revela site
-//        + hero:animate-entry DISPARADO NO INÍCIO DO SPLIT (cena já visível por trás)
+// Versão simplificada - sem race conditions, timing direto GSAP
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
@@ -27,14 +25,11 @@ const Preloader = ({ onComplete }) => {
     window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
 
   // ---------------------------------------
-  // 1) Setup inicial (sem FOUC e z-order)
+  // 1) Setup inicial
   // ---------------------------------------
   useEffect(() => {
-    // Mantemos a classe 'preloading' apenas para sinalizar o estado;
-    // não vamos mais esconder o body inteiro.
     document.documentElement.classList.add('preloading');
 
-    // Logo base (red) preparado para OUT
     if (logoRedRef.current) {
       gsap.set(logoRedRef.current, {
         perspective: 1000,
@@ -47,7 +42,6 @@ const Preloader = ({ onComplete }) => {
       });
     }
 
-    // Cortinas invisíveis até o split
     gsap.set([curtainLeftRef.current, curtainRightRef.current], {
       visibility: 'hidden',
       x: 0,
@@ -59,15 +53,13 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // -----------------------------------------------------------------
-  // 2) Orquestração do loading (wipe “seco” = sem blur / sem tween CSS)
-  //    - Atualiza width da barra e clip-path do logo light no mesmo tick
+  // 2) Loading animation - wipe simultâneo (barra + clip-path)
   // -----------------------------------------------------------------
   useEffect(() => {
     if (!loaderBarRef.current || !logoLightRef.current) return;
 
     const setWidth = gsap.quickSetter(loaderBarRef.current, 'width', '%');
     const setClip  = (v) => {
-      // Revela da esquerda → direita: 100→0% da margem direita
       logoLightRef.current.style.clipPath = `inset(0 ${100 - v}% 0 0)`;
     };
 
@@ -95,41 +87,42 @@ const Preloader = ({ onComplete }) => {
   }, [prefersReduced]);
 
   // ----------------------
-  // 3) Canvas readiness
+  // 3) Canvas readiness - ESTRATÉGIA ÚNICA (polling + timeout)
   // ----------------------
   useEffect(() => {
-    const markReady = () => setCanvasReady(true);
-    const ok = () => {
+    const check = () => {
       const c = document.querySelector('#root canvas');
-      return c && c.width > 0;
+      return c?.width > 0;
     };
 
-    const onEvt = () => markReady();
-    window.addEventListener('canvas:ready', onEvt, { once: true });
-
-    if (ok()) markReady();
-    else {
-      const iv = setInterval(() => {
-        if (ok()) {
-          clearInterval(iv);
-          clearTimeout(to);
-          markReady();
-        }
-      }, 100);
-      const to = setTimeout(() => {
-        console.warn('⚠️ Canvas timeout – forçando ready');
-        clearInterval(iv);
-        markReady();
-      }, 3000);
-
-      return () => {
-        clearInterval(iv);
-        clearTimeout(to);
-        window.removeEventListener('canvas:ready', onEvt);
-      };
+    // Early return se já estiver pronto
+    if (check()) {
+      setCanvasReady(true);
+      console.log('✅ Canvas ready (immediate)');
+      return;
     }
 
-    return () => window.removeEventListener('canvas:ready', onEvt);
+    // Polling a cada 100ms
+    const iv = setInterval(() => {
+      if (check()) {
+        clearInterval(iv);
+        clearTimeout(to);
+        setCanvasReady(true);
+        console.log('✅ Canvas ready (polled)');
+      }
+    }, 100);
+
+    // Fallback timeout 3s
+    const to = setTimeout(() => {
+      clearInterval(iv);
+      setCanvasReady(true);
+      console.warn('⚠️ Canvas forced by timeout');
+    }, 3000);
+
+    return () => {
+      clearInterval(iv);
+      clearTimeout(to);
+    };
   }, []);
 
   // -------------------
@@ -137,7 +130,13 @@ const Preloader = ({ onComplete }) => {
   // -------------------
   useEffect(() => {
     let resolved = false;
-    const done = () => { if (!resolved) { resolved = true; setFontsReady(true); } };
+    const done = () => { 
+      if (!resolved) { 
+        resolved = true; 
+        setFontsReady(true);
+        console.log('✅ Fonts ready');
+      } 
+    };
 
     (async () => {
       try {
@@ -151,7 +150,7 @@ const Preloader = ({ onComplete }) => {
     })();
 
     const to = setTimeout(() => {
-      console.warn('⚠️ Fonts forçadas por timeout');
+      console.warn('⚠️ Fonts forced by timeout');
       done();
     }, 2000);
 
@@ -159,11 +158,13 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // -----------------------
-  // 5) Saída coreografada
+  // 5) Exit - Timing direto GSAP + sincronização real com Hero
   // -----------------------
   const animateExit = useCallback(() => {
     const el = preloaderRef.current;
     if (!el) return;
+
+    console.log('🎬 Starting preloader exit');
 
     if (prefersReduced) {
       gsap.to(el, {
@@ -175,35 +176,48 @@ const Preloader = ({ onComplete }) => {
           document.documentElement.classList.remove('preloading');
           window.dispatchEvent(new CustomEvent('hero:animate-entry'));
           onComplete();
+          console.log('✅ Preloader complete (reduced motion)');
         },
       });
       return;
     }
 
-    // instala o listener ANTES, dispara o Hero e espera o 1º frame (ou 600 ms)
-    const waitAfterDispatch = () =>
-      new Promise((resolve) => {
-        let done = false;
-        const finish = () => { if (!done) { done = true; resolve(); } };
-        const to = setTimeout(finish, 100); // segurança
-        const on = () => { clearTimeout(to); finish(); };
-        window.addEventListener('hero:first-frame', on, { once: true });
-        window.dispatchEvent(new CustomEvent('hero:animate-entry'));
-      });
+    // Promise que resolve quando Hero completar animação
+    const waitForHeroComplete = () => new Promise((resolve) => {
+      const onHeroComplete = () => {
+        console.log('✅ Hero animation completed - ready for curtains');
+        resolve();
+      };
+      window.addEventListener('hero:animation-complete', onHeroComplete, { once: true });
+      
+      // Fallback: se não receber evento em 3s, continua mesmo assim
+      setTimeout(() => {
+        console.warn('⚠️ Hero animation timeout - forcing curtains');
+        resolve();
+      }, 3000);
+    });
 
     const tl = gsap.timeline({
       onComplete: () => {
         el.style.display = 'none';
-        document.documentElement.classList.remove('preloading'); // libera o site
+        document.documentElement.classList.remove('preloading');
         onComplete();
+        console.log('✅ Preloader complete');
       },
     });
 
     tl.addLabel('start')
-      // pausa elegante (respiro visual)
-      .to({}, { duration: 0 }, 'start')
+      // Pausa elegante
+      .to({}, { duration: 0.25 }, 'start')
 
-      // OUT nas duas camadas do logo (sem piscar)
+      // ✅ PRIME: Dispara Hero IMEDIATAMENTE após pausa
+      .addLabel('prime', 'start+=0.25')
+      .call(() => {
+        window.dispatchEvent(new CustomEvent('hero:animate-entry'));
+        console.log('📡 Hero entry triggered');
+      }, null, 'prime')
+
+      // OUT logo acontece AO MESMO TEMPO que Hero anima
       .to([logoRedRef.current, logoLightRef.current], {
         opacity: 0,
         rotationX: 90,
@@ -211,31 +225,51 @@ const Preloader = ({ onComplete }) => {
         transformOrigin: '50% 100%',
         ease: 'power2.in',
         duration: 0.55,
-      }, 'start')
+      }, 'prime')
 
-      // listener → dispatch hero → espera 1º frame
-      .call(async () => { await waitAfterDispatch(); })
+      // ✅ WAIT: Aguarda Hero completar (Promise resolve)
+      .call(async () => {
+        await waitForHeroComplete();
+      })
 
-      // SPLIT: agora é seguro
-      .addLabel('split')
-      .set([curtainLeftRef.current, curtainRightRef.current], { visibility: 'visible' }, 'split')
-      .set(loaderBarRef.current, { display: 'none' }, 'split')
-      .set(backgroundRef.current, { autoAlpha: 0 }, 'split')
-      .to(curtainLeftRef.current,  { x: '-100%', duration: 0.9, ease: 'power3.inOut' }, 'split+=0.05')
-      .to(curtainRightRef.current, { x: '100%',  duration: 0.9, ease: 'power3.inOut' }, 'split+=0.05');
+      // ✅ REVEAL: Split das cortinas (Hero garantidamente completo)
+      .addLabel('reveal')
+      
+      // Prepara cortinas
+      .set([curtainLeftRef.current, curtainRightRef.current], { 
+        visibility: 'visible' 
+      }, 'reveal')
+      .set(loaderBarRef.current, { display: 'none' }, 'reveal')
+      .set(backgroundRef.current, { autoAlpha: 0 }, 'reveal')
+
+      // Abre cortinas (Hero já está pintado atrás)
+      .to(curtainLeftRef.current, { 
+        x: '-100%', 
+        duration: 0.9, 
+        ease: 'power3.inOut' 
+      }, 'reveal')
+      .to(curtainRightRef.current, { 
+        x: '100%', 
+        duration: 0.9, 
+        ease: 'power3.inOut' 
+      }, 'reveal');
+
   }, [onComplete, prefersReduced]);
-
 
   // ------------------------
   // 6) Gate para disparar saída
   // ------------------------
   useEffect(() => {
     const allReady = fakeProgress >= 100 && canvasReady && fontsReady;
-    if (allReady) animateExit();
+    
+    if (allReady) {
+      console.log('🎯 All gates passed:', { fakeProgress, canvasReady, fontsReady });
+      animateExit();
+    }
   }, [fakeProgress, canvasReady, fontsReady, animateExit]);
 
   // --------------
-// 7) Render
+  // 7) Render
   // --------------
   return (
     <div

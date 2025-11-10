@@ -54,7 +54,11 @@ function prepareSplitting() {
 // 2) Animação de entrada do Hero (igual a sua)
 function animateHeroEntry() {
   const entryTl = gsap.timeline({
-    onComplete: () => console.log('Hero entry animation complete')
+    onComplete: () => {
+      console.log('Hero entry animation complete');
+      // ✅ ADICIONAR ESTA LINHA:
+      window.dispatchEvent(new CustomEvent('hero:animation-complete'));
+    }
   });
 
   heroCharsByLine.forEach((chars, i) => {
