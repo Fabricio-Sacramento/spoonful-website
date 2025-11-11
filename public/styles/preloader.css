@@ -8,8 +8,10 @@
   z-index: 99999;
   background-color: var(--primary-red);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
   pointer-events: all;
   
   /* Performance */
@@ -23,13 +25,42 @@
   animation: swipeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-/* Barra de progresso */
+/* Texto LOADING */
+.preloader__label {
+  color: var(--neutral-light);
+  text-align: right;
+  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
+  font-size: 3rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 3rem;
+  letter-spacing: -0.1175rem;
+  margin: 0;
+  
+  /* Performance */
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container da barra (250px fixo) */
+.preloader__bar-container {
+  width: 250px;
+  height: 2px;
+  background-color: rgba(235, 235, 235, 0.2); /* Fundo sutil */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Barra de progresso - cresce da esquerda para direita */
 .preloader__bar {
-  width: 0;
-  height: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0; /* Inicia em 0 */
+  height: 2px;
   background-color: var(--neutral-light);
   transition: width 0.3s ease-out;
-  border-radius: 5px;
   
   /* Performance */
   will-change: width;
@@ -49,6 +80,73 @@
 /* Hidden final state */
 #preloader.preloader--hidden {
   display: none;
+}
+
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+/* Desktop Padrão: 1440px - 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .preloader__label {
+    font-size: 5.46875rem;
+    line-height: 6.8125rem;
+    letter-spacing: -0.109375rem;
+  }
+}
+
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .preloader__label {
+    font-size: 5.125rem;
+    line-height: 6.375rem;
+    letter-spacing: -0.1025rem;
+  }
+}
+
+/* Tablet Landscape: 768px - 1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .preloader__label {
+    font-size: 4.1125rem;
+    line-height: 5.125rem;
+    letter-spacing: -0.08225rem;
+  }
+}
+
+/* Tablet Portrait: 600px - 767px */
+@media (max-width: 767px) {
+  .preloader__label {
+    font-size: 2.9375rem;
+    line-height: 3.65625rem;
+    letter-spacing: -0.05875rem;
+  }
+}
+
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
+  .preloader__label {
+    font-size: 2.584375rem;
+    line-height: 3.221875rem;
+    letter-spacing: -0.0516875rem;
+  }
+}
+
+/* Mobile Padrão: 360px - 479px */
+@media (max-width: 479px) {
+  .preloader__label {
+    font-size: 2.34375rem;
+    line-height: 2.921875rem;
+    letter-spacing: -0.046875rem;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
+@media (max-width: 375px) {
+  .preloader__label {
+    font-size: 2.05625rem;
+    line-height: 2.565625rem;
+    letter-spacing: -0.041125rem;
+  }
 }
 
 /* ================================= */
