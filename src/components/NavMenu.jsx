@@ -1,9 +1,8 @@
 // src/components/NavMenu.jsx
-// CORREÇÃO: Statement "agarrando" no Work
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { EVENTS } from '../utils/site-load-coordinator';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -315,31 +314,61 @@ const NavMenu = () => {
   }, [activeSection, detectAbsolutePosition]);
 
   // ================================
-  // RESTO DO CÓDIGO (mantido igual)
+  // ANIMAÇÃO DE ENTRADA - MODIFICADO PARA PRELOADER
   // ================================
-  
-  // Animação de entrada
   useEffect(() => {
     if (hasEnteredRef.current) return;
-    hasEnteredRef.current = true;
-
+    
     const logo = logoRef.current;
     const toggle = toggleRef.current;
     const items = itemsRef.current.filter(Boolean);
 
     if (!logo || !toggle) return;
 
+    // Preparar estado inicial
     gsap.set(items, { y: 0, opacity: 0, visibility: 'visible' });
     gsap.set(logo, { x: 200, opacity: 0 });
     gsap.set(toggle, { x: 100, opacity: 0 });
 
-    entryTl.current = gsap.timeline({ delay: 0.5 });
+    // Criar timeline, mas NÃO executá-la ainda
+    entryTl.current = gsap.timeline({ 
+      paused: true, // NOVO: Inicialmente pausado
+      onComplete: () => {
+        hasEnteredRef.current = true;
+        console.log('✅ NavMenu: Animação de entrada completa');
+      }
+    });
 
     entryTl.current
       .to(logo, { x: 0, opacity: 1, duration: 1.2, ease: 'elastic.out(1, 0.6)' }, 0)
       .to(toggle, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.4);
+    
+    // NOVO: Sinalizar que NavMenu está pronto
+    console.log('🎭 NavMenu: Pronto para animação, aguardando evento');
+    
+    // Verifica se window.siteLoadState existe para evitar erros
+    if (window.siteLoadState) {
+      window.siteLoadState.navReady = true;
+    } else {
+      // Se não existe, cria o objeto
+      window.siteLoadState = { navReady: true };
+    }
+    
+    // NOVO: Listener para iniciar animação quando autorizado
+    const startAnimationHandler = () => {
+      console.log('🎭 NavMenu: Iniciando animação de entrada');
+      // Pequeno delay para sequenciar após o Hero
+      setTimeout(() => {
+        if (entryTl.current) {
+          entryTl.current.play();
+        }
+      }, 500);
+    };
+    
+    window.addEventListener(EVENTS.START_ANIMATIONS, startAnimationHandler, { once: true });
 
     return () => {
+      window.removeEventListener(EVENTS.START_ANIMATIONS, startAnimationHandler);
       if (entryTl.current) entryTl.current.kill();
     };
   }, []);
@@ -508,7 +537,6 @@ const NavMenu = () => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
-  // RENDER (mantido igual)
   return (
     <nav
       ref={containerRef}
@@ -525,17 +553,19 @@ const NavMenu = () => {
             const zIndex = 9 - index;
             
             return (
-              <li key={item.id} style={{ position: 'relative', height: 0 }}>
+              <li key={item.id} style={{ position: "relative", height: 0 }}>
                 <a
-                  ref={el => itemsRef.current[index] = el}
-                  href={item.href || '#'}
-                  className={`nav-menu-item ${activeSection === item.id ? 'active' : ''}`}
+                  ref={(el) => {
+                    itemsRef.current[index] = el;
+                  }}
+                  href={item.href || "#"}
+                  className={`nav-menu-item ${activeSection === item.id ? "active" : ""}`}
                   style={{ zIndex }}
                   onClick={(e) => {
                     e.preventDefault();
                     handleItemClick(item);
                   }}
-                  aria-current={activeSection === item.id ? 'page' : undefined}
+                  aria-current={activeSection === item.id ? "page" : undefined}
                 >
                   {item.label}
                 </a>
@@ -551,7 +581,7 @@ const NavMenu = () => {
         onClick={handleToggle}
         aria-expanded={isOpen}
         aria-controls="nav-menu-list"
-        aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
+        aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
       >
         <svg className="nav-menu-icon" width="28" height="24" viewBox="0 0 28 24" fill="none">
           <line className="nav-menu-icon-line" x1="4" y1="4" x2="24" y2="4" strokeWidth="4" strokeLinecap="round" />

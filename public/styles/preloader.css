@@ -39,17 +39,18 @@
 }
 
 .text-container {
-  height: 3em;
+  height: 1.5em;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  overflow: hidden;
+  overflow: hidden; /* Isso já está correto, garante que o texto não transborde */
   width: 200px;
   text-align: center;
   z-index: 10001;
 }
 
+/* Ajustes para os textos individuais */
 .loading-text {
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-weight: 700;
@@ -57,18 +58,22 @@
   font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  position: absolute;
+  position: absolute; /* Já está correto, posiciona absoluto dentro do contêiner */
   width: 100%;
   text-align: center;
   mix-blend-mode: difference;
+  transition: transform 0.5s ease-in-out; /* Adicionar para suavizar a transição */
 }
 
+/* Garantir posições iniciais corretas */
 .loading-text.initial {
-  transform: translateY(0);
+  transform: translateY(0); /* Está correto, começa visível na posição 0 */
+  opacity: 1; /* Adicionar para garantir que esteja 100% visível */
 }
 
 .loading-text.complete {
-  transform: translateY(100%);
+  transform: translateY(100%); /* Está correto, começa abaixo (invisível) */
+  opacity: 0; /* Adicionar para garantir invisibilidade no início */
 }
 
 /* Responsive adjustments */

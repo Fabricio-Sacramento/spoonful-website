@@ -15,10 +15,8 @@ import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
 
-// src/main.jsx - parte relevante
-import { createRoot } from 'react-dom/client';
 import Preloader from './components/Preloader';
-import { EVENTS } from './utils/site-load-coordinator';
+import { createRoot } from 'react-dom/client';
 
 // Função para remover o preloader e mostrar o conteúdo do site
 function handlePreloaderComplete() {
@@ -29,12 +27,14 @@ function handlePreloaderComplete() {
     setTimeout(() => {
       if (preloaderEl && preloaderEl.parentNode) {
         preloaderEl.parentNode.removeChild(preloaderEl);
-        // Dispara evento para iniciar animações após preloader ser removido
-        window.dispatchEvent(new CustomEvent(EVENTS.START_ANIMATIONS));
       }
     }, 1500);
   }
+
+  // Mostra o conteúdo principal (que estava oculto pelo CSS)
+  document.body.classList.add('content-loaded');
 }
+
 // Cria o container para o preloader
 const preloaderContainer = document.createElement('div');
 preloaderContainer.id = 'preloader-container';

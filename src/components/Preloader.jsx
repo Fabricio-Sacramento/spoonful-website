@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import FontFaceObserver from 'fontfaceobserver';
 import PropTypes from 'prop-types';
-import { EVENTS, checkAndStart } from '../utils/site-load-coordinator';
+//import { EVENTS, checkAndStart } from '../utils/site-load-coordinator';
 
 const Preloader = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
@@ -160,60 +160,53 @@ const Preloader = ({ onComplete }) => {
   }, []);
 
   // Animação de saída quando o carregamento estiver completo
-  useEffect(() => {
+  // No useEffect que controla a animação de saída:
+    useEffect(() => {
     if (!isComplete || !preloaderRef.current) return;
 
-    console.log('🎬 Preloader atingiu 100% - sinalizando conclusão');
-    
-    // NOVO: Atualizar estado global
-    window.siteLoadState.preloaderComplete = true;
-    
-    // NOVO: Chamar verificador centralizado
-    const alreadyStarted = checkAndStart();
-    
-    // Se ainda não iniciou (esperando Hero), configura listener
-    if (!alreadyStarted) {
-      const heroReadyHandler = () => {
-        console.log('🎬 Hero ficou pronto após preloader');
-        checkAndStart();
-      };
-      
-      window.addEventListener(EVENTS.HERO_READY, heroReadyHandler, { once: true });
-    }
-    
-    // Timing da animação - chamado pelo site-load-coordinator
+    // Timing da animação
     const tl = gsap.timeline({
-      onComplete: () => {
+        onComplete: () => {
         if (onComplete) {
-          onComplete();
+            onComplete();
         }
-      }
+        }
     });
 
+    // Primeiro, anima SOMENTE o texto (com certeza de conclusão)
     tl.to(initialTextRef.current, {
-      y: '-100%',
-      duration: 0.5,
-      ease: 'power2.inOut'
+        y: '-100%', // Move SPOONFUL para cima (fora de vista)
+        duration: 0.5,
+        ease: 'power2.inOut',
+        opacity: 0 // Garantir que fique invisível
     })
     .to(completeTextRef.current, {
-      y: '0%',
-      duration: 0.5,
-      ease: 'power2.inOut'
-    }, '<')
+        y: '0%', // Traz COMPLETE para a posição visível
+        duration: 0.5, 
+        ease: 'power2.inOut',
+        opacity: 1, // Garantir que fique totalmente visível
+        clearProps: "all" // Limpa props após a animação
+    }, '<') // Começa ao mesmo tempo que a animação anterior
+    
+    // Pausa para ver o texto "COMPLETE" por um momento
+    .addLabel("textComplete")
+    .to({}, {duration: 0.3}) // Pequena pausa
+    
+    // Depois continua com o restante da animação
     .to([percentageRef.current, textContainerRef.current], {
-      y: -50,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power2.inOut'
-    })
+        y: -50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power2.inOut'
+    }, "textComplete+=0.3")
     .to(preloaderRef.current, {
-      y: '-100vh',
-      duration: 1,
-      ease: 'power2.inOut'
+        y: '-100vh',
+        duration: 1,
+        ease: 'power2.inOut'
     }, '<0.3');
     
-  }, [isComplete, onComplete]);
+    }, [isComplete, onComplete]);
 
   return (
     <div className="preloader" ref={preloaderRef}>
@@ -224,8 +217,8 @@ const Preloader = ({ onComplete }) => {
       ></div>
       
       <div className="text-container" ref={textContainerRef}>
-        <div className="loading-text initial" ref={initialTextRef}>SPOONFUL</div>
-        <div className="loading-text complete" ref={completeTextRef}>COMPLETE</div>
+      <div className="loading-text initial" ref={initialTextRef}>SPOONFUL</div>
+      <div className="loading-text complete" ref={completeTextRef}>COMPLETE</div>
       </div>
       
       <div className="percentage-wrap">

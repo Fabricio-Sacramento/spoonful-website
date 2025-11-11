@@ -9,7 +9,7 @@ import {
   setContactInteractivity, 
   focusFirstContactElement
 } from '../utils/contact-interactivity.js';
-import { EVENTS } from '../utils/site-load-coordinator';
+
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -58,18 +58,14 @@ function prepareSplitting() {
 // 2) Animação de entrada do Hero
 // -----------------------------
 function animateHeroEntry() {
-  console.log('👋 Preparando animação do Hero (sem executar)');
-  
   gsap.set(heroAllChars, {
     opacity: 0,
     rotationX: -90,
     z: -200,
     transformOrigin: '50% 0%'
   });
-  
-  // NOVO: Armazena a timeline sem executá-la
+
   const entryTl = gsap.timeline({
-    paused: true, // NOVO: Inicialmente pausada
     onComplete: () => {
       console.log('Hero entry animation complete');
     }
@@ -86,18 +82,6 @@ function animateHeroEntry() {
       delay: i * 0.1
     }, i === 0 ? 0.5 : '<0.1');
   });
-
-  // NOVO: Sinalizar que hero está pronto
-  window.siteLoadState.heroReady = true;
-  window.dispatchEvent(new CustomEvent(EVENTS.HERO_READY));
-  
-  // NOVO: Listener para iniciar animação quando autorizado
-  const startHandler = () => {
-    console.log('🎭 Iniciando animação do Hero');
-    entryTl.play();
-  };
-  
-  window.addEventListener(EVENTS.START_ANIMATIONS, startHandler, { once: true });
 
   return entryTl;
 }
