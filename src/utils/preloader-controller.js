@@ -1,5 +1,8 @@
 // src/utils/preloader-controller.js
-// Controla carregamento e saída do preloader com timing controlado
+// Controla carregamento REAL de assets + timing controlado
+
+import assetLoader from './asset-loader.js';
+import { projects } from '../scripts/projects.js';
 
 class PreloaderController {
   constructor() {
@@ -10,19 +13,20 @@ class PreloaderController {
     this.checkpoints = {
       windowLoad: false,
       canvasReady: false,
-      fontsReady: false
+      fontsReady: false,
+      assetsLoaded: false  // ⬅️ NOVO
     };
     this.isComplete = false;
     this.animationFrame = null;
-    this.timeCheckInterval = null; // ⬅️ NOVO
+    this.timeCheckInterval = null;
     
-    // Configuração de timing
     this.config = {
-      minDuration: 5000, // 5 segundos mínimo
-      maxWidth: 250,     // 250px de largura total
+      minDuration: 5000,
+      maxWidth: 250,
     };
     
     this.startTime = null;
+    this.lastLoggedProgress = 0;
   }
 
   init() {
@@ -34,33 +38,24 @@ class PreloaderController {
       return;
     }
 
-    console.log('⏳ Preloader initialized - minimum duration: 5s');
+    console.log('⏳ Preloader initialized - REAL asset loading enabled');
 
-    // Marca tempo de início
     this.startTime = performance.now();
 
-    // Escuta eventos de carregamento
     this.setupListeners();
-    
-    // Inicia checagem de fontes
     this.checkFonts();
-    
-    // Inicia loop de animação suave
+    this.loadAssets();  // ⬅️ NOVO
     this.startAnimationLoop();
-    
-    // ⬇️ NOVO: Timer contínuo para verificar progresso temporal
     this.startTimeCheck();
   }
 
   setupListeners() {
-    // Window load
     window.addEventListener('load', () => {
       console.log('✅ Window loaded');
       this.checkpoints.windowLoad = true;
       this.updateTargetProgress();
     });
 
-    // Canvas ready (emitido pelo App.jsx)
     window.addEventListener('canvas:ready', () => {
       console.log('✅ Canvas ready');
       this.checkpoints.canvasReady = true;
@@ -70,26 +65,73 @@ class PreloaderController {
 
   async checkFonts() {
     try {
-      // Aguarda fontes carregarem
       await document.fonts.ready;
       console.log('✅ Fonts ready');
       this.checkpoints.fontsReady = true;
       this.updateTargetProgress();
     } catch (err) {
       console.warn('⚠️ Font loading check failed:', err);
-      // Continua mesmo com erro
       this.checkpoints.fontsReady = true;
       this.updateTargetProgress();
     }
   }
 
-  // ⬇️ NOVO: Verifica progresso temporal continuamente
+  // ⬇️ NOVO: Carrega assets reais
+  async loadAssets() {
+    try {
+      // Coleta todas as imagens dos projetos
+      const projectImages = [];
+      
+      projects.forEach(project => {
+        // Imagem principal
+        if (project.image) {
+          projectImages.push(project.image);
+        }
+        
+        // Galeria (5 imagens por projeto)
+        if (project.galleryImages && Array.isArray(project.galleryImages)) {
+          projectImages.push(...project.galleryImages);
+        }
+      });
+
+      // Imagens do About (se quiser incluir)
+      // const profileImage = '../assets/images/Me-4.jpg';
+      // const brandLogos = [...]; // 17 logos
+      // projectImages.push(profileImage, ...brandLogos);
+
+      console.log(`📦 Starting to load ${projectImages.length} project images`);
+
+      // Escuta progresso granular
+      assetLoader.onProgress((progress) => {
+        // Atualiza checkpoint parcialmente (0-100%)
+        // Não marca como true até 100%
+        if (progress >= 100) {
+          this.checkpoints.assetsLoaded = true;
+          this.updateTargetProgress();
+        }
+      });
+
+      // Inicia carregamento
+      await assetLoader.loadImages(projectImages);
+
+      console.log('✅ All assets loaded');
+      this.checkpoints.assetsLoaded = true;
+      this.updateTargetProgress();
+
+    } catch (err) {
+      console.error('❌ Error loading assets:', err);
+      // Continua mesmo com erro (não bloqueia site)
+      this.checkpoints.assetsLoaded = true;
+      this.updateTargetProgress();
+    }
+  }
+
   startTimeCheck() {
     this.timeCheckInterval = setInterval(() => {
       if (!this.isComplete) {
         this.updateTargetProgress();
       }
-    }, 100); // Atualiza a cada 100ms
+    }, 100);
   }
 
   updateTargetProgress() {
@@ -102,17 +144,16 @@ class PreloaderController {
     const elapsed = performance.now() - this.startTime;
     const timeProgress = Math.min((elapsed / this.config.minDuration) * 100, 100);
 
-    // Progresso real = menor dos dois (garante 5s mínimo)
+    // Progresso real = menor dos dois
     this.targetProgress = Math.min(technicalProgress, timeProgress);
 
-    // Log apenas se mudou significativamente (reduz spam no console)
+    // Log reduzido
     const logThreshold = 5;
     if (Math.abs(this.targetProgress - this.lastLoggedProgress) >= logThreshold || this.targetProgress === 100) {
       console.log(`📊 Progress - Technical: ${technicalProgress.toFixed(0)}% | Time: ${timeProgress.toFixed(0)}% | Target: ${this.targetProgress.toFixed(0)}%`);
       this.lastLoggedProgress = this.targetProgress;
     }
 
-    // Se ambos chegaram em 100%, completa
     if (technicalProgress >= 100 && timeProgress >= 100 && !this.isComplete) {
       this.complete();
     }
@@ -120,17 +161,14 @@ class PreloaderController {
 
   startAnimationLoop() {
     const animate = () => {
-      // Interpola suavemente para o target
       const diff = this.targetProgress - this.progress;
-      this.progress += diff * 0.1; // Suavização (ease out)
+      this.progress += diff * 0.1;
 
-      // Atualiza barra visual (0 a 250px)
       if (this.bar) {
         const width = (this.progress / 100) * this.config.maxWidth;
         this.bar.style.width = `${width}px`;
       }
 
-      // Continua loop até completar
       if (!this.isComplete) {
         this.animationFrame = requestAnimationFrame(animate);
       }
@@ -145,23 +183,19 @@ class PreloaderController {
 
     console.log('🎉 Preloader complete - starting exit');
 
-    // ⬇️ NOVO: Para timer de checagem temporal
     if (this.timeCheckInterval) {
       clearInterval(this.timeCheckInterval);
       this.timeCheckInterval = null;
     }
 
-    // Cancela animation loop
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
     }
 
-    // Força barra em 100% visual
     if (this.bar) {
       this.bar.style.width = `${this.config.maxWidth}px`;
     }
 
-    // Pequeno delay para garantir que barra chegou visualmente em 250px
     setTimeout(() => {
       this.exit();
     }, 300);
@@ -172,37 +206,24 @@ class PreloaderController {
 
     console.log('🚀 Preloader exiting...');
 
-    // Adiciona classe de animação
     this.preloader.classList.add('preloader--exiting');
 
-    // Aguarda animação terminar
     setTimeout(() => {
-      // Remove do DOM
       this.preloader.classList.add('preloader--hidden');
-      
-      // Emite evento para liberar Hero e Nav
       window.dispatchEvent(new CustomEvent('preloader:complete'));
-      
       console.log('✅ Preloader exit complete');
-    }, 600); // Tempo da animação swipeUp
+    }, 600);
   }
 
-  // API pública para forçar conclusão (debug)
   forceComplete() {
     console.log('🔧 Force completing preloader');
-    
-    // Marca todos os checkpoints
     Object.keys(this.checkpoints).forEach(key => {
       this.checkpoints[key] = true;
     });
-    
-    // Força tempo mínimo completo
     this.startTime = performance.now() - this.config.minDuration;
-    
     this.updateTargetProgress();
   }
 
-  // Cleanup
   destroy() {
     if (this.timeCheckInterval) {
       clearInterval(this.timeCheckInterval);
@@ -213,10 +234,8 @@ class PreloaderController {
   }
 }
 
-// Singleton
 const preloaderController = new PreloaderController();
 
-// Auto-init quando DOM estiver pronto
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     preloaderController.init();
@@ -225,7 +244,6 @@ if (document.readyState === 'loading') {
   preloaderController.init();
 }
 
-// Debug helper
 if (window.location.hash === '#debug') {
   window.debugPreloader = {
     force: () => preloaderController.forceComplete(),
@@ -233,7 +251,8 @@ if (window.location.hash === '#debug') {
       progress: preloaderController.progress.toFixed(1),
       target: preloaderController.targetProgress.toFixed(1),
       checkpoints: preloaderController.checkpoints,
-      elapsed: ((performance.now() - preloaderController.startTime) / 1000).toFixed(1) + 's'
+      elapsed: ((performance.now() - preloaderController.startTime) / 1000).toFixed(1) + 's',
+      assetsProgress: assetLoader.getProgress().toFixed(1) + '%'
     })
   };
 }
