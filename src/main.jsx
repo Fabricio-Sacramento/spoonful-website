@@ -14,10 +14,23 @@ import NavWithDrawer from './components/NavWithDrawer.jsx';
 import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
+import PreloaderManager from './utils/PreloaderManager.js';
+
+// ================================
+// PRELOADER INITIALIZATION
+// ================================
+let preloaderManager;
+let heroAnimationReady = false;
+
+// Inicia preloader imediatamente
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Initializing Preloader Manager...');
+  preloaderManager = new PreloaderManager();
+});
 
 // ================================
 // MONTA COMPONENTES EXISTENTES
-// (resto igual, sem mudanças)
+// (hero animation será disparada pelo preloader)
 // ================================
 
 // 1) Canvas 3D
@@ -50,17 +63,39 @@ const cursorRoot = ReactDOM.createRoot(cursorContainer);
 cursorRoot.render(<CustomCursor />);
 
 // ================================
+// HERO ANIMATION COORDINATION
+// ================================
+
+// Escuta evento do preloader para disparar hero animation
+window.addEventListener('preloader:complete', () => {
+  console.log('🎬 Preloader complete - triggering hero animation');
+  
+  // Aguarda um frame para garantir que o DOM está limpo
+  requestAnimationFrame(() => {
+    // Dispara animação do hero se a função existir
+    if (typeof window.animateHeroEntry === 'function') {
+      window.animateHeroEntry();
+    } else {
+      console.warn('⚠️ animateHeroEntry function not found');
+      // Fallback: dispara evento para o scroll orchestrator
+      window.dispatchEvent(new CustomEvent('hero:start-animation'));
+    }
+  });
+});
+
+// ================================
 // CANVAS PERFORMANCE CONTROLLER
+// (delay aumentado para dar tempo ao preloader)
 // ================================
 window.addEventListener('load', () => {
   setTimeout(() => {
     canvasController.init(root3D, <CanvasApp />);
     console.log('Canvas Performance Controller ativo');
-  }, 600);
+  }, 1200); // Aumentado de 600ms para dar tempo ao preloader
 });
 
 // ================================
-// DEBUG HELPERS (igual antes)
+// DEBUG HELPERS
 // ================================
 if (window.location.hash === '#debug') {
   window.debugCanvas = {
@@ -130,23 +165,39 @@ if (window.location.hash === '#debug') {
     }
   };
   
+  // Debug para PRELOADER
   window.debugPreloader = {
-    forceShow: () => {
-      const preloader = document.querySelector('.preloader');
-      if (preloader) preloader.style.display = 'flex';
+    manager: () => preloaderManager,
+    forceComplete: () => {
+      if (preloaderManager) {
+        preloaderManager.forceComplete();
+      } else {
+        console.warn('Preloader manager not found');
+      }
     },
-    forceHide: () => {
-      const preloader = document.querySelector('.preloader');
-      if (preloader) preloader.style.display = 'none';
+    getProgress: () => {
+      if (preloaderManager) {
+        return {
+          progress: preloaderManager.progress,
+          assets: preloaderManager.assets,
+          isComplete: preloaderManager.isComplete
+        };
+      }
+      return null;
+    },
+    triggerHero: () => {
+      window.dispatchEvent(new CustomEvent('preloader:complete'));
     },
     checkAssets: () => {
       return {
         canvas: !!document.querySelector('#root canvas'),
         canvasWidth: document.querySelector('#root canvas')?.width,
-        fontsReady: document.fonts.status
+        fontsReady: document.fonts.status,
+        preloaderExists: !!document.getElementById('preloader')
       };
     }
   };
   
   document.body.setAttribute('data-debug', 'true');
+  console.log('🔧 Debug mode ativo - use window.debugPreloader para controles');
 }

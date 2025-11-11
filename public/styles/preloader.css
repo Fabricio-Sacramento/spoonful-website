@@ -1,0 +1,246 @@
+/* ================================= */
+/* PRELOADER - SPOONFUL             */
+/* ================================= */
+
+/* Container principal */
+.preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--primary-red);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 2rem;
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Container do conteúdo */
+.preloader-content {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  transform-origin: left bottom;
+  
+  /* Performance */
+  will-change: transform, font-size;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Texto LOADING */
+.preloader-text {
+  color: var(--neutral-light);
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: -0.58313rem;
+  line-height: 0.377; /* 37.621% convertido */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Tamanho inicial pequeno */
+  font-size: 1.5rem;
+  
+  /* Transições suaves */
+  transition: font-size 0.1s ease-out;
+}
+
+/* Counter numérico */
+.preloader-counter {
+  color: var(--neutral-light);
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: -0.58313rem;
+  line-height: 0.377;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Tamanho inicial pequeno */
+  font-size: 1.5rem;
+  
+  /* Transições suaves */
+  transition: font-size 0.1s ease-out;
+}
+
+/* ================================= */
+/* WELCOME STATE                     */
+/* ================================= */
+
+.preloader-welcome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--primary-red);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  
+  /* Performance */
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.preloader-welcome-text {
+  color: var(--neutral-light);
+  font-family: "Neue Haas Grotesk Display Pro", sans-serif;
+  font-size: 4rem;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0.1rem;
+  text-align: center;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+}
+
+/* ================================= */
+/* ESTADOS DE ANIMAÇÃO               */
+/* ================================= */
+
+/* Estado oculto (final) */
+.preloader--hidden {
+  display: none;
+}
+
+/* Swipe up animation */
+.preloader--swipe-up {
+  transform: translateY(-100%);
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Welcome fade states */
+.preloader-welcome--visible {
+  opacity: 1;
+  transition: opacity 0.6s ease-in-out;
+}
+
+.preloader-welcome--hidden {
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+}
+
+/* ================================= */
+/* RESPONSIVE                        */
+/* ================================= */
+
+/* Desktop Padrão: 1440px - 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .preloader {
+    padding: 1.875rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 3.5rem;
+    letter-spacing: 0.09rem;
+  }
+}
+
+/* Laptop: 1024px - 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .preloader {
+    padding: 1.75rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 3.2rem;
+    letter-spacing: 0.08rem;
+  }
+}
+
+/* Tablet Landscape: 768px - 1023px */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .preloader {
+    padding: 1.5rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 2.8rem;
+    letter-spacing: 0.07rem;
+  }
+}
+
+/* Tablet Portrait: 600px - 767px */
+@media (max-width: 767px) {
+  .preloader {
+    padding: 1.25rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 2.2rem;
+    letter-spacing: 0.05rem;
+  }
+}
+
+/* Mobile Large: 480px - 599px */
+@media (max-width: 599px) {
+  .preloader {
+    padding: 1rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 1.8rem;
+    letter-spacing: 0.04rem;
+  }
+}
+
+/* Mobile Padrão: 360px - 479px */
+@media (max-width: 479px) {
+  .preloader {
+    padding: 0.875rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 1.5rem;
+    letter-spacing: 0.03rem;
+  }
+}
+
+/* Mobile Small: 375px e abaixo */
+@media (max-width: 375px) {
+  .preloader {
+    padding: 0.75rem;
+  }
+  
+  .preloader-welcome-text {
+    font-size: 1.3rem;
+    letter-spacing: 0.025rem;
+  }
+}
+
+/* ================================= */
+/* REDUCED MOTION                    */
+/* ================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-text,
+  .preloader-counter {
+    transition: none;
+  }
+  
+  .preloader--swipe-up {
+    transition: transform 0.3s ease;
+  }
+  
+  .preloader-welcome--visible,
+  .preloader-welcome--hidden {
+    transition: opacity 0.2s ease;
+  }
+}

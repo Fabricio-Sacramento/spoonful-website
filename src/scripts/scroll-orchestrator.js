@@ -488,3 +488,5 @@ window.debugKinetic = () => {
     workTrack: document.querySelector('.work-track'),
   });
 };
+// Expõe função globalmente para coordenação com preloader
+window.animateHeroEntry = animateHeroEntry;
