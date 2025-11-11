@@ -65,6 +65,7 @@ function animateHeroEntry() {
   });
 
   const entryTl = gsap.timeline({
+    paused: true, // ⬅️ PAUSA inicial
     onComplete: () => {
       console.log('Hero entry animation complete');
     }
@@ -81,6 +82,12 @@ function animateHeroEntry() {
       delay: i * 0.1
     }, i === 0 ? 0.5 : '<0.1');
   });
+
+  // ⬇️ NOVO: Escuta evento do preloader
+  window.addEventListener('preloader:complete', () => {
+    console.log('🎬 Preloader complete - starting Hero animation');
+    entryTl.play();
+  }, { once: true });
 
   return entryTl;
 }

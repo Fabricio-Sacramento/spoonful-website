@@ -1,0 +1,67 @@
+/* ================================= */
+/* PRELOADER - SIMPLE & FUNCTIONAL   */
+/* ================================= */
+
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: var(--primary-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Estado de saída - swipe up */
+#preloader.preloader--exiting {
+  animation: swipeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Barra de progresso */
+.preloader__bar {
+  width: 0;
+  height: 10px;
+  background-color: var(--neutral-light);
+  transition: width 0.3s ease-out;
+  border-radius: 5px;
+  
+  /* Performance */
+  will-change: width;
+  transform: translateZ(0);
+}
+
+/* Animação swipe up */
+@keyframes swipeUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+/* Hidden final state */
+#preloader.preloader--hidden {
+  display: none;
+}
+
+/* ================================= */
+/* REDUCED MOTION                    */
+/* ================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  #preloader.preloader--exiting {
+    animation: fadeOut 300ms ease-out forwards;
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+}

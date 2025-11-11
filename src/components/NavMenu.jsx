@@ -321,8 +321,7 @@ const NavMenu = () => {
   // Animação de entrada
   useEffect(() => {
     if (hasEnteredRef.current) return;
-    hasEnteredRef.current = true;
-
+    
     const logo = logoRef.current;
     const toggle = toggleRef.current;
     const items = itemsRef.current.filter(Boolean);
@@ -333,14 +332,24 @@ const NavMenu = () => {
     gsap.set(logo, { x: 200, opacity: 0 });
     gsap.set(toggle, { x: 100, opacity: 0 });
 
-    entryTl.current = gsap.timeline({ delay: 0.5 });
+    // ⬇️ NOVO: Aguarda preloader antes de animar
+    const startAnimation = () => {
+      if (hasEnteredRef.current) return;
+      hasEnteredRef.current = true;
 
-    entryTl.current
-      .to(logo, { x: 0, opacity: 1, duration: 1.2, ease: 'elastic.out(1, 0.6)' }, 0)
-      .to(toggle, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.4);
+      entryTl.current = gsap.timeline({ delay: 0.5 });
+
+      entryTl.current
+        .to(logo, { x: 0, opacity: 1, duration: 1.2, ease: 'elastic.out(1, 0.6)' }, 0)
+        .to(toggle, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.4);
+    };
+
+    // Escuta evento do preloader
+    window.addEventListener('preloader:complete', startAnimation, { once: true });
 
     return () => {
       if (entryTl.current) entryTl.current.kill();
+      window.removeEventListener('preloader:complete', startAnimation);
     };
   }, []);
 

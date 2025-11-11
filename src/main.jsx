@@ -14,6 +14,7 @@ import NavWithDrawer from './components/NavWithDrawer.jsx';
 import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
+import './utils/preloader-controller.js';
 
 // ================================
 // MONTA COMPONENTES EXISTENTES
