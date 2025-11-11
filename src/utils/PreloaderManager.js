@@ -1,5 +1,5 @@
 // src/utils/PreloaderManager.js
-// Manager do preloader com monitoramento real de assets
+// VERSÃO CORRIGIDA - Evita interferência com interactions existentes
 
 import gsap from 'gsap';
 
@@ -39,15 +39,15 @@ class PreloaderManager {
     const existing = document.getElementById('preloader');
     if (existing) existing.remove();
 
-    // Cria estrutura do preloader
+    // Cria estrutura do preloader COM CUIDADO no z-index
     const preloaderHTML = `
-      <div id="preloader" class="preloader">
+      <div id="preloader" class="preloader" style="z-index: 9999; pointer-events: auto;">
         <div class="preloader-content">
           <span class="preloader-text">LOADING</span>
           <span class="preloader-counter">000</span>
         </div>
       </div>
-      <div class="preloader-welcome">
+      <div class="preloader-welcome" style="z-index: 9999; pointer-events: none;">
         <h1 class="preloader-welcome-text">WELCOME TO SPOONFUL</h1>
       </div>
     `;
@@ -235,13 +235,13 @@ class PreloaderManager {
       // 6. Dispara animação do Hero
       this.triggerHeroAnimation();
       
-      // 7. Remove preloader
-      this.cleanup();
+      // 7. LIMPEZA AGRESSIVA
+      this.aggressiveCleanup();
       
     } catch (error) {
       console.error('❌ Erro na sequência de saída:', error);
       // Fallback: força remoção do preloader
-      this.cleanup();
+      this.aggressiveCleanup();
     }
   }
 
@@ -258,6 +258,9 @@ class PreloaderManager {
 
   showWelcome() {
     return new Promise(resolve => {
+      if (!this.welcomeEl) return resolve();
+      
+      this.welcomeEl.style.pointerEvents = 'none';
       this.welcomeEl.classList.add('preloader-welcome--visible');
       gsap.set(this.welcomeEl, { display: 'flex' });
       
@@ -272,6 +275,8 @@ class PreloaderManager {
 
   hideWelcome() {
     return new Promise(resolve => {
+      if (!this.welcomeEl) return resolve();
+      
       gsap.to(this.welcomeEl, {
         opacity: 0,
         duration: 0.6,
@@ -284,7 +289,7 @@ class PreloaderManager {
   swipeUpBackground() {
     return new Promise(resolve => {
       // Anima ambos elementos para cima
-      const elements = [this.preloader, this.welcomeEl];
+      const elements = [this.preloader, this.welcomeEl].filter(Boolean);
       
       gsap.to(elements, {
         y: '-100%',
@@ -308,12 +313,48 @@ class PreloaderManager {
     }
   }
 
-  cleanup() {
-    setTimeout(() => {
-      if (this.preloader) this.preloader.remove();
-      if (this.welcomeEl) this.welcomeEl.remove();
-      console.log('🧹 Preloader cleanup complete');
-    }, 1000);
+  aggressiveCleanup() {
+    console.log('🧹 Starting aggressive cleanup...');
+    
+    // Remove elementos imediatamente
+    if (this.preloader) {
+      this.preloader.remove();
+      this.preloader = null;
+    }
+    if (this.welcomeEl) {
+      this.welcomeEl.remove();
+      this.welcomeEl = null;
+    }
+
+    // Força limpeza de event listeners
+    this.preloaderContent = null;
+    this.loadingText = null;
+    this.counter = null;
+    this.welcomeText = null;
+
+    // CRÍTICO: Restaura pointer events no body e elementos principais
+    document.body.style.pointerEvents = '';
+    
+    // Restaura interactions em elementos críticos
+    const criticalElements = [
+      '#root', // Canvas
+      '.nav-menu-container', // Nav
+      '.work-track', // Portfolio cards
+      '.custom-cursor' // Cursor
+    ];
+    
+    criticalElements.forEach(selector => {
+      const el = document.querySelector(selector);
+      if (el) {
+        el.style.pointerEvents = '';
+        el.style.zIndex = '';
+      }
+    });
+    
+    // Força reflow para garantir que mudanças sejam aplicadas
+    document.body.offsetHeight;
+    
+    console.log('✅ Aggressive cleanup complete');
   }
 
   wait(ms) {

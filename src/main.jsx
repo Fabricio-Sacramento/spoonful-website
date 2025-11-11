@@ -20,7 +20,6 @@ import PreloaderManager from './utils/PreloaderManager.js';
 // PRELOADER INITIALIZATION
 // ================================
 let preloaderManager;
-let heroAnimationReady = false;
 
 // Inicia preloader imediatamente
 document.addEventListener('DOMContentLoaded', () => {
