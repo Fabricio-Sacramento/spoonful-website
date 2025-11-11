@@ -15,6 +15,35 @@ import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
 
+import Preloader from './components/Preloader';
+import { createRoot } from 'react-dom/client';
+
+// Função para remover o preloader e mostrar o conteúdo do site
+function handlePreloaderComplete() {
+  // Oculta o preloader e mostra o conteúdo
+  const preloaderEl = document.getElementById('preloader-container');
+  if (preloaderEl) {
+    // Remove o preloader do DOM após a animação
+    setTimeout(() => {
+      if (preloaderEl && preloaderEl.parentNode) {
+        preloaderEl.parentNode.removeChild(preloaderEl);
+      }
+    }, 1500);
+  }
+
+  // Mostra o conteúdo principal (que estava oculto pelo CSS)
+  document.body.classList.add('content-loaded');
+}
+
+// Cria o container para o preloader
+const preloaderContainer = document.createElement('div');
+preloaderContainer.id = 'preloader-container';
+document.body.insertBefore(preloaderContainer, document.body.firstChild);
+
+// Renderiza o preloader
+const preloaderRoot = createRoot(preloaderContainer);
+preloaderRoot.render(<Preloader onComplete={handlePreloaderComplete} />);
+
 // ================================
 // MONTA COMPONENTES EXISTENTES
 // (resto igual, sem mudanças)

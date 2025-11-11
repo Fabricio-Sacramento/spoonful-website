@@ -43,6 +43,26 @@
 box-sizing: border-box;
 }
 
+/* Adicionar ao public/styles/style.css */
+
+/* Estado inicial: todo conteúdo oculto até que o preloader complete */
+body:not(.content-loaded) > *:not(#preloader-container) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Estado após carregamento: conteúdo visível */
+body.content-loaded > * {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease;
+}
+
+/* O preloader já está com z-index alto, então sempre ficará visível */
+#preloader-container {
+  z-index: 10000;
+}
+
 /* ----------------------------- */
 /* 2) RESET / BASE               */
 /* ----------------------------- */
@@ -64,60 +84,6 @@ position: relative; /* Garante que o pseudo-elemento seja posicionado corretamen
 top: 0;
 left: 0;
 }
-/*
-body::after {
-content: "";
-position: fixed;
-top: -100%;
-left: -100%;
-width: 300%;
-height: 300%;
-background-image: url("https://i.imgur.com/ax4UqqW.png");
-background-repeat: repeat;
-opacity: 0.05;
-pointer-events: none;
-animation: noise 12s steps(20) infinite;
-transition: opacity 0.4s ease;
-will-change: transform;
-z-index: -1; /* Ajuste o z-index para garantir que o noise fique atrÃ¡s do conteÃºdo
-}
-
-@keyframes noise {
-0% {
-transform: translate(20%, -15%);
-}
-10% {
-transform: translate(-20%, -15%);
-}
-20% {
-transform: translate(20%, -5%);
-}
-30% {
-transform: translate(-20%, -5%);
-}
-40% {
-transform: translate(20%, 5%);
-}
-50% {
-transform: translate(-20%, 5%);
-}
-60% {
-transform: translate(20%, 15%);
-}
-70% {
-transform: translate(-20%, 15%);
-}
-80% {
-transform: translate(20%, 5%);
-}
-90% {
-transform: translate(-20%, 5%);
-}
-100% {
-transform: translate(20%, -5%);
-}
-}
-*/
 /* ================================= */
 /* Overrides para SVG de clipPath    */
 /* ================================= */
