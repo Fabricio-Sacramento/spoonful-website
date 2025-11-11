@@ -1,12 +1,14 @@
-// src/scroll-orchestrator.js
+// src/scripts/scroll-orchestrator.js
 // CORREÇÃO CIRÚRGICA - Mantém animações originais, corrige bugs específicos
+// Atualizado: espera pelo evento 'preloader:finished' antes de iniciar as timelines (fallback curto).
+// Mantive a estrutura original e adicionei apenas a orquestração de start (mínimo invasivo).
 
 import Splitting from 'splitting';
 import 'splitting/dist/splitting.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { 
-  setContactInteractivity, 
+import {
+  setContactInteractivity,
   focusFirstContactElement
 } from '../utils/contact-interactivity.js';
 
@@ -32,7 +34,7 @@ function prepareSplitting() {
   aboutChars = aboutSplits.flatMap(r => r.chars);
 
   heroAllChars.forEach(char => {
-    gsap.set(char.parentNode, { 
+    gsap.set(char.parentNode, {
       perspective: 1000,
       transformStyle: 'preserve-3d'
     });
@@ -42,7 +44,7 @@ function prepareSplitting() {
     });
   });
 
-  aboutChars.forEach(char => 
+  aboutChars.forEach(char =>
     gsap.set(char.parentNode, { perspective: 1000 })
   );
 
@@ -91,7 +93,7 @@ function animateHeroEntry() {
 function initHeroAboutTimeline() {
   const wrapper = document.querySelector('.intro-wrapper');
   const whatWeDo = document.querySelector('#what-we-do');
-  
+
   if (!wrapper || !whatWeDo) {
     console.error('Required elements not found:', { wrapper: !!wrapper, whatWeDo: !!whatWeDo });
     return;
@@ -178,16 +180,16 @@ function setupWhatWeDoSection() {
   const section = document.querySelector('#what-we-do');
   const wrapper = document.querySelector('.what-we-do__wrapper');
   const rows = gsap.utils.toArray('.what-we-do__row');
-  
+
   if (!section || !wrapper) {
     console.log('What We Do section elements not found');
     return;
   }
-  
+
   console.log('Setting up What We Do section...');
-  
+
   gsap.set(rows, { opacity: 0, y: 50 });
-  
+
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
@@ -196,7 +198,7 @@ function setupWhatWeDoSection() {
     invalidateOnRefresh: true,
     onEnter: () => {
       console.log('What We Do content animation triggered');
-      
+
       if (rows.length > 0) {
         gsap.to(rows, {
           y: 0,
@@ -208,7 +210,7 @@ function setupWhatWeDoSection() {
       }
     }
   });
-  
+
   ScrollTrigger.create({
     trigger: section,
     start: 'top top',
@@ -231,7 +233,7 @@ function setupWhatWeDoSection() {
 function setupTestimonialsSection() {
   const section = document.querySelector('#testimonials');
   if (!section) return;
-  
+
   ScrollTrigger.create({
     trigger: section,
     start: 'top 80%',
@@ -251,16 +253,16 @@ function setupStatementSection() {
     console.log('Statement wrapper detected - delegando para setupStatementContactTransition()');
     return;
   }
-  
+
   const section = document.querySelector('#statement');
-  
+
   if (!section) {
     console.log('Statement section not found');
     return;
   }
-  
+
   console.log('Setting up Statement section (standalone)...');
-  
+
   ScrollTrigger.create({
     id: 'statement-pin',
     trigger: section,
@@ -271,22 +273,22 @@ function setupStatementSection() {
     anticipatePin: 1,
     refreshPriority: 1,
     invalidateOnRefresh: true,
-    
+
     onEnter: () => {
       console.log('📍 Statement: Pinned - iniciando loop');
       window.dispatchEvent(new CustomEvent('statement:start'));
     },
-    
+
     onLeave: () => {
       console.log('📍 Statement: Unpinned - parando loop');
       window.dispatchEvent(new CustomEvent('statement:stop'));
     },
-    
+
     onEnterBack: () => {
       console.log('📍 Statement: Re-entered - iniciando loop');
       window.dispatchEvent(new CustomEvent('statement:start'));
     },
-    
+
     onLeaveBack: () => {
       console.log('📍 Statement: Left back - parando loop');
       window.dispatchEvent(new CustomEvent('statement:stop'));
@@ -301,17 +303,17 @@ function setupStatementContactTransition() {
   const wrapper = document.querySelector('.statement-contact-wrapper');
   const statementLayer = document.querySelector('.statement-layer');
   const contactLayer = document.querySelector('.contact-layer');
-  
+
   if (!wrapper || !statementLayer || !contactLayer) {
     console.warn('Statement/Contact wrapper não encontrado');
     return;
   }
-  
+
   console.log('🎬 Setting up Statement → Contact transition...');
-  
+
   // Estado inicial
   setContactInteractivity(false);
-  
+
   // Timeline com scrub (igual Hero/About)
   const mainTl = gsap.timeline({
     scrollTrigger: {
@@ -325,19 +327,19 @@ function setupStatementContactTransition() {
       anticipatePin: 1,
       invalidateOnRefresh: true,
       refreshPriority: 0,
-      
+
       onEnter: () => {
         console.log('📍 Statement: Pinned - iniciando loop');
         window.dispatchEvent(new CustomEvent('statement:start'));
       },
-      
+
       onUpdate: (self) => {
         // Para o loop quando começa a subir (50% do scroll)
         if (self.progress > 0.5 && self.direction === 1) {
           window.dispatchEvent(new CustomEvent('statement:stop'));
         }
       },
-      
+
       onLeave: () => {
         console.log('📍 Statement saiu - habilitando Contact');
         window.dispatchEvent(new CustomEvent('statement:stop'));
@@ -345,21 +347,21 @@ function setupStatementContactTransition() {
         contactLayer.classList.add('contact--revealed');
         focusFirstContactElement();
       },
-      
+
       onEnterBack: () => {
         console.log('📍 Voltando para Statement');
         setContactInteractivity(false);
         contactLayer.classList.remove('contact--revealed');
         window.dispatchEvent(new CustomEvent('statement:start'));
       },
-      
+
       onLeaveBack: () => {
         console.log('📍 Statement: saiu voltando');
         window.dispatchEvent(new CustomEvent('statement:stop'));
       }
     }
   });
-  
+
   // Animação: Statement sobe (igual Hero sai)
   mainTl
     .addLabel('start')
@@ -373,7 +375,7 @@ function setupStatementContactTransition() {
       },
       'statementExit'
     );
-  
+
   console.log('✅ Statement → Contact transition configured');
 }
 
@@ -385,7 +387,7 @@ let refreshScheduled = false;
 function smartRefresh() {
   if (refreshScheduled) return;
   refreshScheduled = true;
-  
+
   gsap.delayedCall(0.1, () => {
     ScrollTrigger.refresh(true);
     refreshScheduled = false;
@@ -408,7 +410,7 @@ function debounce(func, wait) {
 function resetAnimations() {
   console.log('Resetting animations...');
   ScrollTrigger.getAll().forEach(st => st.kill());
-  
+
   if (heroAllChars.length > 0) {
     gsap.set(heroAllChars, { clearProps: 'all' });
   }
@@ -418,7 +420,7 @@ function resetAnimations() {
 }
 
 // -----------------------------
-// 7) Inicialização
+// 7) Inicialização (AGORA: startOrchestrator + espera pelo preloader)
 // -----------------------------
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM loaded - preparing splitting...');
@@ -426,37 +428,98 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('load', () => {
-  console.log('Window loaded - starting animations...');
-  
+  console.log('Window loaded - preparing to start animations...');
+
   const wrapper = document.querySelector('.intro-wrapper');
   if (!wrapper) {
     console.error('Intro wrapper not found!');
     return;
   }
-  
+
+  // Ajuste inicial do wrapper height (para 100vh hero)
   const viewport = window.innerHeight;
   wrapper.style.height = `${viewport}px`;
 
-  animateHeroEntry();
-  
-  gsap.delayedCall(0.1, () => {
-    initHeroAboutTimeline();
-    setupWhatWeDoSection();
-    setupStatementSection(); // Checa wrapper e delega se necessário
-    setupStatementContactTransition(); // Timeline statement/contact
-    setupTestimonialsSection();
-  });
-  
-  gsap.delayedCall(0.5, smartRefresh);
-  
-  const handleResize = debounce(() => {
-    console.log('Handling resize...');
-    const newViewport = window.innerHeight;
-    wrapper.style.height = `${newViewport}px`;
-    smartRefresh();
-  }, 300);
-  
-  window.addEventListener('resize', handleResize);
+  // encapsula o processo de iniciar todas as timelines/handlers
+  let orchestratorStarted = false;
+  function startOrchestrator() {
+    if (orchestratorStarted) return;
+    orchestratorStarted = true;
+
+    console.log('Starting orchestrator timelines...');
+
+    // Hero entry + timelines
+    animateHeroEntry();
+
+    gsap.delayedCall(0.1, () => {
+      initHeroAboutTimeline();
+      setupWhatWeDoSection();
+      setupStatementSection(); // Checa wrapper e delega se necessário
+      setupStatementContactTransition(); // Timeline statement/contact
+      setupTestimonialsSection();
+    });
+
+    gsap.delayedCall(0.5, smartRefresh);
+
+    // resize handler (somente quando orchestrator iniciou)
+    const handleResize = debounce(() => {
+      console.log('Handling resize...');
+      const newViewport = window.innerHeight;
+      wrapper.style.height = `${newViewport}px`;
+      smartRefresh();
+    }, 300);
+
+    window.addEventListener('resize', handleResize);
+  }
+
+  // Se o preloader já terminou (flag global), inicia imediatamente
+  if (window.__PRELOADER_FINISHED__ === true) {
+    console.log('Preloader already finished - starting orchestrator immediately');
+    startOrchestrator();
+    return;
+  }
+
+  // Caso contrário, aguarda pelo evento 'preloader:finished' — com fallback curto
+  const onPreloaderFinished = () => {
+    console.log('preloader:finished received — starting orchestrator');
+    window.removeEventListener('preloader:finished', onPreloaderFinished);
+    startOrchestrator();
+  };
+
+  window.addEventListener('preloader:finished', onPreloaderFinished, { once: true });
+
+  // fallback: não manter o site bloqueado por muito tempo se o preloader falhar
+  const fallbackMs = 500;
+  setTimeout(() => {
+    if (!orchestratorStarted) {
+      console.warn(`preloader:finished not received within ${fallbackMs}ms — starting orchestrator fallback`);
+
+      // 1) marca a flag global que outros módulos verificam
+      try {
+        window.__PRELOADER_FINISHED__ = true;
+      } catch {
+        /* ignore - ambiente muito restrito */
+      }
+
+      // 2) tenta acionar a animação de saída do Preloader (mais elegante que sumir direto)
+      try {
+        window.dispatchEvent(new Event('preloader:forceFinish'));
+      } catch {
+        /* ignore */
+      }
+
+      // 3) garante que listeners que esperam 'preloader:finished' sejam notificados
+      try {
+        window.dispatchEvent(new Event('preloader:finished'));
+      } catch {
+        /* ignore */
+      }
+
+      // remove listener e inicia orchestrator
+      window.removeEventListener('preloader:finished', onPreloaderFinished);
+      startOrchestrator();
+    }
+  }, fallbackMs);
 });
 
 // -----------------------------
@@ -465,7 +528,7 @@ window.addEventListener('load', () => {
 if (window.location.hash === '#debug') {
   ScrollTrigger.defaults({ markers: true });
   console.log('🐛 Debug mode ativo');
-  
+
   window.debugScrollOrchestrator = {
     heroChars: () => heroAllChars,
     aboutChars: () => aboutChars,

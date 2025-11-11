@@ -9,11 +9,29 @@ import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import NavWithDrawer from './components/NavWithDrawer.jsx';
+import Preloader from './components/Preloader.jsx';
 
 // Utils
 import './scripts/scroll-orchestrator.js';
 import canvasController from './utils/canvas-performance-controller.js';
 import { setContactInteractivity } from './utils/contact-interactivity.js';
+
+// -----------------------------------------------------------------------------
+// MOUNT PRELOADER EARLY (root separado) - overlay global que o componente controla
+// -----------------------------------------------------------------------------
+try {
+  const preloaderContainer = document.createElement('div');
+  preloaderContainer.id = 'preloader-root';
+  // mantém compatibilidade com debug helpers que buscam `.preloader`
+  preloaderContainer.className = 'preloader';
+  document.body.appendChild(preloaderContainer);
+
+  const preloaderRoot = ReactDOM.createRoot(preloaderContainer);
+  preloaderRoot.render(<Preloader minDisplay={900} hardTimeout={10000} />);
+} catch (err) {
+  // Se falhar, não bloqueia o app — apenas registra
+  console.warn('Could not mount Preloader root:', err);
+}
 
 // ================================
 // MONTA COMPONENTES EXISTENTES
@@ -81,14 +99,14 @@ if (window.location.hash === '#debug') {
     },
     checkScrollTrigger: () => {
       const triggers = ScrollTrigger.getAll();
-      const statementTrigger = triggers.find(t => 
+      const statementTrigger = triggers.find(t =>
         t.trigger?.id === 'statement'
       );
       console.log('Statement ScrollTrigger:', statementTrigger);
       return statementTrigger;
     }
   };
-  
+
   window.debugContact = {
     enable: () => setContactInteractivity(true),
     disable: () => setContactInteractivity(false),
@@ -103,7 +121,7 @@ if (window.location.hash === '#debug') {
       };
     }
   };
-  
+
   window.debugCursor = {
     getState: () => {
       const cursor = document.querySelector('.custom-cursor');
@@ -129,7 +147,7 @@ if (window.location.hash === '#debug') {
       };
     }
   };
-  
+
   window.debugPreloader = {
     forceShow: () => {
       const preloader = document.querySelector('.preloader');
@@ -147,6 +165,6 @@ if (window.location.hash === '#debug') {
       };
     }
   };
-  
+
   document.body.setAttribute('data-debug', 'true');
 }
