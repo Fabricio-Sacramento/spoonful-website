@@ -2,12 +2,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import FontFaceObserver from 'fontfaceobserver';
-import PropTypes from 'prop-types'; // Adicionado para validação de props
+import PropTypes from 'prop-types';
+import { EVENTS, checkAndStart } from '../utils/site-load-coordinator';
 
 const Preloader = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  // Removi a variável textState que não estava sendo usada
   
   // Refs
   const preloaderRef = useRef(null);
@@ -163,7 +163,25 @@ const Preloader = ({ onComplete }) => {
   useEffect(() => {
     if (!isComplete || !preloaderRef.current) return;
 
-    // Timing da animação
+    console.log('🎬 Preloader atingiu 100% - sinalizando conclusão');
+    
+    // NOVO: Atualizar estado global
+    window.siteLoadState.preloaderComplete = true;
+    
+    // NOVO: Chamar verificador centralizado
+    const alreadyStarted = checkAndStart();
+    
+    // Se ainda não iniciou (esperando Hero), configura listener
+    if (!alreadyStarted) {
+      const heroReadyHandler = () => {
+        console.log('🎬 Hero ficou pronto após preloader');
+        checkAndStart();
+      };
+      
+      window.addEventListener(EVENTS.HERO_READY, heroReadyHandler, { once: true });
+    }
+    
+    // Timing da animação - chamado pelo site-load-coordinator
     const tl = gsap.timeline({
       onComplete: () => {
         if (onComplete) {
