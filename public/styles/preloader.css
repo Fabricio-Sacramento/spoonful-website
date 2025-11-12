@@ -9,8 +9,8 @@
   background-color: var(--primary-red);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start; /* ⬅️ MUDOU: flex-start para alinhar à esquerda */
+  justify-content: flex-end; /* ⬅️ MUDOU: flex-end para alinhar ao bottom */
   padding: 0;
   pointer-events: all;
   
@@ -20,23 +20,23 @@
   backface-visibility: hidden;
 }
 
-/* Container do SVG SPOONFUL */
+/* Container do SVG SPOONFUL - alinhado bottom-left */
 .preloader__title {
-  flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end; /* ⬅️ Alinha ao bottom */
+  justify-content: flex-start; /* ⬅️ Alinha à esquerda */
   width: 100%;
-  padding: 2rem;
+  padding: 0 2rem; /* ⬅️ Padding lateral, sem padding vertical */
+  margin-bottom: 8px; /* ⬅️ Gap de 8px da barra */
 }
 
 /* Wrapper interno para controle preciso */
 .preloader__title-wrapper {
-  width: 100%;
+  width: auto; /* ⬅️ MUDOU: auto ao invés de 100% */
   max-width: 50vw;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* ⬅️ Alinha à esquerda */
 }
 
 /* SVG ocupa 50vw mantendo aspect ratio */
@@ -113,7 +113,8 @@
   }
   
   .preloader__title {
-    padding: 1.875rem;
+    padding: 0 1.875rem;
+    margin-bottom: 8px;
   }
 }
 
@@ -124,7 +125,8 @@
   }
   
   .preloader__title {
-    padding: 1.75rem;
+    padding: 0 1.75rem;
+    margin-bottom: 8px;
   }
 }
 
@@ -135,7 +137,8 @@
   }
   
   .preloader__title {
-    padding: 1.5rem;
+    padding: 0 1.5rem;
+    margin-bottom: 8px;
   }
 }
 
@@ -146,7 +149,8 @@
   }
   
   .preloader__title {
-    padding: 1.25rem;
+    padding: 0 1.25rem;
+    margin-bottom: 6px;
   }
 }
 
@@ -157,7 +161,8 @@
   }
   
   .preloader__title {
-    padding: 1rem;
+    padding: 0 1rem;
+    margin-bottom: 6px;
   }
 }
 
@@ -168,7 +173,8 @@
   }
   
   .preloader__title {
-    padding: 0.875rem;
+    padding: 0 0.875rem;
+    margin-bottom: 4px;
   }
 }
 
@@ -179,7 +185,8 @@
   }
   
   .preloader__title {
-    padding: 0.75rem;
+    padding: 0 0.75rem;
+    margin-bottom: 4px;
   }
 }
 
