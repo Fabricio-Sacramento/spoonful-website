@@ -45,11 +45,6 @@ export function setContactInteractivity(enabled) {
   contactEl.setAttribute('aria-hidden', String(!enabled));
   contactEl.style.pointerEvents = enabled ? 'auto' : 'none';
   
-  console.log(
-    enabled 
-      ? '✅ Contact interativo (habilitado)' 
-      : '🚫 Contact não-interativo (bloqueado)'
-  );
 }
 
 /**
@@ -69,7 +64,6 @@ export function focusFirstContactElement() {
     setTimeout(() => {
       try {
         firstInteractive.focus({ preventScroll: true });
-        console.log('🎯 Focus definido no primeiro elemento:', firstInteractive);
       } catch (err) {
         console.warn('⚠️ Erro ao definir focus:', err);
       }
@@ -89,5 +83,4 @@ export function revealContactElements() {
   // Adiciona classe que ativa animações CSS
   contactEl.classList.add('contact-layer--revealed');
   
-  console.log('✨ Contact elements revealed');
 }

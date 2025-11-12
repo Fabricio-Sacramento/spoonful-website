@@ -17,7 +17,6 @@ function AppCanvasCleanupRegistrar() {
     registeredRef.current = true;
 
     const cleanup = async () => {
-      console.log('[r3f] Running scene cleanup...');
       try {
         // 1) dispose scene children
         disposeScene(scene);
@@ -66,7 +65,6 @@ function AppCanvasCleanupRegistrar() {
         // 7) small pause to let GPU/driver catch up
         await new Promise(res => setTimeout(res, 80));
 
-        console.log('[r3f] Scene cleanup finished successfully');
       } catch (error) {
         console.error('[r3f] Error during cleanup:', error);
       }
@@ -75,7 +73,6 @@ function AppCanvasCleanupRegistrar() {
     // Registra cleanup no controller
     if (canvasController && typeof canvasController.registerCleanup === 'function') {
       unregisterRef.current = canvasController.registerCleanup(cleanup);
-      console.log('[r3f] Cleanup registered to canvas controller');
     } else {
       // Fallback: anexa ao window para segurança
       window.__r3fCleanup = cleanup;

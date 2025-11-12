@@ -65,7 +65,6 @@ export function disposeNode(node) {
 export function disposeScene(scene) {
   if (!scene) return;
   try {
-    console.log('[three-dispose] Disposing scene with', scene.children.length, 'children');
     scene.traverse((child) => {
       disposeNode(child);
     });
@@ -73,7 +72,6 @@ export function disposeScene(scene) {
     while (scene.children.length > 0) {
       scene.remove(scene.children[0]);
     }
-    console.log('[three-dispose] Scene disposed');
   } catch(e) {
     console.warn('[three-dispose] Error disposing scene', e);
   }
@@ -99,7 +97,6 @@ export function disposeComposer(composer) {
     if (composer._readBuffer && composer._readBuffer.dispose) composer._readBuffer.dispose();
     if (composer._writeBuffer && composer._writeBuffer.dispose) composer._writeBuffer.dispose();
     if (typeof composer.dispose === 'function') composer.dispose();
-    console.log('[three-dispose] Composer disposed');
   } catch (e) {
     console.warn('Failed to dispose composer', e);
   }
@@ -116,7 +113,6 @@ export function disposeRenderer(renderer) {
     const contextLost = gl && typeof gl.isContextLost === 'function' && gl.isContextLost();
 
     if (isGlobalLost || contextLost) {
-      console.log('[three-dispose] Skipping loseContext: already marked/lost');
     } else {
       // Try renderer.forceContextLoss wrapped
       try {
@@ -150,7 +146,6 @@ export function disposeRenderer(renderer) {
       renderer.domElement.parentNode.removeChild(renderer.domElement);
     }
 
-    console.log('[three-dispose] Renderer disposed (best-effort)');
   } catch (e) {
     console.warn('[three-dispose] disposeRenderer error', e);
   }

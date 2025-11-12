@@ -108,12 +108,6 @@ const NavMenu = () => {
   const handleSmartNavigation = useCallback((targetItem) => {
     const currentPosition = detectAbsolutePosition();
     
-    console.log('🧭 Smart Navigation:', {
-      from: currentPosition,
-      to: targetItem.id,
-      currentScroll: window.scrollY,
-      documentHeight: document.documentElement.scrollHeight
-    });
     
     // CASO 1: Hero → About Us
     if (currentPosition === 'home' && targetItem.id === 'about-us') {
@@ -121,7 +115,6 @@ const NavMenu = () => {
         top: window.innerHeight,
         behavior: 'smooth'
       });
-      console.log('📍 Hero → About Us: Scroll 1 viewport');
       return;
     }
     
@@ -131,7 +124,6 @@ const NavMenu = () => {
         top: document.documentElement.scrollHeight,
         behavior: 'smooth'
       });
-      console.log('📍 Statement → Contact: Scroll para final');
       return;
     }
     
@@ -141,7 +133,6 @@ const NavMenu = () => {
         top: window.scrollY - window.innerHeight,
         behavior: 'smooth'
       });
-      console.log('Contact → Statement: Scroll 1 viewport para cima');
       return;
     }
     
@@ -151,7 +142,6 @@ const NavMenu = () => {
         top: 0,
         behavior: 'smooth'
       });
-      console.log('📍 About Us → Hero: Topo absoluto');
       return;
     }
     
@@ -168,7 +158,6 @@ const NavMenu = () => {
           statementSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
-      console.log('📍 Navegação direta para Statement');
       return;
     }
     
@@ -187,7 +176,6 @@ const NavMenu = () => {
       }
     }
     
-    console.log('📍 Navegação padrão para:', targetItem.id);
   }, [detectAbsolutePosition]);
 
   // ================================
@@ -203,12 +191,6 @@ const NavMenu = () => {
       
       if (absolutePosition) {
         if (activeSection !== absolutePosition) {
-          console.log('📍 Mudança de seção:', {
-            de: activeSection,
-            para: absolutePosition,
-            scroll: window.scrollY,
-            maxScroll: document.documentElement.scrollHeight - window.innerHeight
-          });
           setActiveSection(absolutePosition);
         }
         return;
@@ -269,11 +251,8 @@ const NavMenu = () => {
             const nearStatement = scrollY >= maxScroll * 0.7; // Últimos 30%
             
             if (!absolutePosition && !nearStatement) {
-              console.log('📍 IO detectou:', section.id, '(scroll:', scrollY, ')');
               setActiveSection(section.id);
             } else {
-              console.log('📍 IO bloqueado para:', section.id, 
-                         '(absoluto:', absolutePosition, ', nearStatement:', nearStatement, ')');
             }
           }
         }
@@ -286,8 +265,6 @@ const NavMenu = () => {
       observer.observe(section.element);
     });
 
-    console.log('👁️ IO configurado com threshold 0.6 para seções:', 
-                intermediateSections.map(s => s.id));
 
     return () => {
       observer.disconnect();
@@ -310,7 +287,6 @@ const NavMenu = () => {
         })
       };
       
-      console.log('🐛 Debug NavMenu disponível em window.debugNavMenu');
     }
   }, [activeSection, detectAbsolutePosition]);
 
@@ -490,7 +466,6 @@ const NavMenu = () => {
   }, []);
 
   const handleItemClick = useCallback((item) => {
-    console.log('🔗 Nav Menu: Click em', item.label);
     setIsOpen(false);
 
     if (item.type === 'anchor') {

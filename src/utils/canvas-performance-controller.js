@@ -33,7 +33,6 @@ class CanvasPerformanceController {
       return;
     }
 
-    console.log('Canvas Performance Controller inicializado');
     gsap.delayedCall(0.3, () => {
       this.createScrollMonitor();
     });
@@ -49,12 +48,10 @@ class CanvasPerformanceController {
       return () => this.cleanupFns.delete(fn);
     }
     this.cleanupFns.add(fn);
-    console.log('Cleanup function registrada (total:', this.cleanupFns.size, ')');
 
     // return unregistrar
     return () => {
       const removed = this.cleanupFns.delete(fn);
-      if (removed) console.log('Cleanup unregistered (total:', this.cleanupFns.size, ')');
     };
   }
 
@@ -69,7 +66,6 @@ class CanvasPerformanceController {
       refreshPriority: 1
     });
 
-    console.log('Canvas monitor ativo - thresholds:', this.thresholds);
   }
 
   handleScrollProgress(progress) {
@@ -104,7 +100,6 @@ class CanvasPerformanceController {
         Promise.allSettled(fns.map(fn => Promise.resolve().then(() => fn()))),
         new Promise((_, rej) => setTimeout(() => rej(new Error('cleanup timeout')), timeout))
       ]);
-      console.log('All cleanupFns completed (or timed out)');
     } catch (err) {
       console.warn('Some cleanupFns timed out or failed, continuing', err);
     }
@@ -112,7 +107,6 @@ class CanvasPerformanceController {
 
   async unmountCanvas() {
     if (!this.isCanvasMounted || !this.reactRoot || !this.container) return;
-    console.log('UNMOUNTING Canvas - Performance mode ON (graceful)');
 
     try {
       if (typeof window !== 'undefined') window.__R3F_CONTEXT_LOST = true;
@@ -137,7 +131,6 @@ class CanvasPerformanceController {
 
       this.reactRoot = null;
       this.isCanvasMounted = false;
-      console.log('Canvas unmounted successfully (graceful)');
     } catch (error) {
       console.error('Erro ao desmontar Canvas:', error);
     }
@@ -145,13 +138,11 @@ class CanvasPerformanceController {
 
   remountCanvas() {
     if (this.isCanvasMounted || !this.canvasComponent || !this.container) return;
-    console.log('REMOUNTING Canvas - 3D mode ON');
     try {
       this.reactRoot = ReactDOM.createRoot(this.container);
       this.reactRoot.render(this.canvasComponent);
       this.isCanvasMounted = true;
       if (typeof window !== 'undefined') window.__R3F_CONTEXT_LOST = false;
-      console.log('Canvas remounted successfully');
     } catch (error) {
       console.error('Erro ao remontar Canvas:', error);
     }
@@ -178,7 +169,6 @@ class CanvasPerformanceController {
     this.canvasComponent = null;
     this.container = null;
     this.cleanupFns.clear();
-    console.log('Canvas Performance Controller destroyed');
   }
 }
 

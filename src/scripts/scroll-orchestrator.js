@@ -46,11 +46,6 @@ function prepareSplitting() {
     gsap.set(char.parentNode, { perspective: 1000 })
   );
 
-  console.log('Splitting prepared:', {
-    heroChars: heroAllChars.length,
-    aboutChars: aboutChars.length,
-    clipRects: clipRects.length
-  });
 }
 
 // -----------------------------
@@ -67,7 +62,6 @@ function animateHeroEntry() {
   const entryTl = gsap.timeline({
     paused: true, // ⬅️ PAUSA inicial
     onComplete: () => {
-      console.log('Hero entry animation complete');
     }
   });
 
@@ -85,7 +79,6 @@ function animateHeroEntry() {
 
   // ⬇️ NOVO: Escuta evento do preloader
   window.addEventListener('preloader:complete', () => {
-    console.log('🎬 Preloader complete - starting Hero animation');
     entryTl.play();
   }, { once: true });
 
@@ -110,7 +103,6 @@ function initHeroAboutTimeline() {
     transformOrigin: '50% 100%'
   });
 
-  console.log('Creating hero/about timeline...');
 
   const mainTl = gsap.timeline({
     scrollTrigger: {
@@ -175,7 +167,6 @@ function initHeroAboutTimeline() {
     )
     .to({}, { duration: 0.6 }, '+=0');
 
-  console.log('Hero/About timeline created successfully');
 }
 
 // -----------------------------
@@ -187,11 +178,9 @@ function setupWhatWeDoSection() {
   const rows = gsap.utils.toArray('.what-we-do__row');
   
   if (!section || !wrapper) {
-    console.log('What We Do section elements not found');
     return;
   }
   
-  console.log('Setting up What We Do section...');
   
   gsap.set(rows, { opacity: 0, y: 50 });
   
@@ -202,7 +191,6 @@ function setupWhatWeDoSection() {
     refreshPriority: 2,
     invalidateOnRefresh: true,
     onEnter: () => {
-      console.log('What We Do content animation triggered');
       
       if (rows.length > 0) {
         gsap.to(rows, {
@@ -244,7 +232,6 @@ function setupTestimonialsSection() {
     start: 'top 80%',
     once: true,
     onEnter: () => {
-      console.log('Testimonials section ready');
     }
   });
 }
@@ -255,18 +242,15 @@ function setupTestimonialsSection() {
 function setupStatementSection() {
   // Se wrapper existe, delega para setupStatementContactTransition
   if (document.querySelector('.statement-contact-wrapper')) {
-    console.log('Statement wrapper detected - delegando para setupStatementContactTransition()');
     return;
   }
   
   const section = document.querySelector('#statement');
   
   if (!section) {
-    console.log('Statement section not found');
     return;
   }
   
-  console.log('Setting up Statement section (standalone)...');
   
   ScrollTrigger.create({
     id: 'statement-pin',
@@ -280,22 +264,18 @@ function setupStatementSection() {
     invalidateOnRefresh: true,
     
     onEnter: () => {
-      console.log('📍 Statement: Pinned - iniciando loop');
       window.dispatchEvent(new CustomEvent('statement:start'));
     },
     
     onLeave: () => {
-      console.log('📍 Statement: Unpinned - parando loop');
       window.dispatchEvent(new CustomEvent('statement:stop'));
     },
     
     onEnterBack: () => {
-      console.log('📍 Statement: Re-entered - iniciando loop');
       window.dispatchEvent(new CustomEvent('statement:start'));
     },
     
     onLeaveBack: () => {
-      console.log('📍 Statement: Left back - parando loop');
       window.dispatchEvent(new CustomEvent('statement:stop'));
     }
   });
@@ -314,7 +294,6 @@ function setupStatementContactTransition() {
     return;
   }
   
-  console.log('🎬 Setting up Statement → Contact transition...');
   
   // Estado inicial
   setContactInteractivity(false);
@@ -334,7 +313,6 @@ function setupStatementContactTransition() {
       refreshPriority: 0,
       
       onEnter: () => {
-        console.log('📍 Statement: Pinned - iniciando loop');
         window.dispatchEvent(new CustomEvent('statement:start'));
       },
       
@@ -346,7 +324,6 @@ function setupStatementContactTransition() {
       },
       
       onLeave: () => {
-        console.log('📍 Statement saiu - habilitando Contact');
         window.dispatchEvent(new CustomEvent('statement:stop'));
         setContactInteractivity(true);
         contactLayer.classList.add('contact--revealed');
@@ -354,14 +331,12 @@ function setupStatementContactTransition() {
       },
       
       onEnterBack: () => {
-        console.log('📍 Voltando para Statement');
         setContactInteractivity(false);
         contactLayer.classList.remove('contact--revealed');
         window.dispatchEvent(new CustomEvent('statement:start'));
       },
       
       onLeaveBack: () => {
-        console.log('📍 Statement: saiu voltando');
         window.dispatchEvent(new CustomEvent('statement:stop'));
       }
     }
@@ -381,7 +356,6 @@ function setupStatementContactTransition() {
       'statementExit'
     );
   
-  console.log('✅ Statement → Contact transition configured');
 }
 
 // -----------------------------
@@ -396,7 +370,6 @@ function smartRefresh() {
   gsap.delayedCall(0.1, () => {
     ScrollTrigger.refresh(true);
     refreshScheduled = false;
-    console.log('Smart refresh executed');
   });
 }
 
@@ -413,7 +386,6 @@ function debounce(func, wait) {
 }
 
 function resetAnimations() {
-  console.log('Resetting animations...');
   ScrollTrigger.getAll().forEach(st => st.kill());
   
   if (heroAllChars.length > 0) {
@@ -428,12 +400,10 @@ function resetAnimations() {
 // 7) Inicialização
 // -----------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded - preparing splitting...');
   prepareSplitting();
 });
 
 window.addEventListener('load', () => {
-  console.log('Window loaded - starting animations...');
   
   const wrapper = document.querySelector('.intro-wrapper');
   if (!wrapper) {
@@ -457,7 +427,6 @@ window.addEventListener('load', () => {
   gsap.delayedCall(0.5, smartRefresh);
   
   const handleResize = debounce(() => {
-    console.log('Handling resize...');
     const newViewport = window.innerHeight;
     wrapper.style.height = `${newViewport}px`;
     smartRefresh();
@@ -471,7 +440,6 @@ window.addEventListener('load', () => {
 // -----------------------------
 if (window.location.hash === '#debug') {
   ScrollTrigger.defaults({ markers: true });
-  console.log('🐛 Debug mode ativo');
   
   window.debugScrollOrchestrator = {
     heroChars: () => heroAllChars,
@@ -490,8 +458,4 @@ if (window.location.hash === '#debug') {
 export { smartRefresh as refreshScrollTriggers, resetAnimations };
 
 window.debugKinetic = () => {
-  console.log('Kinetic debug info:', {
-    workSection: document.querySelector('#work'),
-    workTrack: document.querySelector('.work-track'),
-  });
 };

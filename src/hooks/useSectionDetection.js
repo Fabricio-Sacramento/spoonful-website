@@ -26,7 +26,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       'ontouchstart' in window;
     
     if (isTouchDevice) {
-      console.log('📱 Section detection disabled');
       return;
     }
 
@@ -40,7 +39,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       }
 
       const handleNavEnter = () => {
-        console.log('🎯 Nav hover: ENTER - forçando GREEN_DOT');
         isOverNavRef.current = true;
         
         // Força GREEN_DOT independente da seção atual
@@ -48,7 +46,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       };
 
       const handleNavLeave = () => {
-        console.log('🎯 Nav hover: LEAVE - voltando para seção atual');
         isOverNavRef.current = false;
         
         // ✅ DELAY: Aguarda navegação programática completar antes de detectar seção
@@ -57,7 +54,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
             const currentSection = activeSection.current;
             const targetState = SECTION_STATE_MAP[currentSection] || CURSOR_STATES.GREEN_DOT;
             
-            console.log('🎯 Nav leave delayed - seção atual:', currentSection, '→', targetState);
             onSectionChange(currentSection, targetState);
           }
         }, 100); // 100ms delay para aguardar scroll/navegação
@@ -67,7 +63,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       const handleProgrammaticNavigation = (event) => {
         const { targetSection } = event.detail || {};
         if (targetSection) {
-          console.log('🧭 Navegação programática detectada:', targetSection);
           
           // Atualiza seção ativa imediatamente
           activeSection.current = targetSection;
@@ -86,7 +81,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       navMenu.addEventListener('mouseleave', handleNavLeave);
       window.addEventListener('nav:programmatic-navigation', handleProgrammaticNavigation);
 
-      console.log('✅ Nav hover detection + programmatic navigation configurado');
       
       return () => {
         navMenu.removeEventListener('mouseenter', handleNavEnter);
@@ -112,7 +106,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         
         onEnter: () => {
           if (activeSection.current === 'hero') return;
-          console.log('📍 Hero ENTERED (explicit trigger)');
           activeSection.current = 'hero';
           
           // ✅ CRÍTICO: Só muda cursor se não estivermos sobre o nav
@@ -123,7 +116,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         
         onEnterBack: () => {
           if (activeSection.current === 'hero') return;
-          console.log('📍 Hero ENTERED BACK (explicit trigger)');
           activeSection.current = 'hero';
           
           // ✅ CRÍTICO: Só muda cursor se não estivermos sobre o nav
@@ -133,7 +125,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         },
         
         onLeave: () => {
-          console.log('📍 Hero LEFT (explicit trigger)');
         }
       });
 
@@ -146,11 +137,9 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         onEnter: () => {
           // Bloqueia se VIEW (modal/card hover) OU se sobre nav
           if (getCurrentCursorState() === CURSOR_STATES.VIEW || isOverNavRef.current) {
-            console.log('🔒 About blocked - VIEW active ou nav hover');
             return;
           }
           if (activeSection.current === 'about-us') return;
-          console.log('📍 About Us ENTERED (explicit trigger)');
           activeSection.current = 'about-us';
           onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
         },
@@ -158,22 +147,18 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
         onEnterBack: () => {
           if (getCurrentCursorState() === CURSOR_STATES.VIEW || isOverNavRef.current) return;
           if (activeSection.current === 'about-us') return;
-          console.log('📍 About Us ENTERED BACK (explicit trigger)');
           activeSection.current = 'about-us';
           onSectionChange('about-us', CURSOR_STATES.GREEN_DOT);
         },
         
         onLeave: () => {
-          console.log('📍 About LEFT (explicit trigger)');
         },
         
         onLeaveBack: () => {
-          console.log('📍 About LEFT BACK (explicit trigger)');
         }
       });
 
       scrollTriggersRef.current = [heroTrigger, aboutTrigger];
-      console.log('✅ ScrollTrigger OK (explicit per-section triggers)');
       return true;
     };
 
@@ -200,7 +185,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
     ].filter(Boolean);
 
     if (sectionsForIO.length > 0) {
-      console.log(`🎯 IO: Observing ${sectionsForIO.length} sections`);
     }
 
     const observerConfig = {
@@ -217,7 +201,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
 
         // ✅ NOVO: Bloqueia se VIEW, modal ou hover no nav
         if (getCurrentCursorState() === CURSOR_STATES.VIEW || isOverNavRef.current) {
-          console.log(`🔒 ${sectionId} blocked - VIEW active ou nav hover`);
           return;
         }
 
@@ -228,7 +211,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
           const targetState = SECTION_STATE_MAP[sectionId];
 
           if (targetState) {
-            console.log(`📍 ${sectionId} ENTERED (IO)`);
             onSectionChange(sectionId, targetState);
           }
         }
@@ -244,7 +226,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       observerRef.current.observe(section);
     });
 
-    console.log('✅ IntersectionObserver initialized');
 
     return () => {
       clearInterval(setupInterval);
@@ -256,7 +237,6 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
       if (navCleanup) {
         navCleanup();
       }
-      console.log('🧹 Section detection cleaned');
     };
   }, [onSectionChange, getCurrentCursorState]);
 

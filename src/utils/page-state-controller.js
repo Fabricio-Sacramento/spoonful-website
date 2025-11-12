@@ -26,7 +26,6 @@ class PageStateController {
     this.setupEventListeners();
     this.startDetection();
     
-    console.log('📋 PageStateController initialized');
   }
 
   cacheElements() {
@@ -35,11 +34,6 @@ class PageStateController {
     this.elements.heroSection = document.querySelector('#hero');
     this.elements.contactLayer = document.querySelector('.contact-layer');
     
-    console.log('📋 Elements cached:', {
-      navMenu: !!this.elements.navMenu,
-      heroSection: !!this.elements.heroSection,
-      contactLayer: !!this.elements.contactLayer
-    });
   }
 
   setupEventListeners() {
@@ -59,7 +53,6 @@ class PageStateController {
     // Scroll detection
     window.addEventListener('scroll', this.handleScroll.bind(this));
     
-    console.log('📋 Event listeners attached');
   }
 
   startDetection() {
@@ -108,7 +101,6 @@ class PageStateController {
       this.sectionObserver.observe(section);
     });
 
-    console.log('📋 Section observer setup for', sectionsForIO.length, 'sections');
   }
 
   // Event Handlers
@@ -117,13 +109,11 @@ class PageStateController {
   }
 
   handleNavEnter() {
-    console.log('📋 Nav hover: ENTER');
     this.isOverNav = true;
     this.emit('nav-hover', true);
   }
 
   handleNavLeave() {
-    console.log('📋 Nav hover: LEAVE');
     this.isOverNav = false;
     this.emit('nav-hover', false);
     
@@ -133,13 +123,11 @@ class PageStateController {
   }
 
   handleModalOpen() {
-    console.log('📋 Modal: OPEN');
     this.isModalOpen = true;
     this.emit('modal-state', true);
   }
 
   handleModalClose() {
-    console.log('📋 Modal: CLOSE');
     this.isModalOpen = false;
     this.emit('modal-state', false);
     
@@ -191,7 +179,6 @@ class PageStateController {
     const previousSection = this.currentSection;
     this.currentSection = sectionId;
     
-    console.log('📋 Section changed:', previousSection, '→', sectionId);
     this.notifyStateChange();
   }
 
@@ -236,7 +223,6 @@ class PageStateController {
     
     this.listeners.get(event).add(callback);
     
-    console.log('📋 Listener added for:', event);
     
     // Return unsubscribe function
     return () => {
@@ -300,7 +286,6 @@ class PageStateController {
     // Clear listeners
     this.listeners.clear();
     
-    console.log('📋 PageStateController destroyed');
   }
 }
 

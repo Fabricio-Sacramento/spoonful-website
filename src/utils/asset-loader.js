@@ -24,13 +24,11 @@ class AssetLoader {
     this.loadedAssets = 0;
     this.failedAssets = 0;
 
-    console.log(`📦 AssetLoader: Starting to load ${this.totalAssets} images`);
 
     const promises = urls.map((url) => this.loadImage(url));  // ⬅️ SEM index
 
     await Promise.allSettled(promises);
 
-    console.log(`✅ AssetLoader: Complete - ${this.loadedAssets} loaded, ${this.failedAssets} failed`);
   }
 
   /**
@@ -46,7 +44,6 @@ class AssetLoader {
         settled = true;
         this.loadedAssets++;
         this.notifyProgress();
-        console.log(`✅ [${this.loadedAssets}/${this.totalAssets}] ${url.split('/').pop()}`);
         resolve({ url, status: 'loaded' });
       };
 

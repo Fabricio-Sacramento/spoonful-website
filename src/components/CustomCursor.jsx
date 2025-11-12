@@ -36,11 +36,6 @@ const CustomCursor = () => {
     const cursor = cursorRef.current;
     const text = cursorTextRef.current;
 
-    console.log(`🎨 Updating cursor:`, {
-      state: getCurrentState(),
-      scale: config.scale,
-      showText: config.showText
-    });
 
     gsap.to(cursor, {
       scale: config.scale,
@@ -48,7 +43,6 @@ const CustomCursor = () => {
       ease: 'back.out(1.7)',
       overwrite: 'auto',
       onComplete: () => {
-        console.log(`✅ Scale complete: ${config.scale}`);
       }
     });
 
@@ -74,7 +68,6 @@ const CustomCursor = () => {
   }, [getStateConfig, getCurrentState]);
 
   const handleSectionChange = useCallback((sectionId, targetState) => {
-    console.log(`🎯 Section: ${sectionId} → ${targetState}`);
     
     // ✅ NOVO: Prioridade especial para nav-hover
     let success;
@@ -86,13 +79,11 @@ const CustomCursor = () => {
     }
     
     if (success && isMountedRef.current) {
-      console.log(`✅ Transition OK`);
       updateCursorVisual();
     }
   }, [transition, updateCursorVisual]);
 
   const handleCardHover = useCallback((isHovering) => {
-    console.log(`🎴 Card: ${isHovering}`);
     
     if (isHovering) {
       const success = transition(CURSOR_STATES.VIEW);
@@ -108,7 +99,6 @@ const CustomCursor = () => {
 
   useEffect(() => {
     if (shouldDisable()) {
-      console.log('🚫 Custom cursor disabled');
       return;
     }
 
@@ -116,7 +106,6 @@ const CustomCursor = () => {
     if (!cursor) return;
 
     document.body.appendChild(cursor);
-    console.log('✅ Custom cursor mounted');
 
     gsap.set(cursor, { scale: 1 });
 
@@ -160,13 +149,11 @@ const CustomCursor = () => {
     };
 
     const handleModalOpen = () => {
-      console.log('🎬 Modal open event - setting GREEN_DOT for modal UI');
       transition(CURSOR_STATES.GREEN_DOT, true);
       updateCursorVisual();
     };
 
     const handleModalClose = () => {
-      console.log('🎬 Modal close event - re-evaluating hover AFTER modal removed');
 
       // Double RAF: aguarda modal sair do DOM
       requestAnimationFrame(() => {
@@ -177,7 +164,6 @@ const CustomCursor = () => {
           // ✅ NOVO: Checa se mouse está sobre nav menu
           const navMenu = elementUnderMouse?.closest('.nav-menu-container');
           if (navMenu) {
-            console.log('✅ Nav menu detected under mouse AFTER modal closed - GREEN_DOT');
             transition(CURSOR_STATES.GREEN_DOT, true);
             updateCursorVisual();
             return;
@@ -186,11 +172,9 @@ const CustomCursor = () => {
           // Busca #work
           const workSection = elementUnderMouse?.closest('#work');
           if (workSection) {
-            console.log('✅ Work section detected under mouse AFTER modal closed - VIEW');
             transition(CURSOR_STATES.VIEW);
             updateCursorVisual();
           } else {
-            console.log('✅ Default state AFTER modal closed - GREEN_DOT');
             transition(CURSOR_STATES.GREEN_DOT, true);
             updateCursorVisual();
           }
@@ -223,7 +207,6 @@ const CustomCursor = () => {
         cursor.parentNode.removeChild(cursor);
       }
       
-      console.log('🧹 Custom cursor unmounted');
     };
   }, [shouldDisable, updateCursorVisual, getStateConfig, transition]);
 

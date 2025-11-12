@@ -17,7 +17,6 @@ function CanvasReadySignal() {
     // garante que o frame inicial foi renderizado
     requestAnimationFrame(() => {
       window.dispatchEvent(new Event('canvas:ready'));
-      console.log('📡 Evento "canvas:ready" emitido');
     });
   }, [gl]);
 

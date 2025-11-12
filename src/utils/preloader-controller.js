@@ -28,7 +28,6 @@ this.lastLoggedProgress = 0;
 this.resizeHandler = () => {
   if (this.isComplete) return;
   this.config.maxWidth = window.innerWidth;
-  console.log(`📐 Viewport resized to ${window.innerWidth}px`);
 };
 
 // Registra listener de resize
@@ -44,7 +43,6 @@ if (!this.preloader || !this.bar) {
   return;
 }
 
-console.log('⏳ Preloader initialized - REAL asset loading + full width bar');
 
 this.startTime = performance.now();
 
@@ -56,12 +54,10 @@ this.startTimeCheck();
 }
 setupListeners() {
 window.addEventListener('load', () => {
-console.log('✅ Window loaded');
 this.checkpoints.windowLoad = true;
 this.updateTargetProgress();
 });
 window.addEventListener('canvas:ready', () => {
-  console.log('✅ Canvas ready');
   this.checkpoints.canvasReady = true;
   this.updateTargetProgress();
 });
@@ -69,7 +65,6 @@ window.addEventListener('canvas:ready', () => {
 async checkFonts() {
 try {
 await document.fonts.ready;
-console.log('✅ Fonts ready');
 this.checkpoints.fontsReady = true;
 this.updateTargetProgress();
 } catch (err) {
@@ -91,7 +86,6 @@ const projectImages = [];
     }
   });
 
-  console.log(`📦 Starting to load ${projectImages.length} project images`);
 
   assetLoader.onProgress((progress) => {
     if (progress >= 100) {
@@ -102,7 +96,6 @@ const projectImages = [];
 
   await assetLoader.loadImages(projectImages);
 
-  console.log('✅ All assets loaded');
   this.checkpoints.assetsLoaded = true;
   this.updateTargetProgress();
 
@@ -130,7 +123,6 @@ this.targetProgress = Math.min(technicalProgress, timeProgress);
 
 const logThreshold = 5;
 if (Math.abs(this.targetProgress - this.lastLoggedProgress) >= logThreshold || this.targetProgress === 100) {
-  console.log(`📊 Progress - Technical: ${technicalProgress.toFixed(0)}% | Time: ${timeProgress.toFixed(0)}% | Target: ${this.targetProgress.toFixed(0)}%`);
   this.lastLoggedProgress = this.targetProgress;
 }
 
@@ -162,7 +154,6 @@ this.animationFrame = requestAnimationFrame(animate);
 complete() {
 if (this.isComplete) return;
 this.isComplete = true;
-console.log('🎉 Preloader complete - starting exit');
 
 if (this.timeCheckInterval) {
   clearInterval(this.timeCheckInterval);
@@ -188,18 +179,15 @@ setTimeout(() => {
 }
 exit() {
 if (!this.preloader) return;
-console.log('🚀 Preloader exiting...');
 
 this.preloader.classList.add('preloader--exiting');
 
 setTimeout(() => {
   this.preloader.classList.add('preloader--hidden');
   window.dispatchEvent(new CustomEvent('preloader:complete'));
-  console.log('✅ Preloader exit complete');
 }, 600);
 }
 forceComplete() {
-console.log('🔧 Force completing preloader');
 Object.keys(this.checkpoints).forEach(key => {
 this.checkpoints[key] = true;
 });
@@ -207,7 +195,6 @@ this.startTime = performance.now() - this.config.minDuration;
 this.updateTargetProgress();
 }
 destroy() {
-console.log('🧹 Destroying preloader controller');
 if (this.timeCheckInterval) {
   clearInterval(this.timeCheckInterval);
   this.timeCheckInterval = null;

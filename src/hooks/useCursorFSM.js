@@ -61,7 +61,6 @@ export const useCursorFSM = (initialState = CURSOR_STATES.DRAG_ME) => {
     if (force) {
       stateRef.current = targetState;
       setCurrentState(targetState);
-      console.log(`🔴 FSM: Forced transition ${current} → ${targetState}`);
       return true;
     }
 
@@ -84,14 +83,12 @@ export const useCursorFSM = (initialState = CURSOR_STATES.DRAG_ME) => {
 
     // Prioridade: VIEW bloqueia transições de seção
     if (current === CURSOR_STATES.VIEW && targetState !== CURSOR_STATES.GREEN_DOT) {
-      console.log(`🔒 FSM: VIEW priority - blocking transition to ${targetState}`);
       return false;
     }
 
     // Executa transição
     stateRef.current = targetState;
     setCurrentState(targetState);
-    console.log(`✅ FSM: ${current} → ${targetState}`);
     
     return true;
   }, []);

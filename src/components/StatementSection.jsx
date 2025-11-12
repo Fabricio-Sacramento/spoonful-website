@@ -45,7 +45,6 @@ const StatementSection = forwardRef((props, ref) => {
     isPlayingRef.current = true;
     phraseIndexRef.current = 0;
 
-    console.log('🎬 Statement: Iniciando loop contínuo');
 
     await playNextPhrase();
   };
@@ -54,7 +53,6 @@ const StatementSection = forwardRef((props, ref) => {
    * Para ciclo em progresso
    */
   const stopCycle = () => {
-    console.log('⏹️ Statement: Parando loop');
     isPlayingRef.current = false;
     
     if (cycleTimeoutRef.current) {
@@ -109,7 +107,6 @@ const StatementSection = forwardRef((props, ref) => {
     ).matches;
 
     if (prefersReducedMotion) {
-      console.log('ℹ️ Statement: Scramble desabilitado (reduced motion)');
       if (textRef.current) {
         textRef.current.innerText = PHRASES.join(' / ');
       }
@@ -120,26 +117,21 @@ const StatementSection = forwardRef((props, ref) => {
 
     // Cria instância TextScramble
     scrambleRef.current = new TextScramble(textRef.current);
-    console.log('🎯 Statement: TextScramble criado');
 
     // Event Listeners para comunicação com GSAP ScrollTrigger
     const handleStart = () => {
-      console.log('📍 Statement: GSAP event received - starting loop');
       startCycle();
     };
 
     const handleStop = () => {
-      console.log('📍 Statement: GSAP event received - stopping loop');
       stopCycle();
     };
 
     window.addEventListener('statement:start', handleStart);
     window.addEventListener('statement:stop', handleStop);
-    console.log('📍 Statement: Event listeners registrados');
 
     // Cleanup
     return () => {
-      console.log('🧹 Statement: Cleanup iniciado');
       isMountedRef.current = false;
 
       window.removeEventListener('statement:start', handleStart);
@@ -152,7 +144,6 @@ const StatementSection = forwardRef((props, ref) => {
         scrambleRef.current = null;
       }
 
-      console.log('✅ Statement: Cleanup completo');
     };
   }, []);
 

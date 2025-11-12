@@ -81,11 +81,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   useEffect(() => {
   if (isOpen) {
     // Força cursor VIEW quando modal abre
-    console.log('🎬 Modal opened - forcing cursor VIEW');
     window.dispatchEvent(new CustomEvent('modal:open'));
     } else {
       // ✅ NOVO: Re-detecta posição do mouse ao fechar
-      console.log('🎬 Modal closed - re-detecting mouse position');
       window.dispatchEvent(new CustomEvent('modal:close'));
     }
   }, [isOpen]);
@@ -145,7 +143,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   const preloadImage = useCallback((src) => {
     return new Promise((resolve) => {
       if (!src) {
-        console.log('📸 No image to preload');
         return resolve();
       }
 
@@ -163,7 +160,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       };
 
       img.onload = () => {
-        console.log('📸 Image preloaded successfully:', src);
         cleanup();
         resolve();
       };
@@ -219,11 +215,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     try {
       const targetProject = projects[targetIndex];
       const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
-      console.log('📸 Preloading image:', heroSrc);
       await preloadImage(heroSrc);
 
       if (preferReduced) {
-        console.log('⚡ Reduced motion - direct swap');
         clearTimeout(safety);
         if (isMountedRef.current) {
           setCurrentIndex(targetIndex);
@@ -237,7 +231,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         return;
       }
 
-      console.log('🌫️ Fading out');
       if (!isMountedRef.current) return;
       setFadingState('fading');
       await nextPaint();
@@ -250,9 +243,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
 
       const fadeOutResult = await waitForTransition(contentEl, 700, 'opacity');
-      console.log('Fade-out result:', fadeOutResult);
 
-      console.log('⬆️ Scrolling to top');
       await Promise.race([
         smoothScrollToTop(modal, 650, false),
         new Promise(r => setTimeout(r, 1000))
@@ -262,7 +253,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       setCurrentIndex(targetIndex);
       await nextPaint();
 
-      console.log('✨ Fading in');
       if (!isMountedRef.current) return;
       setFadingState('visible');
       await nextPaint();
@@ -281,7 +271,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       }
 
       const fadeInResult = await waitForTransition(newContentEl, 700, 'opacity');
-      console.log('Fade-in result:', fadeInResult);
 
       const hero = modal.querySelector('.modal-hero');
       if (hero) {
@@ -306,7 +295,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       if (isMountedRef.current) {
         setFadingState('visible');
       }
-      console.log('🏁 Animation flags reset');
     }
   }, [currentIndex, projects, preloadImage, smoothScrollToTop, setAnimating]);
 
@@ -410,7 +398,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
   useEffect(() => {
     if (!isOpen) {
-      console.log('🧹 Modal closed - resetting all state');
       if (isMountedRef.current) {
         setFadingState('visible');
       }
@@ -667,14 +654,6 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     }
   };
 
-  console.log('🔍 RENDER STATE:', {
-    currentIndex,
-    currentProject: currentProject?.title,
-    prevProject: prevProject?.title,
-    nextProject: nextProject?.title,
-    fadingState,
-    isAnimatingState
-  });
 
   if (!isOpen || projects.length === 0) return null;
 

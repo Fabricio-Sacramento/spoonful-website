@@ -11,7 +11,6 @@ export const useCardHover = (onCardHover) => {
   const handleMouseEnter = useCallback(() => {
     if (!isHoveringRef.current) {
       isHoveringRef.current = true;
-      console.log('🎯 Work track hover START');
       onCardHover(true);
     }
   }, [onCardHover]);
@@ -19,19 +18,16 @@ export const useCardHover = (onCardHover) => {
   const handleMouseLeave = useCallback(() => {
     // Se marcada a flag de ignorar, consumimos o evento sem disparar a callback
     if (ignoreNextLeaveRef.current) {
-      console.log('⏱️ Ignoring one mouseleave due to recent modal close');
       ignoreNextLeaveRef.current = false;
       return;
     }
 
     // Ignora mouseleave se modal está aberto (comportamento já existente)
     if (isModalOpenRef.current) {
-      console.log('🔒 Work track hover END blocked - modal is open');
       return;
     }
 
     if (isHoveringRef.current) {
-      console.log('👋 Work track hover END');
       isHoveringRef.current = false;
       onCardHover(false);
     }
@@ -43,20 +39,17 @@ export const useCardHover = (onCardHover) => {
       'ontouchstart' in window;
 
     if (isTouchDevice) {
-      console.log('📱 Work track hover disabled');
       return;
     }
 
     // Listeners para modal
     const handleModalOpen = () => {
-      console.log('🔒 Modal opened - blocking work track hover events');
       isModalOpenRef.current = true;
       // também podemos limpar ignore flag (prevenção)
       ignoreNextLeaveRef.current = false;
     };
 
     const handleModalClose = () => {
-      console.log('🔓 Modal closed - allowing work track hover events');
       // libera hover, mas IGNORA o próximo mouseleave que venha logo em seguida
       isModalOpenRef.current = false;
       ignoreNextLeaveRef.current = true;
@@ -71,7 +64,6 @@ export const useCardHover = (onCardHover) => {
       const workTrack = document.querySelector('.work-track');
 
       if (!workTrack) {
-        console.log('⏳ Work track not found yet...');
         return false;
       }
 
@@ -81,7 +73,6 @@ export const useCardHover = (onCardHover) => {
       window.addEventListener('modal:open', handleModalOpen);
       window.addEventListener('modal:close', handleModalClose);
 
-      console.log('✅ Work track hover detection initialized');
       return true;
     };
 
@@ -107,7 +98,6 @@ export const useCardHover = (onCardHover) => {
       window.removeEventListener('modal:open', handleModalOpen);
       window.removeEventListener('modal:close', handleModalClose);
 
-      console.log('🧹 Work track hover cleaned up');
       isHoveringRef.current = false;
       isModalOpenRef.current = false;
       ignoreNextLeaveRef.current = false;

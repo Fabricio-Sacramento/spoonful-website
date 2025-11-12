@@ -63,7 +63,6 @@ cursorRoot.render(<CustomCursor />);
 window.addEventListener('load', () => {
   setTimeout(() => {
     canvasController.init(root3D, <CanvasApp />);
-    console.log('Canvas Performance Controller ativo');
   }, 600);
 });
 
@@ -80,11 +79,9 @@ if (window.location.hash === '#debug') {
 
   window.debugStatement = {
     trigger: () => {
-      console.log('🧪 Debug: Disparando statement:start');
       window.dispatchEvent(new CustomEvent('statement:start'));
     },
     stop: () => {
-      console.log('🧪 Debug: Disparando statement:stop');
       window.dispatchEvent(new CustomEvent('statement:stop'));
     },
     checkScrollTrigger: () => {
@@ -92,7 +89,6 @@ if (window.location.hash === '#debug') {
       const statementTrigger = triggers.find(t => 
         t.trigger?.id === 'statement'
       );
-      console.log('Statement ScrollTrigger:', statementTrigger);
       return statementTrigger;
     }
   };
