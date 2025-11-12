@@ -37,7 +37,7 @@
   display: flex;
   align-items: flex-end; /* ⬅️ Alinha ao baseline da SVG */
   justify-content: flex-start; /* ⬅️ Alinha à esquerda */
-  gap: 32px; /* ⬅️ Espaçamento entre SVG e contador */
+  gap: 16px; /* ⬅️ Espaçamento entre SVG e contador */
 }
 
 /* SVG ocupa 50vw mantendo aspect ratio */
@@ -65,11 +65,18 @@
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-size: 5.9375rem; /* 95px */
   font-style: normal;
-  font-weight: 300;
-  line-height: 7.3125rem; /* 117px - 123.158% */
+  font-weight: 900;
+  line-height: 4.8rem; /* ⬅️ MUDOU: 1 ao invés de 7.3125rem para alinhar ao baseline */
   letter-spacing: -0.05938rem; /* -0.95px */
   white-space: nowrap;
   flex-shrink: 0; /* ⬅️ Não encolhe */
+  
+  /* ⬅️ NOVO: Width fixo para 3 dígitos (evita jitter) */
+  min-width: 3ch; /* 3 caracteres de largura */
+  text-align: right; /* Alinha à direita dentro do espaço fixo */
+  
+  /* ⬅️ NOVO: Tabular numbers para largura consistente */
+  font-variant-numeric: tabular-nums;
   
   /* Performance */
   transform: translateZ(0);
@@ -130,7 +137,7 @@
 @media (min-width: 1440px) and (max-width: 1919px) {
   .preloader__title-wrapper {
     max-width: 50vw;
-    gap: 28px;
+    gap: 16px;
   }
   
   .preloader__title {
@@ -140,7 +147,7 @@
   
   .preloader__counter {
     font-size: 5.21875rem; /* 87.5% do original */
-    line-height: 6.421875rem;
+    line-height: 1;
     letter-spacing: -0.0521875rem;
   }
 }
@@ -149,7 +156,7 @@
 @media (min-width: 1024px) and (max-width: 1439px) {
   .preloader__title-wrapper {
     max-width: 55vw;
-    gap: 24px;
+    gap: 16px;
   }
   
   .preloader__title {
@@ -159,7 +166,7 @@
   
   .preloader__counter {
     font-size: 4.75rem; /* 80% do original */
-    line-height: 5.85rem;
+    line-height: 1;
     letter-spacing: -0.0475rem;
   }
 }
@@ -168,7 +175,7 @@
 @media (max-width: 1023px) and (min-width: 768px) {
   .preloader__title-wrapper {
     max-width: 65vw;
-    gap: 20px;
+    gap: 16px;
   }
   
   .preloader__title {
@@ -178,7 +185,7 @@
   
   .preloader__counter {
     font-size: 3.5625rem; /* 60% do original */
-    line-height: 4.3875rem;
+    line-height: 1;
     letter-spacing: -0.035625rem;
   }
 }
@@ -187,7 +194,7 @@
 @media (max-width: 767px) {
   .preloader__title-wrapper {
     max-width: 75vw;
-    gap: 16px;
+    gap: 8px;
   }
   
   .preloader__title {
@@ -197,7 +204,7 @@
   
   .preloader__counter {
     font-size: 2.96875rem; /* 50% do original */
-    line-height: 3.65625rem;
+    line-height: 1;
     letter-spacing: -0.0296875rem;
   }
 }
@@ -216,7 +223,7 @@
   
   .preloader__counter {
     font-size: 2.375rem; /* 40% do original */
-    line-height: 2.925rem;
+    line-height: 1;
     letter-spacing: -0.02375rem;
   }
 }
@@ -225,7 +232,7 @@
 @media (max-width: 479px) {
   .preloader__title-wrapper {
     max-width: 85vw;
-    gap: 10px;
+    gap: 12px;
   }
   
   .preloader__title {
@@ -235,7 +242,7 @@
   
   .preloader__counter {
     font-size: 2.078125rem; /* 35% do original */
-    line-height: 2.559375rem;
+    line-height: 1;
     letter-spacing: -0.02078125rem;
   }
 }
@@ -254,7 +261,7 @@
   
   .preloader__counter {
     font-size: 1.78125rem; /* 30% do original */
-    line-height: 2.19375rem;
+    line-height: 1;
     letter-spacing: -0.0178125rem;
   }
 }
