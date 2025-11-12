@@ -9,6 +9,7 @@ import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import NavWithDrawer from './components/NavWithDrawer.jsx';
+import PreloaderTitle from './components/PreloaderTitle.jsx'; // ⬅️ NOVO
 
 // Utils
 import './scripts/scroll-orchestrator.js';
@@ -17,9 +18,15 @@ import { setContactInteractivity } from './utils/contact-interactivity.js';
 import './utils/preloader-controller.js';
 
 // ================================
-// MONTA COMPONENTES EXISTENTES
-// (resto igual, sem mudanças)
+// MONTA COMPONENTES
 // ================================
+
+// 0) Preloader Title (SVG SPOONFUL) ⬅️ NOVO
+const preloaderTitleContainer = document.querySelector('#preloader .preloader__title');
+if (preloaderTitleContainer) {
+  const preloaderTitleRoot = ReactDOM.createRoot(preloaderTitleContainer);
+  preloaderTitleRoot.render(<PreloaderTitle />);
+}
 
 // 1) Canvas 3D
 const root3D = ReactDOM.createRoot(document.getElementById('root'));
@@ -61,7 +68,7 @@ window.addEventListener('load', () => {
 });
 
 // ================================
-// DEBUG HELPERS (igual antes)
+// DEBUG HELPERS
 // ================================
 if (window.location.hash === '#debug') {
   window.debugCanvas = {
@@ -133,18 +140,19 @@ if (window.location.hash === '#debug') {
   
   window.debugPreloader = {
     forceShow: () => {
-      const preloader = document.querySelector('.preloader');
+      const preloader = document.querySelector('#preloader');
       if (preloader) preloader.style.display = 'flex';
     },
     forceHide: () => {
-      const preloader = document.querySelector('.preloader');
+      const preloader = document.querySelector('#preloader');
       if (preloader) preloader.style.display = 'none';
     },
     checkAssets: () => {
       return {
         canvas: !!document.querySelector('#root canvas'),
         canvasWidth: document.querySelector('#root canvas')?.width,
-        fontsReady: document.fonts.status
+        fontsReady: document.fonts.status,
+        svgMounted: !!document.querySelector('.preloader__title svg')
       };
     }
   };

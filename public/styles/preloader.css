@@ -1,5 +1,5 @@
 /* ================================= */
-/* PRELOADER - FULL WIDTH BAR        */
+/* PRELOADER - SPOONFUL WORDMARK     */
 /* ================================= */
 
 #preloader {
@@ -10,8 +10,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  justify-content: space-between;
+  padding: 0;
   pointer-events: all;
   
   /* Performance */
@@ -20,45 +20,61 @@
   backface-visibility: hidden;
 }
 
-/* Estado de saída - swipe up */
-#preloader.preloader--exiting {
-  animation: swipeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+/* Container do SVG SPOONFUL */
+.preloader__title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem;
 }
 
-/* Texto LOADING */
-.preloader__label {
-  color: var(--neutral-light);
-  text-align: center; /* ⬅️ CENTER (era right) */
-  font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 2.5rem;
-  font-style: normal;
-  font-weight: 900;
-  line-height: 4rem;
-  letter-spacing: 0.1rem;
-  margin: 0;
+/* Wrapper interno para controle preciso */
+.preloader__title-wrapper {
+  width: 100%;
+  max-width: 50vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG ocupa 50vw mantendo aspect ratio */
+.preloader__title svg,
+.preloader__title-wrapper svg {
+  width: 100%;
+  height: auto;
+  display: block;
   
   /* Performance */
   transform: translateZ(0);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
-/* Container da barra - FULL WIDTH */
+/* Cor do SVG - branco (neutral-light) */
+.preloader__title svg path,
+.preloader__title-wrapper svg path {
+  fill: var(--neutral-light);
+}
+
+/* Container da barra - FIXED BOTTOM com 10px */
 .preloader__bar-container {
-  width: 100vw; /* ⬅️ MUDOU: era 250px */
-  height: 2px;
+  width: 100vw;
+  height: 10px;
   background-color: rgba(235, 235, 235, 0.2);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
-/* Barra de progresso - cresce da esquerda para direita */
+/* Barra de progresso - 10px de altura */
 .preloader__bar {
   position: absolute;
   top: 0;
   left: 0;
   width: 0;
-  height: 2px;
+  height: 10px;
   background-color: var(--neutral-light);
   transition: width 0.3s ease-out;
   
@@ -67,7 +83,11 @@
   transform: translateZ(0);
 }
 
-/* Animação swipe up */
+/* Estado de saída - swipe up */
+#preloader.preloader--exiting {
+  animation: swipeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
 @keyframes swipeUp {
   from {
     transform: translateY(0);
@@ -88,64 +108,78 @@
 
 /* Desktop Padrão: 1440px - 1919px */
 @media (min-width: 1440px) and (max-width: 1919px) {
-  .preloader__label {
-    font-size: 5.46875rem;
-    line-height: 6.8125rem;
-    letter-spacing: -0.109375rem;
+  .preloader__title-wrapper {
+    max-width: 50vw;
+  }
+  
+  .preloader__title {
+    padding: 1.875rem;
   }
 }
 
 /* Laptop: 1024px - 1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
-  .preloader__label {
-    font-size: 5.125rem;
-    line-height: 6.375rem;
-    letter-spacing: -0.1025rem;
+  .preloader__title-wrapper {
+    max-width: 55vw;
+  }
+  
+  .preloader__title {
+    padding: 1.75rem;
   }
 }
 
 /* Tablet Landscape: 768px - 1023px */
 @media (max-width: 1023px) and (min-width: 768px) {
-  .preloader__label {
-    font-size: 4.1125rem;
-    line-height: 5.125rem;
-    letter-spacing: -0.08225rem;
+  .preloader__title-wrapper {
+    max-width: 65vw;
+  }
+  
+  .preloader__title {
+    padding: 1.5rem;
   }
 }
 
 /* Tablet Portrait: 600px - 767px */
 @media (max-width: 767px) {
-  .preloader__label {
-    font-size: 2.9375rem;
-    line-height: 3.65625rem;
-    letter-spacing: -0.05875rem;
+  .preloader__title-wrapper {
+    max-width: 75vw;
+  }
+  
+  .preloader__title {
+    padding: 1.25rem;
   }
 }
 
 /* Mobile Large: 480px - 599px */
 @media (max-width: 599px) {
-  .preloader__label {
-    font-size: 2.584375rem;
-    line-height: 3.221875rem;
-    letter-spacing: -0.0516875rem;
+  .preloader__title-wrapper {
+    max-width: 82vw;
+  }
+  
+  .preloader__title {
+    padding: 1rem;
   }
 }
 
 /* Mobile Padrão: 360px - 479px */
 @media (max-width: 479px) {
-  .preloader__label {
-    font-size: 2.34375rem;
-    line-height: 2.921875rem;
-    letter-spacing: -0.046875rem;
+  .preloader__title-wrapper {
+    max-width: 85vw;
+  }
+  
+  .preloader__title {
+    padding: 0.875rem;
   }
 }
 
 /* Mobile Small: 375px e abaixo */
 @media (max-width: 375px) {
-  .preloader__label {
-    font-size: 2.05625rem;
-    line-height: 2.565625rem;
-    letter-spacing: -0.041125rem;
+  .preloader__title-wrapper {
+    max-width: 88vw;
+  }
+  
+  .preloader__title {
+    padding: 0.75rem;
   }
 }
 
