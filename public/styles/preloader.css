@@ -1,5 +1,5 @@
 /* ================================= */
-/* PRELOADER - SIMPLE & FUNCTIONAL   */
+/* PRELOADER - FULL WIDTH BAR        */
 /* ================================= */
 
 #preloader {
@@ -28,12 +28,12 @@
 /* Texto LOADING */
 .preloader__label {
   color: var(--neutral-light);
-  text-align: right;
+  text-align: center; /* ⬅️ CENTER (era right) */
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 3rem;
+  font-size: 5.875rem;
   font-style: normal;
   font-weight: 900;
-  line-height: 3rem;
+  line-height: 7.3125rem;
   letter-spacing: -0.1175rem;
   margin: 0;
   
@@ -43,11 +43,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Container da barra (250px fixo) */
+/* Container da barra - FULL WIDTH */
 .preloader__bar-container {
-  width: 250px;
+  width: 100vw; /* ⬅️ MUDOU: era 250px */
   height: 2px;
-  background-color: rgba(235, 235, 235, 0.2); /* Fundo sutil */
+  background-color: rgba(235, 235, 235, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -57,7 +57,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 0; /* Inicia em 0 */
+  width: 0;
   height: 2px;
   background-color: var(--neutral-light);
   transition: width 0.3s ease-out;
