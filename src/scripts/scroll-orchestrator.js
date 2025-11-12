@@ -117,7 +117,7 @@ function initHeroAboutTimeline() {
       trigger: wrapper,
       start: 'top top',
       end: 'bottom top',
-      scrub: 1,
+      scrub: 2.5,
       pin: true,
       pinSpacing: true,
       anticipatePin: 1,
@@ -131,8 +131,8 @@ function initHeroAboutTimeline() {
 
   mainTl
     .addLabel('start')
-    .addLabel('heroExit', 0.3)
-    .addLabel('aboutEnter', 0.5)
+    .addLabel('heroExit', 0.4)
+    .addLabel('aboutEnter', 0.7)
     .to(
       heroAllChars,
       {
