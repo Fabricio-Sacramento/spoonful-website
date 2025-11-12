@@ -1,5 +1,5 @@
 /* ================================= */
-/* PRELOADER - FULL WIDTH BAR        */
+/* PRELOADER - CURTAINS EFFECT       */
 /* ================================= */
 
 #preloader {
@@ -11,7 +11,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
   pointer-events: all;
   
   /* Performance */
@@ -20,15 +19,58 @@
   backface-visibility: hidden;
 }
 
-/* Estado de saída - swipe up */
-#preloader.preloader--exiting {
-  animation: swipeUp 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+/* ================================= */
+/* CORTINAS - ESTRUTURA              */
+/* ================================= */
+
+.preloader__curtain {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background-color: var(--primary-red);
+  z-index: 2; /* Acima do conteúdo */
+  
+  /* Performance */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.preloader__curtain--top {
+  top: 0;
+  transform-origin: top center;
+}
+
+.preloader__curtain--bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+}
+
+/* ================================= */
+/* CONTEÚDO (LOADING + BARRA)        */
+/* ================================= */
+
+.preloader__content {
+  position: relative;
+  z-index: 1; /* Abaixo das cortinas */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  /* ⬇️ ADICIONA ISSO */
+  opacity: 1;
+  
+  /* Performance */
+  transform: translateZ(0);
 }
 
 /* Texto LOADING */
 .preloader__label {
   color: var(--neutral-light);
-  text-align: center; /* ⬅️ CENTER (era right) */
+  text-align: center;
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
   font-size: 5.875rem;
   font-style: normal;
@@ -36,6 +78,9 @@
   line-height: 7.3125rem;
   letter-spacing: -0.1175rem;
   margin: 0;
+  
+  /* Fade out quando completa */
+  transition: opacity 300ms ease-out;
   
   /* Performance */
   transform: translateZ(0);
@@ -45,14 +90,17 @@
 
 /* Container da barra - FULL WIDTH */
 .preloader__bar-container {
-  width: 100vw; /* ⬅️ MUDOU: era 250px */
+  width: 100vw;
   height: 2px;
   background-color: rgba(235, 235, 235, 0.2);
   position: relative;
   overflow: hidden;
+  
+  /* Fade out quando completa */
+  transition: opacity 300ms ease-out;
 }
 
-/* Barra de progresso - cresce da esquerda para direita */
+/* Barra de progresso */
 .preloader__bar {
   position: absolute;
   top: 0;
@@ -67,13 +115,41 @@
   transform: translateZ(0);
 }
 
-/* Animação swipe up */
-@keyframes swipeUp {
+/* ================================= */
+/* ANIMAÇÕES DE SAÍDA                */
+/* ================================= */
+
+/* Fade out do conteúdo - MANUAL via JS */
+#preloader.preloader--fade-content .preloader__content {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+/* Cortinas abrem - SEM delay (JS já controla) */
+#preloader.preloader--open-curtains .preloader__curtain--top {
+  animation: curtainUp 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+#preloader.preloader--open-curtains .preloader__curtain--bottom {
+  animation: curtainDown 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Keyframes das cortinas */
+@keyframes curtainUp {
   from {
-    transform: translateY(0);
+    transform: translateY(0) translateZ(0);
   }
   to {
-    transform: translateY(-100%);
+    transform: translateY(-100%) translateZ(0);
+  }
+}
+
+@keyframes curtainDown {
+  from {
+    transform: translateY(0) translateZ(0);
+  }
+  to {
+    transform: translateY(100%) translateZ(0);
   }
 }
 
@@ -83,7 +159,7 @@
 }
 
 /* ================================= */
-/* RESPONSIVE                        */
+/* RESPONSIVE - TIPOGRAFIA           */
 /* ================================= */
 
 /* Desktop Padrão: 1440px - 1919px */
@@ -154,12 +230,26 @@
 /* ================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  #preloader.preloader--exiting {
-    animation: fadeOut 300ms ease-out forwards;
+  /* Desabilita curtains, usa fade simples */
+  #preloader.preloader--fade-content .preloader__curtain--top,
+  #preloader.preloader--fade-content .preloader__curtain--bottom {
+    animation: none;
+    opacity: 0;
+    transition: opacity 300ms ease-out;
   }
   
-  @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+  #preloader.preloader--fade-content {
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+}
+
+/* ================================= */
+/* HIGH CONTRAST MODE                */
+/* ================================= */
+
+@media (prefers-contrast: high) {
+  .preloader__curtain {
+    border: 2px solid var(--neutral-light);
   }
 }

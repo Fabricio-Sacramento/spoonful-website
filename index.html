@@ -19,9 +19,16 @@
 <body>
 <!-- PRELOADER -->
 <div id="preloader">
-  <h1 class="preloader__label">LOADING</h1>
-  <div class="preloader__bar-container">
-    <div class="preloader__bar"></div>
+  <!-- Cortinas -->
+  <div class="preloader__curtain preloader__curtain--top"></div>
+  <div class="preloader__curtain preloader__curtain--bottom"></div>
+  
+  <!-- Conteúdo (LOADING + barra) -->
+  <div class="preloader__content">
+    <h1 class="preloader__label">LOADING</h1>
+    <div class="preloader__bar-container">
+      <div class="preloader__bar"></div>
+    </div>
   </div>
 </div>
 <!-- SVG para o clipPath do Hero -->
