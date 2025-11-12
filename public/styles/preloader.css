@@ -30,11 +30,11 @@
   color: var(--neutral-light);
   text-align: center; /* ⬅️ CENTER (era right) */
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 5.875rem;
+  font-size: 2.5rem;
   font-style: normal;
   font-weight: 900;
-  line-height: 7.3125rem;
-  letter-spacing: -0.1175rem;
+  line-height: 4rem;
+  letter-spacing: 0.1rem;
   margin: 0;
   
   /* Performance */
