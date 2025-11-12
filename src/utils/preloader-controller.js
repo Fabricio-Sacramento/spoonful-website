@@ -147,6 +147,11 @@ this.progress += diff * 0.1;
     this.bar.style.width = `${width}px`;
   }
 
+  // ⬅️ NOVO: Dispara evento para atualizar o contador React
+  window.dispatchEvent(new CustomEvent('preloader:progress', {
+    detail: { progress: this.progress }
+  }));
+
   if (!this.isComplete) {
     this.animationFrame = requestAnimationFrame(animate);
   }
@@ -171,6 +176,11 @@ if (this.animationFrame) {
 if (this.bar) {
   this.bar.style.width = `${this.config.maxWidth}px`;
 }
+
+// ⬅️ Dispara evento final com 100%
+window.dispatchEvent(new CustomEvent('preloader:progress', {
+  detail: { progress: 100 }
+}));
 
 setTimeout(() => {
   this.exit();
