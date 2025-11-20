@@ -124,7 +124,26 @@ export const projects = [
     techStack: "Three.js, React, GSAP, WebGL, Sanity CMS",
     tags: ["WEBSITE", "UIUX", "DEVELOPMENT", "3D", "MOTION"],
     image: hysteriaSlide01,
-    galleryImages: [hysteriaSlide01, hysteriaSlide02, hysteriaSlide03, hysteriaSlide04, hysteriaSlide05],
+    
+    // 🆕 EXEMPLO: Mix de imagens (legacy) + iframe
+    galleryImages: [
+      hysteriaSlide01, // Legacy format (string) - continua funcionando
+      hysteriaSlide02,
+      {
+        type: 'iframe',
+        url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Substitua pelo URL real do vídeo
+        aspectRatio: '16/9' // Opcional - padrão é 16/9
+      },
+      hysteriaSlide03,
+      {
+        type: 'iframe',
+        url: 'https://player.vimeo.com/video/76979871', // Exemplo de Vimeo
+        aspectRatio: '16/9'
+      },
+      hysteriaSlide04,
+      hysteriaSlide05
+    ],
+    
     projectUrl: "https://hysteria-gallery.vercel.app",
     backgroundColor: "var(--primary-red)"
   },

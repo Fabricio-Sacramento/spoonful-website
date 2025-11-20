@@ -42,3 +42,73 @@
     scroll-behavior: auto;
   }
 }
+
+/* ================================ */
+/* 🆕 IFRAME SUPPORT */
+/* ================================ */
+
+/* Container responsivo para iframes */
+.modal__iframe-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--iframe-aspect-ratio, 16/9);
+  background: var(--neutral-normal, #1a1a1a);
+  overflow: hidden;
+}
+
+.modal__iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 2;
+}
+
+/* Loading skeleton para iframes */
+.modal__iframe-loading {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--neutral-normal, #1a1a1a) 25%,
+    var(--neutral-medium-dark, #2a2a2a) 50%,
+    var(--neutral-normal, #1a1a1a) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Animação de shimmer para loading */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Remove loading quando iframe carrega */
+.modal__iframe-container iframe:not([data-loading]) + .modal__iframe-loading {
+  display: none;
+}
+
+/* === RESPONSIVIDADE === */
+@media (max-width: 768px) {
+  .modal__iframe-container {
+    /* Mantém aspect ratio mesmo em mobile */
+    min-height: 200px;
+  }
+}
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  .modal__iframe-loading {
+    animation: none;
+    background: var(--neutral-medium-dark, #2a2a2a);
+  }
+}

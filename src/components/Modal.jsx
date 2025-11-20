@@ -12,16 +12,6 @@ const clamp = (v, a = 0, b = 1) => Math.min(Math.max(v, a), b);
 const nextPaint = () =>
   new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
 
-const ensureScrollTop = async (el, attempts = 6) => {
-  if (!el) return;
-  for (let i = 0; i < attempts; i++) {
-    el.scrollTop = 0;
-    await nextPaint();
-    if (el.scrollTop === 0) return;
-  }
-  el.scrollTop = 0;
-};
-
 const safeFocus = (el) => {
   if (!el || typeof el.focus !== 'function') return;
   try {
@@ -64,6 +54,115 @@ const waitForTransition = (el, timeout = 800, property = 'opacity') => {
       resolve({ via: 'timeout' });
     }, Math.max(timeout, maxDuration + 80));
   });
+};
+
+// ================================
+// 🆕 RENDER SLIDE - Suporte a iFrames
+// ================================
+
+/**
+ * Renderiza um slide do gallery (imagem ou iframe)
+ * Suporta backward compatibility com strings (formato legacy)
+ */
+const renderSlide = (slide, index, projectTitle) => {
+  // Backward compatibility: se for string, é imagem legacy
+  if (typeof slide === 'string') {
+    return (
+      <div key={index} className="modal-gallery-image">
+        <img
+          src={slide}
+          alt={`${projectTitle} - Gallery ${index + 1}`}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block'
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Novo formato: iframe
+  if (slide.type === 'iframe') {
+    const aspectRatio = slide.aspectRatio || '16/9';
+    
+    return (
+      <div 
+        key={index} 
+        className="modal-gallery-iframe-container"
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: aspectRatio,
+          backgroundColor: 'var(--neutral-normal, #1a1a1a)',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Loading skeleton */}
+        <div 
+          className="modal-gallery-iframe-loading"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 1.5s ease-in-out infinite',
+            zIndex: 1,
+            pointerEvents: 'none'
+          }}
+        />
+        
+        <iframe
+          src={slide.url}
+          loading="lazy"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen={false}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            zIndex: 2
+          }}
+          onLoad={(e) => {
+            // Remove loading skeleton ao carregar
+            const container = e.target.closest('.modal-gallery-iframe-container');
+            const loader = container?.querySelector('.modal-gallery-iframe-loading');
+            if (loader) loader.style.display = 'none';
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Novo formato: imagem como objeto
+  if (slide.type === 'image') {
+    return (
+      <div key={index} className="modal-gallery-image">
+        <img
+          src={slide.src}
+          alt={`${projectTitle} - Gallery ${index + 1}`}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block'
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Fallback: tipo desconhecido
+  console.warn(`⚠️ Unknown slide type at index ${index}:`, slide);
+  return null;
 };
 
 // ================================
@@ -214,8 +313,20 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
 
     try {
       const targetProject = projects[targetIndex];
-      const heroSrc = (targetProject.galleryImages && targetProject.galleryImages[0]) || targetProject.image;
-      await preloadImage(heroSrc);
+      
+      // 🆕 Preload apenas se for imagem (string ou objeto com type='image')
+      const firstSlide = targetProject.galleryImages?.[0];
+      let heroSrc = null;
+      
+      if (typeof firstSlide === 'string') {
+        heroSrc = firstSlide;
+      } else if (firstSlide?.type === 'image') {
+        heroSrc = firstSlide.src;
+      }
+      
+      if (heroSrc) {
+        await preloadImage(heroSrc);
+      }
 
       if (preferReduced) {
         clearTimeout(safety);
@@ -242,392 +353,37 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
         return;
       }
 
-      const fadeOutResult = await waitForTransition(contentEl, 700, 'opacity');
+      await waitForTransition(contentEl, 700, 'opacity');
 
       await Promise.race([
-        smoothScrollToTop(modal, 650, false),
-        new Promise(r => setTimeout(r, 1000))
+        smoothScrollToTop(modal, 0, true),
+        new Promise(r => setTimeout(r, 20))
       ]);
 
       if (!isMountedRef.current) return;
       setCurrentIndex(targetIndex);
-      await nextPaint();
-
-      if (!isMountedRef.current) return;
       setFadingState('visible');
       await nextPaint();
 
-      await ensureScrollTop(modal);
+      await waitForTransition(contentEl, 700, 'opacity');
 
-      if (!modalRef.current) {
-        console.warn('⚠️ Modal ref lost after swap');
-        return;
-      }
-
-      const newContentEl = modal.querySelector(`.${styles.modalContent}`);
-      if (!newContentEl) {
-        console.warn('⚠️ New content element not found');
-        return;
-      }
-
-      const fadeInResult = await waitForTransition(newContentEl, 700, 'opacity');
-
-      const hero = modal.querySelector('.modal-hero');
-      if (hero) {
-        hero.classList.remove('modal-hero--visible');
-        setTimeout(() => hero.classList.add('modal-hero--visible'), 80);
-      }
+      clearTimeout(safety);
 
       setTimeout(() => {
         const title = modal.querySelector('h1') || modal.querySelector('[data-focus-target]');
         safeFocus(title);
-      }, 320);
+      }, 50);
 
     } catch (err) {
       console.error('❌ navigateTo error:', err);
-      if (isMountedRef.current) {
-        setCurrentIndex(targetIndex);
-      }
     } finally {
-      clearTimeout(safety);
       setAnimating(false);
       animRef.current.suppressScroll = false;
-      if (isMountedRef.current) {
-        setFadingState('visible');
-      }
     }
   }, [currentIndex, projects, preloadImage, smoothScrollToTop, setAnimating]);
 
-  const handleClose = useCallback(() => {
-    if (animRef.current.isAnimating) return;
-
-    if (closeTimersRef.current.overlay) clearTimeout(closeTimersRef.current.overlay);
-    if (closeTimersRef.current.hide) clearTimeout(closeTimersRef.current.hide);
-    if (closeTimersRef.current.raf) cancelAnimationFrame(closeTimersRef.current.raf);
-    closeTimersRef.current = { hide: null, overlay: null, raf: null };
-
-    const modal = modalRef.current;
-    if (!modal) {
-      onClose();
-      return;
-    }
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const overlayDuration = prefersReducedMotion ? 120 : 420;
-    const staggerDelays = prefersReducedMotion ? [0, 15, 30] : [0, 60, 120];
-
-    setAnimating(true);
-    animRef.current.suppressScroll = true;
-
-    const hero = modal.querySelector('.modal-hero');
-
-    if (hero) {
-      const items = Array.from(hero.querySelectorAll('[data-reveal]'));
-
-      items.forEach((el, i) => {
-        const reverseIndex = items.length - 1 - i;
-        const delay = staggerDelays[reverseIndex] ?? (staggerDelays[staggerDelays.length - 1] + (reverseIndex - staggerDelays.length + 1) * 40);
-        el.style.transitionDelay = `${delay}ms`;
-      });
-
-      hero.classList.add('modal-hero--hiding');
-      hero.classList.remove('modal-hero--visible');
-
-      const maxStaggerDelay = Math.max(...staggerDelays.slice(0, Math.min(items.length, staggerDelays.length)));
-      const heroHideDuration = Math.round(320 + maxStaggerDelay);
-      const overlayStartTime = Math.round(heroHideDuration * 0.6);
-
-      closeTimersRef.current.overlay = window.setTimeout(() => {
-        modal.classList.add('modal-overlay--exiting');
-        modal.classList.remove('modal-overlay--visible');
-      }, overlayStartTime);
-
-      const totalDuration = Math.max(overlayStartTime + overlayDuration, heroHideDuration);
-
-      closeTimersRef.current.hide = window.setTimeout(() => {
-        items.forEach(el => {
-          el.style.transitionDelay = '';
-        });
-
-        setAnimating(false);
-        animRef.current.suppressScroll = false;
-
-        if (prevFocusRef.current) {
-          safeFocus(prevFocusRef.current);
-        }
-
-        closeTimersRef.current = { hide: null, overlay: null, raf: null };
-        onClose();
-      }, totalDuration);
-
-    } else {
-      modal.classList.add('modal-overlay--exiting');
-      modal.classList.remove('modal-overlay--visible');
-
-      closeTimersRef.current.hide = window.setTimeout(() => {
-        const hero = modal.querySelector('.modal-hero');
-        if (hero) {
-          hero.classList.remove('modal-hero--visible', 'modal-hero--hiding');
-          hero.querySelectorAll('[data-reveal]').forEach(el => {
-            el.style.transitionDelay = '';
-          });
-        }
-
-        setAnimating(false);
-        animRef.current.suppressScroll = false;
-
-        if (prevFocusRef.current) {
-          safeFocus(prevFocusRef.current);
-        }
-
-        closeTimersRef.current = { hide: null, overlay: null, raf: null };
-        onClose();
-      }, overlayDuration);
-    }
-  }, [onClose, setAnimating]);
-
-  useEffect(() => {
-    if (isOpen) {
-      prevFocusRef.current = document.activeElement;
-    } else {
-      if (prevFocusRef.current) {
-        safeFocus(prevFocusRef.current);
-      }
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      if (isMountedRef.current) {
-        setFadingState('visible');
-      }
-      setAnimating(false);
-      animRef.current.suppressScroll = false;
-    }
-  }, [isOpen, setAnimating]);
-
-  useEffect(() => {
-    return () => {
-      if (closeTimersRef.current.raf != null) cancelAnimationFrame(closeTimersRef.current.raf);
-      if (closeTimersRef.current.overlay != null) clearTimeout(closeTimersRef.current.overlay);
-      if (closeTimersRef.current.hide != null) clearTimeout(closeTimersRef.current.hide);
-      closeTimersRef.current = { hide: null, overlay: null, raf: null };
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-
-    const modal = modalRef.current;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const overlayDuration = prefersReducedMotion ? 120 : 450;
-    const staggerDelays = prefersReducedMotion ? [0, 20, 40] : [0, 90, 160];
-
-    const rafIdRef = { id: null };
-    const revealTimeoutRef = { id: null };
-    const releaseTimeoutRef = { id: null };
-    const focusTimeoutRef = { id: null };
-
-    setAnimating(true);
-    animRef.current.suppressScroll = true;
-
-    modal.classList.add('modal-overlay--entering');
-
-    rafIdRef.id = requestAnimationFrame(() => {
-      modal.classList.remove('modal-overlay--entering');
-      modal.classList.add('modal-overlay--visible');
-
-      const hero = modal.querySelector('.modal-hero');
-
-      if (hero) {
-        const items = Array.from(hero.querySelectorAll('[data-reveal]'));
-        items.forEach((el, i) => {
-          const delay = staggerDelays[i] ?? (staggerDelays[staggerDelays.length - 1] + (i - staggerDelays.length + 1) * 70);
-          el.style.transitionDelay = `${delay}ms`;
-        });
-
-        const revealStartTime = Math.round(overlayDuration * 0.7);
-
-        revealTimeoutRef.id = window.setTimeout(() => {
-          hero.classList.add('modal-hero--visible');
-
-          releaseTimeoutRef.id = window.setTimeout(() => {
-            setAnimating(false);
-            animRef.current.suppressScroll = false;
-          }, Math.round(overlayDuration * 0.3));
-        }, revealStartTime);
-
-        const closeButton = modal.querySelector('button[aria-label="Fechar modal"]');
-        if (closeButton) {
-          focusTimeoutRef.id = window.setTimeout(() => safeFocus(closeButton), overlayDuration + 150);
-        }
-      } else {
-        releaseTimeoutRef.id = window.setTimeout(() => {
-          setAnimating(false);
-          animRef.current.suppressScroll = false;
-        }, overlayDuration);
-      }
-      closeTimersRef.current.raf = rafIdRef.id;
-    });
-
-    return () => {
-      if (rafIdRef.id != null) cancelAnimationFrame(rafIdRef.id);
-      if (revealTimeoutRef.id != null) clearTimeout(revealTimeoutRef.id);
-      if (releaseTimeoutRef.id != null) clearTimeout(releaseTimeoutRef.id);
-      if (focusTimeoutRef.id != null) clearTimeout(focusTimeoutRef.id);
-
-      modal.classList.remove('modal-overlay--entering', 'modal-overlay--visible');
-
-      const hero = modal.querySelector('.modal-hero');
-      if (hero) {
-        hero.classList.remove('modal-hero--visible', 'modal-hero--hiding');
-        hero.querySelectorAll('[data-reveal]').forEach(el => {
-          el.style.transitionDelay = '';
-          el.style.opacity = '';
-          el.style.transform = '';
-        });
-      }
-
-      setAnimating(false);
-      animRef.current.suppressScroll = false;
-      closeTimersRef.current.raf = null;
-    };
-  }, [isOpen, setAnimating]);
-
-  useEffect(() => {
-    if (!isOpen || !firstImageRef.current || !modalRef.current) return;
-
-    const scroller = modalRef.current;
-    const target = firstImageRef.current;
-    const currentAnimRef = animRef.current;
-    let running = true;
-    let rootHalf = scroller.clientHeight / 2;
-
-    target.style.setProperty('--expand-radius', '25px');
-    target.style.setProperty('--expand-scale', '0.9');
-
-    const computeAndApply = () => {
-      if (!running) return;
-      if (currentAnimRef.suppressScroll || currentAnimRef.isAnimating) {
-        return;
-      }
-      const targetRect = target.getBoundingClientRect();
-      const scrollerRect = scroller.getBoundingClientRect();
-      const elemTop = targetRect.top - scrollerRect.top;
-      const progress = clamp((rootHalf - elemTop) / rootHalf, 0, 1);
-      const scale = 0.9 + 0.12 * progress;
-      const radius = 25 * (1 - progress);
-
-      target.style.setProperty('--expand-scale', String(scale));
-      target.style.setProperty('--expand-radius', `${radius}px`);
-      rafRef.current = null;
-    };
-
-    const onScroll = () => {
-      if (rafRef.current) return;
-      rafRef.current = requestAnimationFrame(() => {
-        computeAndApply();
-      });
-    };
-
-    const onResize = () => {
-      rootHalf = scroller.clientHeight / 2;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => computeAndApply());
-    };
-
-    computeAndApply();
-
-    scroller.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
-
-    const innerImg = target.querySelector('img');
-    const onImgLoad = () => {
-      rootHalf = scroller.clientHeight / 2;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => computeAndApply());
-    };
-    if (innerImg && !innerImg.complete) {
-      innerImg.addEventListener('load', onImgLoad, { once: true });
-    }
-
-    return () => {
-      running = false;
-      scroller.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
-
-      target.style.removeProperty('--expand-scale');
-      target.style.removeProperty('--expand-radius');
-
-      setAnimating(false);
-      animRef.current.suppressScroll = false;
-
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (innerImg && onImgLoad) {
-        try {
-          innerImg.removeEventListener('load', onImgLoad);
-        } catch (err) {
-          console.warn('Error removing image load listener', err);
-        }
-      }
-    };
-  }, [isOpen, currentIndex, setAnimating]);
-
-  useEffect(() => {
-    if (project && projects.length > 0) {
-      const index = projects.findIndex(p => p.id === project.id);
-      if (index !== -1) {
-        setCurrentIndex(index);
-      }
-    }
-  }, [project, projects]);
-
-  const goToPrevious = useCallback(() => {
-    navigateTo('prev');
-  }, [navigateTo]);
-
-  const goToNext = useCallback(() => {
-    navigateTo('next');
-  }, [navigateTo]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!isOpen) return;
-
-      switch (e.key) {
-        case 'Escape':
-          handleClose();
-          break;
-        case 'ArrowLeft':
-          goToPrevious();
-          break;
-        case 'ArrowRight':
-          goToNext();
-          break;
-        default:
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleClose, goToPrevious, goToNext]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-    };
-  }, [isOpen]);
+  const goToNext = useCallback(() => navigateTo('next'), [navigateTo]);
+  const goToPrevious = useCallback(() => navigateTo('prev'), [navigateTo]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -636,138 +392,435 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
     };
   }, []);
 
-  const { currentProject, prevProject, nextProject } = useMemo(() => {
-    const current = projects[currentIndex] || projects[0];
-    const prevIdx = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
-    const nextIdx = currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
+  useEffect(() => {
+    if (!isOpen) return;
+    prevFocusRef.current = document.activeElement;
 
-    return {
-      currentProject: current,
-      prevProject: projects[prevIdx],
-      nextProject: projects[nextIdx]
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const handleKeyDown = (e) => {
+      if (animRef.current.isAnimating) return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToPrevious();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goToNext();
+      }
     };
-  }, [currentIndex, projects]);
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
+    // 🆕 Força o foco no overlay (evita que iframe roube o foco do teclado)
+    setTimeout(() => {
+      if (modal) {
+        modal.setAttribute('tabindex', '-1');
+        safeFocus(modal);
+      }
+    }, 100);
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose, goToPrevious, goToNext]);
+
+  useEffect(() => {
+    if (project) {
+      const idx = projects.findIndex(p => p.id === project.id);
+      if (idx !== -1 && idx !== currentIndex) {
+        setCurrentIndex(idx);
+      }
     }
-  };
+  }, [project, projects, currentIndex]);
 
+  useEffect(() => {
+    const modalEl = modalRef.current;
+    if (!modalEl || animRef.current.suppressScroll) return;
 
-  if (!isOpen || projects.length === 0) return null;
+    const handleWheel = (e) => {
+      if (animRef.current.suppressScroll) {
+        e.preventDefault();
+        return;
+      }
 
-  const getGalleryImages = (project) => {
-    if (project.galleryImages && project.galleryImages.length >= 5) {
-      return project.galleryImages.slice(0, 5);
+      const scrollTop = modalEl.scrollTop;
+      const scrollHeight = modalEl.scrollHeight;
+      const clientHeight = modalEl.clientHeight;
+      const atTop = scrollTop <= 1;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+      if ((atTop && e.deltaY < 0) || (atBottom && e.deltaY > 0)) {
+        e.preventDefault();
+      }
+    };
+
+    modalEl.addEventListener('wheel', handleWheel, { passive: false });
+    return () => modalEl.removeEventListener('wheel', handleWheel);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const firstImageEl = firstImageRef.current;
+    if (!firstImageEl) return;
+
+    let scrollSub = null;
+    let rafId = null;
+
+    const calculateExpansion = (scrollTop, scrollHeight, clientHeight) => {
+      const heroBottomRange = scrollHeight * 0.5;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2;
+
+      if (atBottom) return { scale: 1, radius: 0 };
+
+      const t = clamp(scrollTop / heroBottomRange, 0, 1);
+      const scale = 1 + t * 0.04;
+      const radius = 25 * (1 - t);
+      return { scale, radius };
+    };
+
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = rafRef.current = requestAnimationFrame(() => {
+        rafId = null;
+        const modal = modalRef.current;
+        if (!modal) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = modal;
+        const { scale, radius } = calculateExpansion(scrollTop, scrollHeight, clientHeight);
+
+        firstImageEl.style.setProperty('--expand-scale', scale.toFixed(4));
+        firstImageEl.style.setProperty('--expand-radius', `${radius.toFixed(2)}px`);
+      });
+    };
+
+    const modal = modalRef.current;
+    if (modal) {
+      scrollSub = onScroll;
+      modal.addEventListener('scroll', scrollSub, { passive: true });
+      onScroll();
     }
-    return Array(5).fill(project.image);
-  };
 
-  const galleryImages = getGalleryImages(currentProject);
+    return () => {
+      if (scrollSub && modal) {
+        modal.removeEventListener('scroll', scrollSub);
+      }
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafRef.current = null;
+      }
+    };
+  }, [isOpen, currentIndex]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      const timers = closeTimersRef.current;
+      [timers.hide, timers.overlay, timers.raf].forEach(t => {
+        if (t != null) clearTimeout(t);
+      });
+      timers.hide = timers.overlay = timers.raf = null;
+
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
+
+  const currentProject = useMemo(
+    () => projects[currentIndex] || project,
+    [projects, currentIndex, project]
+  );
+
+  const prevIndex = useMemo(() => {
+    if (projects.length === 0) return 0;
+    return currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
+  }, [currentIndex, projects.length]);
+
+  const nextIndex = useMemo(() => {
+    if (projects.length === 0) return 0;
+    return currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
+  }, [currentIndex, projects.length]);
+
+  const prevProject = useMemo(() => projects[prevIndex] || project, [projects, prevIndex, project]);
+  const nextProject = useMemo(() => projects[nextIndex] || project, [projects, nextIndex, project]);
+
+  const galleryImages = useMemo(
+    () => currentProject?.galleryImages || [currentProject?.image],
+    [currentProject]
+  );
+
+  if (!isOpen) return null;
 
   const modalContent = (
     <div
       ref={modalRef}
-      className={`modal-overlay ${styles.modalOverlay}`}
-      onClick={handleOverlayClick}
+      className="modal-overlay"
       style={{
         position: 'fixed',
-        inset: 0,
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
         backgroundColor: 'var(--neutral-normal)',
-        zIndex: 10000,
+        zIndex: 999999,
         display: 'flex',
         flexDirection: 'column',
         overflowY: 'auto',
         overflowX: 'hidden',
-        boxSizing: 'border-box'
+        WebkitOverflowScrolling: 'touch',
+        scrollBehavior: 'smooth'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
       }}
     >
-      <button
-        onClick={handleClose}
-        className="modal-close-button"
-        aria-label="Fechar modal"
-      >
-        ×
-      </button>
-
       <div className={`${styles.modalContent} ${fadingState === 'fading' ? styles.fading : ''}`}>
-        <div className="modal-hero" style={{
-          width: '100%',
-          height: '50vh',
-          display: 'flex',
-          flexDirection: 'column',
-          flexShrink: 0,
+        <div style={{
           backgroundColor: 'var(--neutral-normal)',
-          padding: '2.25rem',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          gap: '0.5rem',
-          overflow: 'hidden'
+          width: '100%',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1000,
+          boxSizing: 'border-box'
         }}>
-          <div data-reveal className="modal-hero-tags">
-            {currentProject.tags?.join(' • ') || 'PROJECT'}
-          </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: 'var(--modal-header-padding-y, clamp(1.5rem, 4vw, 3rem)) var(--modal-header-padding-x, clamp(1.5rem, 4vw, 3rem))',
+            gap: 'var(--modal-header-gap, 1rem)',
+            boxSizing: 'border-box',
+            position: 'relative'
+          }}>
+            <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+              <h1
+                data-focus-target
+                tabIndex="-1"
+                style={{
+                  fontSize: 'var(--modal-title-size, clamp(2rem, 6vw, 5rem))',
+                  fontWeight: 700,
+                  color: 'var(--neutral-light)',
+                  margin: 0,
+                  lineHeight: 0.95,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  outline: 'none'
+                }}
+              >
+                {currentProject.title}
+              </h1>
 
-          <h1
-            data-reveal
-            data-focus-target
-            tabIndex="-1"
-            className="modal-hero-title"
-          >
-            {currentProject.title}
-          </h1>
-
-          <div data-reveal className="modal-hero-content-wrapper">
-            <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <h2 className="modal-hero-subtitle">
-                {currentProject.subtitle || currentProject.description}
-              </h2>
-
-              <p className="modal-hero-description">
-                {currentProject.fullDescription || currentProject.description}
+              <p style={{
+                fontSize: 'var(--modal-subtitle-size, clamp(0.875rem, 2vw, 1.125rem))',
+                color: 'var(--neutral-medium)',
+                margin: 'var(--modal-subtitle-margin, clamp(0.5rem, 1.5vw, 1rem)) 0 0',
+                fontWeight: 400,
+                lineHeight: 1.4,
+                maxWidth: '60ch',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'normal'
+              }}>
+                {currentProject.subtitle}
               </p>
             </div>
 
-            <div style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              <div>
-                <h3 className="modal-stack-label">
-                  Design Stack
+            <button
+              onClick={onClose}
+              disabled={isAnimatingState}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--neutral-light)',
+                fontSize: 'var(--modal-close-size, clamp(2rem, 4vw, 3rem))',
+                cursor: isAnimatingState ? 'wait' : 'pointer',
+                lineHeight: 1,
+                padding: 0,
+                width: 'var(--modal-close-size, clamp(2rem, 4vw, 3rem))',
+                height: 'var(--modal-close-size, clamp(2rem, 4vw, 3rem))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                opacity: isAnimatingState ? 0.5 : 1,
+                pointerEvents: isAnimatingState ? 'none' : 'auto',
+                transition: 'color 200ms ease, opacity 200ms ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!isAnimatingState) e.currentTarget.style.color = 'var(--primary-red)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--neutral-light)';
+              }}
+              aria-label="Close modal"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: 'var(--neutral-normal)',
+          width: '100%',
+          position: 'relative',
+          zIndex: 1,
+          boxSizing: 'border-box'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--modal-content-gap, clamp(2rem, 5vw, 4rem))',
+            padding: '0 var(--modal-content-padding-x, clamp(1.5rem, 4vw, 3rem)) var(--modal-content-padding-bottom, clamp(3rem, 6vw, 5rem))',
+            boxSizing: 'border-box',
+            maxWidth: '100%'
+          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+              gap: 'var(--modal-info-grid-gap, clamp(1.5rem, 3vw, 2rem))',
+              width: '100%'
+            }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--modal-info-section-gap, 0.75rem)'
+              }}>
+                <h3 style={{
+                  fontSize: 'var(--modal-section-title-size, clamp(0.75rem, 2vw, 0.875rem))',
+                  fontWeight: 600,
+                  color: 'var(--neutral-medium)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  margin: 0
+                }}>
+                  About
                 </h3>
-                <p className="modal-stack-value">
-                  {currentProject.designStack || 'Brand Strategy, UI/UX, Development'}
+                <p style={{
+                  fontSize: 'var(--modal-body-size, clamp(0.875rem, 2vw, 1rem))',
+                  color: 'var(--neutral-light)',
+                  lineHeight: 1.6,
+                  margin: 0,
+                  maxWidth: '65ch'
+                }}>
+                  {currentProject.fullDescription || currentProject.description}
                 </p>
               </div>
 
-              <div>
-                <h3 className="modal-stack-label">
-                  Tech Stack
-                </h3>
-                <p className="modal-stack-value">
-                  {currentProject.techStack || 'React • Node.js • MongoDB'}
-                </p>
-              </div>
-            </div>
-
-            <div style={{ flex: '1' }}>
-              {currentProject.projectUrl && (
-                <div>
-                  <h3 className="modal-stack-label">
-                    Go Live
+              {currentProject.designStack && (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'var(--modal-info-section-gap, 0.75rem)'
+                }}>
+                  <h3 style={{
+                    fontSize: 'var(--modal-section-title-size, clamp(0.75rem, 2vw, 0.875rem))',
+                    fontWeight: 600,
+                    color: 'var(--neutral-medium)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    margin: 0
+                  }}>
+                    Design Stack
                   </h3>
-                  <a
-                    href={currentProject.projectUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="modal-link"
-                    onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-                    onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
-                  >
-                    Visit Website
-                  </a>
+                  <p style={{
+                    fontSize: 'var(--modal-body-size, clamp(0.875rem, 2vw, 1rem))',
+                    color: 'var(--neutral-light)',
+                    lineHeight: 1.6,
+                    margin: 0,
+                    maxWidth: '65ch'
+                  }}>
+                    {currentProject.designStack}
+                  </p>
+                </div>
+              )}
+
+              {currentProject.techStack && (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'var(--modal-info-section-gap, 0.75rem)'
+                }}>
+                  <h3 style={{
+                    fontSize: 'var(--modal-section-title-size, clamp(0.75rem, 2vw, 0.875rem))',
+                    fontWeight: 600,
+                    color: 'var(--neutral-medium)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    margin: 0
+                  }}>
+                    Tech Stack
+                  </h3>
+                  <p style={{
+                    fontSize: 'var(--modal-body-size, clamp(0.875rem, 2vw, 1rem))',
+                    color: 'var(--neutral-light)',
+                    lineHeight: 1.6,
+                    margin: 0,
+                    maxWidth: '65ch'
+                  }}>
+                    {currentProject.techStack}
+                  </p>
                 </div>
               )}
             </div>
+
+            {currentProject.projectUrl && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--modal-cta-gap, 1rem)'
+              }}>
+                <a
+                  href={currentProject.projectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 'var(--modal-button-padding, clamp(0.75rem, 2vw, 1rem)) var(--modal-button-padding-x, clamp(1.5rem, 3vw, 2rem))',
+                    backgroundColor: 'var(--primary-red)',
+                    color: 'var(--neutral-light)',
+                    fontSize: 'var(--modal-button-size, clamp(0.875rem, 2vw, 1rem))',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    borderRadius: 'var(--modal-button-radius, 0.5rem)',
+                    transition: 'transform 200ms ease, background-color 200ms ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.backgroundColor = 'var(--primary-red-dark, #c41e3a)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.backgroundColor = 'var(--primary-red)';
+                  }}
+                >
+                  Visit Website
+                </a>
+              </div>
+            )}
           </div>
         </div>
 
@@ -780,6 +833,7 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
           boxSizing: 'border-box'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {/* 🆕 Primeiro slide com lógica especial de expansão */}
             <div
               ref={firstImageRef}
               className="modal-gallery-image-first"
@@ -796,37 +850,63 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
                 WebkitBackfaceVisibility: 'hidden',
                 backfaceVisibility: 'hidden',
               }}>
-                <img
-                  src={galleryImages[0]}
-                  alt={`${currentProject.title} - Gallery 1`}
-                  style={{
+                {typeof galleryImages[0] === 'string' ? (
+                  <img
+                    src={galleryImages[0]}
+                    alt={`${currentProject.title} - Gallery 1`}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                ) : galleryImages[0]?.type === 'image' ? (
+                  <img
+                    src={galleryImages[0].src}
+                    alt={`${currentProject.title} - Gallery 1`}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                ) : galleryImages[0]?.type === 'iframe' ? (
+                  <div style={{
                     position: 'absolute',
                     inset: 0,
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
-                />
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'var(--neutral-normal, #1a1a1a)'
+                  }}>
+                    <iframe
+                      src={galleryImages[0].url}
+                      loading="lazy"
+                      allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen={false}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none'
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
 
-            {galleryImages.slice(1).map((imageSrc, i) => (
-              <div key={i + 1} className="modal-gallery-image">
-                <img
-                  src={imageSrc}
-                  alt={`${currentProject.title} - Gallery ${i + 2}`}
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
-                />
-              </div>
-            ))}
+            {/* 🆕 Demais slides com renderSlide() */}
+            {galleryImages.slice(1).map((slide, i) => 
+              renderSlide(slide, i + 1, currentProject.title)
+            )}
           </div>
         </div>
 
@@ -989,7 +1069,17 @@ Modal.propTypes = {
     techStack: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     image: PropTypes.string,
-    galleryImages: PropTypes.arrayOf(PropTypes.string),
+    galleryImages: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.shape({
+          type: PropTypes.oneOf(['image', 'iframe']).isRequired,
+          src: PropTypes.string,
+          url: PropTypes.string,
+          aspectRatio: PropTypes.string
+        })
+      ])
+    ),
     projectUrl: PropTypes.string
   }),
   projects: PropTypes.arrayOf(PropTypes.shape({
@@ -1002,7 +1092,17 @@ Modal.propTypes = {
     techStack: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     image: PropTypes.string,
-    galleryImages: PropTypes.arrayOf(PropTypes.string),
+    galleryImages: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.shape({
+          type: PropTypes.oneOf(['image', 'iframe']).isRequired,
+          src: PropTypes.string,
+          url: PropTypes.string,
+          aspectRatio: PropTypes.string
+        })
+      ])
+    ),
     projectUrl: PropTypes.string
   }))
 };
