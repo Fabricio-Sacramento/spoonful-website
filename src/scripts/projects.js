@@ -24,9 +24,9 @@ import humaitaSlide05 from '../assets/images/humaita_digital/slide-05.jpg';
 
 // hysteria
 import hysteriaSlide01 from '../assets/images/hysteria/slide-01.jpg';
-import hysteriaSlide02 from '../assets/images/hysteria/slide-02.jpg';
+//import hysteriaSlide02 from '../assets/images/hysteria/slide-02.jpg';
 import hysteriaSlide03 from '../assets/images/hysteria/slide-03.jpg';
-import hysteriaSlide04 from '../assets/images/hysteria/slide-04.jpg';
+//import hysteriaSlide04 from '../assets/images/hysteria/slide-04.jpg';
 import hysteriaSlide05 from '../assets/images/hysteria/slide-05.jpg';
 
 // itaway
@@ -124,7 +124,13 @@ export const projects = [
     techStack: "Three.js, React, GSAP, WebGL, Sanity CMS",
     tags: ["WEBSITE", "UIUX", "DEVELOPMENT", "3D", "MOTION"],
     image: hysteriaSlide01,
-    galleryImages: [hysteriaSlide01, hysteriaSlide02, hysteriaSlide03, hysteriaSlide04, hysteriaSlide05],
+    galleryImages: [
+      hysteriaSlide01, // Slide 1: imagem (com expansão)
+      "https://www.youtube.com/embed/dQw4w9WgXcQ", // Slide 2: YouTube
+      hysteriaSlide03, // Slide 3: imagem
+      "https://player.vimeo.com/video/76979871", // Slide 4: Vimeo  
+      hysteriaSlide05 // Slide 5: imagem
+    ],
     projectUrl: "https://hysteria-gallery.vercel.app",
     backgroundColor: "var(--primary-red)"
   },

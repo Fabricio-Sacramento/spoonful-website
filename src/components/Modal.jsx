@@ -67,6 +67,56 @@ const waitForTransition = (el, timeout = 800, property = 'opacity') => {
 };
 
 // ================================
+// HELPER: Renderiza slide (imagem ou iframe)
+// ================================
+const renderSlide = (content, index, projectTitle) => {
+  const isIframe = typeof content === 'string' && 
+    (content.includes('youtube.com') || 
+     content.includes('vimeo.com') ||
+     content.includes('iframe'));
+
+  const slideNumber = index + 2; // ← slice(1) já pulou o primeiro, então +2
+
+  if (isIframe) {
+    return (
+      <div key={index} className="modal-gallery-image">
+        <iframe
+          src={content}
+          title={`${projectTitle} - Gallery ${slideNumber}`}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            border: 'none'
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div key={index} className="modal-gallery-image">
+      <img
+        src={content}
+        alt={`${projectTitle} - Gallery ${slideNumber}`}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          display: 'block'
+        }}
+      />
+    </div>
+  );
+};
+
+// ================================
 // MODAL COMPONENT
 // ================================
 
@@ -811,22 +861,9 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
               </div>
             </div>
 
-            {galleryImages.slice(1).map((imageSrc, i) => (
-              <div key={i + 1} className="modal-gallery-image">
-                <img
-                  src={imageSrc}
-                  alt={`${currentProject.title} - Gallery ${i + 2}`}
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
-                />
-              </div>
-            ))}
+            {galleryImages.slice(1).map((slide, i) => 
+              renderSlide(slide, i + 1, currentProject.title)
+            )}
           </div>
         </div>
 
