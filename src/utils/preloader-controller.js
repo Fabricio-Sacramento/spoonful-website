@@ -74,17 +74,25 @@ this.updateTargetProgress();
 }
 }
 async loadAssets() {
-try {
-const projectImages = [];
-  projects.forEach(project => {
-    if (project.image) {
-      projectImages.push(project.image);
-    }
-    
-    if (project.galleryImages && Array.isArray(project.galleryImages)) {
-      projectImages.push(...project.galleryImages);
-    }
-  });
+  try {
+    const projectImages = [];
+    projects.forEach(project => {
+      if (project.image) {
+        projectImages.push(project.image);
+      }
+      
+      if (project.galleryImages && Array.isArray(project.galleryImages)) {
+        // ✅ FILTRO: Só adiciona se NÃO for URL de iframe
+        const imageUrls = project.galleryImages.filter(url => {
+          if (typeof url !== 'string') return true; // Mantém imports
+          // Exclui URLs de embed (YouTube, Vimeo, etc)
+          return !(url.includes('youtube.com') || 
+                   url.includes('vimeo.com') || 
+                   url.includes('iframe'));
+        });
+        projectImages.push(...imageUrls);
+      }
+    });
 
 
   assetLoader.onProgress((progress) => {
