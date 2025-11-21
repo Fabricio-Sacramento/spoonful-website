@@ -7,6 +7,8 @@ import itawaySlide02 from '../assets/images/itaway/slide-02.jpg';
 import itawaySlide03 from '../assets/images/itaway/slide-03.jpg';
 import itawaySlide04 from '../assets/images/itaway/slide-04.jpg';
 import itawaySlide05 from '../assets/images/itaway/slide-05.jpg';
+import itawaySlide06 from '../assets/images/itaway/slide-06.jpg';
+import itawaySlide07 from '../assets/images/itaway/slide-07.jpg';
 
 // tropiview
 import tropiviewSlide01 from '../assets/images/tropiview/slide-01.jpg';
@@ -26,7 +28,7 @@ import humaitaSlide05 from '../assets/images/humaita_digital/slide-05.jpg';
 import hysteriaSlide01 from '../assets/images/hysteria/slide-01.jpg';
 //import hysteriaSlide02 from '../assets/images/hysteria/slide-02.jpg';
 import hysteriaSlide03 from '../assets/images/hysteria/slide-03.jpg';
-//import hysteriaSlide04 from '../assets/images/hysteria/slide-04.jpg';
+import hysteriaSlide04 from '../assets/images/hysteria/slide-04.jpg';
 import hysteriaSlide05 from '../assets/images/hysteria/slide-05.jpg';
 
 // myhabitat
@@ -54,7 +56,7 @@ export const projects = [
     techStack: "React, Node.js, Stripe API, MongoDB, AWS",
     tags: ["WEBSITE", "E-COMMERCE", "UIUX", "DEVELOPMENT"],
     image: itawaySlide01,
-    galleryImages: [itawaySlide01, itawaySlide02, itawaySlide03, itawaySlide04, itawaySlide05],
+    galleryImages: [itawaySlide01, itawaySlide02, itawaySlide03, itawaySlide04,itawaySlide05,itawaySlide06,itawaySlide07],
     projectUrl: "https://itawayecotours.com",
     backgroundColor: "var(--primary-red)"
   },
@@ -100,7 +102,7 @@ export const projects = [
       hysteriaSlide01, // Slide 1: imagem (com expansão)
       "https://www.youtube.com/embed/dQw4w9WgXcQ", // Slide 2: YouTube
       hysteriaSlide03, // Slide 3: imagem
-      "https://player.vimeo.com/video/76979871", // Slide 4: Vimeo  
+      hysteriaSlide04, // Slide 4: imagem 
       hysteriaSlide05 // Slide 5: imagem
     ],
     projectUrl: "https://hysteria.etc.br",
