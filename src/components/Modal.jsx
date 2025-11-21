@@ -708,9 +708,11 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
   if (!isOpen || projects.length === 0) return null;
 
   const getGalleryImages = (project) => {
-    if (project.galleryImages && project.galleryImages.length >= 5) {
-      return project.galleryImages.slice(0, 5);
+  // ✅ Retorna TODAS as imagens disponíveis
+    if (project.galleryImages && project.galleryImages.length > 0) {
+      return project.galleryImages;
     }
+    // Fallback: se não tiver galleryImages, usa a imagem principal 5x
     return Array(5).fill(project.image);
   };
 
