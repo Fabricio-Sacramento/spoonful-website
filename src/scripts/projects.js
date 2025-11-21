@@ -30,13 +30,16 @@ import hysteriaSlide01 from '../assets/images/hysteria/slide-01.jpg';
 import hysteriaSlide03 from '../assets/images/hysteria/slide-03.jpg';
 import hysteriaSlide04 from '../assets/images/hysteria/slide-04.jpg';
 import hysteriaSlide05 from '../assets/images/hysteria/slide-05.jpg';
+import hysteriaSlide06 from '../assets/images/hysteria/slide-06.jpg';
 
 // myhabitat
 import myhabitatSlide01 from '../assets/images/myhabitat/slide-01.jpg';
-import myhabitatSlide02 from '../assets/images/myhabitat/slide-02.jpg';
+//import myhabitatSlide02 from '../assets/images/myhabitat/slide-02.jpg';
 import myhabitatSlide03 from '../assets/images/myhabitat/slide-03.jpg';
 import myhabitatSlide04 from '../assets/images/myhabitat/slide-04.jpg';
 import myhabitatSlide05 from '../assets/images/myhabitat/slide-05.jpg';
+import myhabitatSlide06 from '../assets/images/myhabitat/slide-06.jpg';
+import myhabitatSlide07 from '../assets/images/myhabitat/slide-07.jpg';
 
 // urban-woof
 import urbanwoofSlide01 from '../assets/images/urban-woof/slide-01.jpg';
@@ -100,10 +103,11 @@ export const projects = [
     image: hysteriaSlide01,
     galleryImages: [
       hysteriaSlide01, // Slide 1: imagem (com expansão)
-      "https://www.youtube.com/embed/dQw4w9WgXcQ", // Slide 2: YouTube
+      // "https://www.youtube.com/embed/_Shw3Tdl17w?si=-qH-IZObxHXSiLy0&amp;controls=0", // Slide 2: YouTube
       hysteriaSlide03, // Slide 3: imagem
       hysteriaSlide04, // Slide 4: imagem 
-      hysteriaSlide05 // Slide 5: imagem
+      hysteriaSlide05, // Slide 5: imagem
+      hysteriaSlide06, // Slide 6: imagem
     ],
     projectUrl: "https://hysteria.etc.br",
     backgroundColor: "var(--primary-red)"
@@ -118,7 +122,7 @@ export const projects = [
     techStack: "React Native, Node.js, InfluxDB, Grafana, Arduino IoT",
     tags: ["WEBSITE", "MOBILE APP", "IOT", "DATA VIZ", "DEVELOPMENT"],
     image: myhabitatSlide01,
-    galleryImages: [myhabitatSlide01, myhabitatSlide02, myhabitatSlide03, myhabitatSlide04, myhabitatSlide05],
+    galleryImages: [myhabitatSlide01, myhabitatSlide03, myhabitatSlide04, myhabitatSlide05, myhabitatSlide06, myhabitatSlide07],
     projectUrl: "hhttps://myhabitatapp.com/",
     backgroundColor: "var(--primary-red)"
   },
