@@ -103,11 +103,11 @@ export const projects = [
     image: hysteriaSlide01,
     galleryImages: [
       hysteriaSlide01, // Slide 1: imagem (com expansão)
-      // "https://www.youtube.com/embed/_Shw3Tdl17w?si=-qH-IZObxHXSiLy0&amp;controls=0", // Slide 2: YouTube
       hysteriaSlide03, // Slide 3: imagem
       hysteriaSlide04, // Slide 4: imagem 
       hysteriaSlide05, // Slide 5: imagem
       hysteriaSlide06, // Slide 6: imagem
+      "https://player.vimeo.com/video/1140169847?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
     ],
     projectUrl: "https://hysteria.etc.br",
     backgroundColor: "var(--primary-red)"
@@ -122,7 +122,15 @@ export const projects = [
     techStack: "React Native, Node.js, InfluxDB, Grafana, Arduino IoT",
     tags: ["WEBSITE", "MOBILE APP", "IOT", "DATA VIZ", "DEVELOPMENT"],
     image: myhabitatSlide01,
-    galleryImages: [myhabitatSlide01, myhabitatSlide03, myhabitatSlide04, myhabitatSlide05, myhabitatSlide06, myhabitatSlide07],
+    galleryImages: [
+      myhabitatSlide01, 
+      myhabitatSlide03, 
+      myhabitatSlide04, 
+      myhabitatSlide05, 
+      myhabitatSlide06, 
+      myhabitatSlide07,
+      "https://player.vimeo.com/video/1140175428?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+    ],
     projectUrl: "hhttps://myhabitatapp.com/",
     backgroundColor: "var(--primary-red)"
   },
@@ -136,7 +144,14 @@ export const projects = [
     techStack: "React Native, Node.js, Stripe, Google Maps API, Firebase",
     tags: ["BRANDING", "MOBILE APP", "BOOKING SYSTEM", "UIUX", "DEVELOPMENT"],
     image: urbanwoofSlide01,
-    galleryImages: [urbanwoofSlide01, urbanwoofSlide02, urbanwoofSlide03, urbanwoofSlide04, urbanwoofSlide05],
+    galleryImages: [
+      urbanwoofSlide01,
+      urbanwoofSlide02,
+      urbanwoofSlide03,
+      urbanwoofSlide04,
+      urbanwoofSlide05,
+      "https://player.vimeo.com/video/1140177024?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+    ],
     projectUrl: "https://urbanwoofnyc.com/",
     backgroundColor: "var(--primary-red)"
   }
