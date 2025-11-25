@@ -1,10 +1,13 @@
 /* public/styles/cursor.css */
+/* ================================= */
+/* FIREFOX FIX: Removido will-change */
+/* ================================= */
+
 :root {
   --cursor-size-base: 60px;
   --cursor-size-dot: 17px;
   --cursor-accent: var(--primary-green);
   --cursor-bg: var(--neutral-light);
-  /* ❌ REMOVIDO: --cursor-scale (agora é nativo via GSAP) */
 }
 
 .custom-cursor {
@@ -22,13 +25,13 @@
   background-color: var(--cursor-accent);
   mix-blend-mode: difference;
   
-  /* Performance */
-  will-change: transform;
+  /* ✅ FIREFOX FIX: Removido will-change (excede limite do FF) */
+  /* Performance otimizada apenas com backface-visibility + translate3d */
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   
-  /* ✅ CORRIGIDO: Transform sem var() - GSAP controla scale diretamente */
-  transform: translate(-50%, -50%) translateZ(0);
+  /* ✅ translate3d força GPU acceleration sem will-change */
+  transform: translate(-50%, -50%) translate3d(0, 0, 0);
   
   display: flex;
   align-items: center;
@@ -59,7 +62,6 @@
 }
 
 /* Responsive, accessibility, debug mantidos iguais */
-
 
 @media (min-width: 1024px) and (max-width: 1439px) {
   :root {

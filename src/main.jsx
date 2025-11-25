@@ -1,6 +1,27 @@
 // src/main.jsx
 import ReactDOM from 'react-dom/client';
+import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// ================================
+// FIREFOX FIX: Configuração GSAP
+// ================================
+// Desabilita will-change automático para não exceder limite do Firefox
+gsap.config({
+  autoSleep: 60,
+  force3D: true,
+  nullTargetWarn: false,
+  units: { left: "%", top: "%", rotation: "rad" }
+});
+
+// Configuração ScrollTrigger
+ScrollTrigger.config({
+  autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+});
+
+// ================================
+// IMPORTS
+// ================================
 
 // Components
 import CanvasApp from './components/CanvasApp.jsx';
@@ -9,7 +30,7 @@ import CustomCursor from './components/CustomCursor.jsx';
 import StatementSection from './components/StatementSection.jsx';
 import ContactSection from './components/ContactSection.jsx';
 import NavWithDrawer from './components/NavWithDrawer.jsx';
-import PreloaderTitle from './components/PreloaderTitle.jsx'; // ⬅️ NOVO
+import PreloaderTitle from './components/PreloaderTitle.jsx';
 
 // Utils
 import './scripts/scroll-orchestrator.js';
@@ -21,7 +42,7 @@ import './utils/preloader-controller.js';
 // MONTA COMPONENTES
 // ================================
 
-// 0) Preloader Title (SVG SPOONFUL) ⬅️ NOVO
+// 0) Preloader Title (SVG SPOONFUL)
 const preloaderTitleContainer = document.querySelector('#preloader .preloader__title');
 if (preloaderTitleContainer) {
   const preloaderTitleRoot = ReactDOM.createRoot(preloaderTitleContainer);

@@ -1,7 +1,26 @@
 @import url("./src/fonts.css");
 
+/* ================================= */
+/* FIREFOX FIX: Limite will-change   */
+/* ================================= */
+/* Evita que Splitting.js + GSAP excedam limite do Firefox */
+.char,
+.word,
+.line {
+  /* ❌ NÃO usar will-change permanente */
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ✅ Aplica will-change APENAS durante animação GSAP */
+.char.is-animating,
+.word.is-animating,
+.line.is-animating {
+  will-change: transform, opacity;
+}
+
 /* ----------------------------- */
-/* 1) DESIGN TOKENS (VariÃ¡veis)  */
+/* 1) DESIGN TOKENS (Variáveis)  */
 /* ----------------------------- */
 :root {
 /* Primary Green */
@@ -60,64 +79,11 @@ background: var(--neutral-darker);
 body {
 background-color: var(--neutral-normal);
 color: white;
-position: relative; /* Garante que o pseudo-elemento seja posicionado corretamente */
+position: relative;
 top: 0;
 left: 0;
 }
-/*
-body::after {
-content: "";
-position: fixed;
-top: -100%;
-left: -100%;
-width: 300%;
-height: 300%;
-background-image: url("https://i.imgur.com/ax4UqqW.png");
-background-repeat: repeat;
-opacity: 0.05;
-pointer-events: none;
-animation: noise 12s steps(20) infinite;
-transition: opacity 0.4s ease;
-will-change: transform;
-z-index: -1; /* Ajuste o z-index para garantir que o noise fique atrÃ¡s do conteÃºdo
-}
 
-@keyframes noise {
-0% {
-transform: translate(20%, -15%);
-}
-10% {
-transform: translate(-20%, -15%);
-}
-20% {
-transform: translate(20%, -5%);
-}
-30% {
-transform: translate(-20%, -5%);
-}
-40% {
-transform: translate(20%, 5%);
-}
-50% {
-transform: translate(-20%, 5%);
-}
-60% {
-transform: translate(20%, 15%);
-}
-70% {
-transform: translate(-20%, 15%);
-}
-80% {
-transform: translate(20%, 5%);
-}
-90% {
-transform: translate(-20%, 5%);
-}
-100% {
-transform: translate(20%, -5%);
-}
-}
-*/
 /* ================================= */
 /* Overrides para SVG de clipPath    */
 /* ================================= */
@@ -162,7 +128,7 @@ display: flex;
 flex-direction: column;
 justify-content: center;
 }
-/* Para a seÃ§Ã£o What We Do, usamos um container em linha */
+/* Para a seção What We Do, usamos um container em linha */
 .container-full {
 width: 100%;
 margin: 0 auto;
@@ -174,7 +140,7 @@ align-items: stretch;
 }
 
 .spacer {
-height: 25vh; /* Ajuste a altura conforme necessÃ¡rio */
+height: 25vh;
 width: 100%;
 display: block;
 }
@@ -190,15 +156,15 @@ display: block;
 .intro-wrapper {
 position: relative;
 width: 100%;
-height: 100vh;           /* soma 100vh + 100vh dos filhos */
-overflow: hidden;       /* esconde tudo que sair da viewport */
-background-color: var(--primary-red); /* cor do fundo atÃ© About Us aparecer */
+height: 100vh;
+overflow: hidden;
+background-color: var(--primary-red);
 }
 
 /* Ambos os filhos do wrapper ocupam exatamente a viewport e ficam empilhados */
 .intro-wrapper > section {
 height: 100vh !important;
-position: absolute !important;  /* forÃ§a a camada, tira do fluxo normal */
+position: absolute !important;
 top: 0 !important;
 left: 0 !important;
 width: 100% !important;
@@ -226,7 +192,7 @@ clip-path: url(#heroClip);
   justify-content: center;
   pointer-events: none;
 }
-/* Garante que, ao rotacionar em 3D, a face traseira dos chars seja visÃ­vel */
+/* Garante que, ao rotacionar em 3D, a face traseira dos chars seja visível */
 .hero-content .char {
 -webkit-backface-visibility: visible;
 backface-visibility: visible;
@@ -272,8 +238,8 @@ display: inline-block;
 #statement {
   position: relative;
   min-height: 100vh;
-  contain: layout; /* Isola reflows */
-  content-visibility: auto; /* Performance boost */
+  contain: layout;
+  content-visibility: auto;
 }
 
 /* Texto principal - reserva espaço antes da font */
@@ -281,17 +247,17 @@ display: inline-block;
   color: var(--neutral-light);
   text-align: center;
   font-family: 'Neue Haas Grotesk Display Pro', sans-serif;
-  font-size: 15.4375rem; /* ~247px */
+  font-size: 15.4375rem;
   font-style: normal;
   font-weight: 900;
-  line-height: 11.25rem; /* ~180px */
+  line-height: 11.25rem;
   letter-spacing: 0.15438rem;
   text-transform: uppercase;
   margin: 0;
-  min-height: 11.25rem; /* Previne CLS */
-  will-change: contents;
+  min-height: 11.25rem;
   
-  /* Garante rendering suave durante scramble */
+  /* ✅ FIREFOX: Removido will-change permanente */
+  
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -311,7 +277,7 @@ display: inline-block;
 /* Tablet */
 @media (max-width: 1023px) {
   .statement-text {
-    font-size: 10.8063rem; /* 70% do original */
+    font-size: 10.8063rem;
     line-height: 7.875rem;
     letter-spacing: 0.10806rem;
     min-height: 7.875rem;
@@ -321,18 +287,18 @@ display: inline-block;
 /* Mobile */
 @media (max-width: 767px) {
   .statement-text {
-    font-size: 7.7188rem; /* 50% do original */
+    font-size: 7.7188rem;
     line-height: 5.625rem;
     letter-spacing: 0.07719rem;
     min-height: 5.625rem;
-    padding: 0 1rem; /* Respira nas laterais */
+    padding: 0 1rem;
   }
 }
 
 /* Extra small */
 @media (max-width: 375px) {
   .statement-text {
-    font-size: 5.4031rem; /* 35% do original */
+    font-size: 5.4031rem;
     line-height: 3.9375rem;
     letter-spacing: 0.05403rem;
     min-height: 3.9375rem;
@@ -344,10 +310,6 @@ display: inline-block;
 /* ================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .statement-text {
-    /* Sem animações, apenas texto estático */
-    will-change: auto;
-  }
   
   .statement-text .dud {
     /* Sem transições */
@@ -377,7 +339,6 @@ font-weight: 900;
 font-size: 80px;
 line-height: 1.1;
 letter-spacing: 1px;
-/* font-style: italic; */
 }
 .heading-medium-bold {
 color: var(--neutral-light);
@@ -386,7 +347,6 @@ font-weight: 100;
 font-size: 90px;
 line-height: 1.1;
 letter-spacing: 3px;
-/* font-style: italic; */
 }
 .heading-small {
 color: var(--primary-red);
@@ -403,8 +363,8 @@ z-index: 1;
 /* Modal Animation Classes - Phase 2 */
 /* Modal Animation Classes - Refinado para Fluidez */
 .modal-overlay { 
-  --overlay-ease: cubic-bezier(0.16, 1, 0.3, 1); /* Mais suave que (.2,.9,.2,1) */
-  --reveal-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Clássica ease-out-quad */
+  --overlay-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --reveal-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Bloqueia interações durante animações */
@@ -416,29 +376,28 @@ z-index: 1;
 /* Modal states - apenas transform, sem opacity */
 .modal-overlay--entering { 
   transform: translateY(100%); 
-  /* opacity removida - modal puramente material */
 }
 
 .modal-overlay--visible {
   transform: translateY(0);
   pointer-events: auto;
-  transition: transform 450ms var(--overlay-ease); /* Apenas transform */
+  transition: transform 450ms var(--overlay-ease);
 }
 
 /* Saída: movimento puro sem fade */
 .modal-overlay--exiting {
   transform: translateY(100%);
-  transition: transform 420ms cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Só movimento */
+  transition: transform 420ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Hero reveal items - timing mais orgânico */
 .modal-hero [data-reveal] {
   opacity: 0;
-  transform: translateY(12px); /* 8px → 12px para movimento mais perceptível */
+  transform: translateY(12px);
   transition-property: opacity, transform;
-  transition-duration: 380ms; /* 240ms → 380ms */
+  transition-duration: 380ms;
   transition-timing-function: var(--reveal-ease);
-  will-change: opacity, transform;
+  /* ✅ FIREFOX: Removido will-change permanente */
   transform-origin: center top;
 }
 
@@ -450,9 +409,9 @@ z-index: 1;
 /* Hero hiding for close animation - refinado */
 .modal-hero--hiding [data-reveal] {
   opacity: 0;
-  transform: translateY(-8px); /* Reverse direction for close */
+  transform: translateY(-8px);
   transition-property: opacity, transform;
-  transition-duration: 320ms; /* Slightly faster for close */
+  transition-duration: 320ms;
   transition-timing-function: var(--reveal-ease);
 }
 
