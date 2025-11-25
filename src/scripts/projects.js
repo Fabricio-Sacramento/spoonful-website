@@ -131,7 +131,7 @@ export const projects = [
       myhabitatSlide07,
       "https://player.vimeo.com/video/1140175428?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
     ],
-    projectUrl: "hhttps://myhabitatapp.com/",
+    projectUrl: "https://myhabitatapp.com/",
     backgroundColor: "var(--primary-red)"
   },
   {

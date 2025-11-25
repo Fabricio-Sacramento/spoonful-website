@@ -746,16 +746,16 @@ const Modal = ({ isOpen, onClose, project, projects = [] }) => {
       <div className={`${styles.modalContent} ${fadingState === 'fading' ? styles.fading : ''}`}>
         <div className="modal-hero" style={{
           width: '100%',
-          height: '50vh',
+          minHeight: '50vh',
           display: 'flex',
           flexDirection: 'column',
           flexShrink: 0,
           backgroundColor: 'var(--neutral-normal)',
           padding: '2.25rem',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           alignItems: 'flex-start',
           gap: '0.5rem',
-          overflow: 'hidden'
+          overflow: 'visible'
         }}>
           <div data-reveal className="modal-hero-tags">
             {currentProject.tags?.join(' • ') || 'PROJECT'}
