@@ -92,7 +92,7 @@ const AboutSection = () => {
             {/* LinkedIn Link */}
             <div className="about-link-wrapper" data-fade>
               <a 
-                href="https://linkedin.com/in/fabriciosacramento" 
+                href="https://www.linkedin.com/in/fabricio-sacramento-17508610/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="about-linkedin-link"
