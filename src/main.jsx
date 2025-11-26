@@ -5,6 +5,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { inject } from '@vercel/analytics';
 
 // ================================
+// ANALYTICS
+// ================================
+inject(); // Vercel Analytics
+
+// ================================
 // FIREFOX FIX: Configuração GSAP
 // ================================
 // Desabilita will-change automático para não exceder limite do Firefox
@@ -14,11 +19,6 @@ gsap.config({
   nullTargetWarn: false,
   units: { left: "%", top: "%", rotation: "rad" }
 });
-
-// ================================
-// ANALYTICS
-// ================================
-inject(); // Vercel Analytics
 
 // Configuração ScrollTrigger
 ScrollTrigger.config({

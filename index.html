@@ -3,7 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fabricio Sacramento - Portfolio</title>
+
+<!-- Primary Meta Tags -->
+<title>Spoonful - Design Digital, Branding e Desenvolvimento Criativo</title>
+<meta name="title" content="Spoonful - Design Digital, Branding e Desenvolvimento Criativo">
+<meta name="description" content="Criando experiências digitais que convertem. 20+ anos de expertise em UI/UX, branding, desenvolvimento web e creative coding com Three.js, React e GSAP.">
+<meta name="keywords" content="design digital, branding, UI UX, desenvolvimento web, creative coding, Three.js, React, WebGL, GSAP, motion design, 3D web">
+<meta name="author" content="Fabricio Sacramento - Spoonful">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://spoonful.com.br">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://spoonful.com.br">
+<meta property="og:title" content="Spoonful - Design, Branding, UIUX e Desenvolvimento.">
+<meta property="og:description" content="Criando experiências digitais que convertem. 20+ anos de expertise em UI/UX, branding, desenvolvimento web e creative coding.">
+<meta property="og:image" content="https://spoonful.com.br/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Spoonful">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://spoonful.com.br">
+<meta name="twitter:title" content="Spoonful - Design, Branding, UIUX e Desenvolvimento.">
+<meta name="twitter:description" content="Criando experiências digitais que convertem. 20+ anos de expertise em UI/UX, branding, desenvolvimento web e creative coding.">
+<meta name="twitter:image" content="https://spoonful.com.br/og-image.jpg">
+
+<!-- Favicons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+<!-- Web App Manifest -->
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Theme Color -->
+<meta name="theme-color" content="#F5163C">
+<meta name="msapplication-TileColor" content="#F5163C">
+
+<!-- Robots -->
+<meta name="robots" content="index, follow">
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Spoonful",
+  "url": "https://spoonful.com.br",
+  "logo": "https://spoonful.com.br/android-chrome-512x512.png",
+  "description": "Design digital, branding e desenvolvimento criativo com 20+ anos de experiência",
+  "founder": {
+    "@type": "Person",
+    "name": "Fabricio Sacramento"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "BR"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/spoonful",
+    "https://www.instagram.com/spoonful"
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Spoonful",
+  "url": "https://spoonful.com.br",
+  "description": "Portfolio de design digital e desenvolvimento criativo",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://spoonful.com.br/?s={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LY2QDX6VWJ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LY2QDX6VWJ');
+</script>
+
+<!-- Stylesheets -->
 <link rel="stylesheet" type="text/css" href="/styles/style.css">
 <link rel="stylesheet" type="text/css" href="/styles/cursor.css">
 <link rel="stylesheet" type="text/css" href="/styles/what-we-do.css">
@@ -15,15 +109,6 @@
 <link rel="stylesheet" type="text/css" href="/styles/about-drawer.css">
 <link rel="stylesheet" type="text/css" href="/styles/nav-menu.css">
 <link rel="stylesheet" type="text/css" href="/styles/preloader.css">
-
-<!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LY2QDX6VWJ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-LY2QDX6VWJ');
-</script>
 
 </head>
 <body>
@@ -39,7 +124,7 @@
 <svg width="0" height="0">
 <defs>
 <clipPath id="heroClip" clipPathUnits="objectBoundingBox">
-<!-- 5 retÃ¢ngulos que cobrem toda a Ã¡rea inicialmente -->
+<!-- 5 retângulos que cobrem toda a área inicialmente -->
 <rect id="clip-rect-1" x="0"   y="0" width="0.2" height="1" fill="black" />
 <rect id="clip-rect-2" x="0.2" y="0" width="0.2" height="1" fill="black" />
 <rect id="clip-rect-3" x="0.4" y="0" width="0.2" height="1" fill="black" />
@@ -63,7 +148,7 @@
 </div>
 </section>
 
-<!-- ABOUT US Section (posicionada atrÃ¡s do Hero) -->
+<!-- ABOUT US Section (posicionada atrás do Hero) -->
 <section id="about-us">
   <div class="about-us-container-absolute">
     <p class="text-back heading-medium" data-splitting>
@@ -94,7 +179,7 @@
 </div>
 <div class="what-we-do__row">
 <h2 class="what-we-do__title">Graphic Design</h2>
-<p class="what-we-do__description">Transforming ideas into clean, compelling visualsâ€”logos, brochures, social posts and infographics. We balance color, typography and layout to communicate your message clearly.</p>
+<p class="what-we-do__description">Transforming ideas into clean, compelling visuals—logos, brochures, social posts and infographics. We balance color, typography and layout to communicate your message clearly.</p>
 </div>
 <div class="what-we-do__row">
 <h2 class="what-we-do__title">Digital Strategy</h2>
