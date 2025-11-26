@@ -2,6 +2,7 @@
 import ReactDOM from 'react-dom/client';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { inject } from '@vercel/analytics';
 
 // ================================
 // FIREFOX FIX: Configuração GSAP
@@ -13,6 +14,11 @@ gsap.config({
   nullTargetWarn: false,
   units: { left: "%", top: "%", rotation: "rad" }
 });
+
+// ================================
+// ANALYTICS
+// ================================
+inject(); // Vercel Analytics
 
 // Configuração ScrollTrigger
 ScrollTrigger.config({
