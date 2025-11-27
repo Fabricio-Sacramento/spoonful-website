@@ -34,22 +34,25 @@ const App = () => {
   }, []);
 
   return (
-    <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 50 }} shadows style={{ touchAction: isMobile ? 'pan-y' : 'none' }}>
+    <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 50 }} shadows>
       <AppCanvasCleanupRegistrar />
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
       <DynamicBackground />
       <Glass />
       <GlassCube />
-      <OrbitControls
-        enabled={!isMobile}
-        enableZoom={false}
-        enablePan={false}
-        enableRotate={true}
-        enableDamping={true}
-        dampingFactor={0.05}
-      />
-      {/* Adiciona o emissor do evento de readiness */}
+      
+      {/* Renderiza OrbitControls APENAS no desktop */}
+      {!isMobile && (
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          enableRotate={true}
+          enableDamping={true}
+          dampingFactor={0.05}
+        />
+      )}
+      
       <CanvasReadySignal />
     </Canvas>
   );
