@@ -327,6 +327,11 @@
     backdrop-filter: blur(2px);
   }
 
+  .about-drawer-content {
+    width: 100%;
+    padding: 0 1rem;
+  }
+
   .about-brands-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
