@@ -295,6 +295,16 @@
     max-width: 100%;
   }
 
+  .about-drawer-content #about {
+    min-height: unset;
+    height: auto;
+  }
+  
+  .about-drawer-content .about-wrapper {
+    min-height: unset;
+    height: auto;
+  }
+
   .about-drawer-close {
     top: 1.5rem;
     right: 1.5rem;
