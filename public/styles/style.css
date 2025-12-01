@@ -451,6 +451,27 @@ z-index: 1;
 /* RESPONSIVE                        */
 /* ================================= */
 
+/* ================================= */
+/* MOBILE/TABLET: Desabilita animações pesadas */
+/* ================================= */
+@media (max-width: 1023px) {
+  .intro-wrapper {
+    height: auto !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+  
+  #hero, #about-us {
+    position: relative !important;
+    height: 100vh !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+  
+  #hero {
+    clip-path: none !important;
+  }
+}
 
 /* Desktop Padrão: 1440px - 1919px */
 @media (min-width: 1440px) and (max-width: 1919px) {

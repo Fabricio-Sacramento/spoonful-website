@@ -31,6 +31,16 @@ function prepareSplitting() {
   const aboutSplits = Splitting({ target: '#about-us .text-back', by: 'chars' });
   aboutChars = aboutSplits.flatMap(r => r.chars);
 
+  // Mobile: Setup simples sem transforms 3D
+  const isMobile = window.innerWidth <= 1023;
+  
+  if (isMobile) {
+    console.log('📱 Mobile: Animações simplificadas ativadas');
+    gsap.set(heroAllChars, { opacity: 1 });
+    gsap.set(aboutChars, { opacity: 1 });
+    return;
+  }
+
   heroAllChars.forEach(char => {
     gsap.set(char.parentNode, { 
       perspective: 1000,
@@ -52,6 +62,29 @@ function prepareSplitting() {
 // 2) Animação de entrada do Hero
 // -----------------------------
 function animateHeroEntry() {
+  const isMobile = window.innerWidth <= 1023;
+  
+  // Mobile: Animação simples de fade
+  if (isMobile) {
+    gsap.set(heroAllChars, { opacity: 0 });
+    
+    const entryTl = gsap.timeline({ paused: true });
+    
+    entryTl.to(heroAllChars, {
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.02,
+      ease: 'power2.out'
+    });
+    
+    window.addEventListener('preloader:complete', () => {
+      entryTl.play();
+    }, { once: true });
+    
+    return entryTl;
+  }
+  
+  // Desktop: Animação 3D completa
   gsap.set(heroAllChars, {
     opacity: 0,
     rotationX: -90,
@@ -60,8 +93,9 @@ function animateHeroEntry() {
   });
 
   const entryTl = gsap.timeline({
-    paused: true, // ⬅️ PAUSA inicial
+    paused: true,
     onComplete: () => {
+      console.log('✅ Hero entry animation complete');
     }
   });
 
@@ -77,7 +111,6 @@ function animateHeroEntry() {
     }, i === 0 ? 0.5 : '<0.1');
   });
 
-  // ⬇️ NOVO: Escuta evento do preloader
   window.addEventListener('preloader:complete', () => {
     entryTl.play();
   }, { once: true });
@@ -89,6 +122,12 @@ function animateHeroEntry() {
 // 3) Timeline Hero + About Us
 // -----------------------------
 function initHeroAboutTimeline() {
+  const isMobile = window.innerWidth <= 1023;
+  if (isMobile) {
+    console.log('📱 Mobile: Timeline desabilitada - scroll nativo ativo');
+    return;
+  }
+  
   const wrapper = document.querySelector('.intro-wrapper');
   const whatWeDo = document.querySelector('#what-we-do');
   
@@ -232,6 +271,7 @@ function setupTestimonialsSection() {
     start: 'top 80%',
     once: true,
     onEnter: () => {
+      console.log('📣 Testimonials entered viewport');
     }
   });
 }
@@ -411,24 +451,35 @@ window.addEventListener('load', () => {
     return;
   }
   
-  const viewport = window.innerHeight;
-  wrapper.style.height = `${viewport}px`;
+  const isMobile = window.innerWidth <= 1023;
+  
+  if (!isMobile) {
+    const viewport = window.innerHeight;
+    wrapper.style.height = `${viewport}px`;
+  }
 
   animateHeroEntry();
   
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
     setupWhatWeDoSection();
-    setupStatementSection(); // Checa wrapper e delega se necessário
-    setupStatementContactTransition(); // Timeline statement/contact
+    setupStatementSection();
+    setupStatementContactTransition();
     setupTestimonialsSection();
   });
   
   gsap.delayedCall(0.5, smartRefresh);
   
   const handleResize = debounce(() => {
-    const newViewport = window.innerHeight;
-    wrapper.style.height = `${newViewport}px`;
+    const newIsMobile = window.innerWidth <= 1023;
+    
+    if (!newIsMobile) {
+      const newViewport = window.innerHeight;
+      wrapper.style.height = `${newViewport}px`;
+    } else {
+      wrapper.style.height = 'auto';
+    }
+    
     smartRefresh();
   }, 300);
   
@@ -458,4 +509,5 @@ if (window.location.hash === '#debug') {
 export { smartRefresh as refreshScrollTriggers, resetAnimations };
 
 window.debugKinetic = () => {
+  console.log('Kinetic scroll debug removed - native scroll on mobile');
 };
