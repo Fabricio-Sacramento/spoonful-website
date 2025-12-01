@@ -16,6 +16,7 @@ class CanvasPerformanceController {
     this.lastProgress = 0;
     this.debounceTimeout = null;
     this.cleanupFns = new Set(); // <-- multiple cleanups supported
+    this.isMobileMode = false; // <-- NEW: flag para modo mobile
 
     this.thresholds = {
       unmountProgress: 0.28,
@@ -24,6 +25,23 @@ class CanvasPerformanceController {
   }
 
   init(reactRoot, canvasComponent) {
+    // ========================================
+    // MOBILE/TABLET: Skip controller completo
+    // ========================================
+    const isMobile = window.innerWidth <= 1023;
+    
+    if (isMobile) {
+      console.log('📱 Mobile: Canvas permanente - Controller desabilitado');
+      this.isMobileMode = true;
+      this.reactRoot = reactRoot;
+      this.canvasComponent = canvasComponent;
+      this.container = document.getElementById('root');
+      return; // <-- Early return, não cria ScrollTrigger
+    }
+    
+    // ========================================
+    // DESKTOP: Comportamento normal
+    // ========================================
     this.reactRoot = reactRoot;
     this.canvasComponent = canvasComponent;
     this.container = document.getElementById('root');
@@ -69,6 +87,9 @@ class CanvasPerformanceController {
   }
 
   handleScrollProgress(progress) {
+    // Mobile: Ignora completamente
+    if (this.isMobileMode) return;
+    
     clearTimeout(this.debounceTimeout);
     this.debounceTimeout = setTimeout(() => {
       const isMovingForward = progress > this.lastProgress;
@@ -106,6 +127,12 @@ class CanvasPerformanceController {
   }
 
   async unmountCanvas() {
+    // Mobile: Nunca desmonta
+    if (this.isMobileMode) {
+      console.log('📱 Mobile: Unmount bloqueado');
+      return;
+    }
+    
     if (!this.isCanvasMounted || !this.reactRoot || !this.container) return;
 
     try {
@@ -137,6 +164,12 @@ class CanvasPerformanceController {
   }
 
   remountCanvas() {
+    // Mobile: Nunca remonta (porque nunca desmonta)
+    if (this.isMobileMode) {
+      console.log('📱 Mobile: Remount bloqueado');
+      return;
+    }
+    
     if (this.isCanvasMounted || !this.canvasComponent || !this.container) return;
     try {
       this.reactRoot = ReactDOM.createRoot(this.container);
@@ -148,8 +181,21 @@ class CanvasPerformanceController {
     }
   }
 
-  forceKill() { this.unmountCanvas(); }
-  forceResume() { this.remountCanvas(); }
+  forceKill() { 
+    if (this.isMobileMode) {
+      console.warn('📱 Mobile: forceKill ignorado');
+      return;
+    }
+    this.unmountCanvas(); 
+  }
+  
+  forceResume() { 
+    if (this.isMobileMode) {
+      console.warn('📱 Mobile: forceResume ignorado');
+      return;
+    }
+    this.remountCanvas(); 
+  }
 
   getStatus() {
     return {
@@ -158,7 +204,8 @@ class CanvasPerformanceController {
       hasContainer: !!this.container,
       cleanupCount: this.cleanupFns.size,
       thresholds: this.thresholds,
-      lastProgress: this.lastProgress
+      lastProgress: this.lastProgress,
+      isMobileMode: this.isMobileMode // <-- NEW
     };
   }
 
