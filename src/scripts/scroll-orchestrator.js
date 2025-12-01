@@ -36,8 +36,7 @@ function prepareSplitting() {
   
   if (isMobile) {
     console.log('📱 Mobile: Animações simplificadas ativadas');
-    gsap.set(heroAllChars, { opacity: 1 });
-    gsap.set(aboutChars, { opacity: 1 });
+    // About-Us agora também anima no animateHeroEntry()
     return;
   }
 
@@ -64,12 +63,14 @@ function prepareSplitting() {
 function animateHeroEntry() {
   const isMobile = window.innerWidth <= 1023;
   
-  // Mobile: Animação simples de fade
+  // Mobile: Animação simples de fade apenas para Hero
   if (isMobile) {
     gsap.set(heroAllChars, { opacity: 0 });
+    gsap.set(aboutChars, { opacity: 0 }); // About anima no scroll (ver setupAboutUsScroll)
     
     const entryTl = gsap.timeline({ paused: true });
     
+    // Hero fade in
     entryTl.to(heroAllChars, {
       opacity: 1,
       duration: 0.8,
@@ -119,7 +120,29 @@ function animateHeroEntry() {
 }
 
 // -----------------------------
-// 3) Timeline Hero + About Us
+// 3.5) About-Us Scroll Animation (Mobile)
+// -----------------------------
+function setupAboutUsScroll() {
+  const isMobile = window.innerWidth <= 1023;
+  if (!isMobile || aboutChars.length === 0) return;
+  
+  ScrollTrigger.create({
+    trigger: '#about-us',
+    start: 'top 80%', // Anima quando About entra 80% da tela
+    once: true,
+    onEnter: () => {
+      gsap.to(aboutChars, {
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.02,
+        ease: 'power2.out'
+      });
+    }
+  });
+}
+
+// -----------------------------
+// 4) Timeline Hero + About Us
 // -----------------------------
 function initHeroAboutTimeline() {
   const isMobile = window.innerWidth <= 1023;
@@ -462,6 +485,7 @@ window.addEventListener('load', () => {
   
   gsap.delayedCall(0.1, () => {
     initHeroAboutTimeline();
+    setupAboutUsScroll(); // <-- Animação de scroll do About em mobile
     setupWhatWeDoSection();
     setupStatementSection();
     setupStatementContactTransition();
