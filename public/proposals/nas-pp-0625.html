@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta — NAS Titânio × Spoonful Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:     #0A0A0B;
+    --steel:   #1A1C1F;
+    --panel:   #111316;
+    --off:     #F2F0EB;
+    --silver:  #9EA4AD;
+    --wire:    #2E3238;
+    --titanium:#C8CDD6;
+    --accent:  #D0D5DE;
+    --hot:     #E8E0C8;
+    --mono:    'Space Mono', monospace;
+    --serif:   'DM Serif Display', serif;
+    --sans:    'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--off);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--ink);
+    border-bottom: 1px solid var(--wire);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 48px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--silver);
+  }
+
+  .topbar strong { color: var(--titanium); letter-spacing: 0.08em; }
+
+  /* ── LAYOUT ── */
+  .slide {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding-top: 44px;
+  }
+
+  .slide--light  { background: var(--off);   color: var(--ink); }
+  .slide--panel  { background: var(--panel); color: var(--off); }
+  .slide--steel  { background: var(--steel); color: var(--off); }
+
+  .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 64px;
+    width: 100%;
+  }
+
+  /* ── LABEL ── */
+  .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--silver);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--wire);
+  }
+  .slide--light .label { color: #888; }
+  .slide--light .label::after { background: rgba(10,10,11,0.1); }
+
+  /* ── DISPLAY TYPE ── */
+  .display {
+    font-family: var(--serif);
+    font-size: clamp(52px, 6vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    margin-bottom: 48px;
+  }
+
+  .display em { font-style: italic; color: var(--titanium); }
+
+  /* ── TWO COL ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .col-title {
+    font-family: var(--serif);
+    font-size: clamp(36px, 3.5vw, 54px);
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+    position: sticky;
+    top: 80px;
+  }
+
+  .col-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--silver);
+    margin-top: 16px;
+    line-height: 1.8;
+  }
+
+  .slide--light .col-title { color: var(--ink); }
+  .slide--light .col-sub   { color: #888; }
+
+  /* ── BODY TEXT ── */
+  .body-lg {
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    margin-bottom: 40px;
+    color: var(--titanium);
+  }
+  .slide--light .body-lg { color: #444; }
+
+  .body {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--silver);
+  }
+  .slide--light .body { color: #555; }
+
+  /* ── DIVIDER ITEMS ── */
+  .divider-list { display: flex; flex-direction: column; }
+
+  .divider-item {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 20px;
+    padding: 28px 0;
+    border-top: 1px solid var(--wire);
+    align-items: start;
+  }
+  .divider-item:last-child { border-bottom: 1px solid var(--wire); }
+
+  .slide--light .divider-item { border-top-color: rgba(10,10,11,0.1); }
+  .slide--light .divider-item:last-child { border-bottom-color: rgba(10,10,11,0.1); }
+
+  .d-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--silver);
+    padding-top: 4px;
+    letter-spacing: 0.06em;
+  }
+
+  .d-title {
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+    color: var(--off);
+  }
+  .slide--light .d-title { color: var(--ink); }
+
+  .d-desc {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--silver);
+  }
+  .slide--light .d-desc { color: #666; }
+
+  /* ── TAGS ── */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 12px;
+    border: 1px solid var(--wire);
+    letter-spacing: 0.06em;
+    color: var(--silver);
+    border-radius: 1px;
+  }
+
+  .slide--light .tag { border-color: rgba(10,10,11,0.15); color: #777; }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight {
+    border-left: 2px solid var(--titanium);
+    padding: 24px 28px;
+    background: rgba(200,205,214,0.04);
+    margin-top: 32px;
+  }
+
+  .highlight p {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--titanium);
+  }
+
+  .slide--light .highlight { border-left-color: var(--ink); background: rgba(10,10,11,0.04); }
+  .slide--light .highlight p { color: #333; }
+
+  /* ── DIAGNOSIS GRID ── */
+  .diag-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    background: var(--wire);
+    margin-top: 48px;
+  }
+
+  .diag-card {
+    background: var(--panel);
+    padding: 32px 28px;
+  }
+
+  .diag-card--accent { background: var(--steel); }
+
+  .diag-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--silver);
+    margin-bottom: 12px;
+  }
+
+  .diag-text {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--titanium);
+    line-height: 1.65;
+  }
+
+  /* ── INVESTMENT ── */
+  .investment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .price-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--silver);
+    margin-bottom: 16px;
+  }
+
+  .price-value {
+    font-family: var(--serif);
+    font-size: clamp(56px, 7vw, 96px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    border-bottom: 1px solid var(--wire);
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    color: var(--off);
+  }
+
+  .payment-rows { display: flex; flex-direction: column; }
+
+  .payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--wire);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--silver);
+  }
+
+  .payment-row strong {
+    font-weight: 500;
+    color: var(--off);
+    font-size: 15px;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 48px;
+    background: var(--wire);
+  }
+
+  .tl-item {
+    background: var(--panel);
+    padding: 32px 24px;
+    border-right: 1px solid var(--wire);
+    position: relative;
+  }
+  .tl-item:last-child { border-right: none; }
+
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--titanium);
+    margin-bottom: 20px;
+  }
+
+  .tl-week {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--titanium);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .tl-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--off);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .tl-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--silver);
+    line-height: 1.65;
+  }
+
+  .tl-milestone {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--titanium);
+    letter-spacing: 0.06em;
+    margin-top: 16px;
+  }
+
+  /* ── SCOPE TABLE ── */
+  .scope-table { width: 100%; border-collapse: collapse; margin-top: 40px; }
+
+  .scope-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #555;
+    text-align: left;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(10,10,11,0.15);
+    font-weight: 400;
+  }
+
+  .scope-table td {
+    font-size: 14px;
+    font-weight: 400;
+    color: #1A1C1F;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(10,10,11,0.1);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .scope-table td:first-child { color: #444; font-size: 13px; font-weight: 500; padding-right: 24px; white-space: nowrap; }
+  .scope-table td:last-child  { color: #333; font-size: 13px; font-weight: 500; }
+
+  .scope-table .section-row td {
+    padding-top: 28px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: #777;
+    border-bottom: none;
+  }
+
+  .incl { color: #1A1C1F !important; font-weight: 500 !important; }
+  .excl { color: #888 !important; font-weight: 400 !important; }
+
+  /* ── BENEFIT GRID ── */
+  .benefit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--wire);
+    margin-top: 48px;
+  }
+
+  .benefit-card {
+    background: var(--panel);
+    padding: 36px 28px;
+    position: relative;
+  }
+
+  .benefit-n {
+    font-family: var(--serif);
+    font-size: 64px;
+    color: rgba(200,205,214,0.06);
+    position: absolute;
+    top: 20px; right: 24px;
+    line-height: 1;
+  }
+
+  .benefit-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--off);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .benefit-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--silver);
+    line-height: 1.7;
+  }
+
+  /* ── TERMS ── */
+  .term-item {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(10,10,11,0.1);
+    align-items: start;
+  }
+
+  .term-key {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .term-val {
+    font-size: 14px;
+    font-weight: 300;
+    color: #555;
+    line-height: 1.7;
+  }
+
+  /* ── CLOSING ── */
+  .closing-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px 64px 64px;
+  }
+
+  .closing-headline {
+    font-family: var(--serif);
+    font-size: clamp(72px, 10vw, 140px);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    color: var(--off);
+  }
+
+  .closing-headline em { font-style: italic; color: var(--titanium); }
+
+  .closing-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    border-top: 1px solid var(--wire);
+    padding-top: 40px;
+  }
+
+  .cf-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--silver);
+    margin-bottom: 8px;
+  }
+
+  .cf-val {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--off);
+  }
+
+  /* ── DECO ── */
+  .grid-deco {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image:
+      linear-gradient(var(--off) 1px, transparent 1px),
+      linear-gradient(90deg, var(--off) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ── COVER ── */
+  .cover-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  .cover-left {
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 80px 64px;
+    position: relative;
+    border-right: 1px solid var(--wire);
+  }
+
+  .cover-right {
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 120px 64px 80px;
+  }
+
+  .cover-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--silver);
+    margin-bottom: 32px;
+  }
+
+  .cover-title {
+    font-family: var(--serif);
+    font-size: clamp(52px, 6vw, 88px);
+    line-height: 0.93;
+    letter-spacing: -0.01em;
+    color: var(--off);
+    margin-bottom: 40px;
+  }
+
+  .cover-title em { font-style: italic; color: var(--titanium); }
+
+  .cover-index { list-style: none; }
+
+  .cover-index li {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--silver);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--wire);
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.04em;
+  }
+
+  .cover-index li span:last-child { color: var(--titanium); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .cover-grid, .two-col, .investment-grid, .closing-footer { grid-template-columns: 1fr; }
+    .cover-left, .cover-right { padding: 60px 32px; }
+    .cover-right { padding-top: 60px; }
+    .inner { padding: 60px 32px; }
+    .timeline-grid, .benefit-grid, .diag-grid { grid-template-columns: 1fr; }
+    .col-title { position: static; }
+    .term-item { grid-template-columns: 1fr; gap: 8px; }
+    .closing-layout { padding: 80px 32px 48px; }
+  }
+
+  @media print {
+    .topbar { display: none; }
+    .slide { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <strong>SPOONFUL DESIGN</strong>
+  <span>PROPOSTA DE SERVIÇO — 05.2026</span>
+  <span>fabricio@spoonful.com.br</span>
+</div>
+
+<!-- ══════════════════════════════════════════
+     01 — COVER
+     ══════════════════════════════════════════ -->
+<div class="slide" style="padding-top: 44px; min-height: 100vh;">
+  <div class="cover-grid">
+
+    <div class="cover-left">
+      <div class="grid-deco"></div>
+      <p class="cover-eyebrow">SPOONFUL DESIGN × NAS TITÂNIO</p>
+      <h1 class="cover-title">
+        Experiência<br>
+        Digital <em>Estratégica</em><br>
+        para B2B Industrial
+      </h1>
+      <p style="font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.75; max-width: 400px;">
+        Redesign completo do website da NAS Titânio — do diagnóstico de posicionamento à entrega de uma plataforma digital que comunica autoridade técnica e atrai o comprador industrial certo.
+      </p>
+    </div>
+
+    <div class="cover-right">
+      <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.1em;">05.2026 — PROPOSTA #002</p>
+
+      <ul class="cover-index">
+        <li><span>Diagnóstico & Oportunidade</span><span>→ 02</span></li>
+        <li><span>A Estratégia</span><span>→ 03</span></li>
+        <li><span>Escopo & Entregáveis</span><span>→ 04</span></li>
+        <li><span>Metodologia</span><span>→ 05</span></li>
+        <li><span>Cronograma</span><span>→ 06</span></li>
+        <li><span>Investimento</span><span>→ 07</span></li>
+        <li><span>Benefícios Esperados</span><span>→ 08</span></li>
+        <li><span>Termos & Condições</span><span>→ 09</span></li>
+        <li><span>Referências Visuais</span><span>→ 10</span></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     02 — DIAGNÓSTICO
+     ══════════════════════════════════════════ -->
+<div class="slide slide--light">
+  <div class="inner">
+    <p class="label">02 — Diagnóstico & Oportunidade</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-title">O Problema<br>Real</h2>
+        <p class="col-sub">
+          ANÁLISE DO CENÁRIO<br>ATUAL DA NAS TITÂNIO
+        </p>
+      </div>
+
+      <div>
+        <p class="body-lg">
+          O site atual da NAS Titânio funciona como um catálogo genérico — traz visitantes, mas não convence o comprador industrial certo de que a empresa é o parceiro técnico que ele precisa.
+        </p>
+
+        <div class="diag-grid">
+          <div class="diag-card">
+            <p class="diag-label">PROBLEMA 01 — POSICIONAMENTO</p>
+            <p class="diag-text">O site não comunica a diferença fundamental da NAS: ela não vende peças, ela <strong style="color: var(--off); font-weight:500;">resolve problemas técnicos complexos</strong> com titânio e ligas especiais. Isso é invisível para quem visita.</p>
+          </div>
+          <div class="diag-card diag-card--accent">
+            <p class="diag-label">PROBLEMA 02 — LEAD QUALIFICADO</p>
+            <p class="diag-text">O SEO funciona, mas atrai o público errado. Faltam sinalizadores claros que falem com gerentes de manutenção, engenheiros de processo e compradores de indústrias químicas, petroquímicas e de galvanoplastia.</p>
+          </div>
+          <div class="diag-card diag-card--accent">
+            <p class="diag-label">PROBLEMA 03 — AUTORIDADE TÉCNICA</p>
+            <p class="diag-text">Concorrentes internacionais como TiFab (EUA) já comunicam credibilidade técnica com linguagem de engenharia, cases por setor e ativos visuais de alta qualidade. A NAS tem o mesmo nível — mas não mostra.</p>
+          </div>
+          <div class="diag-card">
+            <p class="diag-label">PROBLEMA 04 — HIERARQUIA DE VALOR</p>
+            <p class="diag-text">O serviço principal — <strong style="color: var(--off); font-weight:500;">fabricação sob medida</strong> — concorre visualmente com a venda de estoque, criando ambiguidade sobre o que a empresa realmente faz de melhor.</p>
+          </div>
+        </div>
+
+        <div class="highlight" style="margin-top: 32px; border-left-color: var(--ink);">
+          <p style="color: #333;">A oportunidade é clara: posicionar a NAS Titânio como o <strong style="font-weight:500;">parceiro técnico especializado</strong> para indústrias que operam em ambientes agressivos — antes do orçamento, antes da cotação, na primeira visita ao site.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     03 — A ESTRATÉGIA
+     ══════════════════════════════════════════ -->
+<div class="slide slide--panel">
+  <div class="inner">
+    <p class="label">03 — A Estratégia</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-title">Não um<br>site.<br><em style="font-style:italic; color: var(--titanium);">Uma<br>ferramenta<br>de vendas.</em></h2>
+        <p class="col-sub" style="margin-top: 20px;">
+          SCROLL-DRIVEN NARRATIVE<br>
+          PARA COMPRADORES B2B
+        </p>
+      </div>
+
+      <div>
+        <p class="body-lg">
+          A nova experiência digital da NAS Titânio será construída como uma jornada narrativa. Em vez de apresentar um catálogo de produtos, o site vai conduzir o visitante por um raciocínio técnico — do problema industrial à solução em titânio.
+        </p>
+
+        <div class="divider-list">
+
+          <div class="divider-item">
+            <span class="d-num">A</span>
+            <div>
+              <h3 class="d-title">Comunicação por indústria, não por produto</h3>
+              <p class="d-desc">O site será organizado pela perspectiva do comprador: galvanoplastia, química, petroquímica, papel e celulose. Cada setor verá conteúdo que fala diretamente sobre seu problema de corrosão, temperatura e processo — e como a NAS resolve isso.</p>
+              <div class="tag-row">
+                <span class="tag">INDÚSTRIA QUÍMICA</span>
+                <span class="tag">GALVANOPLASTIA</span>
+                <span class="tag">PETROQUÍMICA</span>
+                <span class="tag">PAPEL & CELULOSE</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider-item">
+            <span class="d-num">B</span>
+            <div>
+              <h3 class="d-title">Hierarquia clara: fabricação sob medida em primeiro lugar</h3>
+              <p class="d-desc">A narrativa principal do site posiciona a NAS como parceira técnica de fabricação customizada. A venda de estoque e matéria-prima são apresentadas como serviços complementares — sem competir com o posicionamento premium.</p>
+            </div>
+          </div>
+
+          <div class="divider-item">
+            <span class="d-num">C</span>
+            <div>
+              <h3 class="d-title">Autoridade técnica visível</h3>
+              <p class="d-desc">Design de alto nível de engenharia: linguagem precisa, especificações técnicas em destaque, fotos e mockups de peças reais. O comprador industrial precisa sentir que está falando com especialistas — antes de mandar o primeiro e-mail.</p>
+            </div>
+          </div>
+
+          <div class="divider-item">
+            <span class="d-num">D</span>
+            <div>
+              <h3 class="d-title">SEO e GEO orientados ao lead qualificado</h3>
+              <p class="d-desc">Reestruturação do conteúdo para atrair buscas técnicas específicas — não "peças de titânio", mas "fabricação de trocadores de calor titânio grau 2 para ambiente ácido". E otimização para IAs generativas (ChatGPT, Perplexity) que já respondem perguntas de compra B2B.</p>
+              <div class="tag-row">
+                <span class="tag">SEO TÉCNICO</span>
+                <span class="tag">GEO / AI SEARCH</span>
+                <span class="tag">COPY ESTRATÉGICO</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="highlight">
+          <p>O comprador industrial não toma decisão por impulso. Ele pesquisa, avalia credibilidade e só pede orçamento quando confia. O novo site da NAS precisa fazer esse trabalho de pré-venda — 24 horas por dia, sem precisar de um vendedor na linha.</p>
+        </div>
+
+        <!-- BLOCO TÉCNICO -->
+        <div style="margin-top: 40px; border-top: 1px solid rgba(240,237,228,0.1); padding-top: 40px;">
+          <p style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--silver); margin-bottom: 28px;">A FUNDAÇÃO TÉCNICA — INCLUSA EM TODO O PROJETO</p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(240,237,228,0.06);">
+
+            <div style="background: var(--panel); padding: 28px 24px;">
+              <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.08em; margin-bottom: 14px;">01 — ENGENHARIA & ARQUITETURA</p>
+              <p style="font-size: 14px; font-weight: 300; color: var(--titanium); line-height: 1.7;">Não construímos páginas hard-coded. Definimos uma lógica global via <strong style="color: var(--off); font-weight: 500;">Design Tokens</strong> — cores, tipografia, espaçamento e radius — que garante consistência pixel-perfect e escalabilidade imediata. A biblioteca de componentes modulares permite que a equipe da NAS expanda o site sem depender de desenvolvedor.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px;">
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Design Tokens</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Atomic System</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Client-First</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Webflow CMS</span>
+              </div>
+            </div>
+
+            <div style="background: var(--steel); padding: 28px 24px;">
+              <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.08em; margin-bottom: 14px;">02 — VISUAIS & MOTION</p>
+              <p style="font-size: 14px; font-weight: 300; color: var(--titanium); line-height: 1.7;">Não usamos screenshots brutos das peças. Criamos <strong style="color: var(--off); font-weight: 500;">ativos de alta fidelidade</strong> — mockups e abstrações visuais que comunicam precisão técnica e qualidade de fabricação. Micro-interações refinadas (hovers, transições, estados de botão) que sinalizam ao comprador industrial que está lidando com uma empresa séria.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px;">
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">High-Fidelity Assets</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Micro-interactions</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Scroll triggers</span>
+              </div>
+            </div>
+
+            <div style="background: var(--steel); padding: 28px 24px;">
+              <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.08em; margin-bottom: 14px;">03 — UX & BEHAVIOR DESIGN</p>
+              <p style="font-size: 14px; font-weight: 300; color: var(--titanium); line-height: 1.7;">Aplicamos <strong style="color: var(--off); font-weight: 500;">heurísticas de usabilidade e frameworks de design comportamental</strong> para eliminar pontos de fricção invisíveis — hierarquias de valor confusas, caminhos de navegação ambíguos, sobrecarga cognitiva. Cada interação é projetada para guiar o engenheiro ou gerente de manutenção do interesse à solicitação de orçamento.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px;">
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Jobs-to-be-Done</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Friction mapping</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Conversion flow</span>
+              </div>
+            </div>
+
+            <div style="background: var(--panel); padding: 28px 24px;">
+              <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.08em; margin-bottom: 14px;">04 — COPY ESTRATÉGICO & GEO</p>
+              <p style="font-size: 14px; font-weight: 300; color: var(--titanium); line-height: 1.7;">Copy orientado ao comprador industrial — não institucional. Usamos o framework <strong style="color: var(--off); font-weight: 500;">Jobs-to-be-Done</strong> para falar da dor real do gerente de manutenção, não das especificações do produto. Mais GEO — estruturamos o conteúdo para que quando um engenheiro pergunte ao ChatGPT <em style="color: var(--titanium);">"fornecedor de peças em titânio para indústria química no Brasil"</em>, a NAS apareça como resposta.</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px;">
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">Behavioral triggers</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">GEO / AI Search</span>
+                <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; border: 0.5px solid rgba(240,237,228,0.15); color: var(--silver); border-radius: 1px;">SEO técnico</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     04 — ESCOPO & ENTREGÁVEIS
+     ══════════════════════════════════════════ -->
+<div class="slide slide--light">
+  <div class="inner">
+    <p class="label">04 — Escopo & Entregáveis</p>
+    <h2 class="display" style="color: var(--ink);">O que será<br><em style="font-style:italic; color: #888;">entregue</em></h2>
+
+    <table class="scope-table">
+      <thead>
+        <tr>
+          <th style="width: 200px;">FRENTE</th>
+          <th>ENTREGÁVEL</th>
+          <th style="width: 120px; text-align: right;">STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-row"><td colspan="3">— ESTRATÉGIA & CONTEÚDO</td></tr>
+        <tr>
+          <td>Diagnóstico de posicionamento</td>
+          <td>Análise do site atual, concorrentes e público-alvo. Mapeamento de personas (gerente de manutenção, engenheiro de processo, comprador técnico).</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Arquitetura de informação</td>
+          <td>Novo sitemap orientado por setor industrial. Hierarquia de conteúdo que prioriza fabricação sob medida.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Copywriting estratégico</td>
+          <td>Textos de todas as páginas principais — headlines, corpo e CTAs — com frameworks de persuasão B2B e otimização para SEO + GEO.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="3">— DESIGN</td></tr>
+        <tr>
+          <td>Design System</td>
+          <td>Tokens de cor, tipografia, espaçamento e componentes. Base para consistência visual em todas as páginas atuais e futuras.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Arquivo Figma master</td>
+          <td>Todas as telas, estados e variantes. Documentação de uso do design system.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Mockups e ativos visuais</td>
+          <td>Criação de ativos de alta fidelidade das peças e equipamentos — não screenshots brutos, mas apresentações visuais que comunicam precisão técnica.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="3">— PÁGINAS DESENVOLVIDAS</td></tr>
+        <tr>
+          <td>Homepage</td>
+          <td>Experiência scroll-driven narrativa. Apresenta o problema industrial → solução NAS → setores atendidos → autoridade → CTA.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Páginas por setor (4)</td>
+          <td>Galvanoplastia, Química/Petroquímica, Papel & Celulose, Petróleo & Gás. Cada uma com linguagem técnica específica do setor.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Fabricação sob medida</td>
+          <td>Página principal do serviço core — processo, capacidades técnicas, materiais (titânio, zircônio, hastelloy, inconel), CTA de orçamento.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Quem Somos</td>
+          <td>Posicionamento institucional com foco em autoridade técnica e histórico de soluções.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Contato / Orçamento</td>
+          <td>Formulário técnico de solicitação de orçamento — campos relevantes para o comprador industrial (material, liga, aplicação, volume).</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="3">— DESENVOLVIMENTO & ENTREGA</td></tr>
+        <tr>
+          <td>Plataforma</td>
+          <td>Webflow — CMS nativo que permite à equipe da NAS atualizar conteúdo sem depender de desenvolvedor.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Responsivo completo</td>
+          <td>Desktop, tablet e mobile — com testes em dispositivos reais.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>SEO técnico on-page</td>
+          <td>Meta tags, estrutura de headings, Schema.org para empresa B2B industrial, sitemap XML e robots.txt.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Treinamento editorial</td>
+          <td>Sessão de onboarding para a equipe da NAS usar o Webflow Editor e o CMS de forma autônoma.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Suporte pós-entrega</td>
+          <td>30 dias de correções e ajustes após o go-live.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="3">— CATÁLOGO & INTEGRAÇÕES</td></tr>
+        <tr>
+          <td>Catálogo de produtos</td>
+          <td>Migração e reestruturação do catálogo completo com as 18+ categorias atuais em CMS modular — cada produto com especificações técnicas, materiais e aplicações por setor.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Blog / Central de conteúdo</td>
+          <td>Estrutura de blog em CMS nativo do Webflow — templates prontos para a equipe publicar artigos técnicos, casos de aplicação e novidades sem depender de desenvolvedor.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+        <tr>
+          <td>Formulário técnico de orçamento</td>
+          <td>Formulário avançado com campos específicos para o comprador industrial (material, liga, aplicação, temperatura, volume). Integração com e-mail e opção de conexão com CRM via Zapier ou Make.</td>
+          <td style="text-align:right;" class="incl">Incluso</td>
+        </tr>
+
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     05 — METODOLOGIA
+     ══════════════════════════════════════════ -->
+<div class="slide slide--steel">
+  <div class="inner">
+    <p class="label">05 — Metodologia de Trabalho</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-title">Processo<br><em style="font-style:italic; color: var(--titanium);">iterativo<br>& estruturado</em></h2>
+        <p class="col-sub">CADA ETAPA COM<br>VALIDAÇÃO ANTES DE AVANÇAR</p>
+      </div>
+
+      <div class="divider-list">
+
+        <div class="divider-item">
+          <span class="d-num">01</span>
+          <div>
+            <h3 class="d-title">Imersão técnica & diagnóstico</h3>
+            <p class="d-desc">Entrevistas com a equipe da NAS para mapear o processo de fabricação, os setores atendidos, os perfis de clientes que geram mais valor e os diferenciais que a empresa tem mas não comunica. Análise do site atual e dos concorrentes.</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: rgba(240,237,228,0.3); letter-spacing: 0.06em; margin-top: 10px;">Competitor audit · Persona mapping · Content inventory</p>
+          </div>
+        </div>
+
+        <div class="divider-item">
+          <span class="d-num">02</span>
+          <div>
+            <h3 class="d-title">Estratégia de conteúdo & arquitetura</h3>
+            <p class="d-desc">Definição do novo sitemap, hierarquia de mensagens e estrutura de copywriting. Apresentação e validação antes de qualquer pixel de design.</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: rgba(240,237,228,0.3); letter-spacing: 0.06em; margin-top: 10px;">Sitemap · Information architecture · Jobs-to-be-Done · GEO brief</p>
+          </div>
+        </div>
+
+        <div class="divider-item">
+          <span class="d-num">03</span>
+          <div>
+            <h3 class="d-title">Conceito visual & design system</h3>
+            <p class="d-desc">Desenvolvimento da direção visual com moodboard, paleta e primeiros componentes. Aprovação do conceito antes da produção das páginas.</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: rgba(240,237,228,0.3); letter-spacing: 0.06em; margin-top: 10px;">Design Tokens · Typography scale · Color system · Component library · Figma master file</p>
+          </div>
+        </div>
+
+        <div class="divider-item">
+          <span class="d-num">04</span>
+          <div>
+            <h3 class="d-title">Design de páginas & produção</h3>
+            <p class="d-desc">Criação de todas as telas no Figma com duas rodadas de revisão por milestone. A equipe da NAS acompanha e aprova cada entrega parcial.</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: rgba(240,237,228,0.3); letter-spacing: 0.06em; margin-top: 10px;">High-fidelity mockups · Scroll animations · Micro-interactions · Responsive breakpoints</p>
+          </div>
+        </div>
+
+        <div class="divider-item">
+          <span class="d-num">05</span>
+          <div>
+            <h3 class="d-title">Desenvolvimento em Webflow</h3>
+            <p class="d-desc">Implementação fiel ao design aprovado. Uma rodada de refinamentos inclusa. Testes em múltiplos dispositivos e browsers.</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: rgba(240,237,228,0.3); letter-spacing: 0.06em; margin-top: 10px;">Client-First · Webflow CMS · Schema.org · Semantic HTML · PageSpeed optimization</p>
+          </div>
+        </div>
+
+        <div class="divider-item">
+          <span class="d-num">06</span>
+          <div>
+            <h3 class="d-title">Go-live, treinamento & suporte</h3>
+            <p class="d-desc">Publicação no domínio da NAS. Sessão de onboarding para a equipe. 30 dias de suporte pós-lançamento incluso.</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: rgba(240,237,228,0.3); letter-spacing: 0.06em; margin-top: 10px;">DNS migration · Webflow Editor training · Analytics setup · 30-day support</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     06 — CRONOGRAMA
+     ══════════════════════════════════════════ -->
+<div class="slide slide--panel">
+  <div class="inner">
+    <p class="label">06 — Cronograma</p>
+    <h2 class="display">8 semanas<br><em>de execução</em></h2>
+
+    <div class="timeline-grid">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <p class="tl-week">SEMANAS 01 — 02</p>
+        <h3 class="tl-title">Imersão, diagnóstico & estratégia</h3>
+        <p class="tl-desc">Entrevistas, análise, definição do sitemap, arquitetura de conteúdo e copywriting estratégico.</p>
+        <p class="tl-milestone">→ Entrega da estratégia</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <p class="tl-week">SEMANAS 03 — 04</p>
+        <h3 class="tl-title">Conceito visual & design system</h3>
+        <p class="tl-desc">Direção visual, paleta, tipografia, componentes base e design das páginas principais.</p>
+        <p class="tl-milestone">→ Aprovação do conceito</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <p class="tl-week">SEMANAS 05 — 07</p>
+        <h3 class="tl-title">Produção & desenvolvimento</h3>
+        <p class="tl-desc">Design completo de todas as páginas + desenvolvimento em Webflow com testes responsivos.</p>
+        <p class="tl-milestone">→ Staging para revisão</p>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot" style="background: var(--hot);"></div>
+        <p class="tl-week" style="color: var(--hot);">SEMANA 08</p>
+        <h3 class="tl-title">Ajustes finais & go-live</h3>
+        <p class="tl-desc">Aplicação dos feedbacks finais, publicação no domínio, treinamento da equipe e início do suporte.</p>
+        <p class="tl-milestone" style="color: var(--hot);">★ Entrega & go-live</p>
+      </div>
+    </div>
+
+    <div class="highlight" style="margin-top: 32px;">
+      <p>O cronograma é sequencial e validado em marcos — não avançamos para a próxima fase sem aprovação da anterior. Isso garante alinhamento total e elimina retrabalho tardio.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     07 — INVESTIMENTO
+     ══════════════════════════════════════════ -->
+<div class="slide slide--steel">
+  <div class="inner">
+    <p class="label">07 — Investimento</p>
+
+    <div class="investment-grid">
+      <div>
+        <p class="price-label">VALOR TOTAL DO PROJETO</p>
+        <div class="price-value">R$<br>18.000<span style="font-size: 0.4em; font-family: var(--sans); font-weight: 300;">,00</span></div>
+        <p style="font-size: 13px; font-weight: 300; color: var(--silver); line-height: 1.75;">
+          Inclui estratégia, copywriting, design system completo, desenvolvimento em Webflow, SEO técnico, treinamento e 30 dias de suporte. <strong style="font-weight:500; color: var(--off);">Impostos inclusos (15,5%)</strong> — emitido via Spoonful Serviços de Design Ltda.
+        </p>
+      </div>
+
+      <div>
+        <h3 style="font-size: 15px; font-weight: 500; margin-bottom: 24px; color: var(--off);">Forma de pagamento</h3>
+
+        <div class="payment-rows">
+          <div class="payment-row">
+            <span>30% na assinatura do contrato</span>
+            <strong>R$ 5.400</strong>
+          </div>
+          <div class="payment-row">
+            <span>30% na aprovação do design</span>
+            <strong>R$ 5.400</strong>
+          </div>
+          <div class="payment-row">
+            <span>40% na entrega final</span>
+            <strong>R$ 7.200</strong>
+          </div>
+        </div>
+
+        <div style="margin-top: 28px; padding: 20px 24px; border: 1px solid var(--wire); border-left: 2px solid var(--titanium);">
+          <p style="font-family: var(--mono); font-size: 10px; color: var(--titanium); letter-spacing: 0.08em; margin-bottom: 8px;">PROPOSTA VÁLIDA ATÉ</p>
+          <p style="font-size: 22px; font-family: var(--serif); color: var(--off);">19.05.2026</p>
+        </div>
+
+        <div style="margin-top: 16px; padding: 16px 20px; border: 1px solid var(--wire);">
+          <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); line-height: 1.8; letter-spacing: 0.04em;">
+            PIX, TED ou depósito em conta PJ.<br>Nota fiscal emitida a cada parcela.<br>Contrato formal assinado antes do início.
+          </p>
+        </div>
+
+        <div style="margin-top: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 14px; border: 1px solid rgba(200,168,74,0.4); background: rgba(200,168,74,0.05);">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #C8A84A; flex-shrink: 0;"></div>
+          <p style="font-family: var(--mono); font-size: 11px; color: #C8A84A; letter-spacing: 0.06em; line-height: 1.6;">Impostos de 15,5% já inclusos no valor total — sem cobranças adicionais.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     08 — BENEFÍCIOS
+     ══════════════════════════════════════════ -->
+<div class="slide slide--panel">
+  <div class="inner">
+    <p class="label">08 — Benefícios Esperados</p>
+    <h2 class="display">O que<br><em>muda</em></h2>
+
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <span class="benefit-n">01</span>
+        <h3 class="benefit-title">Lead qualificado desde o primeiro contato</h3>
+        <p class="benefit-desc">O novo site filtra naturalmente o público — quem chega ao formulário de orçamento já entendeu o que a NAS faz, o valor que entrega e por que é diferente da China.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-n">02</span>
+        <h3 class="benefit-title">Posicionamento como parceiro técnico, não fornecedor</h3>
+        <p class="benefit-desc">A linguagem do site comunica que a NAS é especialista em resolver problemas de corrosão e processo — não apenas em vender peças. Isso muda o tipo de conversa que o cliente inicia.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-n">03</span>
+        <h3 class="benefit-title">Pré-venda automatizada 24h</h3>
+        <p class="benefit-desc">O gerente de manutenção que pesquisa às 23h em planta industrial vai encontrar as respostas técnicas que ele precisa para confiar — e pedir o orçamento no dia seguinte.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-n">04</span>
+        <h3 class="benefit-title">Presença em buscas de alta intenção</h3>
+        <p class="benefit-desc">SEO técnico e GEO orientados a buscas específicas de engenheiros e compradores — não termos genéricos. A NAS aparece quando o comprador já sabe o que precisa.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-n">05</span>
+        <h3 class="benefit-title">Autonomia editorial para a equipe</h3>
+        <p class="benefit-desc">Webflow com CMS nativo — a NAS publica novos conteúdos, adiciona produtos e atualiza textos sem depender de desenvolvedor externo.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-n">06</span>
+        <h3 class="benefit-title">Base para crescimento escalável</h3>
+        <p class="benefit-desc">Design system e arquitetura modular permitem adicionar novos setores, produtos e páginas em fase 2 sem refazer o site — apenas expandindo o que já foi construído.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     09 — TERMOS & CONDIÇÕES
+     ══════════════════════════════════════════ -->
+<div class="slide slide--light">
+  <div class="inner">
+    <p class="label">09 — Termos & Condições</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-title">Regras<br>do<br>projeto</h2>
+        <p class="col-sub">CLARO PARA AMBOS<br>OS LADOS</p>
+      </div>
+
+      <div>
+        <div class="term-item" style="border-top: 1px solid rgba(10,10,11,0.1);">
+          <span class="term-key">Prazo de entrega</span>
+          <p class="term-val">O prazo de 8 semanas considera o escopo definido nesta proposta. Poderá ser ajustado caso o cliente solicite alterações de escopo ou atrase a entrega de insumos (materiais, fotos, informações técnicas).</p>
+        </div>
+        <div class="term-item">
+          <span class="term-key">Revisões inclusas</span>
+          <p class="term-val">2 rodadas de revisão por milestone na fase de design. 1 rodada de refinamentos na fase de desenvolvimento. Revisões adicionais serão orçadas separadamente antes de serem executadas.</p>
+        </div>
+        <div class="term-item">
+          <span class="term-key">Alterações de escopo</span>
+          <p class="term-val">Qualquer adição ao escopo original — novas páginas, novos serviços ou integrações não previstas — será negociada separadamente e documentada antes do início da execução.</p>
+        </div>
+        <div class="term-item">
+          <span class="term-key">Responsabilidades do cliente</span>
+          <p class="term-val">A NAS Titânio deve fornecer fotos, textos de referência, informações técnicas e acesso ao domínio/DNS em tempo hábil. Atrasos na entrega desses insumos impactam diretamente o cronograma.</p>
+        </div>
+        <div class="term-item">
+          <span class="term-key">Propriedade intelectual</span>
+          <p class="term-val">Após quitação integral, todos os direitos de uso dos arquivos finais (Figma, Webflow) são transferidos à NAS Titânio. O Spoonful mantém o direito de exibir o projeto em portfolio.</p>
+        </div>
+        <div class="term-item">
+          <span class="term-key">Hospedagem Webflow</span>
+          <p class="term-val">O custo do plano Webflow (a partir de USD 23/mês no plano Business) não está incluso na proposta e é de responsabilidade da NAS Titânio após o go-live.</p>
+        </div>
+        <div class="term-item" style="border-bottom: none;">
+          <span class="term-key">Validade da proposta</span>
+          <p class="term-val">Esta proposta é válida até 19 de maio de 2026. Após essa data, valores e condições estão sujeitos a revisão.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     10 — REFERÊNCIAS
+     ══════════════════════════════════════════ -->
+<div class="slide slide--light">
+  <div class="inner">
+    <p class="label">10 — Referências Visuais</p>
+    <h2 class="display" style="color: var(--ink);">O nível<br><em style="font-style:italic; color:#888;">que buscamos</em></h2>
+
+    <div style="margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <span style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: #888;">EXECUÇÃO — SCROLLYTELLING & MOTION</span>
+        <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; background: #0E0E0E; color: #C8A84A; border-radius: 2px; letter-spacing: 0.06em;">ALTO PADRÃO</span>
+        <div style="flex:1; height: 0.5px; background: rgba(10,10,11,0.1);"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;">
+
+        <div style="border: 1px solid #C8A84A; border-radius: 8px; overflow: hidden;">
+          <div style="height: 88px; background: #060608; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #444; letter-spacing: 0.04em;">HEAVN-ONE.WEBFLOW.IO</div>
+          <div style="padding: 14px 16px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">HEAVN One</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 10px;">heavn-one.webflow.io</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 10px;">Produto físico que se explica visualmente durante o scroll. Referência máxima de storytelling técnico de alto impacto em Webflow.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Scroll narrative</span>
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Webflow award</span>
+            </div>
+            <a href="https://heavn-one.webflow.io/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #C8A84A; border-radius: 8px; overflow: hidden;">
+          <div style="height: 88px; background: #100A06; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #4A2010; letter-spacing: 0.04em;">OILSTAINLAB.COM</div>
+          <div style="padding: 14px 16px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">Oil Stain Lab</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 10px;">oilstainlab.com</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 10px;">Scrollytelling cinematográfico para nicho técnico automotivo. Referência de como identidade e narrativa coexistem com máxima ambição.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Scrollytelling</span>
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Niche premium</span>
+            </div>
+            <a href="https://www.oilstainlab.com/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #C8A84A; border-radius: 8px; overflow: hidden;">
+          <div style="height: 88px; background: #111318; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #555; letter-spacing: 0.04em;">ELECTRONICMATERIALSOFFICE</div>
+          <div style="padding: 14px 16px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">Electronic Materials Office®</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 10px;">electronicmaterialsoffice.com</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 10px;">Hardware técnico com posicionamento nível Apple. Materiais e precisão comunicados com elegância extrema — referência direta para a NAS.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Hardware premium</span>
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Materiais técnicos</span>
+            </div>
+            <a href="https://electronicmaterialsoffice.com/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #C8A84A; border-radius: 8px; overflow: hidden;">
+          <div style="height: 88px; background: #090C14; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #2A3A5A; letter-spacing: 0.04em;">AI-IN-BANKING-UX</div>
+          <div style="padding: 14px 16px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">AI in Banking UX</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 10px;">videinfra.com</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 10px;">Scroll narrative para conteúdo técnico complexo. Como guiar o comprador B2B por uma jornada educativa sem perder rigor técnico.</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px;">
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Narrative B2B</span>
+              <span style="font-family: var(--mono); font-size: 10px; padding: 2px 7px; border: 0.5px solid #C8A84A; color: #C8A84A; border-radius: 2px;">Jornada guiada</span>
+            </div>
+            <a href="https://ai-in-banking-ux-design.videinfra.com/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <span style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: #888;">CONTEXTO — UNIVERSO INDUSTRIAL B2B (SITES REAIS EM WEBFLOW)</span>
+        <div style="flex:1; height: 0.5px; background: rgba(10,10,11,0.1);"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;">
+
+        <div style="border: 0.5px solid rgba(10,10,11,0.12); border-radius: 8px; overflow: hidden;">
+          <div style="height: 72px; background: #111318; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #555; letter-spacing: 0.04em;">EN.SKH-GMBH.DE</div>
+          <div style="padding: 12px 14px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">SKH GmbH</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 8px;">en.skh-gmbh.de</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 8px;">Empresa química industrial alemã em Webflow. Mesmo universo da NAS: soluções sob medida, B2B técnico, linguagem científica precisa.</p>
+            <a href="https://en.skh-gmbh.de/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+        <div style="border: 0.5px solid rgba(10,10,11,0.12); border-radius: 8px; overflow: hidden;">
+          <div style="height: 72px; background: #081210; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #2A4A3A; letter-spacing: 0.04em;">BONDALTI.COM</div>
+          <div style="padding: 12px 14px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">Bondalti</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 8px;">bondalti.com</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 8px;">Empresa química industrial portuguesa em Webflow. Credibilidade corporativa em indústria pesada — design sóbrio e técnico.</p>
+            <a href="https://www.bondalti.com/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+        <div style="border: 0.5px solid rgba(10,10,11,0.12); border-radius: 8px; overflow: hidden;">
+          <div style="height: 72px; background: #060608; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #333; letter-spacing: 0.04em;">COMPOSECURE.COM</div>
+          <div style="padding: 12px 14px;">
+            <p style="font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px;">CompoSecure</p>
+            <p style="font-family: var(--mono); font-size: 10px; color: #999; margin-bottom: 8px;">composecure.com</p>
+            <p style="font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 8px;">Metal de alta performance em Webflow. Como produto industrial físico pode ser comunicado com nível premium — visual que valoriza o material.</p>
+            <a href="https://www.composecure.com/" style="font-size: 11px; font-weight: 500; color: var(--ink); border-bottom: 0.5px solid rgba(10,10,11,0.3); padding-bottom: 1px; text-decoration: none;">ver site →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     11 — CLOSING
+     ══════════════════════════════════════════ -->
+<div class="slide slide--panel" style="position: relative;">
+  <div class="grid-deco"></div>
+  <div class="closing-layout">
+    <div>
+      <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.12em; margin-bottom: 48px;">SPOONFUL DESIGN — 05.2026</p>
+      <h2 class="closing-headline">
+        Pronto para<br>
+        <em>transformar</em><br>
+        o site da NAS.
+      </h2>
+    </div>
+
+    <div class="closing-footer">
+      <div>
+        <p class="cf-label">CONTATO</p>
+        <p class="cf-val">Fabricio Sacramento</p>
+        <p class="cf-val" style="color: var(--titanium); margin-top: 4px;">fabricio@spoonful.com.br</p>
+        <p class="cf-val" style="color: var(--silver); font-size: 13px; margin-top: 4px;">+55 21 99614-5512</p>
+      </div>
+      <div>
+        <p class="cf-label">EMPRESA</p>
+        <p class="cf-val">Spoonful Serviços de Design Ltda</p>
+        <p class="cf-val" style="color: var(--silver); font-size: 13px; margin-top: 4px;">Rio de Janeiro, RJ — Brasil</p>
+        <div style="margin-top: 24px; display: inline-block; padding: 16px 24px; border: 1px solid var(--wire);">
+          <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.08em; margin-bottom: 6px;">INVESTIMENTO TOTAL</p>
+          <p style="font-family: var(--serif); font-size: 28px; color: var(--off);">R$ 18.000,00</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
