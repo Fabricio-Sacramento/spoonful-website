@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta — Tangente DIY Skateparks × Spoonful Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --off: #F0EDE4;
+    --black: #0E0E0E;
+    --accent: #F04E0A;
+    --warm: #F04E0A;
+    --mid: #787670;
+    --mono: 'Space Mono', monospace;
+    --display: 'Bebas Neue', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--off);
+    color: var(--black);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── LAYOUT ── */
+  .slide {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide--dark { background: var(--black); color: var(--off); }
+  .slide--accent { background: var(--accent); color: var(--black); }
+  .slide--warm { background: var(--warm); color: var(--off); }
+
+  .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 64px;
+    width: 100%;
+  }
+
+  /* ── HEADER BAR ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    color: var(--off);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 40px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .topbar a { color: var(--accent); text-decoration: none; }
+
+  /* ── COVER ── */
+  .cover-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 100vh;
+  }
+
+  .cover-left {
+    background: var(--black);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 80px 64px;
+    position: relative;
+  }
+
+  .cover-left::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 1px;
+    height: 100%;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .cover-logo-mark {
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+
+  .cover-logo-mark svg { width: 60px; height: 60px; }
+
+  .cover-title {
+    font-family: var(--display);
+    font-size: clamp(72px, 8vw, 120px);
+    line-height: 0.92;
+    color: var(--off);
+    letter-spacing: 0.01em;
+    margin-bottom: 32px;
+  }
+
+  .cover-title span { color: var(--accent); }
+
+  .cover-sub {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: rgba(240,237,228,0.5);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .cover-right {
+    background: var(--off);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 120px 64px 80px;
+  }
+
+  .cover-index {
+    list-style: none;
+    margin-top: auto;
+  }
+
+  .cover-index li {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--mid);
+    padding: 14px 0;
+    border-bottom: 0.5px solid rgba(14,14,14,0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.05em;
+  }
+
+  .cover-index li span:last-child {
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  .cover-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.08em;
+    margin-bottom: 40px;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: currentColor;
+    opacity: 0.3;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(52px, 6vw, 88px);
+    line-height: 0.92;
+    letter-spacing: 0.01em;
+    margin-bottom: 48px;
+  }
+
+  /* ── TWO COL ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .col-left-title {
+    font-family: var(--display);
+    font-size: clamp(40px, 4vw, 60px);
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    position: sticky;
+    top: 80px;
+  }
+
+  .col-left-desc {
+    font-size: 15px;
+    color: var(--mid);
+    line-height: 1.65;
+    margin-top: 20px;
+    font-weight: 300;
+  }
+
+  /* ── ESCOPO CARDS ── */
+  .scope-cards { display: flex; flex-direction: column; gap: 0; }
+
+  .scope-card {
+    border-top: 0.5px solid rgba(14,14,14,0.15);
+    padding: 32px 0;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .scope-card:last-child { border-bottom: 0.5px solid rgba(14,14,14,0.15); }
+
+  .scope-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--mid);
+    padding-top: 4px;
+  }
+
+  .scope-card-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .scope-card-desc {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 1.65;
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+
+  .deliverable-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .deliverable-list li {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border: 0.5px solid rgba(14,14,14,0.25);
+    letter-spacing: 0.04em;
+    border-radius: 2px;
+  }
+
+  /* Dark slide pills */
+  .slide--dark .scope-card { border-top-color: rgba(240,237,228,0.12); }
+  .slide--dark .scope-card:last-child { border-bottom-color: rgba(240,237,228,0.12); }
+  .slide--dark .deliverable-list li { border-color: rgba(240,237,228,0.2); }
+
+  /* ── CRONOGRAMA ── */
+  .timeline {
+    position: relative;
+    padding: 48px 0;
+  }
+
+  .timeline-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(240,237,228,0.15);
+    transform: translateY(-50%);
+  }
+
+  .timeline-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .timeline-item { padding: 0 24px; }
+
+  .timeline-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .timeline-week {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .timeline-title {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--off);
+  }
+
+  .timeline-desc {
+    font-size: 13px;
+    color: rgba(240,237,228,0.55);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .timeline-milestone {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  /* ── INVESTIMENTO ── */
+  .investment-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  .price-display {
+    font-family: var(--display);
+    font-size: clamp(64px, 8vw, 110px);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    border-bottom: 2px solid currentColor;
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+  }
+
+  .price-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.5;
+    margin-bottom: 16px;
+  }
+
+  .payment-list { list-style: none; }
+
+  .payment-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    padding: 14px 0;
+    border-bottom: 0.5px solid rgba(14,14,14,0.12);
+    font-weight: 300;
+  }
+
+  .payment-list li::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--warm);
+    flex-shrink: 0;
+  }
+
+  .payment-note {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.05em;
+    margin-top: 24px;
+    padding: 16px;
+    border: 0.5px solid rgba(14,14,14,0.12);
+    border-left: 2px solid var(--warm);
+    line-height: 1.7;
+  }
+
+  /* ── BENEFICIOS ── */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 48px;
+    background: rgba(240,237,228,0.1);
+  }
+
+  .benefit-card {
+    background: var(--black);
+    padding: 40px 32px;
+    position: relative;
+  }
+
+  .benefit-num {
+    font-family: var(--display);
+    font-size: 56px;
+    color: rgba(240,237,228,0.08);
+    line-height: 1;
+    position: absolute;
+    top: 24px; right: 24px;
+    letter-spacing: 0.01em;
+  }
+
+  .benefit-icon {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(240,237,228,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .benefit-title {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--off);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .benefit-desc {
+    font-size: 13px;
+    color: rgba(240,237,228,0.5);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ── TERMOS ── */
+  .terms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .term-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    padding: 28px 0;
+    border-bottom: 0.5px solid rgba(14,14,14,0.12);
+    align-items: start;
+  }
+
+  .term-title {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .term-desc {
+    font-size: 14px;
+    color: var(--mid);
+    font-weight: 300;
+    line-height: 1.65;
+  }
+
+  /* ── CLOSING ── */
+  .closing-inner {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 100px 64px 64px;
+    max-width: 100%;
+  }
+
+  .closing-headline {
+    font-family: var(--display);
+    font-size: clamp(80px, 12vw, 160px);
+    line-height: 0.88;
+    color: var(--accent);
+    letter-spacing: 0.01em;
+  }
+
+  .closing-contact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    border-top: 0.5px solid rgba(240,237,228,0.12);
+    padding-top: 40px;
+  }
+
+  .contact-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: rgba(240,237,228,0.35);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .contact-value {
+    font-size: 15px;
+    color: var(--off);
+    font-weight: 300;
+  }
+
+  /* ── TEXTURA DECORATIVA ── */
+  .deco-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image:
+      linear-gradient(rgba(240,237,228,1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240,237,228,1) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .deco-cross {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(240,237,228,0.15);
+    pointer-events: none;
+    letter-spacing: 0;
+  }
+
+  /* ── PRINT / A4 ── */
+  @media print {
+    .topbar { display: none; }
+    .slide { page-break-after: always; min-height: 100vh; }
+    body { background: white; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .cover-grid { grid-template-columns: 1fr; }
+    .cover-right { padding: 60px 32px; }
+    .cover-left { padding: 60px 32px; min-height: 60vh; }
+    .two-col { grid-template-columns: 1fr; gap: 32px; }
+    .col-left-title { position: static; }
+    .investment-block { grid-template-columns: 1fr; }
+    .benefits-grid { grid-template-columns: 1fr; }
+    .closing-contact { grid-template-columns: 1fr; }
+    .timeline-items { grid-template-columns: 1fr; }
+    .inner { padding: 60px 32px; }
+    .term-item { grid-template-columns: 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span>SPOONFUL DESIGN</span>
+  <span>04.05.2025</span>
+  <span><a href="mailto:fabricio@spoonful.com.br">fabricio@spoonful.com.br</a></span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 01 — COVER
+     ═══════════════════════════════════════════════════ -->
+<div class="slide" style="padding-top: 44px;">
+  <div class="cover-grid">
+
+    <div class="cover-left">
+      <div class="deco-grid"></div>
+      <div class="deco-cross" style="bottom: 160px; left: 64px;">+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +</div>
+
+
+
+      <p class="cover-sub">Proposta de Serviço — Design</p>
+      <h1 class="cover-title">TANGENTE<br><span>DIY</span><br>SKATEPARKS</h1>
+      <p class="cover-sub" style="margin-top: 16px;">Identidade Visual & Materiais de Comunicação</p>
+    </div>
+
+    <div class="cover-right" style="padding-top: 120px;">
+      <div>
+        <p class="cover-date">04.05.2025 — Proposta #001</p>
+        <p style="font-size: 15px; color: var(--mid); font-weight: 300; line-height: 1.7; max-width: 400px;">
+          Esta proposta apresenta um plano de trabalho para três frentes distintas: o desenvolvimento da identidade visual da <strong style="font-weight: 500; color: var(--black);">Concave</strong>, a criação de estampas para a <strong style="font-weight: 500; color: var(--black);">Tangente</strong>, e a remontagem da apresentação institucional da marca.
+        </p>
+      </div>
+
+      <ul class="cover-index">
+        <li><span>Contexto & Objetivo</span><span>→ 02</span></li>
+        <li><span>Escopo & Entregáveis</span><span>→ 03</span></li>
+        <li><span>Metodologia</span><span>→ 04</span></li>
+        <li><span>Cronograma</span><span>→ 05</span></li>
+        <li><span>Investimento</span><span>→ 06</span></li>
+        <li><span>Benefícios Esperados</span><span>→ 07</span></li>
+        <li><span>Termos & Condições</span><span>→ 08</span></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 02 — CONTEXTO
+     ═══════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="inner">
+    <p class="section-label">02 — Contexto & Objetivo</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-left-title">Contexto<br>do<br>Projeto</h2>
+        <p class="col-left-desc">
+          Pharra e Bahia são os fundadores da Tangente DIY Skateparks. A operação continua a mesma, mas cada um passa a ter sua própria marca.
+        </p>
+      </div>
+
+      <div>
+        <p style="font-size: 22px; font-weight: 300; line-height: 1.55; letter-spacing: -0.01em; margin-bottom: 40px;">
+          Bahia fica com a <strong style="font-weight: 500;">Tangente</strong>. Pharra fica com a <strong style="font-weight: 500;">Concave</strong>. São duas marcas independentes que compartilham o mesmo DNA cultural: o universo raw e autêntico do skate DIY.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(14,14,14,0.08);">
+          <div style="background: var(--off); padding: 28px 24px;">
+            <p style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--mid); margin-bottom: 12px;">MARCA 01</p>
+            <p style="font-size: 24px; font-weight: 500; margin-bottom: 8px;">Concave</p>
+            <p style="font-size: 13px; color: var(--mid); font-weight: 300; line-height: 1.6;">Nova identidade visual. Do zero. A marca de Pharra.</p>
+          </div>
+          <div style="background: var(--off); padding: 28px 24px;">
+            <p style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--mid); margin-bottom: 12px;">MARCA 02</p>
+            <p style="font-size: 24px; font-weight: 500; margin-bottom: 8px;">Tangente</p>
+            <p style="font-size: 13px; color: var(--mid); font-weight: 300; line-height: 1.6;">Estampas + remontagem da apresentação institucional existente.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 28px; border-left: 2px solid var(--warm); background: rgba(200,57,10,0.05);">
+          <p style="font-size: 15px; font-weight: 300; line-height: 1.7; color: var(--black);">
+            O objetivo deste projeto é garantir que as duas marcas se posicionem com clareza e força no cenário skate — mantendo o espírito DIY, mas com comunicação visual consistente e materiais prontos para uso em diferentes contextos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 03 — ESCOPO & ENTREGÁVEIS
+     ═══════════════════════════════════════════════════ -->
+<div class="slide slide--dark">
+  <div class="inner">
+    <p class="section-label" style="color: rgba(240,237,228,0.4);">03 — Escopo & Entregáveis</p>
+    <h2 class="section-title" style="color: var(--off);">O QUE<br>SERÁ<br>FEITO</h2>
+
+    <div class="two-col">
+      <div>
+        <p class="col-left-desc" style="color: rgba(240,237,228,0.5);">
+          Três serviços independentes, cada um com escopo e entregáveis bem definidos. Todos dentro do mesmo universo visual do skate.
+        </p>
+      </div>
+
+      <div class="scope-cards">
+
+        <div class="scope-card">
+          <span class="scope-num">01</span>
+          <div>
+            <h3 class="scope-card-title" style="color: var(--accent);">Identidade Visual — Concave</h3>
+            <p class="scope-card-desc">
+              Desenvolvimento completo da identidade visual da nova marca Concave, de Pharra. Do conceito às diretrizes de uso, passando pela criação do logotipo, paleta, tipografia e grafismos que traduzam o universo raw do skate DIY.
+            </p>
+            <ul class="deliverable-list" style="color: var(--off);">
+              <li>Logotipo principal</li>
+              <li>Versões alternativas</li>
+              <li>Paleta de cores</li>
+              <li>Tipografia</li>
+              <li>Grafismos & texturas</li>
+              <li>Brandbook resumido</li>
+              <li>Arquivos editáveis</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="scope-card">
+          <span class="scope-num">02</span>
+          <div>
+            <h3 class="scope-card-title" style="color: var(--accent);">Estampas — Tangente DIY</h3>
+            <p class="scope-card-desc">
+              Criação de duas estampas originais para a Tangente DIY Skateparks. Artes com linguagem gráfica alinhada à identidade da marca, prontas para aplicação em produtos (camisetas, adesivos, brindes).
+            </p>
+            <ul class="deliverable-list" style="color: var(--off);">
+              <li>2 estampas originais</li>
+              <li>Versões coloridas</li>
+              <li>Versão monocromática</li>
+              <li>Arquivos vetoriais</li>
+              <li>PNG em alta resolução</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="scope-card">
+          <span class="scope-num">03</span>
+          <div>
+            <h3 class="scope-card-title" style="color: var(--accent);">Apresentação — Tangente DIY</h3>
+            <p class="scope-card-desc">
+              Remontagem e refinamento da apresentação institucional da Tangente DIY Skateparks. O conteúdo existente é mantido — o trabalho é de edição visual, coesão e padronização dos slides para que a apresentação tenha qualidade profissional.
+            </p>
+            <ul class="deliverable-list" style="color: var(--off);">
+              <li>Revisão do deck existente</li>
+              <li>Redesign dos slides</li>
+              <li>Padronização visual</li>
+              <li>Arquivo editável (.pptx / Figma)</li>
+              <li>Versão em PDF</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 04 — METODOLOGIA
+     ═══════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="inner">
+    <p class="section-label">04 — Metodologia de Trabalho</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-left-title">Como<br>Traba-<br>lhamos</h2>
+        <p class="col-left-desc">
+          Cada entrega passa por um ciclo de pesquisa, conceito, criação e revisão colaborativa — garantindo resultado alinhado ao universo de cada marca.
+        </p>
+      </div>
+
+      <div>
+        <div style="display: flex; flex-direction: column; gap: 0;">
+
+          <div style="display: grid; grid-template-columns: 48px 1fr; gap: 20px; padding: 28px 0; border-bottom: 0.5px solid rgba(14,14,14,0.12);">
+            <div style="width: 36px; height: 36px; border: 1px solid rgba(14,14,14,0.15); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+              <span style="font-family: 'Space Mono'; font-size: 10px; font-weight: 700;">A</span>
+            </div>
+            <div>
+              <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Pesquisa & Referência</h3>
+              <p style="font-size: 14px; color: var(--mid); line-height: 1.65; font-weight: 300;">Mapeamento do universo visual e cultural de cada marca. Referências do skate, tipografia urbana, DIY culture. Definição do tom visual antes de qualquer traço.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr; gap: 20px; padding: 28px 0; border-bottom: 0.5px solid rgba(14,14,14,0.12);">
+            <div style="width: 36px; height: 36px; border: 1px solid rgba(14,14,14,0.15); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+              <span style="font-family: 'Space Mono'; font-size: 10px; font-weight: 700;">B</span>
+            </div>
+            <div>
+              <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Conceito & Direção</h3>
+              <p style="font-size: 14px; color: var(--mid); line-height: 1.65; font-weight: 300;">Apresentação do conceito visual com moodboard, paleta e primeiras direções gráficas. Alinhamento com Pharra e Bahia antes de avançar.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr; gap: 20px; padding: 28px 0; border-bottom: 0.5px solid rgba(14,14,14,0.12);">
+            <div style="width: 36px; height: 36px; border: 1px solid rgba(14,14,14,0.15); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+              <span style="font-family: 'Space Mono'; font-size: 10px; font-weight: 700;">C</span>
+            </div>
+            <div>
+              <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Criação & Produção</h3>
+              <p style="font-size: 14px; color: var(--mid); line-height: 1.65; font-weight: 300;">Desenvolvimento de todos os entregáveis: logotipo, estampas, slides. Processo iterativo com entregas parciais para manter o projeto no caminho certo.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 48px 1fr; gap: 20px; padding: 28px 0;">
+            <div style="width: 36px; height: 36px; border: 1px solid rgba(14,14,14,0.15); display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+              <span style="font-family: 'Space Mono'; font-size: 10px; font-weight: 700;">D</span>
+            </div>
+            <div>
+              <h3 style="font-size: 17px; font-weight: 500; margin-bottom: 8px;">Revisão & Entrega</h3>
+              <p style="font-size: 14px; color: var(--mid); line-height: 1.65; font-weight: 300;">Rodada de ajustes com base no feedback. Finalização e entrega de todos os arquivos organizados e prontos para uso — digitais e impressos.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 05 — CRONOGRAMA
+     ═══════════════════════════════════════════════════ -->
+<div class="slide slide--dark">
+  <div class="inner">
+    <p class="section-label" style="color: rgba(240,237,228,0.4);">05 — Cronograma</p>
+    <h2 class="section-title" style="color: var(--off);">~5<br>SEMANAS</h2>
+
+    <div style="position: relative; margin-top: 24px;">
+      <div style="position: absolute; top: 20px; left: 0; right: 0; height: 1px; background: rgba(240,237,228,0.1);"></div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative;">
+
+        <div class="timeline-item" style="padding-left: 0;">
+          <div class="timeline-dot"></div>
+          <p class="timeline-week">Semanas 01 & 02</p>
+          <h3 class="timeline-title">Identidade Visual — Concave</h3>
+          <p class="timeline-desc">Pesquisa, conceito e desenvolvimento completo da identidade visual da Concave. Logotipo, paleta, tipografia, grafismos e brandbook.</p>
+          <p class="timeline-milestone">→ Entrega da ID Visual</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <p class="timeline-week">Semana 03</p>
+          <h3 class="timeline-title">Estampas — Tangente DIY</h3>
+          <p class="timeline-desc">Criação das duas estampas originais para a Tangente. Versões coloridas e monocromáticas, arquivos vetoriais prontos para produção.</p>
+          <p class="timeline-milestone">→ Entrega das estampas</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <p class="timeline-week">Semana 04 — 3 dias</p>
+          <h3 class="timeline-title">Apresentação — Tangente DIY</h3>
+          <p class="timeline-desc">Remontagem e refinamento visual do deck institucional da Tangente. Padronização, coesão e entrega em PDF + arquivo editável.</p>
+          <p class="timeline-milestone" style="color: var(--accent);">★ Entrega final</p>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background: rgba(240,237,228,0.2);"></div>
+          <p class="timeline-week" style="color: rgba(240,237,228,0.3);">Buffer</p>
+          <h3 class="timeline-title" style="color: rgba(240,237,228,0.4);">Ajustes finais</h3>
+          <p class="timeline-desc">Margem para revisões e ajustes solicitados ao longo do processo. Cada etapa tem uma rodada de feedback inclusa.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin-top: 56px; padding: 24px; border: 0.5px solid rgba(240,237,228,0.1); border-left: 2px solid rgba(212,255,0,0.4);">
+      <p style="font-family: 'Space Mono'; font-size: 11px; color: rgba(240,237,228,0.4); line-height: 1.7; letter-spacing: 0.04em;">
+        NOTA — O prazo poderá ser ajustado conforme novas requisições ou alterações solicitadas durante o processo. Qualquer alteração de escopo será tratada separadamente.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 06 — INVESTIMENTO
+     ═══════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="inner">
+    <p class="section-label">06 — Investimento</p>
+
+    <div class="investment-block">
+      <div>
+        <p class="price-label">Valor total do projeto</p>
+        <div class="price-display">R$<br>3.500<span style="font-size: 0.45em; font-family: 'DM Sans'; font-weight: 300;">,00</span></div>
+        <p style="font-size: 13px; color: var(--mid); font-weight: 300; line-height: 1.7;">
+          Valor especial de parceria, incluindo todos os impostos. Cobre os três serviços descritos no escopo: identidade visual Concave, estampas Tangente e remontagem da apresentação.
+        </p>
+      </div>
+
+      <div>
+        <h3 style="font-size: 15px; font-weight: 500; margin-bottom: 20px; letter-spacing: -0.01em;">Forma de pagamento</h3>
+        <ul class="payment-list">
+          <li>50% na assinatura do contrato — R$&nbsp;1.750,00</li>
+          <li>50% na entrega final — R$&nbsp;1.750,00</li>
+        </ul>
+        <div class="payment-note">
+          PIX, TED ou depósito em conta PJ. Após confirmação do primeiro pagamento, o projeto é iniciado. Nota fiscal emitida via Spoonful Serviços de Design Ltda.
+        </div>
+
+        <div style="margin-top: 32px; padding: 24px; border: 0.5px solid rgba(14,14,14,0.1); background: rgba(200,57,10,0.04); border-left: 2px solid var(--warm);">
+          <p style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.08em; color: var(--warm); margin-bottom: 8px;">PROPOSTA VÁLIDA ATÉ</p>
+          <p style="font-size: 20px; font-weight: 500;">18.05.2025</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 07 — BENEFÍCIOS
+     ═══════════════════════════════════════════════════ -->
+<div class="slide slide--dark">
+  <div class="inner">
+    <p class="section-label" style="color: rgba(240,237,228,0.4);">07 — Benefícios Esperados</p>
+    <h2 class="section-title" style="color: var(--off);">O QUE<br>VOCÊ<br>GANHA</h2>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <span class="benefit-num">01</span>
+        <div class="benefit-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="5" stroke="rgba(240,237,228,0.5)" stroke-width="1"/>
+            <circle cx="8" cy="8" r="2" fill="rgba(240,237,228,0.5)"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">Identidade própria para a Concave</h3>
+        <p class="benefit-desc">Uma marca do zero, com DNA de skate e posicionamento claro — pronta para funcionar em camisetas, redes sociais e qualquer mídia.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-num">02</span>
+        <div class="benefit-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="5" width="12" height="8" stroke="rgba(240,237,228,0.5)" stroke-width="1" rx="1"/>
+            <path d="M5 5V4a3 3 0 016 0v1" stroke="rgba(240,237,228,0.5)" stroke-width="1"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">Estampas prontas para produção</h3>
+        <p class="benefit-desc">Duas artes originais para a Tangente, com arquivos organizados para serem mandadas direto para a gráfica ou para serigrafia.</p>
+      </div>
+
+      <div class="benefit-card">
+        <span class="benefit-num">03</span>
+        <div class="benefit-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 4h12M2 8h8M2 12h10" stroke="rgba(240,237,228,0.5)" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="benefit-title">Apresentação com cara profissional</h3>
+        <p class="benefit-desc">A história da Tangente contada com qualidade visual — deck organizado, coeso e pronto para mostrar a investidores, parceiros e patrocinadores.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 08 — TERMOS & CONDIÇÕES
+     ═══════════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="inner">
+    <p class="section-label">08 — Termos & Condições</p>
+
+    <div class="two-col">
+      <div>
+        <h2 class="col-left-title">Regras<br>do<br>Jogo</h2>
+        <p class="col-left-desc">
+          Termos simples, feitos para proteger o trabalho e garantir que tudo rode bem de ambos os lados.
+        </p>
+      </div>
+
+      <div>
+        <div class="terms-list">
+          <div class="term-item">
+            <span class="term-title">Prazo de entrega</span>
+            <p class="term-desc">O prazo de 3 semanas considera o escopo definido nesta proposta. Poderá ser ajustado caso o cliente solicite novas requisições ou alterações durante o processo.</p>
+          </div>
+          <div class="term-item">
+            <span class="term-title">Alterações fora do escopo</span>
+            <p class="term-desc">Qualquer adição ao escopo original — novas peças, novos formatos ou serviços não previstos aqui — será negociada separadamente antes de ser iniciada.</p>
+          </div>
+          <div class="term-item">
+            <span class="term-title">Responsabilidades do cliente</span>
+            <p class="term-desc">Pharra e Bahia devem fornecer referências, conteúdos, textos e materiais necessários em tempo hábil. Atrasos na entrega desses insumos podem impactar o prazo final.</p>
+          </div>
+          <div class="term-item">
+            <span class="term-title">Revisões inclusas</span>
+            <p class="term-desc">Cada entregável inclui uma rodada de revisão. Revisões adicionais além do acordado serão cobradas separadamente mediante alinhamento prévio.</p>
+          </div>
+          <div class="term-item">
+            <span class="term-title">Propriedade intelectual</span>
+            <p class="term-desc">Após quitação integral do valor, todos os direitos de uso dos arquivos finais são transferidos ao cliente. Arquivos fonte de trabalho (Figma, Illustrator) são entregues conforme combinado.</p>
+          </div>
+          <div class="term-item" style="border-bottom: none;">
+            <span class="term-title">Validade da proposta</span>
+            <p class="term-desc">Esta proposta é válida por 14 dias a partir da data de emissão — até 18 de maio de 2025. Após esse prazo, os valores e condições ficam sujeitos a revisão.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 09 — CLOSING
+     ═══════════════════════════════════════════════════ -->
+<div class="slide slide--dark" style="position: relative;">
+  <div class="deco-grid"></div>
+
+  <div class="closing-inner">
+    <div>
+      <p style="font-family: 'Space Mono'; font-size: 11px; color: rgba(240,237,228,0.35); letter-spacing: 0.1em; margin-bottom: 40px;">SPOONFUL DESIGN — 04.05.2025</p>
+      <h2 class="closing-headline">VAMOS<br>NESSA?</h2>
+    </div>
+
+    <div class="closing-contact">
+      <div>
+        <p class="contact-label">Contato</p>
+        <p class="contact-value">Fabricio Sacramento</p>
+        <p class="contact-value" style="color: var(--accent); margin-top: 4px;">fabricio@spoonful.com.br</p>
+        <p class="contact-value" style="color: rgba(240,237,228,0.4); font-size: 13px; margin-top: 4px;">+55 21 99614-5512</p>
+      </div>
+
+      <div>
+        <p class="contact-label">Empresa</p>
+        <p class="contact-value">Spoonful Serviços de Design Ltda</p>
+        <p class="contact-value" style="color: rgba(240,237,228,0.4); font-size: 13px; margin-top: 4px;">Rio de Janeiro, RJ — Brasil</p>
+
+        <div style="margin-top: 24px; padding: 16px 20px; border: 0.5px solid rgba(240,237,228,0.12); display: inline-block;">
+          <p style="font-family: 'Space Mono'; font-size: 10px; color: rgba(240,237,228,0.35); letter-spacing: 0.08em; margin-bottom: 6px;">VALOR TOTAL DO PROJETO</p>
+          <p style="font-family: 'Bebas Neue'; font-size: 28px; color: var(--accent); letter-spacing: 0.01em;">R$ 3.500,00</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
