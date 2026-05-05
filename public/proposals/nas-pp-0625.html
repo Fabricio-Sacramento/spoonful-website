@@ -582,14 +582,52 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
+    /* Grids principais */
     .cover-grid, .two-col, .investment-grid, .closing-footer { grid-template-columns: 1fr; }
+
+    /* Cover */
     .cover-left, .cover-right { padding: 60px 32px; }
     .cover-right { padding-top: 60px; }
-    .inner { padding: 60px 32px; }
-    .timeline-grid, .benefit-grid, .diag-grid { grid-template-columns: 1fr; }
+
+    /* Inner padding */
+    .inner { padding: 48px 24px; }
+
+    /* Cronograma, benefícios, diagnóstico */
+    .timeline-grid { grid-template-columns: 1fr; }
+    .timeline-grid .tl-item { border-right: none; border-bottom: 1px solid var(--wire); }
+    .timeline-grid .tl-item:last-child { border-bottom: none; }
+    .benefit-grid { grid-template-columns: 1fr; }
+    .diag-grid { grid-template-columns: 1fr; }
+
+    /* Sticky title */
     .col-title { position: static; }
+
+    /* Termos */
     .term-item { grid-template-columns: 1fr; gap: 8px; }
-    .closing-layout { padding: 80px 32px 48px; }
+
+    /* Closing */
+    .closing-layout { padding: 80px 24px 48px; }
+
+    /* Topbar compacta */
+    .topbar { padding: 12px 20px; flex-wrap: wrap; gap: 4px; }
+
+    /* Tabela de escopo — esconde coluna STATUS em mobile */
+    .scope-table th:last-child,
+    .scope-table td:last-child { display: none; }
+
+    /* Tabela — primeira coluna não força nowrap */
+    .scope-table td:first-child { white-space: normal; }
+
+    /* Grids inline do bloco técnico e referências */
+    .tech-grid { grid-template-columns: 1fr !important; }
+    .ref-grid-4 { grid-template-columns: 1fr 1fr !important; }
+    .ref-grid-3 { grid-template-columns: 1fr !important; }
+  }
+
+  @media (max-width: 600px) {
+    .ref-grid-4 { grid-template-columns: 1fr !important; }
+    .inner { padding: 40px 20px; }
+    .closing-layout { padding: 60px 20px 40px; }
   }
 
   @media print {
@@ -768,7 +806,7 @@
         <div style="margin-top: 40px; border-top: 1px solid rgba(240,237,228,0.1); padding-top: 40px;">
           <p style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--silver); margin-bottom: 28px;">A FUNDAÇÃO TÉCNICA — INCLUSA EM TODO O PROJETO</p>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(240,237,228,0.06);">
+          <div class="tech-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(240,237,228,0.06);">
 
             <div style="background: var(--panel); padding: 28px 24px;">
               <p style="font-family: var(--mono); font-size: 10px; color: var(--silver); letter-spacing: 0.08em; margin-bottom: 14px;">01 — ENGENHARIA & ARQUITETURA</p>
@@ -1232,7 +1270,7 @@
         <span style="font-family: var(--mono); font-size: 10px; padding: 3px 10px; background: #0E0E0E; color: #C8A84A; border-radius: 2px; letter-spacing: 0.06em;">ALTO PADRÃO</span>
         <div style="flex:1; height: 0.5px; background: rgba(10,10,11,0.1);"></div>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;">
+      <div class="ref-grid-4" style="display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;">
 
         <div style="border: 1px solid #C8A84A; border-radius: 8px; overflow: hidden;">
           <div style="height: 88px; background: #060608; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #444; letter-spacing: 0.04em;">HEAVN-ONE.WEBFLOW.IO</div>
@@ -1298,7 +1336,7 @@
         <span style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: #888;">CONTEXTO — UNIVERSO INDUSTRIAL B2B (SITES REAIS EM WEBFLOW)</span>
         <div style="flex:1; height: 0.5px; background: rgba(10,10,11,0.1);"></div>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;">
+      <div class="ref-grid-3" style="display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;">
 
         <div style="border: 0.5px solid rgba(10,10,11,0.12); border-radius: 8px; overflow: hidden;">
           <div style="height: 72px; background: #111318; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 9px; color: #555; letter-spacing: 0.04em;">EN.SKH-GMBH.DE</div>
