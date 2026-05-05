@@ -302,7 +302,7 @@
     position: relative;
   }
 
-  .timeline-item { padding: 0 24px; }
+  .timeline-item { padding: 0; }
 
   .timeline-dot {
     width: 10px; height: 10px;
@@ -559,8 +559,6 @@
     .benefits-grid { grid-template-columns: 1fr; }
     .closing-contact { grid-template-columns: 1fr; }
     .timeline-items { grid-template-columns: 1fr; }
-    .timeline-item { padding: 0; }
-    .timeline-item:first-child { padding-left: 0; }
     .inner { padding: 60px 32px; }
     .term-item { grid-template-columns: 1fr; gap: 8px; }
   }
@@ -805,11 +803,11 @@
     <h2 class="section-title" style="color: var(--off);">~5<br>SEMANAS</h2>
 
     <div style="position: relative; margin-top: 24px;">
-      <div style="position: absolute; top: 20px; left: 0; right: 0; height: 1px; background: rgba(240,237,228,0.1);"></div>
+      <div class="timeline-line-desktop" style="position: absolute; top: 20px; left: 0; right: 0; height: 1px; background: rgba(240,237,228,0.1);"></div>
 
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative;">
+      <div class="timeline-items">
 
-        <div class="timeline-item" style="padding-left: 0;">
+        <div class="timeline-item">
           <div class="timeline-dot"></div>
           <p class="timeline-week">Semanas 01 & 02</p>
           <h3 class="timeline-title">Identidade Visual — Concave</h3>
