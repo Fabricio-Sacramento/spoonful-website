@@ -96,7 +96,7 @@ window.addEventListener('load', () => {
 // ================================
 // DEBUG HELPERS
 // ================================
-if (window.location.hash === '#debug') {
+if (import.meta.env.DEV && window.location.hash === '#debug') {
   window.debugCanvas = {
     controller: canvasController,
     kill: () => canvasController.forceKill(),

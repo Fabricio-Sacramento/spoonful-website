@@ -275,7 +275,7 @@ const NavMenu = () => {
   // DEBUG HELPER (remover em produção)
   // ================================
   useEffect(() => {
-    if (window.location.hash === '#debug') {
+    if (import.meta.env.DEV && window.location.hash === '#debug') {
       window.debugNavMenu = {
         getCurrentSection: () => activeSection,
         detectPosition: detectAbsolutePosition,

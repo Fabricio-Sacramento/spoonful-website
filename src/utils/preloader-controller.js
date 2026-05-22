@@ -230,7 +230,7 @@ preloaderController.init();
 } else {
 preloaderController.init();
 }
-if (window.location.hash === '#debug') {
+if (import.meta.env.DEV && window.location.hash === '#debug') {
 window.debugPreloader = {
 force: () => preloaderController.forceComplete(),
 status: () => ({

@@ -513,7 +513,7 @@ window.addEventListener('load', () => {
 // -----------------------------
 // 8) Debug mode
 // -----------------------------
-if (window.location.hash === '#debug') {
+if (import.meta.env.DEV && window.location.hash === '#debug') {
   ScrollTrigger.defaults({ markers: true });
   
   window.debugScrollOrchestrator = {

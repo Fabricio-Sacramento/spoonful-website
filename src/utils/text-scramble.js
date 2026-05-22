@@ -60,27 +60,30 @@ class TextScramble {
       return;
     }
 
-    let output = '';
+    const fragment = document.createDocumentFragment();
     let complete = 0;
 
     for (let i = 0, n = this.queue.length; i < n; i++) {
       let { from, to, start, end, char } = this.queue[i];
-      
+
       if (this.frame >= end) {
         complete++;
-        output += to;
+        fragment.append(document.createTextNode(to));
       } else if (this.frame >= start) {
         if (!char || Math.random() < 0.28) {
           char = this.randomChar();
           this.queue[i].char = char;
         }
-        output += `<span class="dud">${char}</span>`;
+        const span = document.createElement('span');
+        span.className = 'dud';
+        span.textContent = char;
+        fragment.append(span);
       } else {
-        output += from;
+        fragment.append(document.createTextNode(from));
       }
     }
 
-    this.el.innerHTML = output;
+    this.el.replaceChildren(fragment);
 
     if (complete === this.queue.length) {
       this._isRunning = false;
