@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esclarecimentos — NAS Titânio × Spoonful Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:      #0A0A0B;
+    --steel:    #1A1C1F;
+    --panel:    #111316;
+    --off:      #F2F0EB;
+    --silver:   #9EA4AD;
+    --wire:     #2E3238;
+    --titanium: #C8CDD6;
+    --mono:     'Space Mono', monospace;
+    --serif:    'Lora', serif;
+    --sans:     'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #F5F3EE;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SISTEMA DE COLUNA ÚNICO ── */
+  /* Tudo passa por .col — garante alinhamento vertical consistente */
+  .col {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--ink);
+    border-bottom: 1px solid var(--wire);
+    height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .topbar .col {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--silver);
+  }
+  .topbar strong { color: var(--titanium); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    padding-top: 120px;
+    padding-bottom: 72px;
+    border-bottom: 1px solid var(--wire);
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--silver);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-label::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--wire);
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--off);
+    letter-spacing: -0.01em;
+    margin-bottom: 28px;
+  }
+  .hero h1 em { font-style: italic; color: var(--titanium); }
+
+  .hero-desc {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--titanium);
+    line-height: 1.8;
+    max-width: 520px;
+  }
+
+  /* ── SEÇÕES ── */
+  .section {
+    padding: 64px 0;
+    border-bottom: 1px solid rgba(10,10,11,0.1);
+  }
+  .section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #555;
+    padding-top: 6px;
+    min-width: 24px;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .section-title em { font-style: italic; color: #444; }
+
+  .section-body {
+    padding-left: 48px;
+  }
+  .section-body p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #1A1A1A;
+    line-height: 1.85;
+    margin-bottom: 18px;
+  }
+  .section-body p:last-child { margin-bottom: 0; }
+  .section-body strong { font-weight: 500; color: var(--ink); }
+
+  /* ── HIGHLIGHT ── */
+  .highlight {
+    border-left: 2px solid var(--ink);
+    padding: 18px 22px;
+    background: rgba(10,10,11,0.04);
+    margin: 24px 0;
+  }
+  .highlight p { font-size: 16px !important; color: #111 !important; margin: 0 !important; font-weight: 400 !important; }
+
+  /* ── METHOD BLOCKS ── */
+  .method-list { display: flex; flex-direction: column; gap: 2px; margin: 24px 0; }
+  .method-item {
+    background: white;
+    border: 1px solid rgba(10,10,11,0.08);
+    padding: 22px 26px;
+    border-radius: 3px;
+  }
+  .method-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--silver);
+    margin-bottom: 6px;
+  }
+  .method-title { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+  .method-desc { font-size: 15px; font-weight: 400; color: #2A2A2A; line-height: 1.75; }
+
+  /* ── DISCOUNT BOX ── */
+  .discount-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    background: var(--ink);
+    padding: 18px 26px;
+    margin: 24px 0;
+    border-radius: 3px;
+    flex-wrap: wrap;
+  }
+  .discount-old { font-family: var(--mono); font-size: 12px; color: var(--silver); text-decoration: line-through; }
+  .discount-arrow { font-family: var(--mono); font-size: 12px; color: var(--wire); }
+  .discount-new { font-family: var(--serif); font-size: 26px; color: var(--off); font-weight: 400; }
+  .discount-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--titanium); background: rgba(200,205,214,0.1); padding: 4px 10px; border-radius: 2px; }
+
+  /* ── TABELA RESUMO ── */
+  .summary-table { width: 100%; border-collapse: collapse; margin-top: 32px; }
+  .summary-table th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: #555; text-align: left; padding: 10px 0; border-bottom: 1px solid rgba(10,10,11,0.15); font-weight: 400; }
+  .summary-table td { font-size: 15px; font-weight: 400; color: #1A1A1A; padding: 16px 0; border-bottom: 1px solid rgba(10,10,11,0.08); vertical-align: top; line-height: 1.6; }
+  .summary-table td:first-child { font-weight: 500; color: var(--ink); padding-right: 24px; white-space: nowrap; font-size: 13px; }
+  .summary-table td:last-child { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--ink); text-align: right; white-space: nowrap; }
+  .summary-table tr.total td { border-bottom: none; padding-top: 22px; }
+  .summary-table tr.total td:last-child { font-size: 18px; }
+  .summary-table tr.table-note td { border-bottom: none; padding-top: 16px; font-size: 13px; font-weight: 400; color: #555; border-top: 1px solid rgba(10,10,11,0.08); }
+
+  /* ── CLOSING ── */
+  .closing {
+    background: var(--ink);
+    padding: 80px 0;
+  }
+  .closing-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .closing h2 { font-family: var(--serif); font-size: clamp(32px, 4vw, 52px); font-weight: 400; color: var(--off); line-height: 1.1; letter-spacing: -0.01em; }
+  .closing h2 em { font-style: italic; color: var(--titanium); }
+  .closing-contact { text-align: right; }
+  .closing-contact .cf-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--silver); margin-bottom: 6px; }
+  .closing-contact strong { display: block; font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--off); margin-bottom: 3px; }
+  .closing-contact a { display: block; font-size: 14px; font-weight: 300; color: var(--titanium); text-decoration: none; }
+
+
+  /* ── NAV SIDEBAR FIXA ── */
+  .nav-sidebar {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    width: 180px;
+    height: calc(100vh - 44px);
+    overflow-y: auto;
+    background: var(--ink);
+    border-right: 1px solid var(--wire);
+    padding: 32px 0;
+    z-index: 90;
+  }
+  .nav-sidebar-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: #888;
+    padding: 0 20px 12px;
+    border-bottom: 1px solid var(--wire);
+    margin-bottom: 6px;
+  }
+  .nav-list { list-style: none; }
+  .nav-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: #AAA;
+    text-decoration: none;
+    padding: 8px 20px;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .nav-list a:hover {
+    color: var(--titanium);
+    border-left-color: var(--titanium);
+    background: rgba(200,205,214,0.04);
+  }
+  .nav-list a.active {
+    color: var(--off);
+    border-left-color: var(--off);
+  }
+  .nav-num { color: #888; font-size: 9px; min-width: 16px; flex-shrink: 0; }
+
+  @media (max-width: 1100px) { .nav-sidebar { display: none; } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .col { padding: 0 24px; }
+    .section-body { padding-left: 0; }
+    .closing-inner { flex-direction: column; align-items: flex-start; }
+    .closing-contact { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="col">
+    <span><strong>NAS TITÂNIO</strong> × SPOONFUL DESIGN</span>
+    <span>ESCLARECIMENTOS — 05.2026</span>
+  </div>
+</header>
+
+<!-- NAV SIDEBAR -->
+<nav class="nav-sidebar">
+  <p class="nav-sidebar-label">ÍNDICE</p>
+  <ul class="nav-list">
+    <li><a href="#s1"><span class="nav-num">01</span>Identidade Visual</a></li>
+    <li><a href="#s2"><span class="nav-num">02</span>Arquitetura do site</a></li>
+    <li><a href="#s3"><span class="nav-num">03</span>IA como aliada</a></li>
+    <li><a href="#s4"><span class="nav-num">04</span>Textos e conteúdo</a></li>
+    <li><a href="#s5"><span class="nav-num">05</span>Catálogo e busca</a></li>
+    <li><a href="#s6"><span class="nav-num">06</span>Imagens</a></li>
+    <li><a href="#s7"><span class="nav-num">07</span>Publicação e DNS</a></li>
+    <li><a href="#s8"><span class="nav-num">08</span>Hospedagem Webflow</a></li>
+    <li><a href="#s9"><span class="nav-num">09</span>Revisões</a></li>
+    <li><a href="#s10"><span class="nav-num">10</span>Treinamento</a></li>
+    <li><a href="#s11"><span class="nav-num">11</span>Google e SEO</a></li>
+    <li><a href="#s12"><span class="nav-num">12</span>Prazos</a></li>
+    <li><a href="#s13"><span class="nav-num">13</span>Contrato e NF</a></li>
+    <li><a href="#resumo"><span class="nav-num">—</span>Resumo financeiro</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="col">
+    <p class="hero-label">DOCUMENTO DE ALINHAMENTO</p>
+    <h1>Esclarecimentos técnicos.<br><em>Ponto a ponto.</em></h1>
+    <p class="hero-desc">Este documento responde cada dúvida levantada sobre a proposta. Nosso objetivo é que o início do projeto aconteça com total confiança de ambos os lados.</p>
+  </div>
+</div>
+
+<!-- SEÇÕES -->
+<main>
+
+  <div class="col">
+
+    <section class="section" id="s1">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 class="section-title">Identidade Visual —<br><em>Aproveitando o esboço existente</em></h2>
+      </div>
+      <div class="section-body">
+        <p>O esboço que vocês desenvolveram é um ativo valioso. Ele nos diz muito sobre a direção que a NAS quer seguir — e isso adianta etapas importantes do processo.</p>
+        <div class="discount-box">
+          <span class="discount-old">R$ 6.500</span>
+          <span class="discount-arrow">→</span>
+          <span class="discount-new">R$ 5.525</span>
+          <span class="discount-tag">15% DE DESCONTO</span>
+        </div>
+        <p>O que permanece no escopo — e que o esboço não cobre — é a construção do sistema de marca: tipografia institucional, paleta de cores com critérios de contraste e acessibilidade, padrões de aplicação digital e físico, e o guia de uso que vai orientar qualquer peça futura que a NAS produza, com ou sem a Spoonful.</p>
+        <p>Esse é o trabalho que garante que a marca funcione de forma consistente em qualquer contexto — de um cartão de visita a um banner de feira industrial.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s2">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">Arquitetura do site —<br><em>Produto ou setor?</em></h2>
+      </div>
+      <div class="section-body">
+        <p>Você levantou um ponto que poucos clientes percebem antes de começar: a lógica de navegação de um site pode trabalhar a favor ou contra o negócio. E você tem razão em questionar.</p>
+        <p>A divisão por setor foi uma hipótese inicial — não uma decisão. O que vai definir a arquitetura final é o Discovery: a etapa onde mapeamos como seus clientes reais buscam e compram, quais produtos geram mais margem, e quais jargões o mercado usa de verdade.</p>
+        <div class="highlight">
+          <p>Um exemplo direto: "ilha química" em vez de "Papel e Celulose" — esse tipo de detalhe faz toda a diferença no ranqueamento do site no Google. É exatamente isso que o Discovery captura.</p>
+        </div>
+        <p>Se os dados confirmarem que o comprador direto é tão importante quanto o engenheiro que busca uma solução customizada — e pelos seus números históricos, parece que sim — o site será desenhado para atender os dois perfis sem sacrificar nenhum.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s3">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2 class="section-title">A IA como aliada,<br><em>não como ameaça</em></h2>
+      </div>
+      <div class="section-body">
+        <p>A preocupação é legítima, e vale ser direto: a Inteligência Artificial substitui quem responde perguntas genéricas. Ela não substitui quem fabrica em titânio com o nível técnico e o histórico da NAS.</p>
+        <p>O que muda com a IA é o canal — e nisso a proposta já contempla uma resposta concreta: além do SEO tradicional (Google), o escopo inclui o <strong>AEO — Answer Engine Optimization</strong>. É a otimização do site para que ferramentas como ChatGPT, Gemini e o Google AI Overview citem a NAS Titânio quando alguém perguntar, por exemplo, <em>"quem fabrica trocadores de calor em titânio no Brasil?"</em></p>
+        <div class="highlight">
+          <p>O objetivo é que a resposta seja: a NAS.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="s4">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2 class="section-title">Textos e<br><em>conteúdo</em></h2>
+      </div>
+      <div class="section-body">
+        <p>A responsabilidade pela escrita é da Spoonful, mas ninguém conhece titânio melhor do que a NAS — e é exatamente esse conhecimento que precisamos capturar.</p>
+        <p>O processo começa antes de qualquer tela ser desenhada: enviamos um questionário estruturado para a equipe de vocês, cobrindo produtos, clientes, casos de sucesso e diferenciais técnicos. A partir dessas respostas, a Spoonful escreve todo o conteúdo do site aplicando três disciplinas combinadas:</p>
+        <div class="method-list">
+          <div class="method-item">
+            <p class="method-label">DISCIPLINA 01</p>
+            <p class="method-title">UX Writing</p>
+            <p class="method-desc">A escrita orientada à experiência do usuário. Cada frase é pensada para guiar o visitante, reduzir dúvidas e facilitar a tomada de decisão. Não é redação publicitária — é comunicação funcional que serve ao negócio.</p>
+          </div>
+          <div class="method-item">
+            <p class="method-label">DISCIPLINA 02</p>
+            <p class="method-title">SEO Semântico</p>
+            <p class="method-desc">Os textos são estruturados para que o Google entenda exatamente sobre o que cada página fala e para quem ela é relevante. Isso envolve hierarquia de títulos, uso correto de termos técnicos e organização lógica do conteúdo.</p>
+          </div>
+          <div class="method-item">
+            <p class="method-label">DISCIPLINA 03</p>
+            <p class="method-title">Jobs-to-be-Done</p>
+            <p class="method-desc">Uma metodologia que foca na tarefa real que o visitante quer resolver, não no produto em si. Em vez de descrever o que a NAS faz, o conteúdo responde à pergunta que o comprador tem na cabeça antes mesmo de chegar ao site.</p>
+          </div>
+        </div>
+        <p>Nada é publicado sem o aval da NAS.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s5">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2 class="section-title">Como o visitante encontra<br><em>o que precisa no site</em></h2>
+      </div>
+      <div class="section-body">
+        <p>Não se trata de uma ferramenta específica — é a arquitetura do próprio site trabalhando a seu favor.</p>
+        <p>O site será estruturado com hierarquia de informação clara, navegação intuitiva e conteúdo organizado para que qualquer visitante encontre o que precisa sem esforço. O catálogo de produtos contará com filtros de refinamento de busca — por tipo de produto, aplicação ou característica técnica — permitindo que o visitante chegue rapidamente ao que procura, sem precisar navegar página por página.</p>
+        <p>Independente de quem acessa ou por onde entra, os caminhos já estão mapeados — cada perfil é conduzido naturalmente até a informação certa, no momento certo.</p>
+        <div class="highlight">
+          <p>O resultado é o contato comercial que chega qualificado — já convicto de que a NAS é o fornecedor certo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="s6">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <h2 class="section-title">Imagens e<br><em>tratamento visual</em></h2>
+      </div>
+      <div class="section-body">
+        <p>Sim, o tratamento técnico das fotos enviadas por vocês está incluso no custo do projeto. Isso inclui recorte, ajuste de iluminação, contraste, correção de cor e otimização de peso para carregamento rápido na web — sem perda de qualidade visível.</p>
+        <p>Fotos reais de produto transmitem a credibilidade que nenhuma ilustração substitui, e vamos utilizá-las de forma estratégica em todo o site.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s7">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <h2 class="section-title">Publicação, DNS<br><em>e migração</em></h2>
+      </div>
+      <div class="section-body">
+        <p>A publicação do site novo — incluindo a substituição do site atual administrado pela AIDA — está 100% dentro do nosso escopo e custo. A Spoonful executará toda a migração técnica, garantindo que o site antigo seja substituído pelo novo sem interrupção de serviço.</p>
+        <div class="highlight">
+          <p>"Em tempo hábil" significa apenas que, quando chegarmos na etapa de publicação, precisaremos que vocês forneçam o acesso ao painel do provedor de domínio — como o Registro.br — dentro do prazo definido no cronograma. Nada além disso.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="s8">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <h2 class="section-title">Hospedagem<br><em>Webflow</em></h2>
+      </div>
+      <div class="section-body">
+        <p>A contratação do plano de hospedagem é feita diretamente por vocês junto à plataforma Webflow — mas toda a configuração, ativação e testes são realizados pela Spoonful. O plano a partir de US$ 23/mês cobre integralmente o site institucional proposto, incluindo:</p>
+        <div class="method-list">
+          <div class="method-item">
+            <p class="method-title">Domínio próprio</p>
+            <p class="method-desc">O endereço do site apontando diretamente para a nova plataforma, sem redirecionamentos ou intermediários.</p>
+          </div>
+          <div class="method-item">
+            <p class="method-title">Certificado de segurança SSL</p>
+            <p class="method-desc">O cadeado que aparece no navegador ao lado do endereço do site. Ele garante que a conexão entre o visitante e o site é segura e criptografada — e é um fator de ranqueamento considerado pelo Google.</p>
+          </div>
+          <div class="method-item">
+            <p class="method-title">Alta performance e estabilidade</p>
+            <p class="method-desc">Servidores globais com carregamento rápido e disponibilidade contínua, sem necessidade de contratação de servidor separado.</p>
+          </div>
+        </div>
+        <p>Integrações com sistemas externos — como ERP ou portais com banco de dados próprio — são projetos de outra natureza, orçados separadamente. Para o objetivo atual, nenhum custo extra é gerado.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s9">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <h2 class="section-title">Revisões —<br><em>Como funciona na prática</em></h2>
+      </div>
+      <div class="section-body">
+        <p>O processo começa pelo Discovery, onde alinhamos estratégia, referências visuais, arquitetura de conteúdo e tom de comunicação antes de qualquer tela ser desenhada. Quando a apresentação do projeto chega, ela já reflete decisões aprovadas em conjunto — não é uma surpresa criativa, é a materialização do que foi acordado.</p>
+        <p>Na prática, projetos que seguem esse processo raramente chegam à segunda revisão com pontos relevantes em aberto. As 2 revisões incluídas existem como garantia formal — não como teto sufocante.</p>
+        <p>Caso o projeto evolua para uma direção diferente do que foi acordado no Discovery, novas horas são orçadas de forma transparente, com valores previamente estabelecidos no contrato — sem surpresas.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s10">
+      <div class="section-header">
+        <span class="section-num">10</span>
+        <h2 class="section-title">Treinamento<br><em>e autonomia</em></h2>
+      </div>
+      <div class="section-body">
+        <p>O treinamento incluso no escopo capacita a equipe da NAS para operar o site com total independência no dia a dia: atualizar textos, trocar fotos, adicionar novos produtos ao catálogo, publicar conteúdo. O Webflow foi desenvolvido exatamente para isso — ser operado por equipes não-técnicas, sem necessidade de programação ou conhecimento em desenvolvimento web.</p>
+        <p>O banco de horas de R$ 150/hora é um serviço opcional e separado, acionado apenas se vocês quiserem, no futuro, criar algo estruturalmente novo no site. É suporte avançado sob demanda, não uma obrigação contratual.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s11">
+      <div class="section-header">
+        <span class="section-num">11</span>
+        <h2 class="section-title">Posicionamento no Google<br><em>e monitoramento</em></h2>
+      </div>
+      <div class="section-body">
+        <p>O site será entregue com SEO técnico e semântico completo: código limpo e bem estruturado, velocidade de carregamento otimizada, hierarquia de conteúdo correta, sitemap enviado ao Google e todas as marcações que os algoritmos de busca utilizam para classificar e posicionar um site.</p>
+        <div class="highlight">
+          <p>Essa é a fundação. Sites mal construídos tecnicamente nunca chegam à primeira página do Google, independente do quanto se invista em marketing depois. É por onde qualquer estratégia séria começa — e é o que a Spoonful entrega.</p>
+        </div>
+        <p>O monitoramento contínuo de posicionamento e as campanhas de produção de conteúdo recorrente são a etapa seguinte — e podem ser estruturados como serviço complementar após o lançamento, se fizer sentido para vocês naquele momento.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s12">
+      <div class="section-header">
+        <span class="section-num">12</span>
+        <h2 class="section-title">Penalidades por<br><em>descumprimento de prazo</em></h2>
+      </div>
+      <div class="section-body">
+        <p>Sim, o contrato preverá penalidades claras para ambos os lados. Atrasos por parte da Spoonful no cumprimento do cronograma acordado implicam redução proporcional no saldo devedor.</p>
+        <p>Da mesma forma, atrasos na entrega de insumos pela NAS — fotos, textos de referência, informações técnicas e acesso ao domínio — impactam diretamente o cronograma e serão tratados com a mesma transparência no contrato.</p>
+      </div>
+    </section>
+
+    <section class="section" id="s13">
+      <div class="section-header">
+        <span class="section-num">13</span>
+        <h2 class="section-title">Contrato e<br><em>Notas Fiscais</em></h2>
+      </div>
+      <div class="section-body">
+        <p>Sim para os dois, sem exceção. O projeto só tem início após a assinatura de um contrato formal de prestação de serviços, que detalha escopo completo, cronograma, responsabilidades, propriedade intelectual e penalidades para ambas as partes.</p>
+        <p>Cada pagamento realizado é acompanhado da emissão de Nota Fiscal eletrônica.</p>
+      </div>
+    </section>
+
+    <section class="section" id="resumo">
+      <div class="section-header">
+        <span class="section-num">—</span>
+        <h2 class="section-title">Resumo financeiro<br><em>revisado</em></h2>
+      </div>
+      <div class="section-body">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>FASE</th>
+              <th>DESCRIÇÃO</th>
+              <th style="text-align:right;">VALOR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fase 1</td>
+              <td>Identidade Visual <span style="font-family:var(--mono);font-size:10px;color:#555;">· desconto de 15% aplicado</span></td>
+              <td>R$ 5.525</td>
+            </tr>
+            <tr>
+              <td>Fase 2</td>
+              <td>Website Webflow + SEO/AEO + Treinamento + Suporte 30 dias</td>
+              <td>R$ 19.526</td>
+            </tr>
+            <tr class="total">
+              <td>Total</td>
+              <td></td>
+              <td>R$ 25.051</td>
+            </tr>
+            <tr class="table-note">
+              <td colspan="3"><span>Impostos inclusos · Hospedagem Webflow (a partir de US$ 23/mês) por conta da NAS Titânio após o go-live</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /col -->
+
+</main>
+
+<!-- CLOSING -->
+<div class="closing">
+  <div class="col">
+    <div class="closing-inner">
+      <h2>Prontos para<br><em>começar?</em></h2>
+      <div class="closing-contact">
+        <p class="cf-label">CONTATO</p>
+        <strong>Fabricio Sacramento</strong>
+        <a href="mailto:fabricio@spoonful.com.br">fabricio@spoonful.com.br</a>
+        <a href="tel:+5521996145512">+55 21 99614-5512</a>
+        <p class="cf-label" style="margin-top:16px;">EMPRESA</p>
+        <strong>Spoonful Serviços de Design Ltda</strong>
+        <a>Rio de Janeiro, RJ — Brasil</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-list a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector('.nav-list a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+</script>
+
+</body>
+</html>
