@@ -10,8 +10,9 @@ const DynamicBackground = () => {
       resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       // Novos valores de cores convertidos para floats (0-1)
       color1: { value: new THREE.Vector3(0.9608, 0.0863, 0.2353) }, // #F5163C (primary-red)
-      color2: { value: new THREE.Vector3(0.1137, 0.1137, 0.1137) }, // #1d1d1d
-      color3: { value: new THREE.Vector3(0.2000, 0.0118, 0.0118) }  // #330303 (primary-red-dark)
+      color2: { value: new THREE.Vector3(0.7686, 0.1255, 0.1569) }, // #C42028 (vermelho médio)
+      color3: { value: new THREE.Vector3(0.4500, 0.0200, 0.0200) },  // #731414
+      color2Strength: { value: 0.4 }
     },
     vertexShader: `
       varying vec2 vUv;
@@ -26,12 +27,13 @@ const DynamicBackground = () => {
       uniform vec3 color1;
       uniform vec3 color2;
       uniform vec3 color3;
+      uniform float color2Strength;
       varying vec2 vUv;
       
       void main() {
         vec2 uv = vUv;
         // Interpolação entre color1 e color2 ao longo do eixo horizontal
-        vec3 mixColor = mix(color1, color2, uv.x);
+        vec3 mixColor = mix(color1, color2, uv.x * color2Strength);
         // Interpolação do resultado com color3 ao longo do eixo vertical
         vec3 finalColor = mix(mixColor, color3, uv.y);
         // Modula a intensidade da cor com o tempo (desacelerado por 0.5)
