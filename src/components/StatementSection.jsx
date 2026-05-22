@@ -40,11 +40,14 @@ const StatementSection = forwardRef((props, ref) => {
    */
   const startCycle = async () => {
     if (!isMountedRef.current) return;
-    if (isPlayingRef.current) return;
+
+    // Para qualquer ciclo em andamento antes de reiniciar
+    if (isPlayingRef.current) {
+      stopCycle();
+    }
 
     isPlayingRef.current = true;
     phraseIndexRef.current = 0;
-
 
     await playNextPhrase();
   };
@@ -91,11 +94,11 @@ const StatementSection = forwardRef((props, ref) => {
       }, PHRASE_DELAY);
 
     } catch (err) {
-      // Promise cancelada é esperado durante cleanup
       if (err.message !== 'TextScramble cancelled') {
         console.warn('⚠️ Statement: Erro no scramble', err);
+        isPlayingRef.current = false;
       }
-      isPlayingRef.current = false;
+      // cancelled: stopCycle já gerenciou o estado — não sobrescreve
     }
   };
 

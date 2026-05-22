@@ -47,13 +47,20 @@ export const useSectionDetection = (onSectionChange, getCurrentCursorState) => {
 
       const handleNavLeave = () => {
         isOverNavRef.current = false;
-        
+
         // ✅ DELAY: Aguarda navegação programática completar antes de detectar seção
         setTimeout(() => {
           if (!isOverNavRef.current) { // Confirma que ainda não estamos sobre nav
             const currentSection = activeSection.current;
+
+            // Se o mouse ainda está sobre o work-track, preserva VIEW
+            const workTrack = document.querySelector('.work-track');
+            if (currentSection === 'work' && workTrack?.matches(':hover')) {
+              onSectionChange('work-hover', CURSOR_STATES.VIEW);
+              return;
+            }
+
             const targetState = SECTION_STATE_MAP[currentSection] || CURSOR_STATES.GREEN_DOT;
-            
             onSectionChange(currentSection, targetState);
           }
         }, 100); // 100ms delay para aguardar scroll/navegação

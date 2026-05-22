@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { refreshScrollTriggers } from '../scripts/scroll-orchestrator';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -147,16 +148,13 @@ const NavMenu = () => {
     
     // ✅ NOVO: NAVEGAÇÃO ESPECÍFICA PARA STATEMENT
     if (targetItem.id === 'statement') {
-      const statementWrapper = document.querySelector('.statement-contact-wrapper');
-      if (statementWrapper) {
-        // Scroll para início do wrapper Statement
-        statementWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // scrollIntoView não respeita pinSpacing do GSAP — usa posição real do ScrollTrigger
+      const st = ScrollTrigger.getById('statement-contact-tl') || ScrollTrigger.getById('statement-pin');
+      if (st) {
+        window.scrollTo({ top: st.start + 50, behavior: 'smooth' });
       } else {
-        // Fallback: busca seção Statement diretamente
-        const statementSection = document.querySelector('#statement');
-        if (statementSection) {
-          statementSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        const statementTarget = document.querySelector('.statement-contact-wrapper') || document.querySelector('#statement');
+        if (statementTarget) statementTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       return;
     }
@@ -173,6 +171,7 @@ const NavMenu = () => {
       const target = document.querySelector(targetItem.href);
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => refreshScrollTriggers(), 900);
       }
     }
     

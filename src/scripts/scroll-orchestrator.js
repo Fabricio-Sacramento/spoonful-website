@@ -381,7 +381,8 @@ function setupStatementContactTransition() {
       
       onUpdate: (self) => {
         // Para o loop quando começa a subir (50% do scroll)
-        if (self.progress > 0.5 && self.direction === 1) {
+        // Suprime durante navegação programática para evitar stop prematuro
+        if (!isProgrammaticScroll && self.progress > 0.5 && self.direction === 1) {
           window.dispatchEvent(new CustomEvent('statement:stop'));
         }
       },
@@ -425,6 +426,11 @@ function setupStatementContactTransition() {
 // 6) Utilitários
 // -----------------------------
 let refreshScheduled = false;
+let isProgrammaticScroll = false;
+
+export function setProgrammaticScroll(value) {
+  isProgrammaticScroll = value;
+}
 
 function smartRefresh() {
   if (refreshScheduled) return;
