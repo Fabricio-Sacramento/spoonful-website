@@ -1,6 +1,7 @@
 // src/App.jsx
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect, useState } from 'react';
+import * as THREE from 'three';
 import Glass from './components/Glass';
 import DynamicBackground from './components/DynamicBackground';
 import GlassCube from './components/GlassCube';
@@ -34,7 +35,7 @@ const App = () => {
   }, []);
 
   return (
-    <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 50 }} shadows>
+    <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 50 }} shadows gl={{ outputColorSpace: THREE.SRGBColorSpace }}>
       <AppCanvasCleanupRegistrar />
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
@@ -50,6 +51,8 @@ const App = () => {
           enableRotate={true}
           enableDamping={true}
           dampingFactor={0.05}
+          minPolarAngle={Math.PI * 0.1}
+          maxPolarAngle={Math.PI * 0.9}
         />
       )}
       

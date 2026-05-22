@@ -18,11 +18,11 @@ const GlassCube = () => {
           roughness={0.0}
           metalness={0.1}
           transmission={1}
-          ior={1}
+          ior={1.5}
           thickness={0.5}
           clearcoat={1}
           envMap={envMap}
-          envMapIntensity={1.5}
+          envMapIntensity={1.0}
           reflectivity={1}
           side={THREE.DoubleSide}
         />

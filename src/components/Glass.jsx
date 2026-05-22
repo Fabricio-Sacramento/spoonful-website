@@ -26,9 +26,9 @@ const Glass = () => {
           opacity={0.3}
           roughness={0.05}
           metalness={0}
-          transmission={1.3}
+          transmission={1.0}
           thickness={0.3}
-          ior={1}
+          ior={1.5}
           reflectivity={1}
           envMap={envMap}
           envMapIntensity={1}

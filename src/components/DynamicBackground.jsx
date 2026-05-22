@@ -9,9 +9,9 @@ const DynamicBackground = () => {
       time: { value: 0 },
       resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       // Novos valores de cores convertidos para floats (0-1)
-      color1: { value: new THREE.Vector3(0.9569, 0.6549, 0.0431) }, // #F4A70B
-      color2: { value: new THREE.Vector3(0.2157, 0.2157, 0.2157) }, // #373737
-      color3: { value: new THREE.Vector3(0.0745, 0.0745, 0.0745) }  // #131313
+      color1: { value: new THREE.Vector3(0.9608, 0.0863, 0.2353) }, // #F5163C (primary-red)
+      color2: { value: new THREE.Vector3(0.1137, 0.1137, 0.1137) }, // #1d1d1d
+      color3: { value: new THREE.Vector3(0.2000, 0.0118, 0.0118) }  // #330303 (primary-red-dark)
     },
     vertexShader: `
       varying vec2 vUv;
@@ -35,7 +35,7 @@ const DynamicBackground = () => {
         // Interpolação do resultado com color3 ao longo do eixo vertical
         vec3 finalColor = mix(mixColor, color3, uv.y);
         // Modula a intensidade da cor com o tempo (desacelerado por 0.5)
-        finalColor *= 0.5 + 0.5 * sin(time * 0.5);
+        finalColor *= 0.75 + 0.25 * sin(time * 0.5);
         gl_FragColor = vec4(finalColor, 1.0);
       }
     `,
