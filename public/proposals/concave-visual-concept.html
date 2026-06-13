@@ -188,12 +188,15 @@ section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
 }
 .big em { font-style: normal; color: var(--mg); }
 .quem-img {
-  width: 100%; margin-top: 3rem;
+  width: 100%;
+  min-height: 220px;
+  margin-top: 3rem;
   aspect-ratio: 3/2;
   object-fit: cover;
-  filter: grayscale(100%) contrast(1.1);
-  opacity: 0.55;
+  filter: contrast(1.1);
+  opacity: 0.75;
   display: block;
+  flex-shrink: 0;
 }
 .mono-text {
   font-family: var(--mono);
@@ -295,8 +298,8 @@ section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
 .contra-img {
   width: 100%; aspect-ratio: 4/3;
   object-fit: cover;
-  filter: grayscale(100%) contrast(1.1);
-  opacity: 0.5;
+  filter: contrast(1.1);
+  opacity: 0.75;
 }
 .contra-statement {
   font-size: clamp(18px, 2vw, 26px);
@@ -336,8 +339,8 @@ section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
 .vm img {
   width: 100%; height: 100%;
   object-fit: cover; display: block;
-  filter: grayscale(100%) contrast(1.1);
-  opacity: 0.6;
+  filter: contrast(1.1);
+  opacity: 0.75;
   aspect-ratio: 4/3;
 }
 .vm.h2 img  { aspect-ratio: unset; position: absolute; inset: 0; height: 100%; }
@@ -548,13 +551,8 @@ section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
 .tx img {
   width: 100%; height: 100%;
   object-fit: cover;
-  filter: grayscale(100%) contrast(1.15);
-  opacity: 0.55;
-  transition: opacity 0.4s, filter 0.4s;
-}
-.tx:hover img {
+  filter: contrast(1.15);
   opacity: 0.8;
-  filter: grayscale(0%) contrast(1.1);
 }
 .tx-label {
   position: absolute; bottom: 0; left: 0; right: 0;
@@ -810,12 +808,10 @@ section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
 .foto-cell img {
   width: 100%; height: 100%;
   object-fit: cover;
-  filter: grayscale(100%) contrast(1.1);
-  opacity: 0.65;
-  transition: opacity 0.4s;
+  filter: contrast(1.1);
+  opacity: 0.8;
   display: block;
 }
-.foto-cell:hover img { opacity: 0.88; }
 .foto-label {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 2.5rem 1.25rem 1rem;
@@ -943,8 +939,8 @@ section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
   width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
-  filter: grayscale(100%) invert(1) contrast(0.85);
-  opacity: 0.7;
+  filter: invert(1) contrast(0.85);
+  opacity: 0.8;
   display: block;
   margin-top: 2rem;
 }
@@ -1061,7 +1057,7 @@ footer {
       <p class="sl">02 — Quem é</p>
       <h2 class="big">A ordem<br>e o <em>caos.</em><br>A fluidez<br>e o impacto.</h2>
     </div>
-    <img class="quem-img" src="imagens/concreto-formas.png" alt="Concreto brutalista">
+    <img class="quem-img" src="imagens/concreto-formas-2.png" alt="Concreto brutalista">
   </div>
   <div class="quem-right">
     <p class="mono-text">
