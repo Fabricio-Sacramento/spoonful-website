@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONCAVE — Visual Concept 2025</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --asfalto:        #070707;
+  --concreto-dark:  #101010;
+  --concreto-mid:   #181818;
+  --concreto-surf:  #242220;
+  --concreto-light: #C4C0B8;
+  --off-white:      #EDEAD4;
+  --mg:             #E5134F;
+  --mg-dim:         rgba(229,19,79,0.09);
+  --mg-line:        rgba(229,19,79,0.3);
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--asfalto);
+  color: var(--off-white);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 4rem;
+  border-bottom: 0.5px solid rgba(196,192,184,0.08);
+  background: rgba(7,7,7,0.92);
+  backdrop-filter: blur(20px);
+}
+.nav-logo {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--off-white);
+}
+.nav-logo b { color: var(--mg); font-weight: 500; }
+nav ul { display: flex; gap: 3rem; list-style: none; }
+nav ul a {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(196,192,184,0.4);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+nav ul a:hover { color: var(--mg); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.hero-img {
+  position: absolute; inset: 0;
+  background-image: url('imagens/concreto-formas.png');
+  background-size: cover;
+  background-position: center 35%;
+  filter: grayscale(100%) contrast(1.15);
+  opacity: 0.18;
+  z-index: 0;
+}
+.hero-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(7,7,7,0.55) 0%,
+    rgba(7,7,7,0.0)  30%,
+    rgba(7,7,7,0.0)  55%,
+    rgba(7,7,7,0.97) 100%);
+  z-index: 1;
+}
+.hero-body {
+  flex: 1;
+  position: relative; z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 9rem 4rem 3rem;
+}
+.hero-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--mg);
+  margin-bottom: 2.5rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.hero-tag::before { content: ''; width: 28px; height: 1px; background: var(--mg); }
+h1.hero-title {
+  font-size: clamp(100px, 15vw, 210px);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  color: var(--off-white);
+}
+h1.hero-title .ghost {
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.15vw, 2px) rgba(196,192,184,0.3);
+}
+.hero-foot {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-top: 0.5px solid rgba(196,192,184,0.07);
+}
+.hero-foot-cell {
+  padding: 2rem 4rem;
+  border-right: 0.5px solid rgba(196,192,184,0.07);
+}
+.hero-foot-cell:last-child { border-right: none; }
+.hf-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.hf-value {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(196,192,184,0.55);
+  line-height: 1.8;
+}
+
+/* ─── DIVISOR MAGENTA ─── */
+.strip { height: 2px; background: var(--mg); }
+
+/* ─── SEÇÃO BASE ─── */
+section { border-bottom: 0.5px solid rgba(196,192,184,0.06); }
+
+.sl {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: flex; align-items: center; gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+.sl::after { content: ''; width: 60px; height: 0.5px; background: var(--mg-line); }
+
+/* ─── 01 QUEM É ─── */
+.sec-quem {
+  padding: 7rem 4rem;
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 0;
+}
+.quem-left {
+  padding-right: 5rem;
+  border-right: 0.5px solid rgba(196,192,184,0.07);
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.quem-right { padding-left: 5rem; }
+.big {
+  font-size: clamp(36px, 4.5vw, 62px);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--off-white);
+}
+.big em { font-style: normal; color: var(--mg); }
+.quem-img-wrap {
+  width: 100%;
+  aspect-ratio: 3/2;
+  margin-top: 3rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.quem-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.1);
+  opacity: 0.75;
+  display: block;
+}
+.mono-text {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--concreto-light);
+  line-height: 1.95;
+}
+.mono-text + .mono-text { margin-top: 1.5rem; }
+.eq {
+  margin: 2.5rem 0;
+  padding: 1.75rem 2rem;
+  border: 0.5px solid rgba(229,19,79,0.18);
+  background: var(--mg-dim);
+}
+.eq p {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--concreto-light);
+  line-height: 2.3;
+}
+.eq strong { color: var(--mg); font-weight: 400; }
+.eq .result {
+  border-top: 0.5px solid rgba(229,19,79,0.2);
+  margin-top: 0.75rem; padding-top: 0.75rem;
+  color: var(--off-white);
+}
+
+/* ─── 02 PARA QUEM ─── */
+.sec-paraquem {
+  padding: 7rem 4rem;
+  background: var(--concreto-dark);
+}
+.paraquem-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1px;
+  background: rgba(196,192,184,0.06);
+  margin-top: 0;
+}
+.pq-card {
+  background: var(--concreto-dark);
+  padding: 2.5rem;
+  position: relative;
+}
+.pq-card.pagador { border-top: 2px solid var(--mg); background: var(--concreto-mid); }
+.pq-index {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--mg);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.pq-index::before { content: ''; width: 14px; height: 1px; background: var(--mg); }
+.pq-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin-bottom: 1.25rem;
+  line-height: 1.05;
+}
+.pq-desc {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--concreto-light);
+  line-height: 1.85;
+}
+.pq-tag {
+  margin-top: 2rem;
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.8rem;
+  border: 0.5px solid rgba(229,19,79,0.3);
+  color: var(--mg);
+}
+
+/* ─── 03 CONTRA QUEM ─── */
+.sec-contra {
+  padding: 7rem 4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.contra-left {
+  padding-right: 5rem;
+  border-right: 0.5px solid rgba(196,192,184,0.07);
+}
+.contra-right {
+  padding-left: 5rem;
+  display: flex; align-items: center;
+}
+.contra-img {
+  width: 100%; aspect-ratio: 4/3;
+  object-fit: cover;
+  filter: contrast(1.1);
+  opacity: 0.75;
+}
+.contra-statement {
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgba(237,234,212,0.75);
+  margin-bottom: 2.5rem;
+}
+.contra-statement strong { color: var(--off-white); font-weight: 700; }
+.contra-vs {
+  padding: 1.5rem 2rem;
+  border-left: 2px solid var(--mg);
+  background: var(--mg-dim);
+}
+.contra-vs p {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--concreto-light);
+  line-height: 1.8;
+}
+.contra-vs strong { color: var(--mg); font-weight: 400; }
+
+/* ─── 04 UNIVERSO VISUAL ─── */
+.sec-visual { padding: 7rem 0; background: var(--concreto-dark); }
+.sec-visual-head { padding: 0 4rem; }
+.visual-mosaic {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: rgba(196,192,184,0.05);
+  margin-top: 3rem;
+}
+.vm { position: relative; overflow: hidden; background: var(--concreto-mid); }
+.vm.w2 { grid-column: span 2; }
+.vm.w3 { grid-column: span 3; }
+.vm.h2 { grid-row: span 2; }
+.vm img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  filter: contrast(1.1);
+  opacity: 0.75;
+  aspect-ratio: 4/3;
+}
+.vm.h2 img  { aspect-ratio: unset; position: absolute; inset: 0; height: 100%; }
+.vm.w2 img  { aspect-ratio: 16/7; }
+.vm.w3 img  { aspect-ratio: 21/8; }
+.vm-info {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 2.5rem 1.25rem 1rem;
+  background: linear-gradient(transparent, rgba(7,7,7,0.95));
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.vm:hover .vm-info { opacity: 1; }
+.vm-info .vm-cat {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: block; margin-bottom: 0.25rem;
+}
+.vm-info .vm-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(196,192,184,0.7);
+  letter-spacing: 0.1em;
+}
+.vm-accent { border-top: 2px solid var(--mg); }
+
+/* ─── 05 PALETA ─── */
+.sec-paleta { padding: 7rem 4rem; }
+.paleta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr;
+  gap: 2px;
+  background: rgba(196,192,184,0.05);
+}
+.sw {
+  padding: 3rem 2rem 2.5rem;
+  display: flex; flex-direction: column;
+  min-height: 220px;
+}
+.sw-asfalto { background: #070707; }
+.sw-concreto { background: #3E3A35; }
+.sw-mg      { background: var(--mg); }
+.sw-role {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-bottom: auto;
+}
+.sw-asfalto .sw-role,
+.sw-concreto .sw-role { color: rgba(196,192,184,0.25); }
+.sw-mg .sw-role       { color: rgba(255,255,255,0.35); }
+.sw-name {
+  font-size: 24px; font-weight: 700;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  margin-top: 2.5rem; margin-bottom: 0.2rem;
+}
+.sw-asfalto .sw-name,
+.sw-concreto .sw-name { color: var(--off-white); }
+.sw-mg .sw-name       { color: #fff; }
+.sw-hex {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.08em;
+}
+.sw-asfalto .sw-hex,
+.sw-concreto .sw-hex { color: rgba(196,192,184,0.35); }
+.sw-mg .sw-hex       { color: rgba(255,255,255,0.45); }
+.sw-desc {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.7;
+  margin-top: 0.6rem;
+}
+.sw-asfalto .sw-desc,
+.sw-concreto .sw-desc { color: rgba(196,192,184,0.28); }
+.sw-mg .sw-desc       { color: rgba(255,255,255,0.38); }
+.sw-refs {
+  margin-top: 3rem;
+  padding: 2rem;
+  border: 0.5px solid rgba(196,192,184,0.08);
+  background: var(--concreto-dark);
+  grid-column: span 3;
+}
+.sw-refs-title {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--mg);
+  margin-bottom: 1.25rem;
+}
+.sw-refs-list {
+  display: flex; flex-wrap: wrap; gap: 0.75rem;
+}
+.sw-ref-item {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(196,192,184,0.45);
+  padding: 0.4rem 0.9rem;
+  border: 0.5px solid rgba(196,192,184,0.1);
+  letter-spacing: 0.05em;
+}
+.paleta-regra {
+  margin-top: 2rem;
+  padding: 1.5rem 2rem;
+  border-left: 2px solid var(--mg);
+  background: var(--mg-dim);
+}
+.paleta-regra p {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--concreto-light);
+  line-height: 1.8;
+}
+.paleta-regra strong { color: var(--mg); font-weight: 400; }
+
+/* ─── 06 TIPOGRAFIA ─── */
+.sec-tipo { padding: 7rem 4rem; background: var(--concreto-dark); }
+.tipo-rows { margin-top: 2rem; }
+.tipo-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 4rem;
+  align-items: start;
+  padding: 3rem 0;
+  border-top: 0.5px solid rgba(196,192,184,0.07);
+}
+.tipo-meta-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: block; margin-bottom: 1rem;
+}
+.tipo-meta-info {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(196,192,184,0.28);
+  line-height: 1.9;
+}
+.tipo-meta-refs {
+  margin-top: 1.5rem;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: rgba(229,19,79,0.6);
+  line-height: 2;
+}
+.sample-display {
+  font-family: var(--sans);
+  font-size: clamp(56px, 8.5vw, 120px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  line-height: 0.86;
+}
+.sample-display .ghost {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(196,192,184,0.2);
+}
+.sample-mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--concreto-light);
+  line-height: 2.1;
+}
+.sample-mono .mg { color: var(--mg); }
+.tipo-restric {
+  margin-top: 3rem;
+  padding: 2rem;
+  border: 0.5px solid rgba(196,192,184,0.07);
+  background: var(--concreto-mid);
+}
+.tipo-restric-title {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(229,19,79,0.5);
+  margin-bottom: 1rem;
+}
+.tipo-restric p {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(196,192,184,0.35);
+  line-height: 1.9;
+}
+
+/* ─── 07 TEXTURA ─── */
+.sec-textura { padding: 7rem 4rem; }
+.textura-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 2px;
+  background: rgba(196,192,184,0.05);
+}
+.tx {
+  position: relative; overflow: hidden;
+  background: var(--concreto-mid);
+  aspect-ratio: 1;
+}
+.tx img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: contrast(1.15);
+  opacity: 0.8;
+}
+.tx-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 1.5rem 1rem 0.75rem;
+  background: linear-gradient(transparent, rgba(7,7,7,0.92));
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(196,192,184,0.5);
+}
+.textura-refs {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(196,192,184,0.05);
+}
+.tx-ref {
+  background: var(--concreto-dark);
+  padding: 1.75rem 2rem;
+  display: flex; gap: 1.25rem; align-items: flex-start;
+}
+.tx-ref-dash {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--mg);
+  flex-shrink: 0; margin-top: 0.05rem;
+}
+.tx-ref-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--concreto-light);
+  line-height: 1.75;
+}
+.tx-ref-text strong { color: var(--off-white); font-weight: 500; }
+
+/* ─── 08 REFERÊNCIAS DE MARCA ─── */
+.sec-refs { padding: 7rem 4rem; background: var(--concreto-dark); }
+.refs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.refs-table th {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(196,192,184,0.28);
+  text-align: left;
+  padding: 0.75rem 1.5rem 1rem;
+  border-bottom: 0.5px solid rgba(196,192,184,0.08);
+}
+.refs-table td {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--concreto-light);
+  padding: 1.5rem;
+  border-bottom: 0.5px solid rgba(196,192,184,0.05);
+  vertical-align: top;
+  line-height: 1.7;
+}
+.refs-table td:first-child {
+  color: var(--off-white);
+  font-weight: 500;
+  white-space: nowrap;
+  padding-right: 2.5rem;
+}
+.refs-table tr.negativa td:first-child { color: rgba(229,19,79,0.5); }
+.refs-table tr.negativa td { color: rgba(196,192,184,0.3); }
+.ref-neg-label {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.refs-ilu {
+  margin-top: 3rem;
+}
+.refs-ilu-title {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(229,19,79,0.5);
+  margin-bottom: 1.5rem;
+}
+.ilu-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: rgba(196,192,184,0.05);
+}
+.ilu-card {
+  background: var(--concreto-mid);
+  padding: 2rem;
+}
+.ilu-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--mg);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+.ilu-what {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: rgba(196,192,184,0.5);
+  line-height: 1.75;
+}
+
+/* ─── 09 TERRITÓRIO ─── */
+.sec-territorio { padding: 7rem 4rem; }
+.territorio-wrap {
+  display: flex; flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.terr-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.4rem;
+  border: 0.5px solid rgba(196,192,184,0.13);
+  color: var(--concreto-light);
+  transition: all 0.2s;
+  cursor: default;
+}
+.terr-tag.on {
+  border-color: var(--mg);
+  color: var(--mg);
+  background: var(--mg-dim);
+}
+.terr-tag:hover {
+  border-color: var(--mg);
+  color: var(--mg);
+  background: var(--mg-dim);
+}
+
+/* ─── 10 ARQUÉTIPOS ─── */
+.sec-arch { padding: 7rem 4rem; background: var(--concreto-dark); }
+.arch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: rgba(196,192,184,0.05);
+}
+.arch-card {
+  background: var(--concreto-dark);
+  padding: 3.5rem;
+}
+.arch-card.primary {
+  background: var(--concreto-mid);
+  border-top: 2px solid var(--mg);
+}
+.arch-badge {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.arch-badge::before { content: ''; width: 14px; height: 1px; background: var(--mg); }
+.arch-name {
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+.arch-desire {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(229,19,79,0.6);
+  letter-spacing: 0.1em;
+  margin-bottom: 1.75rem;
+}
+.arch-desc {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--concreto-light);
+  line-height: 1.9;
+}
+.arch-full {
+  grid-column: span 2;
+  background: var(--mg-dim);
+  border: 0.5px solid var(--mg-line);
+  padding: 2.5rem 3.5rem;
+}
+.arch-full-title {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--mg);
+  margin-bottom: 1rem;
+}
+.arch-full p {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--concreto-light);
+  line-height: 1.9;
+}
+.arch-full strong { color: var(--off-white); font-weight: 500; }
+.arch-shadows {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.arch-shadow {
+  padding: 1rem 1.25rem;
+  border: 0.5px solid rgba(196,192,184,0.08);
+  background: rgba(7,7,7,0.5);
+}
+.arch-shadow-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(229,19,79,0.4);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.arch-shadow-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(196,192,184,0.3);
+  line-height: 1.7;
+}
+
+/* ─── 11 LINGUAGEM FOTOGRÁFICA ─── */
+.sec-foto { padding: 7rem 4rem; }
+.foto-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 2px;
+  background: rgba(196,192,184,0.05);
+}
+.foto-cell {
+  position: relative; overflow: hidden;
+  background: var(--concreto-mid);
+  aspect-ratio: 4/3;
+}
+.foto-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: contrast(1.1);
+  opacity: 0.8;
+  display: block;
+}
+.foto-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 2.5rem 1.25rem 1rem;
+  background: linear-gradient(transparent, rgba(7,7,7,0.95));
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(196,192,184,0.5);
+}
+.foto-dir {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1px;
+  background: rgba(196,192,184,0.05);
+}
+.foto-dir-item {
+  background: var(--concreto-dark);
+  padding: 1.75rem 2rem;
+}
+.foto-dir-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--mg);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.foto-dir-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--concreto-light);
+  line-height: 1.75;
+}
+
+/* ─── 12 RESTRIÇÕES ─── */
+.sec-nao { padding: 7rem 4rem; background: var(--concreto-dark); }
+.nao-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 1px;
+  background: rgba(196,192,184,0.05);
+}
+.nao-item {
+  background: var(--concreto-dark);
+  padding: 2rem 2.5rem;
+  display: flex; gap: 1.5rem; align-items: flex-start;
+}
+.nao-x {
+  font-family: var(--mono);
+  font-size: 20px;
+  color: rgba(229,19,79,0.4);
+  flex-shrink: 0; line-height: 1;
+  margin-top: 0.05rem;
+}
+.nao-text {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: rgba(196,192,184,0.45);
+  line-height: 1.75;
+}
+
+/* ─── 13 MANIFESTO ─── */
+.sec-manifesto {
+  position: relative; overflow: hidden;
+  padding: 9rem 4rem;
+  background: var(--asfalto);
+}
+.manifesto-bg {
+  position: absolute; inset: 0;
+  background-image: url('imagens/uso.png');
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%);
+  opacity: 0.05;
+  z-index: 0;
+}
+.manifesto-content { position: relative; z-index: 1; }
+.manifesto-body {
+  font-size: clamp(19px, 2.4vw, 30px);
+  font-weight: 400;
+  line-height: 1.75;
+  color: rgba(237,234,212,0.72);
+  max-width: 800px;
+  margin-bottom: 5rem;
+}
+.manifesto-body strong { color: var(--off-white); font-weight: 700; }
+.manifesto-body em { font-style: normal; color: var(--mg); }
+.style-sentence {
+  font-size: clamp(40px, 6.5vw, 96px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  border-left: 3px solid var(--mg);
+  padding-left: 1.75rem;
+  line-height: 0.95;
+}
+
+/* ─── 14 CONCEITUAL — O NOME ─── */
+.sec-nome { padding: 7rem 4rem; }
+.nome-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.nome-left {
+  padding-right: 5rem;
+  border-right: 0.5px solid rgba(196,192,184,0.07);
+}
+.nome-right { padding-left: 5rem; }
+.conceito-title {
+  font-size: clamp(22px, 2.8vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin-bottom: 2rem;
+  line-height: 1.05;
+}
+.conceito-title em { font-style: normal; color: var(--mg); }
+.shape-diagram {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  filter: invert(1) contrast(0.85);
+  opacity: 0.8;
+  display: block;
+  margin-top: 2rem;
+}
+.curva-sustenta {
+  font-family: var(--mono);
+  font-size: clamp(14px, 2vw, 22px);
+  color: var(--mg);
+  letter-spacing: 0.05em;
+  margin-top: 2rem;
+  padding: 1.25rem 1.75rem;
+  border: 0.5px solid var(--mg-line);
+  background: var(--mg-dim);
+}
+
+/* ─── FOOTER ─── */
+footer {
+  padding: 3rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 0.5px solid rgba(196,192,184,0.07);
+}
+.footer-logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--off-white);
+}
+.footer-logo b { color: var(--mg); font-weight: 500; }
+.footer-right {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(196,192,184,0.18);
+  line-height: 2;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CON<b>C</b>AVE</div>
+  <ul>
+    <li><a href="#quem">Posição</a></li>
+    <li><a href="#visual">Visual</a></li>
+    <li><a href="#sistema">Sistema</a></li>
+    <li><a href="#refs">Referências</a></li>
+    <li><a href="#manifesto">Manifesto</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-img"></div>
+  <div class="hero-grad"></div>
+  <div class="hero-body">
+    <p class="hero-tag">Visual Concept · Fase 03 · 2025</p>
+    <h1 class="hero-title">CON<br><span class="ghost">CAVE</span></h1>
+  </div>
+  <div class="hero-foot">
+    <div class="hero-foot-cell">
+      <span class="hf-label">Segmento</span>
+      <span class="hf-value">Construção de Skateparks<br>B2B · Rio de Janeiro · Brasil</span>
+    </div>
+    <div class="hero-foot-cell">
+      <span class="hf-label">Equação criativa</span>
+      <span class="hf-value">(Skate×Arte) + (Punk×Anarquia)<br>+ (Arquitetura×Rua)</span>
+    </div>
+    <div class="hero-foot-cell">
+      <span class="hf-label">Style sentence</span>
+      <span class="hf-value">Concave flui no caos.</span>
+    </div>
+  </div>
+</div>
+
+<div class="strip"></div>
+
+<!-- 01 CAMADA CONCEITUAL — O NOME -->
+<section class="sec-nome">
+  <p class="sl">01 — Camada Conceitual · O Nome</p>
+  <div class="nome-grid">
+    <div class="nome-left">
+      <h3 class="conceito-title">
+        <em>Concave</em> é a geometria<br>
+        invisível que faz<br>
+        tudo funcionar.
+      </h3>
+      <p class="mono-text">
+        O nome técnico das concavidades do shape — a geometria que dá controle, estabilidade e performance pra manobra. Sem concavidade, o shape não responde.
+      </p>
+      <p class="mono-text" style="margin-top:1.25rem;">
+        A marca carrega esse conceito dentro do nome: a forma que ninguém vê é a que faz tudo funcionar.
+      </p>
+      <div class="curva-sustenta">
+        Isso alimenta o símbolo:<br>
+        <strong>a curva que sustenta.</strong>
+      </div>
+    </div>
+    <div class="nome-right">
+      <img class="shape-diagram" src="imagens/Firefly_Gemini_Flash_Gera_um_símbolo_de_logo___sem_texto__sem_wordmark__Apenas_o_símbolo__A_forma_deve_evo_483403.png" alt="Exploração de símbolo — concavidade como forma">
+      <p class="mono-text" style="margin-top:1.5rem; font-size:10px; color:rgba(196,192,184,0.35);">
+        Firefly/Gemini · Exploração de símbolo · Concavidade como forma
+      </p>
+    </div>
+  </div>
+</section>
+<section id="quem" class="sec-quem">
+  <div class="quem-left">
+    <div>
+      <p class="sl">02 — Quem é</p>
+      <h2 class="big">A ordem<br>e o <em>caos.</em><br>A fluidez<br>e o impacto.</h2>
+    </div>
+    <div class="quem-img-wrap">
+      <img class="quem-img" src="imagens/concreto-formas-2.png" alt="Concreto brutalista">
+    </div>
+  </div>
+  <div class="quem-right">
+    <p class="mono-text">
+      Uma empresa de construção de skateparks fundada, projetada e executada por skatistas — do CAD ao concreto, sem intermediários entre o projeto e a pista.
+    </p>
+    <p class="mono-text">
+      O projeto de linhas perfeitas que respira a imperfeição da rua.
+    </p>
+    <div class="eq">
+      <p><strong>(Skate × Arte)</strong></p>
+      <p>+ <strong>(Punk × Anarquia)</strong></p>
+      <p>+ <strong>(Arquitetura × Rua)</strong></p>
+      <p class="result">= Visão criativa das pistas da Concave</p>
+    </div>
+    <p class="mono-text">
+      <strong style="color:var(--off-white);font-weight:500;">A rua como referência, não como decoração.</strong> Pisos diferentes, cotas inesperadas, obstáculos que remetem à cidade real. As pistas da Concave traduzem a lógica orgânica da rua — a fluidez de uma linha de manobras que brota na sua frente, igual quando andando pela cidade.
+    </p>
+    <p class="mono-text" style="margin-top:1.5rem;">
+      <strong style="color:var(--off-white);font-weight:500;">De skatista para skatista</strong> — com respeito pelo skate. Dos donos aos construtores, todos andam de skate. O amor real é o filtro pelo qual cada decisão técnica passa.
+    </p>
+  </div>
+</section>
+
+<!-- 02 PARA QUEM -->
+<section class="sec-paraquem">
+  <p class="sl">03 — Para quem</p>
+  <div class="paraquem-grid">
+    <div class="pq-card pagador">
+      <p class="pq-index">Cliente pagador</p>
+      <h3 class="pq-title">Prefeituras &amp;<br>Poder Público</h3>
+      <p class="pq-desc">Responsáveis por obras de infraestrutura esportiva e espaços urbanos de uso coletivo. A decisão institucional passa por aqui.</p>
+      <span class="pq-tag">Decisor de compra</span>
+    </div>
+    <div class="pq-card">
+      <p class="pq-index">Cliente influenciador primário</p>
+      <h3 class="pq-title">Skatistas</h3>
+      <p class="pq-desc">A comunidade que valida autenticidade, legitima a marca e é o filtro real de qualidade de cada pista. Sem esse aval, a obra não existe de verdade.</p>
+      <span class="pq-tag">Legitimidade cultural</span>
+    </div>
+    <div class="pq-card">
+      <p class="pq-index">Cliente influenciador secundário</p>
+      <h3 class="pq-title">Arquitetos &amp;<br>Urbanistas</h3>
+      <p class="pq-desc">Reconhecem a precisão técnica e validam o projeto institucionalmente. O vocabulário técnico da Concave é uma credencial junto a esse público.</p>
+      <span class="pq-tag">Validação técnica</span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 CONTRA QUEM -->
+<section class="sec-contra">
+  <div class="contra-left">
+    <p class="sl">04 — Contra quem</p>
+    <p class="contra-statement">
+      Construtoras genéricas que executam skateparks como <strong>qualquer outra obra de concreto</strong> — sem vivência, sem visão de quem vai usar o espaço.
+    </p>
+    <div class="contra-vs">
+      <p><strong style="color:var(--off-white);">Elas:</strong> tecnicamente correto. Culturalmente vazio.</p>
+      <p style="margin-top:0.75rem;"><strong style="color:var(--mg);">Concave:</strong> do CAD ao concreto — com amor real de quem anda de skate.</p>
+    </div>
+  </div>
+  <div class="contra-right">
+    <img class="contra-img" src="imagens/textura.png" alt="Textura de concreto real">
+  </div>
+</section>
+
+<!-- 04 UNIVERSO VISUAL -->
+<section id="visual" class="sec-visual">
+  <div class="sec-visual-head">
+    <p class="sl">05 — Universo Visual · Exploração Fase 03</p>
+  </div>
+  <div class="visual-mosaic">
+    <!-- linha 1 -->
+    <div class="vm w2 vm-accent">
+      <img src="imagens/concave.png" alt="Blueprint shape e truck — vista técnica">
+      <div class="vm-info">
+        <span class="vm-cat">Blueprint · Técnico</span>
+        <span class="vm-name">Shape + Truck — Planta Técnica com Cotas</span>
+      </div>
+    </div>
+    <div class="vm">
+      <img src="imagens/concreto-formas.png" alt="Concreto brutalista interior">
+      <div class="vm-info">
+        <span class="vm-cat">Linguagem Fotográfica</span>
+        <span class="vm-name">Concreto Brutalista — Luz Dura, Sombra Gráfica</span>
+      </div>
+    </div>
+    <div class="vm">
+      <img src="imagens/pink-e-punk.png" alt="Pink e Punk">
+      <div class="vm-info">
+        <span class="vm-cat">Acento Cromático</span>
+        <span class="vm-name">Magenta — Spray no Concreto Real</span>
+      </div>
+    </div>
+    <!-- linha 2 -->
+    <div class="vm h2">
+      <img src="imagens/concave-3.png" alt="Seção transversal bowl — geometria da concavidade">
+      <div class="vm-info">
+        <span class="vm-cat">Forma Central</span>
+        <span class="vm-name">Seção Transversal do Bowl — A Geometria Invisível</span>
+      </div>
+    </div>
+    <div class="vm">
+      <img src="imagens/concreto-formas-2.png" alt="Arquitetura de concreto bruta">
+      <div class="vm-info">
+        <span class="vm-cat">Universo Escultórico</span>
+        <span class="vm-name">Concreto — Fora Bruto, Dentro Fluido</span>
+      </div>
+    </div>
+    <div class="vm">
+      <img src="imagens/punk.png" alt="Gráfico punk magenta">
+      <div class="vm-info">
+        <span class="vm-cat">Gráfico Underground</span>
+        <span class="vm-name">Punk — Magenta + Preto, Sem Pedir Licença</span>
+      </div>
+    </div>
+    <div class="vm">
+      <img src="imagens/punk-2.png" alt="Punk tipografia">
+      <div class="vm-info">
+        <span class="vm-cat">Tipografia Underground</span>
+        <span class="vm-name">Grotesca Pesada — Autoridade Sem Ornamento</span>
+      </div>
+    </div>
+    <!-- linha 3 -->
+    <div class="vm">
+      <img src="imagens/architectural_blueprint_style.png" alt="Blueprint arquitetônico magenta sobre preto">
+      <div class="vm-info">
+        <span class="vm-cat">Sistema Gráfico</span>
+        <span class="vm-name">Blueprint Arquitetônico — Magenta no Escuro</span>
+      </div>
+    </div>
+    <div class="vm w2">
+      <img src="imagens/punk-3.png" alt="Punk gráfico tipografia">
+      <div class="vm-info">
+        <span class="vm-cat">Linguagem Underground</span>
+        <span class="vm-name">Xerox de Zine — Grão Alto, Contraste Brutal</span>
+      </div>
+    </div>
+    <div class="vm">
+      <img src="imagens/abstract.png" alt="Abstrato concreto">
+      <div class="vm-info">
+        <span class="vm-cat">Abstração</span>
+        <span class="vm-name">Concreto + Magenta — Spray Escorrido no Muro</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 PALETA -->
+<section id="sistema" class="sec-paleta">
+  <p class="sl">06 — Paleta Cromática</p>
+  <div class="paleta-grid">
+    <div class="sw sw-asfalto">
+      <span class="sw-role">Base primária</span>
+      <span class="sw-name">Asfalto</span>
+      <span class="sw-hex">#070707</span>
+      <span class="sw-desc">Preto denso, matte, sem brilho.<br>A base sobre tudo.</span>
+    </div>
+    <div class="sw sw-concreto">
+      <span class="sw-role">Base secundária</span>
+      <span class="sw-name">Concreto</span>
+      <span class="sw-hex">#3E3A35</span>
+      <span class="sw-desc">Cinza frio, superfície porosa,<br>quase branco sujo.</span>
+    </div>
+    <div class="sw sw-mg">
+      <span class="sw-role">Único acento — nunca acompanhado</span>
+      <span class="sw-name">Magenta Punk</span>
+      <span class="sw-hex">#E5134F</span>
+      <span class="sw-desc">
+        Onde Rancid e Ramones se encontram.<br>
+        Tem o sangue do vermelho anarco e a<br>síntese gráfica do punk.<br><br>
+        Aparece na cidade sem pedir licença.
+      </span>
+    </div>
+  </div>
+  <div style="margin-top:2px; background: rgba(196,192,184,0.05);">
+    <div style="padding: 2rem; background: var(--concreto-dark);">
+      <p class="sw-refs-title" style="font-family:var(--mono);font-size:8px;letter-spacing:0.35em;text-transform:uppercase;color:var(--mg);margin-bottom:1.25rem;">Referências cromáticas</p>
+      <div class="sw-refs-list">
+        <span class="sw-ref-item">Ramones · Rocket to Russia — pink sintético sobre granulado</span>
+        <span class="sw-ref-item">Rancid · Indestructible — vermelho como ruptura</span>
+        <span class="sw-ref-item">Rancid · And Out Come the Wolves — tinta que escorre</span>
+        <span class="sw-ref-item">Black Label VHS — vermelho condensado no underground</span>
+        <span class="sw-ref-item">Sinalização de obra — cor que aparece sem pedir licença</span>
+      </div>
+    </div>
+  </div>
+  <div class="paleta-regra">
+    <p><strong>Regra absoluta:</strong> não é paleta harmoniosa. É contraste que agride. <strong>Nunca mais de um acento.</strong> O magenta não coexiste com outras cores de destaque. A paleta não é democrática.</p>
+  </div>
+</section>
+
+<!-- 06 TIPOGRAFIA -->
+<section class="sec-tipo">
+  <p class="sl">07 — Tipografia</p>
+  <div class="tipo-rows">
+    <div class="tipo-row">
+      <div>
+        <span class="tipo-meta-label">Display</span>
+        <span class="tipo-meta-info">
+          Space Grotesk<br>
+          Bold · 700<br>
+          Grotesca fria<br>
+          Condensada<br>
+          Técnica
+        </span>
+        <div class="tipo-meta-refs">
+          Akzidenz-Grotesk<br>
+          Helvetica Neue Black<br>
+          Ramones · Rocket to Russia<br>
+          Sinalização de obra
+        </div>
+      </div>
+      <div>
+        <div class="sample-display">
+          CONCAVE<br>
+          <span class="ghost">FLUI NO</span><br>
+          CAOS
+        </div>
+      </div>
+    </div>
+    <div class="tipo-row">
+      <div>
+        <span class="tipo-meta-label">Técnica / Mono</span>
+        <span class="tipo-meta-info">
+          IBM Plex Mono<br>
+          Regular · 400<br>
+          Cotas e dados<br>
+          Referências técnicas<br>
+          Planta de projeto
+        </span>
+        <div class="tipo-meta-refs">
+          Planta técnica CAD<br>
+          Blueprint de obra<br>
+          Etiqueta de distribuição<br>
+          underground
+        </div>
+      </div>
+      <div>
+        <div class="sample-mono">
+          Concavidade: <span class="mg">medium/steep</span> · 7.0"<br>
+          Tipo: Transição calculada no CAD, vivida no corpo.<br>
+          REF: <span class="mg">CONC-2025-B2B</span> · Rio de Janeiro<br>
+          Status: Do CAD ao concreto — sem intermediários.<br>
+          <br>
+          Cliente: Prefeitura · Skatista · Arquiteto<br>
+          Arquétipo: <span class="mg">Criador</span> × Explorador · DIY inovador
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tipo-restric">
+    <p class="tipo-restric-title">Restrição tipográfica</p>
+    <p>Não é display rasgado de skateboard dos anos 90. Não é lettering expressivo. Não é irregular por estética. A agressividade vem do contexto, não da forma. A força vem do peso e da precisão — nunca da distorção.</p>
+  </div>
+</section>
+
+<!-- 07 TEXTURA -->
+<section class="sec-textura">
+  <p class="sl">08 — Textura · Processo e Uso</p>
+  <div class="textura-grid">
+    <div class="tx">
+      <img src="imagens/textura.png" alt="Textura de concreto">
+      <div class="tx-label">Concreto que recebeu grind</div>
+    </div>
+    <div class="tx">
+      <img src="imagens/surface__single_magenta_pink_spray_mark__high_contrast__matte.png" alt="Spray magenta matte">
+      <div class="tx-label">Spray escorrido · stencil no muro</div>
+    </div>
+    <div class="tx">
+      <img src="imagens/punk-4.png" alt="Xerox zine grão alto">
+      <div class="tx-label">Xerox de zine · grão alto</div>
+    </div>
+    <div class="tx">
+      <img src="imagens/concrete_fluido.png" alt="Concreto fluido">
+      <div class="tx-label">Concreto desformado · processo visível</div>
+    </div>
+  </div>
+  <div class="textura-refs">
+    <div class="tx-ref">
+      <span class="tx-ref-dash">—</span>
+      <p class="tx-ref-text"><strong>Concreto que recebeu um grind</strong> — polido pelo uso, não pelo acabamento. O desgaste real como acabamento.</p>
+    </div>
+    <div class="tx-ref">
+      <span class="tx-ref-dash">—</span>
+      <p class="tx-ref-text"><strong>Asfalto que comeu roda</strong> — desgaste real, não simulado. A rua como ela é.</p>
+    </div>
+    <div class="tx-ref">
+      <span class="tx-ref-dash">—</span>
+      <p class="tx-ref-text"><strong>Spray escorrido do stencil</strong> — borda irregular, tinta que não pediu licença. O fazer visível.</p>
+    </div>
+    <div class="tx-ref">
+      <span class="tx-ref-dash">—</span>
+      <p class="tx-ref-text"><strong>Xerox de zine</strong> — grão alto, contraste brutal, reprodução que degrada com orgulho.</p>
+    </div>
+    <div class="tx-ref" style="grid-column:span 2; background: var(--mg-dim); border: 0.5px solid var(--mg-line);">
+      <span class="tx-ref-dash" style="color:var(--mg);">!</span>
+      <p class="tx-ref-text" style="color:var(--concreto-light);">
+        <strong style="color:var(--mg);">Restrição:</strong> não é sujo por estética. É sujo porque a rua é assim. A diferença é intenção versus pastiche.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 08 REFERÊNCIAS DE MARCA -->
+<section id="refs" class="sec-refs">
+  <p class="sl">09 — Universo Gráfico de Referência</p>
+  <table class="refs-table">
+    <thead>
+      <tr>
+        <th>Marca / Referência</th>
+        <th>O que ensina à Concave</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Ramones · <em>Rocket to Russia</em></td>
+        <td>Pink sintético como acento único. Preto e branco granulado. Presença gráfica sem recurso. A força que vem do peso, não do ornamento.</td>
+      </tr>
+      <tr>
+        <td>Rancid · <em>Indestructible</em></td>
+        <td>Vermelho como cor de ruptura. Silhueta urbana. Tipografia que tem tinta. O acento que aparece sem pedir licença.</td>
+      </tr>
+      <tr>
+        <td>Rancid · <em>...And Out Come the Wolves</em></td>
+        <td>Vermelho sobre preto e branco, tipografia que escorre. A tinta como matéria, não como acabamento.</td>
+      </tr>
+      <tr>
+        <td>Black Label Skateboards</td>
+        <td>Logo invertido — atitude de quem não precisa pedir pra ser lido. Ocupa espaço com autoridade. Condensada, presença máxima.</td>
+      </tr>
+      <tr>
+        <td>La Francia Skateboarding DIY</td>
+        <td>Ferramentas de obra como símbolo de honra. O underground latino como referência direta. Nacional, não importado.</td>
+      </tr>
+      <tr>
+        <td>Zero Skateboards</td>
+        <td>Fotografia tratada como impressão antiga. Grão, desgaste, borda que deteriora. O tempo como estética — não é novo e brilhante.</td>
+      </tr>
+      <tr>
+        <td>Black Label VHS</td>
+        <td>Vermelho condensado sobre preto, estética de distribuição underground. A cor que funciona em qualquer suporte.</td>
+      </tr>
+      <tr class="negativa">
+        <td>
+          <span class="ref-neg-label">Referência negativa</span>
+          Antidote Skateparks
+        </td>
+        <td>Quer ser artesanal sem ter força gráfica. Quer ser técnico sem ter precisão. A Concave precisa ser mais afiada — dos dois lados.</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="refs-ilu">
+    <p class="refs-ilu-title">Referências de ilustração</p>
+    <div class="ilu-grid">
+      <div class="ilu-card">
+        <p class="ilu-name">The Ramps</p>
+        <p class="ilu-what">Nanquim sobre amarelo. Punk gráfico aplicado ao skate. Técnico e bruto ao mesmo tempo.</p>
+      </div>
+      <div class="ilu-card">
+        <p class="ilu-name">Rural Skate Ramp</p>
+        <p class="ilu-what">O underground brasileiro. A bowl como coração de uma cena que existe apesar de tudo.</p>
+      </div>
+      <div class="ilu-card">
+        <p class="ilu-name">Doctor Skatepark</p>
+        <p class="ilu-what">Crânio como bowl — a pista como território mental. Traço de gravura, denso, detalhado.</p>
+      </div>
+      <div class="ilu-card">
+        <p class="ilu-name">Skate Urbano Cityscape</p>
+        <p class="ilu-what">Traço único construindo cidade e pista simultaneamente. DIY como método de ilustração.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 TERRITÓRIO -->
+<section class="sec-territorio">
+  <p class="sl">10 — Território de Marca</p>
+  <div class="territorio-wrap">
+    <span class="terr-tag on">Autenticidade</span>
+    <span class="terr-tag on">Vivência de rua</span>
+    <span class="terr-tag">Precisão técnica</span>
+    <span class="terr-tag on">Cultura DIY</span>
+    <span class="terr-tag on">Punk</span>
+    <span class="terr-tag">Skate como linguagem</span>
+    <span class="terr-tag">Ativismo urbano</span>
+    <span class="terr-tag">Nacional</span>
+    <span class="terr-tag on">Carioca</span>
+    <span class="terr-tag">Arquitetura</span>
+    <span class="terr-tag">Concreto</span>
+    <span class="terr-tag on">DIY inovador</span>
+  </div>
+</section>
+
+<!-- 10 ARQUÉTIPOS -->
+<section class="sec-arch">
+  <p class="sl">11 — Arquétipo de Marca</p>
+  <div class="arch-grid">
+    <div class="arch-card primary">
+      <p class="arch-badge">Primário</p>
+      <h3 class="arch-name">Criador</h3>
+      <p class="arch-desire">Desejo central: dar forma ao que ainda não existe</p>
+      <p class="arch-desc">
+        Na Concave — do CAD ao concreto, sem intermediários. A pista como obra. A precisão técnica, o projeto, a arquitetura como linguagem.<br><br>
+        O Criador organiza o impulso em projeto.
+      </p>
+    </div>
+    <div class="arch-card">
+      <p class="arch-badge">Secundário · Atitude DIY inovadora</p>
+      <h3 class="arch-name">Explorador</h3>
+      <p class="arch-desire">Desejo central: abrir caminho onde não existe trilha</p>
+      <p class="arch-desc">
+        Ignora o processo padrão e constrói o próprio. Não é DIY amador — é DIY que resolve com inteligência o que o sistema não conseguiu. Herda a genealogia do skate: a cultura que inventou seus próprios espaços porque a cidade não foi feita pra ela.<br><br>
+        O Explorador garante que o projeto nunca vire burocracia.
+      </p>
+    </div>
+    <div class="arch-full">
+      <p class="arch-full-title">A tensão que define a marca</p>
+      <p>O <strong>Criador</strong> organiza o impulso em projeto. O <strong>Explorador</strong> garante que o projeto nunca vire burocracia. Juntos produzem a equação da Concave.</p>
+      <div class="arch-shadows">
+        <div class="arch-shadow">
+          <span class="arch-shadow-label">Sombra do Criador</span>
+          <p class="arch-shadow-text">Perfeccionismo que paralisa a entrega.</p>
+        </div>
+        <div class="arch-shadow">
+          <span class="arch-shadow-label">Sombra do Explorador</span>
+          <p class="arch-shadow-text">Processo tão autoral que se torna incomunicável.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 LINGUAGEM FOTOGRÁFICA -->
+<section class="sec-foto">
+  <p class="sl">12 — Linguagem Fotográfica</p>
+  <div class="foto-grid">
+    <div class="foto-cell">
+      <img src="imagens/concreto-formas.png" alt="Pista como escultura">
+      <div class="foto-label">Pista como protagonista — não o skatista, a estrutura</div>
+    </div>
+    <div class="foto-cell">
+      <img src="imagens/concreto-formas-2.png" alt="Concreto brutalista interior bowl">
+      <div class="foto-label">Bowl em escala monumental — vazio interno como espaço</div>
+    </div>
+    <div class="foto-cell">
+      <img src="imagens/uso.png" alt="Uso real — magenta no concreto">
+      <div class="foto-label">Magenta no concreto real — a marca do fazer</div>
+    </div>
+    <div class="foto-cell">
+      <img src="imagens/textura.png" alt="Concreto macro uso">
+      <div class="foto-label">Macro concreto — polido pelo uso, não pelo acabamento</div>
+    </div>
+    <div class="foto-cell">
+      <img src="imagens/concrete_fluido.png" alt="Concreto fluido">
+      <div class="foto-label">Escultura em meia-lua — exterior bruto, interior polido</div>
+    </div>
+    <div class="foto-cell">
+      <img src="imagens/concave-2.png" alt="Shape como blueprint">
+      <div class="foto-label">Objeto no espaço — sombra como elemento gráfico</div>
+    </div>
+  </div>
+  <div class="foto-dir">
+    <div class="foto-dir-item">
+      <span class="foto-dir-label">Objeto</span>
+      <p class="foto-dir-text">O objeto no espaço, não a ação. A pista como protagonista — não o skatista, a estrutura.</p>
+    </div>
+    <div class="foto-dir-item">
+      <span class="foto-dir-label">Tratamento</span>
+      <p class="foto-dir-text">Preto e branco com grão. Luz dura, sombra como elemento gráfico. Referência: Zero Cold War.</p>
+    </div>
+    <div class="foto-dir-item">
+      <span class="foto-dir-label">Restrição</span>
+      <p class="foto-dir-text">Não é lifestyle. Não é ação. Não é editorial de moda. É arquitetura fotografada como escultura.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12 O QUE NÃO É -->
+<section class="sec-nao">
+  <p class="sl">13 — O que a Concave não é</p>
+  <div class="nao-grid">
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é marca de lifestyle de skate — não vende roupa, não vende atitude empacotada</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é construtora corporativa que adotou o vocabulário do skate como estratégia de marketing</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é artesanal por estética sem ter a substância — irregular sem ser preciso</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é referência americana ou europeia como modelo — é nacional, é carioca, tem sol</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é agressivo pelo traço — a força vem do peso e da postura, não da distorção</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é sujo por decoração — é bruto porque o processo é real</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não usa mais de um acento cromático — a paleta não é democrática</p>
+    </div>
+    <div class="nao-item">
+      <span class="nao-x">×</span>
+      <p class="nao-text">Não é novo e brilhante — é usado, vivido, marcado pelo tempo e pelo uso</p>
+    </div>
+  </div>
+</section>
+
+<!-- 13 MANIFESTO -->
+<section id="manifesto" class="sec-manifesto">
+  <div class="manifesto-bg"></div>
+  <div class="manifesto-content">
+    <p class="sl">14 — Manifesto</p>
+    <p class="manifesto-body">
+      A Concave é a ordem e o caos. A fluidez e o impacto.<br>
+      O projeto de linhas perfeitas que respira a imperfeição da rua.<br><br>
+      <strong>De skatista para skatista</strong> — com respeito pelo skate.<br><br>
+      Skate é <em>arte</em>. Skate é <em>ruptura</em>.<br><br>
+      Planejar. Projetar. Construir. Andar. Viver.
+    </p>
+    <div class="style-sentence">
+      Concave<br>flui no caos.
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CON<b>C</b>AVE</div>
+  <div class="footer-right">
+    <p>Coletivo XV × Concave</p>
+    <p>Visual Concept · Fase 03 · 2025</p>
+    <p>Construção de Skateparks · Rio de Janeiro</p>
+  </div>
+</footer>
+
+</body>
+</html>
