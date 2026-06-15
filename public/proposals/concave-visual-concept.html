@@ -984,6 +984,151 @@ footer {
   color: rgba(196,192,184,0.18);
   line-height: 2;
 }
+
+/* ─── RESPONSIVO ─── */
+@media (max-width: 1024px) {
+  nav { padding: 1.1rem 2rem; }
+  nav ul { gap: 2rem; }
+
+  .hero-body { padding: 7rem 2rem 2rem; }
+  .hero-foot { grid-template-columns: 1fr 1fr; }
+  .hero-foot-cell { padding: 1.5rem 2rem; }
+  .hero-foot-cell:nth-child(3) { grid-column: span 2; border-right: none; border-top: 0.5px solid rgba(196,192,184,0.07); }
+
+  .sec-quem { padding: 5rem 2rem; grid-template-columns: 1fr 1fr; }
+  .quem-left { padding-right: 2.5rem; }
+  .quem-right { padding-left: 2.5rem; }
+
+  .sec-paraquem { padding: 5rem 2rem; }
+  .sec-contra { padding: 5rem 2rem; }
+  .contra-left { padding-right: 2.5rem; }
+  .contra-right { padding-left: 2.5rem; }
+
+  .sec-visual { padding: 5rem 0; }
+  .sec-visual-head { padding: 0 2rem; }
+  .visual-mosaic { grid-template-columns: repeat(3, 1fr); }
+  .vm.w3 { grid-column: span 3; }
+  .vm.w2 { grid-column: span 2; }
+
+  .sec-paleta { padding: 5rem 2rem; }
+  .sec-tipo { padding: 5rem 2rem; }
+  .sec-textura { padding: 5rem 2rem; }
+  .sec-refs { padding: 5rem 2rem; }
+  .sec-territorio { padding: 5rem 2rem; }
+  .sec-arch { padding: 5rem 2rem; }
+  .sec-foto { padding: 5rem 2rem; }
+  .sec-nao { padding: 5rem 2rem; }
+  .sec-manifesto { padding: 7rem 2rem; }
+  .sec-nome { padding: 5rem 2rem; }
+  footer { padding: 2.5rem 2rem; }
+}
+
+@media (max-width: 768px) {
+  /* NAV */
+  nav { padding: 1rem 1.5rem; }
+  nav ul { gap: 1.25rem; }
+  nav ul a { font-size: 11px; letter-spacing: 0.12em; }
+
+  /* HERO */
+  .hero-body { padding: 6rem 1.5rem 2rem; }
+  .hero-foot { grid-template-columns: 1fr; }
+  .hero-foot-cell { padding: 1.25rem 1.5rem; border-right: none; border-top: 0.5px solid rgba(196,192,184,0.07); }
+  .hero-foot-cell:nth-child(3) { grid-column: span 1; }
+
+  /* SEÇÕES — padding geral */
+  .sec-quem,
+  .sec-paraquem,
+  .sec-contra,
+  .sec-paleta,
+  .sec-tipo,
+  .sec-textura,
+  .sec-refs,
+  .sec-territorio,
+  .sec-arch,
+  .sec-foto,
+  .sec-nao,
+  .sec-nome { padding: 4rem 1.5rem; }
+  .sec-manifesto { padding: 5rem 1.5rem; }
+  .sec-visual { padding: 4rem 0; }
+  .sec-visual-head { padding: 0 1.5rem; }
+  footer { padding: 2rem 1.5rem; flex-direction: column; gap: 1.5rem; align-items: flex-start; }
+  .footer-right { text-align: left; }
+
+  /* 01 NOME */
+  .nome-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .nome-left { padding-right: 0; border-right: none; border-bottom: 0.5px solid rgba(196,192,184,0.07); padding-bottom: 3rem; }
+  .nome-right { padding-left: 0; }
+
+  /* 02 QUEM É */
+  .sec-quem { grid-template-columns: 1fr; }
+  .quem-left { padding-right: 0; border-right: none; border-bottom: 0.5px solid rgba(196,192,184,0.07); padding-bottom: 3rem; margin-bottom: 3rem; }
+  .quem-right { padding-left: 0; }
+
+  /* 03 PARA QUEM */
+  .paraquem-grid { grid-template-columns: 1fr; }
+
+  /* 04 CONTRA QUEM */
+  .sec-contra { grid-template-columns: 1fr; }
+  .contra-left { padding-right: 0; border-right: none; border-bottom: 0.5px solid rgba(196,192,184,0.07); padding-bottom: 3rem; margin-bottom: 3rem; }
+  .contra-right { padding-left: 0; }
+
+  /* 05 MOSAICO */
+  .visual-mosaic { grid-template-columns: 1fr 1fr; }
+  .vm.w2, .vm.w3 { grid-column: span 2; }
+  .vm.h2 { grid-row: span 1; }
+  .vm.h2 img { position: static; height: auto; aspect-ratio: 4/3; }
+  .vm.w2 img { aspect-ratio: 4/3; }
+  .vm.w3 img { aspect-ratio: 4/3; }
+  .vm-info { opacity: 1; }
+
+  /* 06 PALETA */
+  .paleta-grid { grid-template-columns: 1fr; }
+  .sw { min-height: 160px; }
+
+  /* 07 TIPOGRAFIA */
+  .tipo-row { grid-template-columns: 1fr; gap: 2rem; }
+
+  /* 08 TEXTURA */
+  .textura-grid { grid-template-columns: 1fr 1fr; }
+  .textura-refs { grid-template-columns: 1fr; }
+  .tx-ref:last-child { grid-column: span 1 !important; }
+
+  /* 09 REFERÊNCIAS */
+  .refs-table thead { display: none; }
+  .refs-table tr { display: block; margin-bottom: 1.5rem; border-bottom: 0.5px solid rgba(196,192,184,0.07); padding-bottom: 1.5rem; }
+  .refs-table td { display: block; padding: 0.5rem 0; white-space: normal; }
+  .refs-table td:first-child { color: var(--mg); font-size: 13px; margin-bottom: 0.25rem; }
+  .ilu-grid { grid-template-columns: 1fr 1fr; }
+
+  /* 10 ARQUÉTIPOS */
+  .arch-grid { grid-template-columns: 1fr; }
+  .arch-full { grid-column: span 1; }
+  .arch-shadows { grid-template-columns: 1fr; }
+
+  /* 11 FOTOGRAFIA */
+  .foto-grid { grid-template-columns: 1fr 1fr; }
+  .foto-dir { grid-template-columns: 1fr; }
+
+  /* 12 RESTRIÇÕES */
+  .nao-grid { grid-template-columns: 1fr; }
+
+  /* SL */
+  .sl { margin-bottom: 2.5rem; font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  nav ul { display: none; }
+
+  .visual-mosaic { grid-template-columns: 1fr; }
+  .vm.w2, .vm.w3 { grid-column: span 1; }
+
+  .textura-grid { grid-template-columns: 1fr; }
+  .foto-grid { grid-template-columns: 1fr; }
+  .ilu-grid { grid-template-columns: 1fr; }
+
+  .paleta-grid { grid-template-columns: 1fr; }
+  .paraquem-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
