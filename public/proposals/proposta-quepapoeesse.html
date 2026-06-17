@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposta de Design — QuePapoÉEsse</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #FFFFFF;
+    --off-white: #F8F6F2;
+    --warm-gray: #EAE7E1;
+    --text-primary: #1A1814;
+    --text-secondary: #6B6560;
+    --text-muted: #9E9892;
+    --accent: #6B5CE7;
+    --accent-light: #EEE9FF;
+    --accent-mid: #C4B5FD;
+    --gold: #C9A84C;
+    --gold-light: #FBF5E6;
+    --border: #E0DDD7;
+    --border-strong: #C8C4BC;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--off-white);
+    color: var(--text-primary);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--white);
+    padding: 80px 0 72px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-subtitle {
+    font-size: 17px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.65;
+    margin-bottom: 48px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  .hero-meta-item {}
+
+  .hero-meta-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .hero-meta-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* SECTIONS */
+  .section {
+    padding: 64px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+
+  .section:nth-child(odd) {
+    background: var(--off-white);
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  .section-body {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    max-width: 600px;
+  }
+
+  /* INTRO */
+  .intro-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    border-left: 3px solid var(--accent-mid);
+    padding-left: 24px;
+    margin-top: 32px;
+  }
+
+  /* MÓDULOS */
+  .modulos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-top: 40px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .modulo-card {
+    background: var(--white);
+    padding: 28px 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modulo-card:last-child {
+    border-bottom: none;
+  }
+
+  .modulo-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .modulo-info { flex: 1; }
+
+  .modulo-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .modulo-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .modulo-horas {
+    font-size: 13px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  /* ENTREGÁVEIS */
+  .entregaveis-list {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .entregavel-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 22px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .entregavel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+
+  .entregavel-text {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .entregavel-text strong {
+    font-weight: 600;
+  }
+
+  /* INVESTIMENTO */
+  .investimento-section {
+    background: var(--white);
+  }
+
+  .modulos-financeiros {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modulo-financeiro {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 26px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mf-left {}
+
+  .mf-titulo {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+
+  .mf-horas {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .mf-right {
+    text-align: right;
+  }
+
+  .mf-liquido {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+
+  .mf-imposto {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .mf-bruto {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .total-card {
+    margin-top: 4px;
+    background: var(--accent);
+    border-radius: 12px;
+    padding: 28px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .total-left {}
+
+  .total-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 4px;
+  }
+
+  .total-horas {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  .total-right { text-align: right; }
+
+  .total-sublabel {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 4px;
+  }
+
+  .total-valor {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: -0.02em;
+  }
+
+  .impostos-nota {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding: 14px 18px;
+    background: var(--warm-gray);
+    border-radius: 8px;
+  }
+
+  /* PRAZO */
+  .prazo-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .prazo-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 26px;
+  }
+
+  .prazo-card.destaque {
+    border-color: var(--accent-mid);
+    background: var(--accent-light);
+  }
+
+  .prazo-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  .prazo-card.destaque .prazo-tag {
+    color: var(--accent);
+  }
+
+  .prazo-fase {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .prazo-card.destaque .prazo-fase {
+    border-bottom-color: var(--accent-mid);
+  }
+
+  .prazo-fase:last-child { border-bottom: none; }
+
+  .prazo-fase-nome { color: var(--text-primary); font-weight: 500; }
+  .prazo-fase-tempo { color: var(--text-secondary); font-size: 12px; }
+
+  /* PAGAMENTO */
+  .pagamento-opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .pgto-opcao {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 22px 24px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .pgto-opcao.recomendado {
+    border-color: var(--gold);
+    background: var(--gold-light);
+  }
+
+  .pgto-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .pgto-opcao.recomendado .pgto-badge {
+    background: var(--gold);
+    color: var(--white);
+  }
+
+  .pgto-opcao:not(.recomendado) .pgto-badge {
+    background: var(--warm-gray);
+    color: var(--text-muted);
+  }
+
+  .pgto-info {}
+
+  .pgto-titulo {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .pgto-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  .footer {
+    background: var(--text-primary);
+    padding: 56px 0;
+    text-align: center;
+  }
+
+  .footer-empresa {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 32px;
+  }
+
+  .footer-data {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.06em;
+  }
+
+  /* VALIDADE */
+  .validade-banner {
+    background: var(--gold-light);
+    border: 1px solid #E8D5A0;
+    border-radius: 10px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 40px;
+  }
+
+  .validade-icon {
+    font-size: 20px;
+  }
+
+  .validade-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .validade-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .hero-title { font-size: 36px; }
+    .hero-meta { flex-direction: column; gap: 20px; }
+    .prazo-cards { grid-template-columns: 1fr; }
+    .container { padding: 0 24px; }
+    .hero { padding: 56px 0 48px; }
+    .section { padding: 48px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <p class="hero-eyebrow">Proposta de Serviço · Design</p>
+    <h1 class="hero-title">Que Papo<br><em>É Esse?</em></h1>
+    <p class="hero-subtitle">Interface, identidade e sistema de design para uma plataforma de gamificação ao vivo — onde cada interação se transforma em pertencimento.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <p class="hero-meta-label">Prestador</p>
+        <p class="hero-meta-value">Spoonful Design LTDA</p>
+      </div>
+      <div class="hero-meta-item">
+        <p class="hero-meta-label">Data</p>
+        <p class="hero-meta-value">Junho de 2026</p>
+      </div>
+      <div class="hero-meta-item">
+        <p class="hero-meta-label">Modalidade</p>
+        <p class="hero-meta-value">Pacote de Design</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- INTRO -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Contexto</p>
+    <h2 class="section-title">O projeto</h2>
+    <p class="section-body">O QuePapoÉEsse é uma plataforma web de gamificação para programas ao vivo transmitidos no YouTube. Membros telespectadores participam de interações durante a transmissão — quiz, check-in, envio de vídeo e ranking em tempo real — e acumulam pontos ao longo da temporada.</p>
+    <blockquote class="intro-text">
+      "O design tem um papel central: transformar uma transmissão ao vivo numa experiência de comunidade. A interface precisa ser tão envolvente quanto o programa em si."
+    </blockquote>
+  </div>
+</section>
+
+<!-- ESCOPO -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Escopo</p>
+    <h2 class="section-title">O que será entregue</h2>
+    <p class="section-body">O trabalho de design está estruturado em três módulos interdependentes, pensados para guiar o desenvolvimento técnico do início ao fim.</p>
+
+    <div class="modulos-grid">
+      <div class="modulo-card">
+        <span class="modulo-num">01</span>
+        <div class="modulo-info">
+          <p class="modulo-title">Branding</p>
+          <p class="modulo-desc">Criação da identidade visual da plataforma do zero — logotipo, paleta de cores, tipografia e diretrizes de uso. Uma marca que conecte o contexto da comunidade com a energia do programa ao vivo.</p>
+        </div>
+        <p class="modulo-horas">12 horas</p>
+      </div>
+      <div class="modulo-card">
+        <span class="modulo-num">02</span>
+        <div class="modulo-info">
+          <p class="modulo-title">Design System</p>
+          <p class="modulo-desc">Biblioteca de componentes e tokens de design no Figma: botões, inputs, cards, badges, modais e padrões de layout. Base única que garante consistência visual em todo o produto.</p>
+        </div>
+        <p class="modulo-horas">20 horas</p>
+      </div>
+      <div class="modulo-card">
+        <span class="modulo-num">03</span>
+        <div class="modulo-info">
+          <p class="modulo-title">UI/UX — Telas no Figma</p>
+          <p class="modulo-desc">Design de aproximadamente 30 telas cobrindo toda a experiência: painel administrativo (gestão de temporadas, controle ao vivo, fila de vídeos, ranking em tela cheia) e experiência do membro (hub do programa, quiz, Pergunta de Ouro, perfil e desempenho).</p>
+        </div>
+        <p class="modulo-horas">50 horas</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENTREGÁVEIS -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Entregáveis</p>
+    <h2 class="section-title">O que você recebe</h2>
+    <div class="entregaveis-list">
+      <div class="entregavel-item">
+        <div class="entregavel-dot"></div>
+        <p class="entregavel-text"><strong>Arquivo Figma organizado</strong> com branding, design system e todas as telas em fluxo navegável</p>
+      </div>
+      <div class="entregavel-item">
+        <div class="entregavel-dot"></div>
+        <p class="entregavel-text"><strong>Tokens de design exportáveis</strong> — cores, tipografia, espaçamentos e bordas prontos para implementação pelos desenvolvedores</p>
+      </div>
+      <div class="entregavel-item">
+        <div class="entregavel-dot"></div>
+        <p class="entregavel-text"><strong>Protótipo interativo</strong> cobrindo os fluxos principais da experiência do membro e do painel administrativo</p>
+      </div>
+      <div class="entregavel-item">
+        <div class="entregavel-dot"></div>
+        <p class="entregavel-text"><strong>Handoff técnico</strong> com anotações de comportamento, estados de componente e especificações para os desenvolvedores</p>
+      </div>
+      <div class="entregavel-item">
+        <div class="entregavel-dot"></div>
+        <p class="entregavel-text"><strong>Identidade Visual</strong> — logotipo em três versões (principal, reduzida e símbolo), variações monocromática, positivo e negativo, paleta oficial com especificações técnicas (HEX, RGB, CMYK), tipografia institucional e mini brand guide com diretrizes de aplicação. Formatos: SVG, PNG e PDF.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INVESTIMENTO -->
+<section class="section investimento-section">
+  <div class="container">
+    <p class="section-label">Investimento</p>
+    <h2 class="section-title">Valores por módulo</h2>
+    <p class="section-body">Os valores abaixo são líquidos ao prestador, já com a incidência de impostos (alíquota de 15,5%) calculada de forma estratificada por módulo.</p>
+
+    <div class="modulos-financeiros">
+
+      <div class="modulo-financeiro">
+        <div class="mf-left">
+          <p class="mf-titulo">Branding</p>
+          <p class="mf-horas">12 horas · 14,63% do escopo</p>
+        </div>
+        <div class="mf-right">
+          <p class="mf-liquido">Líquido: R$ 1.868,34</p>
+          <p class="mf-imposto">Imposto (15,5%): R$ 289,59</p>
+          <p class="mf-bruto">R$ 2.157,93</p>
+        </div>
+      </div>
+
+      <div class="modulo-financeiro">
+        <div class="mf-left">
+          <p class="mf-titulo">Design System</p>
+          <p class="mf-horas">20 horas · 24,39% do escopo</p>
+        </div>
+        <div class="mf-right">
+          <p class="mf-liquido">Líquido: R$ 3.113,91</p>
+          <p class="mf-imposto">Imposto (15,5%): R$ 482,66</p>
+          <p class="mf-bruto">R$ 3.596,57</p>
+        </div>
+      </div>
+
+      <div class="modulo-financeiro">
+        <div class="mf-left">
+          <p class="mf-titulo">UI/UX — Telas no Figma</p>
+          <p class="mf-horas">50 horas · 60,98% do escopo</p>
+        </div>
+        <div class="mf-right">
+          <p class="mf-liquido">Líquido: R$ 7.788,29</p>
+          <p class="mf-imposto">Imposto (15,5%): R$ 1.207,18</p>
+          <p class="mf-bruto">R$ 9.112,50</p>
+        </div>
+      </div>
+
+      <div class="total-card">
+        <div class="total-left">
+          <p class="total-label">Investimento total</p>
+          <p class="total-horas">82 horas · 3 módulos</p>
+        </div>
+        <div class="total-right">
+          <p class="total-sublabel">Valor bruto total</p>
+          <p class="total-valor">R$ 14.750,00</p>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="impostos-nota">
+      Valores calculados com base em 82 horas totais de trabalho. O total bruto de R$ 14.750,00 corresponde a um valor líquido de R$ 12.770,54 após incidência de impostos à alíquota de 15,5%, distribuída proporcionalmente entre os três módulos.
+    </p>
+
+    <div class="validade-banner">
+      <span class="validade-icon">⏳</span>
+      <p class="validade-text"><strong>Validade desta proposta: 15 dias corridos</strong> a partir da data de emissão. Após este prazo, os valores poderão ser revistos conforme disponibilidade de agenda.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRAZO -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Cronograma</p>
+    <h2 class="section-title">Estimativa de prazo</h2>
+    <p class="section-body">Os módulos seguem uma sequência natural — branding fundamenta o design system, que fundamenta as telas. O prazo total estimado é de 3 a 4 semanas em regime de trabalho dedicado.</p>
+
+    <div class="prazo-cards">
+      <div class="prazo-card destaque">
+        <p class="prazo-tag">Fluxo recomendado</p>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Branding</span>
+          <span class="prazo-fase-tempo">Semana 1</span>
+        </div>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Design System</span>
+          <span class="prazo-fase-tempo">Semana 1–2</span>
+        </div>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">UI/UX — Telas</span>
+          <span class="prazo-fase-tempo">Semanas 2–4</span>
+        </div>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Handoff e revisões</span>
+          <span class="prazo-fase-tempo">Semana 4</span>
+        </div>
+      </div>
+
+      <div class="prazo-card">
+        <p class="prazo-tag">Condições que impactam o prazo</p>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Aprovação de branding</span>
+          <span class="prazo-fase-tempo">Até 48h por rodada</span>
+        </div>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Revisões incluídas</span>
+          <span class="prazo-fase-tempo">Até 2 por módulo</span>
+        </div>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Revisões adicionais</span>
+          <span class="prazo-fase-tempo">A combinar</span>
+        </div>
+        <div class="prazo-fase">
+          <span class="prazo-fase-nome">Início estimado</span>
+          <span class="prazo-fase-tempo">Após assinatura</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGAMENTO -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Condições de pagamento</p>
+    <h2 class="section-title">Como podemos trabalhar</h2>
+    <p class="section-body">Flexibilidade para o que funciona melhor pro projeto.</p>
+
+    <div class="pagamento-opcoes">
+      <div class="pgto-opcao recomendado">
+        <span class="pgto-badge">Recomendado</span>
+        <div class="pgto-info">
+          <p class="pgto-titulo">50% entrada + 50% entrega</p>
+          <p class="pgto-desc">R$ 7.375,00 na assinatura do contrato e R$ 7.375,00 na entrega final de todos os módulos aprovados. Equilibra o compromisso de ambos os lados ao longo do projeto.</p>
+        </div>
+      </div>
+      <div class="pgto-opcao">
+        <span class="pgto-badge">5% de desconto</span>
+        <div class="pgto-info">
+          <p class="pgto-titulo">Pagamento à vista — R$ 14.012,50</p>
+          <p class="pgto-desc">Desconto de 5% (R$ 737,50) sobre o valor total para pagamento integral na assinatura do contrato. De R$ 14.750,00 por R$ 14.012,50.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer-empresa">Spoonful Design LTDA</p>
+    <p class="footer-tagline">Driving Conversion and Engagement Through Strategic Design</p>
+    <p class="footer-data">Proposta emitida em junho de 2026 · Válida por 15 dias</p>
+  </div>
+</footer>
+
+</body>
+</html>
