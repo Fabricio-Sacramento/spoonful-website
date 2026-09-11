@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitetura de equipe — Plataforma Inteligente para Avaliação Dinâmica de Riscos de Integridade de Poços</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@300;400;500;600;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+:root{
+  --green:#005847;
+  --green-dark:#003D32;
+  --white:#DFDFDF;
+  --gray:#2B2B2B;
+  --black:#202020;
+  --success:#10B981;
+  --danger:#ED3D3D;
+  --info:#0EA5E9;
+  --rail:96px;
+  --cond:'Fira Sans Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Fira Sans',system-ui,-apple-system,sans-serif;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+
+body{
+  margin:0;
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--body);
+  font-weight:300;
+  font-size:17px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- depth rail ---------- */
+.rail{
+  position:fixed; left:0; top:0; bottom:0; width:var(--rail);
+  border-right:1px solid rgba(223,223,223,.14);
+  background:var(--black);
+  z-index:60;
+  font-family:var(--cond);
+}
+.rail-inner{position:absolute; inset:0; padding:18px 0}
+.rail-tick{
+  position:absolute; left:0; width:100%;
+  display:flex; align-items:center; gap:8px;
+  padding-left:14px;
+  color:rgba(223,223,223,.4);
+  font-size:12px; letter-spacing:.06em;
+  text-decoration:none;
+  transition:color .18s;
+  cursor:pointer;
+}
+.rail-tick::before{
+  content:''; width:14px; height:1px; background:rgba(223,223,223,.3); flex:none;
+}
+.rail-tick:hover{color:var(--white)}
+.rail-tick.on{color:var(--success)}
+.rail-tick.on::before{background:var(--success); width:22px}
+.rail-depth{
+  position:absolute; left:0; top:0; width:3px; background:var(--success);
+  transition:height .1s linear;
+}
+.rail-read{
+  position:absolute; bottom:18px; left:14px; right:10px;
+  font-size:11px; letter-spacing:.08em; color:rgba(223,223,223,.35);
+  line-height:1.4;
+}
+.rail-read b{display:block; font-size:20px; font-weight:500; color:var(--white); letter-spacing:0}
+
+/* ---------- strata ---------- */
+main{margin-left:var(--rail)}
+.stratum{
+  padding:110px clamp(24px,6vw,110px);
+  border-bottom:1px solid rgba(223,223,223,.1);
+  position:relative;
+}
+.stratum.deep{background:var(--green-dark)}
+.stratum.mid{background:var(--gray)}
+.stratum.core{background:var(--white); color:var(--black)}
+.stratum.core .lead{color:#3a3a3a}
+.wrap{max-width:1080px; margin:0 auto}
+.prose{max-width:66ch}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4,.actno,.tag,.num{font-family:var(--cond)}
+h1{
+  font-size:clamp(38px,6.4vw,80px); font-weight:600; line-height:.98;
+  letter-spacing:-.015em; margin:0 0 28px;
+}
+h2{
+  font-size:clamp(30px,4.4vw,54px); font-weight:600; line-height:1.04;
+  letter-spacing:-.01em; margin:0 0 22px; max-width:20ch;
+}
+h3{font-size:25px; font-weight:600; line-height:1.2; margin:44px 0 12px}
+h4{font-size:19px; font-weight:600; margin:0 0 8px; line-height:1.25}
+p{margin:0 0 18px}
+.lead{font-size:clamp(19px,2.1vw,23px); line-height:1.5; font-weight:300; color:rgba(223,223,223,.86); max-width:56ch}
+.actno{
+  font-size:13px; font-weight:500; letter-spacing:.22em;
+  color:var(--success); margin-bottom:20px; display:block;
+}
+.stratum.core .actno{color:var(--green)}
+em{font-style:italic; color:#fff}
+.stratum.core em{color:#000}
+strong{font-weight:600; color:#fff}
+.stratum.core strong{color:#000}
+a{color:inherit}
+
+/* ---------- quote ---------- */
+.law{
+  border-left:3px solid var(--success);
+  padding:6px 0 6px 28px;
+  margin:36px 0 30px;
+  max-width:60ch;
+}
+.law q{
+  font-family:var(--cond); font-size:clamp(23px,3vw,34px); font-weight:400;
+  line-height:1.25; font-style:normal; display:block; quotes:none;
+}
+.law cite{
+  display:block; margin-top:14px; font-family:var(--cond); font-style:normal;
+  font-size:14px; letter-spacing:.08em; color:rgba(223,223,223,.5);
+}
+
+/* ---------- tables ---------- */
+.grid{width:100%; border-collapse:collapse; margin:34px 0; font-size:15.5px}
+.grid th,.grid td{
+  text-align:left; vertical-align:top; padding:18px 20px 18px 0;
+  border-bottom:1px solid rgba(223,223,223,.14);
+}
+.grid th{
+  font-family:var(--cond); font-weight:600; font-size:14px;
+  letter-spacing:.1em; color:rgba(223,223,223,.55);
+  border-bottom-color:rgba(223,223,223,.3);
+  padding-bottom:10px;
+}
+.stratum.core .grid th{color:#5a5a5a; border-bottom-color:rgba(32,32,32,.35)}
+.stratum.core .grid th,.stratum.core .grid td{border-bottom-color:rgba(32,32,32,.16)}
+.grid td:first-child{font-family:var(--cond); font-weight:600; font-size:17px; width:19%}
+.grid .risk{color:#f1a1a1}
+.stratum.core .grid .risk{color:#a32020}
+
+/* ---------- strata blocks ---------- */
+.band{
+  border-top:1px solid rgba(223,223,223,.18);
+  padding:26px 0 4px;
+  display:grid; grid-template-columns:150px 1fr; gap:34px;
+  align-items:start;
+}
+.stratum.core .band{border-top-color:rgba(32,32,32,.2)}
+.band-k{font-family:var(--cond); font-weight:600; font-size:17px; line-height:1.25; padding-top:1px}
+.band-k span{display:block; font-weight:400; font-size:13px; letter-spacing:.08em; color:rgba(223,223,223,.42); margin-top:5px}
+.stratum.core .band-k span{color:#666}
+.band-v{max-width:62ch}
+.band-v p{margin:0 0 12px}
+.outcome{
+  font-family:var(--cond); font-size:15px; letter-spacing:.02em;
+  padding-left:16px; border-left:2px solid var(--success); margin-top:14px;
+  color:rgba(223,223,223,.8);
+}
+.stratum.core .outcome{color:#333; border-left-color:var(--green)}
+.outcome.bad{border-left-color:var(--danger); color:#f1a1a1}
+.stratum.core .outcome.bad{color:#8f1c1c; border-left-color:var(--danger)}
+
+/* ---------- notes ---------- */
+.note{
+  background:rgba(223,223,223,.05);
+  border:1px solid rgba(223,223,223,.16);
+  padding:22px 26px; margin:32px 0; max-width:62ch;
+  font-size:15.5px; line-height:1.6;
+}
+.stratum.core .note{background:rgba(32,32,32,.05); border-color:rgba(32,32,32,.2)}
+.note h4{font-size:14px; letter-spacing:.12em; color:var(--info); margin-bottom:8px; font-weight:600}
+.note.warn h4{color:var(--danger)}
+.note p:last-child{margin-bottom:0}
+
+/* ---------- confidence chips ---------- */
+.chip{
+  display:inline-block; font-family:var(--cond); font-size:12px; font-weight:500;
+  letter-spacing:.1em; padding:3px 10px; border:1px solid currentColor;
+  vertical-align:middle; margin-left:10px; white-space:nowrap;
+}
+.chip.ok{color:var(--success)}
+.chip.trend{color:var(--info)}
+.chip.myth{color:var(--danger)}
+
+/* ---------- translation chain (climax) ---------- */
+.chain{margin:44px 0 10px}
+.chain-track{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+  border:1px solid rgba(223,223,223,.2);
+}
+.chain-btn{
+  appearance:none; border:0; background:rgba(223,223,223,.04); color:var(--white);
+  font-family:var(--cond); font-size:14px; font-weight:500; letter-spacing:.04em;
+  padding:18px 16px; text-align:left; cursor:pointer; line-height:1.3;
+  border-bottom:3px solid transparent; transition:background .16s, border-color .16s;
+}
+.chain-btn:hover{background:rgba(223,223,223,.1)}
+.chain-btn:focus-visible{outline:2px solid var(--info); outline-offset:-2px}
+.chain-btn b{display:block; font-size:11px; letter-spacing:.14em; color:rgba(223,223,223,.45); font-weight:500; margin-bottom:6px}
+.chain-btn[aria-selected="true"]{background:rgba(16,185,129,.13); border-bottom-color:var(--success)}
+.chain-btn[aria-selected="true"] b{color:var(--success)}
+.chain-panel{
+  border:1px solid rgba(223,223,223,.2); border-top:0;
+  padding:32px; display:grid; grid-template-columns:1fr 1fr; gap:34px;
+}
+.chain-val{
+  font-family:var(--cond); font-size:clamp(24px,3.4vw,40px); font-weight:600;
+  line-height:1.1; margin:0 0 6px; word-break:break-word;
+}
+.chain-lab{font-family:var(--cond); font-size:12px; letter-spacing:.14em; color:rgba(223,223,223,.45); margin-bottom:10px}
+.chain-desc p{margin:0 0 14px; font-size:16px}
+.chain-desc p:last-child{margin:0}
+.chain-owner{
+  font-family:var(--cond); font-size:14px; letter-spacing:.03em;
+  border-top:1px solid rgba(223,223,223,.18); padding-top:14px; margin-top:18px;
+  color:rgba(223,223,223,.72);
+}
+@media(max-width:820px){.chain-panel{grid-template-columns:1fr} .chain-track{grid-template-columns:1fr 1fr}}
+
+/* ---------- enum contract ---------- */
+.enum-row{display:flex; flex-wrap:wrap; gap:10px; margin:30px 0 26px}
+.enum-btn{
+  appearance:none; background:transparent; color:var(--white);
+  border:1px solid rgba(223,223,223,.3); padding:11px 18px;
+  font-family:var(--cond); font-size:14px; font-weight:500; letter-spacing:.06em;
+  cursor:pointer; transition:border-color .16s, color .16s;
+}
+.enum-btn:hover{border-color:var(--white)}
+.enum-btn:focus-visible{outline:2px solid var(--info); outline-offset:2px}
+.enum-btn[aria-pressed="true"]{border-color:currentColor; border-width:2px; padding:10px 17px}
+.enum-btn[data-k="NORMAL"][aria-pressed="true"]{color:var(--success)}
+.enum-btn[data-k="WARNING_DEVIATION"][aria-pressed="true"]{color:var(--info)}
+.enum-btn[data-k="CRITICAL_BLOWOUT_RISK"][aria-pressed="true"]{color:var(--danger)}
+.enum-btn[data-k="WARNING_HIGH"][aria-pressed="true"]{color:var(--danger)}
+.enum-out{
+  border:1px solid rgba(223,223,223,.22); padding:0; overflow:hidden;
+  max-width:62ch;
+}
+.enum-bar{height:5px; background:var(--success); transition:background .2s}
+.enum-body{padding:26px 28px}
+.enum-body code{
+  font-family:var(--cond); font-size:16px; letter-spacing:.04em;
+  display:block; margin-bottom:14px; color:rgba(223,223,223,.6);
+}
+.enum-body code b{color:var(--white); font-weight:600}
+.enum-ui{font-family:var(--cond); font-size:22px; font-weight:600; margin:0 0 10px}
+.enum-body p{font-size:15.5px; margin:0}
+
+/* ---------- thresholds ---------- */
+.thr{margin:40px 0 0}
+.thr-item{
+  border-top:1px solid rgba(32,32,32,.22);
+  padding:34px 0;
+  display:grid; grid-template-columns:1fr 340px; gap:48px; align-items:start;
+}
+.stratum .thr-item{border-top-color:rgba(223,223,223,.18)}
+.stratum.core .thr-item{border-top-color:rgba(32,32,32,.22)}
+.thr-item:last-child{border-bottom:1px solid rgba(32,32,32,.22)}
+.thr-kind{font-family:var(--cond); font-size:11.5px; letter-spacing:.14em; opacity:.5; margin-bottom:8px}
+.thr-viz svg{width:100%; height:auto; display:block; color:inherit; overflow:visible}
+.thr-viz .lab{font-family:var(--cond); font-size:12.5px; fill:currentColor; opacity:.62}
+.thr-viz .lab-b{font-family:var(--cond); font-size:13px; font-weight:600; fill:currentColor}
+.thr-viz .bx{fill:none; stroke:currentColor; stroke-width:1.25; opacity:.55}
+.thr-viz .ln{stroke:currentColor; stroke-width:1.25; fill:none; opacity:.5}
+.st-under{display:none}
+.thr-item.under .st-ok{display:none}
+.thr-item.under .st-under{display:block}
+.thr-toggle{
+  appearance:none; background:transparent; border:1px solid rgba(32,32,32,.35);
+  color:inherit; font-family:var(--cond); font-size:13px; letter-spacing:.05em;
+  padding:9px 15px; margin-top:16px; cursor:pointer;
+}
+.stratum .thr-toggle{border-color:rgba(223,223,223,.3)}
+.stratum.core .thr-toggle{border-color:rgba(32,32,32,.35)}
+.thr-toggle:hover{border-color:currentColor}
+.thr-toggle:focus-visible{outline:2px solid var(--info); outline-offset:2px}
+.thr-fail{
+  margin-top:16px; font-size:15px; color:#8f1c1c; max-width:58ch;
+  border-left:2px solid var(--danger); padding-left:16px;
+}
+.stratum .thr-fail{color:#f1a1a1}
+.stratum.core .thr-fail{color:#8f1c1c}
+.thr-fail[hidden]{display:none}
+@media(max-width:900px){.thr-item{grid-template-columns:1fr; gap:26px} .thr-viz{max-width:420px}}
+
+/* ---------- sources ---------- */
+.src{font-size:15px; max-width:70ch}
+.src dt{font-family:var(--cond); font-weight:600; font-size:16px; margin-top:20px}
+.src dd{margin:4px 0 0; color:rgba(223,223,223,.66)}
+
+
+/* ---------- logo ---------- */
+.logo{width:158px; height:auto; display:block; color:var(--white)}
+.stratum.core .logo{color:var(--green-dark)}
+.hero .logo{margin-bottom:34px}
+.sig{display:flex; align-items:center; gap:22px; margin-top:56px; padding-top:26px; border-top:1px solid rgba(223,223,223,.2)}
+.sig .logo{width:120px}
+.sig p{margin:0; font-family:var(--cond); font-size:13px; letter-spacing:.08em; color:rgba(223,223,223,.45); max-width:34ch; line-height:1.5}
+
+/* ---------- diagrams ---------- */
+figure.dg{margin:44px 0 38px; max-width:920px}
+figure.dg svg{width:100%; height:auto; display:block; color:var(--white); overflow:visible}
+.stratum.core figure.dg svg{color:var(--black)}
+figure.dg figcaption{
+  font-family:var(--cond); font-size:14px; letter-spacing:.03em; line-height:1.5;
+  color:rgba(223,223,223,.52); margin-top:16px; max-width:62ch;
+  border-left:2px solid rgba(223,223,223,.28); padding-left:14px;
+}
+.stratum.core figure.dg figcaption{color:#5d5d5d; border-left-color:rgba(32,32,32,.3)}
+.dg .bx{fill:none; stroke:currentColor; stroke-width:1.25; opacity:.55}
+.dg .bxf{fill:currentColor; opacity:.07}
+.dg .ln{stroke:currentColor; stroke-width:1.25; fill:none; opacity:.5}
+.dg .ln-d{stroke:currentColor; stroke-width:1.25; fill:none; opacity:.42; stroke-dasharray:6 5}
+.dg .t{font-family:var(--cond); font-size:15px; font-weight:500; fill:currentColor}
+.dg .t-s{font-family:var(--cond); font-size:12.5px; font-weight:400; fill:currentColor; opacity:.6}
+.dg .t-k{font-family:var(--cond); font-size:11.5px; font-weight:500; fill:currentColor; opacity:.45; letter-spacing:.12em}
+.dg .ok{fill:var(--success)} .dg .ok-s{stroke:var(--success)}
+.dg .bad{fill:var(--danger)} .dg .bad-s{stroke:var(--danger)}
+.dg .inf{fill:var(--info)} .dg .inf-s{stroke:var(--info)}
+
+/* ---------- hero ---------- */
+.hero{
+  min-height:92vh; display:flex; flex-direction:column; justify-content:flex-end;
+  padding-bottom:80px;
+}
+.hero .kicker{
+  font-family:var(--cond); font-size:14px; letter-spacing:.18em;
+  color:var(--success); margin-bottom:auto; padding-top:10px;
+  max-width:40ch; line-height:1.6;
+}
+.hero-meta{
+  display:flex; flex-wrap:wrap; gap:0 48px; margin-top:44px;
+  border-top:1px solid rgba(223,223,223,.2); padding-top:22px;
+  font-family:var(--cond); font-size:14px; letter-spacing:.04em;
+  color:rgba(223,223,223,.55);
+}
+.hero-meta b{display:block; color:var(--white); font-weight:500; font-size:16px; margin-top:3px}
+
+
+/* ---------- diagramas em telas estreitas ---------- */
+@media(max-width:900px){
+  figure.dg{overflow-x:auto; padding-bottom:8px}
+  figure.dg svg{min-width:680px}
+  figure.dg figcaption{position:sticky; left:0}
+}
+@media(min-width:721px) and (max-width:1024px){
+  .stratum{padding:86px 40px}
+  h2{max-width:24ch}
+  .chain-panel{grid-template-columns:1fr; gap:24px}
+  .chain-track{grid-template-columns:1fr 1fr}
+}
+@media(max-width:720px){
+  :root{--rail:52px}
+  .rail-tick span{display:none}
+  .rail-read{display:none}
+  .stratum{padding:72px 22px}
+  .band{grid-template-columns:1fr; gap:12px}
+  .grid td:first-child{width:auto}
+  .grid,.grid tbody,.grid tr,.grid td{display:block; width:100%}
+  .grid thead{display:none}
+  .grid tr{border-bottom:1px solid rgba(223,223,223,.2); padding-bottom:14px; margin-bottom:14px}
+  .grid td{border:0; padding:4px 0}
+}
+</style>
+</head>
+<body>
+
+<nav class="rail" aria-label="Índice do documento">
+  <div class="rail-inner">
+    <div class="rail-depth" id="depth"></div>
+    <div id="ticks"></div>
+    <div class="rail-read"><b id="pct">0%</b>lido</div>
+  </div>
+</nav>
+
+<main>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="ah-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<marker id="ah-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="#ED3D3D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs></svg>
+
+
+<!-- ========== HERO ========== -->
+<section class="stratum deep hero" id="ato-0" data-t="Abertura">
+  <div class="wrap" style="width:100%">
+    <svg class="logo" role="img" aria-label="EnvironPact" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 153 53" fill="none"><path d="M49.5838 42.164V51.061C49.5838 51.6601 49.5229 52.029 49.2665 52.401C48.9171 52.6847 48.5997 52.6564 47.0322 52.6847C47.061 51.1462 47.0899 49.3207 47.0899 47.1264V42.2806C47.0899 41.3663 46.9424 40.7105 46.7405 40.1399C46.8847 39.9696 47.2598 39.7679 47.9009 39.4841C47.9874 39.4557 48.074 39.4557 48.1029 39.4557C48.6254 39.4557 48.885 39.8278 49.0036 40.3101C49.6992 39.7426 50.366 39.399 51.0039 39.2004C51.613 39.0017 52.1644 38.8882 52.8023 38.8882C56.2515 38.8882 56.9183 40.6853 56.9183 43.9074V48.2709C56.9183 49.8378 56.9471 51.2092 56.976 52.3474C56.6843 52.6059 56.2515 52.691 54.5974 52.691C54.4243 52.3789 54.3666 51.9785 54.3666 51.5245V43.9673C54.3666 41.773 53.8152 40.9722 52.0746 40.9722C51.0328 40.9722 50.1897 41.5145 49.5838 42.1703V42.164Z" fill="currentColor"></path><path d="M101.072 42.164V51.061C101.072 51.6601 101.011 52.029 100.755 52.401C100.406 52.6847 100.088 52.6564 98.5207 52.6847C98.5495 51.1462 98.5784 49.3207 98.5784 47.1264V42.2806C98.5784 41.3663 98.4309 40.7105 98.229 40.1399C98.3732 39.9696 98.7483 39.7679 99.3894 39.4841C99.4759 39.4557 99.5625 39.4557 99.5913 39.4557C100.114 39.4557 100.374 39.8278 100.492 40.3101C101.188 39.7426 101.855 39.399 102.492 39.2004C103.101 39.0017 103.653 38.8882 104.291 38.8882C107.74 38.8882 108.407 40.6853 108.407 43.9074V48.2709C108.407 49.8378 108.436 51.2092 108.464 52.3474C108.173 52.6059 107.74 52.691 106.086 52.691C105.913 52.3789 105.855 51.9785 105.855 51.5245V43.9673C105.855 41.773 105.304 40.9722 103.563 40.9722C102.521 40.9722 101.678 41.5145 101.072 42.1703V42.164Z" fill="currentColor"></path><path d="M111.625 34.5185C111.625 34.2915 111.596 33.9762 111.596 33.6925C111.741 33.6074 112.003 33.5222 112.35 33.4939H112.436C113.334 33.4371 114.379 33.4087 115.421 33.4087C119.306 33.4087 121.656 35.0608 121.656 39.2823C121.656 43.5039 118.844 44.7303 116.902 44.9573C116.264 44.9573 115.363 44.9006 115.363 43.7593C115.363 43.6174 115.568 43.4724 115.799 43.4724C117.19 43.4724 118.873 42.4477 118.873 39.1688C118.873 36.4039 117.395 35.4612 115.651 35.4612C114.985 35.4612 114.52 35.4612 114.203 35.5179V48.1227L114.231 51.2912C114.231 51.802 114.145 52.1172 113.94 52.401C113.622 52.7446 113.042 52.6847 111.619 52.6847C111.648 51.0327 111.676 49.1221 111.676 46.8395L111.619 34.5217L111.625 34.5185Z" fill="currentColor"></path><path d="M123.861 40.5371C123.861 40.4236 123.89 40.307 123.919 40.225C124.528 39.6544 126.268 38.9135 128.211 38.8536C128.673 38.8536 128.73 38.8536 129.224 38.8819C131.372 39.0238 132.067 40.4205 132.067 42.845V44.1281C132.067 46.0986 132.01 48.3781 132.01 49.8914C132.01 49.8914 131.894 51.3732 132.824 51.2029C132.795 51.6033 132.795 52.0857 132.795 52.256C132.564 52.5712 132.01 52.8833 131.26 52.9117C130.564 52.9117 129.811 52.2843 129.519 51.8871C129.346 52.0573 128.996 52.3726 128.679 52.5428C128.041 52.855 127.346 52.9117 126.563 52.9117C124.707 52.9117 122.938 51.7736 122.938 49.1473C122.938 45.6383 126.099 44.7555 127.839 44.5853C128.128 44.5569 128.391 44.5569 128.65 44.5569C129.028 44.5569 129.346 44.5853 129.609 44.642V43.0184C129.609 41.7352 129.464 41.0195 128.217 41.0195C127.201 41.0195 126.012 41.4199 125.172 41.7636C124.852 41.9054 124.563 41.9905 124.332 41.9905C124.069 41.7068 123.954 41.1929 123.896 40.8493C123.867 40.7641 123.867 40.6506 123.867 40.5371H123.861ZM129.602 48.2929V46.2688C129.429 46.2405 129.224 46.2405 129.022 46.2405C128.673 46.2405 128.355 46.2689 128.067 46.2972C126.676 46.5242 125.486 47.1232 125.486 48.9203C125.486 50.3737 126.124 50.8877 127.022 50.9444H127.227C128.096 50.9444 129.051 50.544 129.458 50.0616C129.487 50.0049 129.516 49.8315 129.545 49.6612C129.602 49.3207 129.602 48.892 129.602 48.2929Z" fill="currentColor"></path><path d="M143.434 41.3915H143.287C143.082 41.3915 142.793 41.3064 142.502 41.2213C141.982 40.9911 141.341 40.8493 140.761 40.8493C140.617 40.8493 140.501 40.8493 140.354 40.8776C138.527 41.0163 137.222 42.5896 137.222 46.0103C137.222 50.1184 139.052 50.9728 140.934 50.9728C141.893 50.9728 142.819 50.7174 143.431 50.4305C143.518 50.7174 143.604 51.0295 143.604 51.2281C143.576 51.6285 143.316 52.1109 142.966 52.3695C142.415 52.7415 141.46 52.9968 140.415 52.9968C137.286 52.9968 134.616 51.8555 134.616 46.1554C134.616 43.1319 135.603 41.278 136.735 40.2502C137.866 39.1941 139.315 38.8536 140.706 38.8536C142.415 38.8536 143.694 39.626 143.81 39.9949C143.81 40.3637 143.662 40.9911 143.434 41.3915Z" fill="currentColor"></path><path d="M152.827 51.0894C152.827 51.3448 152.827 51.6317 152.798 51.8871C152.74 52.1141 152.593 52.2875 152.362 52.4577C151.811 52.8014 150.827 53 149.926 53C147.227 53 146.736 50.5188 146.736 48.2078V41.1645C145.807 41.1645 145.342 41.051 144.996 40.8808C144.996 39.998 145.024 40.1084 145.255 39.8814C145.662 39.5377 146.56 39.4526 146.996 39.254L147.143 36.6876C147.345 36.117 147.954 35.6314 149.317 35.5463C149.288 36.8579 149.256 38.0559 149.256 39.2256H153C152.913 40.6538 152.737 40.9659 152.333 41.051C152.099 41.0794 151.868 41.1109 151.638 41.1109C150.884 41.1393 150.506 41.1393 149.259 41.1393C149.23 42.4509 149.201 43.7908 149.201 45.0172C149.201 46.2436 149.23 47.3818 149.23 48.3245C149.346 49.9198 149.608 51.0327 150.766 51.0327C151.202 51.0611 152.532 50.6607 152.766 50.462C152.795 50.6323 152.824 50.8624 152.824 51.0894H152.827Z" fill="currentColor"></path><path d="M90.84 38.8536C94.4111 38.8536 96.0492 41.4262 96.0492 45.7959C96.0492 50.1657 94.3053 52.9811 90.715 52.9811C87.1247 52.9811 85.5059 50.2855 85.5059 45.9567C85.5059 41.2812 87.394 38.8504 90.84 38.8504V38.8536ZM88.0575 46.0734C88.0575 49.409 89.202 51.0106 90.8144 51.0106C92.5134 51.0106 93.5359 49.409 93.5359 45.8874C93.5359 42.3657 92.3403 40.8745 90.7791 40.8745H90.7599C89.1475 40.8745 88.0544 42.4761 88.0544 46.0734H88.0575Z" fill="currentColor"></path><path d="M71.4365 40.1619V47.3755C71.4333 49.4216 71.4044 51.1619 71.3788 52.6847C72.77 52.6847 73.3374 52.7446 73.6483 52.401C73.8054 52.1771 73.8888 51.9312 73.9176 51.5907H73.9304V39.5661C72.3501 39.1184 71.4333 40.1651 71.4333 40.1651L71.4365 40.1619Z" fill="currentColor"></path><path d="M72.7027 35.849C73.5596 35.849 74.2542 35.0966 74.2542 34.1685C74.2542 33.2405 73.5596 32.4881 72.7027 32.4881C71.8458 32.4881 71.1512 33.2405 71.1512 34.1685C71.1512 35.0966 71.8458 35.849 72.7027 35.849Z" fill="currentColor"></path><path d="M83.6114 41.2181C83.6114 41.2181 83.8165 41.3852 83.9384 41.1645C84.0249 41.0163 84.1211 40.8303 84.1275 40.8114C84.2782 40.4394 84.3743 39.8814 84.1692 39.5125C83.9319 39.0806 83.3068 38.9135 82.8452 38.9008C82.2971 38.8851 81.7521 39.0301 81.2328 39.1909C80.5949 39.3927 79.9281 39.7332 79.2325 40.3007C79.1171 39.8183 78.8543 39.4463 78.3317 39.4463C78.3029 39.4463 78.2163 39.4463 78.1298 39.4746C77.4919 39.7584 77.1136 39.9602 76.9694 40.1304C77.1713 40.7011 77.3188 41.3568 77.3188 42.2711V47.1169C77.3188 49.3144 77.2899 51.1367 77.2611 52.6753C78.8286 52.6469 79.146 52.6753 79.4954 52.3915C79.755 52.0195 79.8127 51.6506 79.8127 51.0516V42.1545C80.4186 41.4987 81.2617 40.9564 82.3035 40.9564C82.8517 40.9564 83.2748 41.0416 83.605 41.2181V41.2118L83.6114 41.2181Z" fill="currentColor"></path><path d="M61.5311 39.2666C61.5311 39.2666 63.4 45.6698 64.3873 48.9298C65.4772 45.714 66.035 42.3815 67.1955 39.254C67.2147 39.2067 67.6346 39.1657 67.6987 39.1562C67.8718 39.1278 68.0449 39.1089 68.218 39.1058C68.5931 39.0995 69.1669 39.1405 69.356 39.5251C69.5291 39.875 69.3785 40.3322 69.2663 40.679L66.0767 50.9129C65.6119 52.401 64.8938 52.6658 63.1436 52.5302L61.8389 48.8194C61.8389 48.8194 59.3674 41.1866 59.3609 41.1677C59.2167 40.7263 59.0468 40.184 59.2071 39.7269C59.4379 39.0648 60.2874 39.0553 60.8708 39.1089C60.9702 39.1184 61.4061 39.2035 61.5311 39.2697V39.2666Z" fill="currentColor"></path><path d="M38.5181 50.7773V43.4061C39.9798 43.4061 41.7461 43.3967 42.2622 43.3778C42.493 43.3778 42.7238 43.3494 42.9578 43.3179C43.3618 43.2327 43.5381 42.9206 43.6246 41.4924H38.5181V35.5999C40.0504 35.5999 42.4898 35.5936 43.1117 35.5715C43.3425 35.5715 43.5733 35.5432 43.8073 35.5116C44.2112 35.4265 44.3875 35.1144 44.4741 33.6862H37.6942C36.6043 33.6956 35.9888 34.3955 35.9888 34.3955L36.0177 35.5621V47.3723C36.0145 49.4185 35.9856 51.1588 35.96 52.6816C36.2998 52.6816 42.5668 52.6847 43.3201 52.6563C43.5509 52.6563 43.7817 52.628 44.0157 52.5965C44.4196 52.5113 44.5959 52.1992 44.6825 50.771H38.5117L38.5181 50.7773Z" fill="currentColor"></path><path d="M4.1176 28.8005C3.98297 28.8036 3.9445 28.6145 4.06952 28.5672C13.8338 25.055 27.6885 26.8174 28.5796 26.9372C28.5636 26.8868 28.554 26.8332 28.5379 26.7827L23.3769 18.2482C22.4377 17.0218 20.5528 16.0633 18.9948 16.0633H9.81397C8.13103 16.0633 6.06341 17.1826 5.22354 18.5477L0.629902 26.0008C-0.209967 27.3691 -0.209967 29.6044 0.629902 30.9696L5.31971 38.2651C6.08264 39.4537 7.23987 40.3806 8.62148 40.7432C9.02539 40.8504 9.4293 40.9071 9.81397 40.9071H18.9948C20.6778 40.9071 22.7454 39.791 23.5885 38.4227L27.9417 31.3542C20.2482 28.5893 7.30398 28.7185 4.12081 28.7973L4.1176 28.8005Z" fill="currentColor"></path><path d="M47.1369 11.7598L43.1331 5.13585C42.4022 4.18372 40.9404 3.43966 39.7319 3.43966H32.6059C31.298 3.43966 29.6952 4.30667 29.0444 5.366L25.4798 11.1513C24.8258 12.2138 24.8258 13.9478 25.4798 15.0072L29.1182 20.6695C29.1182 20.6695 33.122 9.26282 39.9275 7.0212C40.0333 6.98652 40.1198 7.11579 40.0429 7.19776C38.751 8.60074 33.4137 14.8243 32.6059 22.7188H39.7319C41.0366 22.7188 42.6426 21.8518 43.2966 20.7925L46.858 15.0072C47.3965 14.1307 47.4895 12.7939 47.1369 11.7567V11.7598Z" fill="currentColor"></path><path d="M15.4558 4.16165C15.3949 4.0513 15.5424 3.94411 15.6322 4.03554L22.7871 11.4698L24.7521 8.28231C25.1368 7.65491 25.2041 6.69962 24.9509 5.95557L22.085 1.21381C21.5625 0.532816 20.5175 0 19.652 0H14.5519C13.6158 0 12.4682 0.621093 12.0034 1.38091L9.45174 5.52049C8.98372 6.2803 8.98372 7.52249 9.45174 8.28231L12.0355 12.3052C12.4874 13.0083 13.1767 13.5569 14.0005 13.7397C14.1864 13.7807 14.3723 13.8028 14.5519 13.8028H19.652C19.9758 13.8028 20.322 13.724 20.6618 13.5947L15.459 4.1648L15.4558 4.16165Z" fill="currentColor"></path></svg>
+    <div class="kicker">Plataforma Inteligente para Avaliação Dinâmica de Riscos de Integridade de Poços</div>
+    <h1>A equipe é uma<br>decisão de arquitetura</h1>
+    <p class="lead">Em software de segurança crítica, a forma como a equipe se comunica vira a forma do produto. Definir quem constrói não é assunto de recursos humanos: é a primeira decisão de risco do projeto.</p>
+    <div class="hero-meta">
+      <div>Documento<b>Arquitetura de equipe</b></div>
+      <div>Destinatários<b>EnvironPact · Petrobras</b></div>
+      <div>Domínio<b>Perfuração offshore · HSEQ</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO I ========== -->
+<section class="stratum" id="ato-1" data-t="Lei de Conway">
+  <div class="wrap">
+    <span class="actno">ATO I</span>
+    <h2>O produto tem o formato da conversa que o construiu</h2>
+
+    <div class="law">
+      <q>As organizações que desenvolvem sistemas de software tendem a produzir sistemas que são cópias das estruturas de comunicação dessas organizações.</q>
+      <cite>Lei de Conway <span class="chip ok">consolidado</span></cite>
+    </div>
+
+    <div class="prose">
+      <p>A consequência é direta e desconfortável. Se a comunicação entre quem modela o risco e quem desenha a interface é fragmentada, o produto será fragmentado — e num sistema de decisão em sala de controle, fragmentação não aparece como feiura, aparece como ambiguidade diante de um número.</p>
+      <p>A leitura inversa é o que torna a lei útil em vez de fatalista: se a arquitetura da equipe determina a arquitetura do produto, então <em>desenhar a equipe é desenhar o software antes de escrever a primeira linha</em>. É por isso que este documento começa pela composição e não pelo cronograma.</p>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 300" role="img" aria-label="A estrutura de comunicação da equipe reproduzida na estrutura do produto">
+        <text class="t-k" x="40" y="24">ESTRUTURA DE COMUNICAÇÃO</text>
+        <circle class="bx" cx="110" cy="90" r="34"></circle><text class="t-s" x="110" y="94" text-anchor="middle">modelo</text>
+        <circle class="bx" cx="300" cy="90" r="34"></circle><text class="t-s" x="300" y="94" text-anchor="middle">dados</text>
+        <circle class="bx" cx="205" cy="216" r="34"></circle><text class="t-s" x="205" y="220" text-anchor="middle">interface</text>
+        <path class="ln" d="M144 90 L266 90"></path>
+        <path class="ln" d="M133 120 L182 186"></path>
+        <path class="ln-d bad-s" d="M277 120 L228 186"></path>
+        <text class="t-s bad" x="292" y="170">sem canal</text>
+
+        <path class="ln-d" d="M450 40 L450 270"></path>
+        <text class="t-k" x="450" y="24" text-anchor="middle">VIRA</text>
+
+        <text class="t-k" x="560" y="24">FORMA DO PRODUTO</text>
+        <rect class="bx" x="560" y="56" width="150" height="68" rx="3"></rect>
+        <rect class="bxf" x="560" y="56" width="150" height="68" rx="3"></rect>
+        <rect class="bx" x="714" y="56" width="150" height="68" rx="3"></rect>
+        <rect class="bxf" x="714" y="56" width="150" height="68" rx="3"></rect>
+        <rect class="bx" x="560" y="182" width="150" height="68" rx="3"></rect>
+        <rect class="bxf" x="560" y="182" width="150" height="68" rx="3"></rect>
+        <path class="ln" d="M635 124 L635 182"></path>
+        <path class="ln-d bad-s" d="M789 124 L717 182"></path>
+        <path class="bad-s" d="M714 182 L710 196 L718 210 L710 224 L716 238 L710 250" fill="none" stroke-width="2"></path>
+        <text class="t-s bad" x="742" y="166">emenda</text>
+        <text class="t-s" x="635" y="95" text-anchor="middle">probabilidade</text>
+        <text class="t-s" x="789" y="95" text-anchor="middle">ingestão</text>
+        <text class="t-s" x="635" y="221" text-anchor="middle">tela do operador</text>
+      </svg>
+      <figcaption>O canal que não existe entre duas equipes reaparece no produto como costura visível — e, em sala de controle, costura é ambiguidade diante de um número.</figcaption>
+    </figure>
+
+    <div class="prose">
+      <p>Num produto comum, errar essa decisão custa retrabalho. Aqui, ela define quem é o dono de cada tradução entre o dado bruto da sonda e o que o operador vê às três da manhã.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO II ========== -->
+<section class="stratum mid" id="ato-2" data-t="Balanço de forças">
+  <div class="wrap">
+    <span class="actno">ATO II</span>
+    <h2>Quem tem mais peso decide o que o produto vira</h2>
+    <p class="lead">A identidade de um produto digital reflete qual disciplina tem mais peso nas decisões arquiteturais. Nenhuma das três é a resposta certa sozinha.</p>
+
+    <table class="grid">
+      <thead>
+        <tr><th>Perfil dominante</th><th>Foco principal</th><th>Impacto no produto</th><th>Risco</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Engenharia</td>
+          <td>Escalabilidade, performance, robustez técnica.</td>
+          <td>Produtos estáveis e rápidos, com infraestrutura sólida e serviços bem delimitados.</td>
+          <td class="risk">Curva de aprendizado alta; interfaces utilitárias sem empatia com o operador.</td>
+        </tr>
+        <tr>
+          <td>Design</td>
+          <td>Experiência, fluxos contínuos, coerência visual e governança de sistema.</td>
+          <td>Adoção rápida, interfaces inteligíveis, identidade consistente e adaptável.</td>
+          <td class="risk">Excesso de engenharia de interface; atraso pela busca de perfeição na prototipagem.</td>
+        </tr>
+        <tr>
+          <td>Produto</td>
+          <td>Métricas, tempo até o mercado, dores imediatas.</td>
+          <td>Entregas rápidas de valor e iteração constante baseada em dados.</td>
+          <td class="risk">O software vira fábrica de funcionalidades; dívida técnica e experiência fragmentada.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 400" role="img" aria-label="Triângulo de forças entre engenharia, design e produto, com o peso oscilando entre descoberta e escala">
+        <path class="ln" d="M450 46 L820 344 L80 344 Z"></path>
+        <circle class="bx" cx="450" cy="46" r="7" fill="currentColor"></circle>
+        <circle class="bx" cx="820" cy="344" r="7" fill="currentColor"></circle>
+        <circle class="bx" cx="80" cy="344" r="7" fill="currentColor"></circle>
+        <text class="t" x="450" y="30" text-anchor="middle">Engenharia</text>
+        <text class="t-s" x="450" y="14" text-anchor="middle">robustez · risco: interface sem empatia</text>
+        <text class="t" x="828" y="372">Produto</text>
+        <text class="t-s" x="828" y="390">velocidade · risco: dívida e fragmentação</text>
+        <text class="t" x="72" y="372" text-anchor="end">Design</text>
+        <text class="t-s" x="72" y="390" text-anchor="end">coerência · risco: atraso por perfeição</text>
+
+        <circle class="ok" cx="352" cy="232" r="9"></circle>
+        <text class="t ok" x="352" y="215" text-anchor="middle">descoberta</text>
+        <circle class="inf" cx="530" cy="180" r="9"></circle>
+        <text class="t inf" x="546" y="166">escala</text>
+        <path class="ln-d inf-s" d="M366 226 L516 186" marker-end="url(#ah)"></path>
+      </svg>
+      <figcaption>O peso oscila ao longo do ciclo de vida. O problema não é a oscilação — é ela acontecer sem ninguém perceber que aconteceu.</figcaption>
+    </figure>
+
+    <div class="prose">
+      <p>O equilíbrio perfeito não existe de forma estática — ele oscila conforme o ciclo de vida. Na fase de descoberta, o peso tende ao produto e ao design; na fase de escala, migra para a engenharia. O que não pode acontecer é a oscilação ser acidental, sem ninguém perceber que ela ocorreu.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO III ========== -->
+<section class="stratum" id="ato-3" data-t="Formas de organizar">
+  <div class="wrap">
+    <span class="actno">ATO III</span>
+    <h2>Três formas de organizar, três produtos diferentes</h2>
+
+    <div class="band">
+      <div class="band-k">Equipes funcionais<span>Silos</span></div>
+      <div class="band-v">
+        <p>O trabalho flui em cascata. Produto define, design desenha e entrega por cima do muro, engenharia implementa reinterpretando o que recebeu.</p>
+        <div class="outcome bad">O usuário percebe as emendas — onde uma equipe parou e a outra começou.</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">Cross-funcionais<span>Orientadas a fluxo de valor</span></div>
+      <div class="band-v">
+        <p>Designers, desenvolvedores e produto são donos de uma fatia inteira — um fluxo, não uma camada técnica.</p>
+        <div class="outcome">O domínio específico fica excelente, porque a equipe entende a dor de ponta a ponta.</div>
+        <div class="outcome bad">Sem alinhamento global, a experiência geral vira um aglomerado de mini-produtos.</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">Plataforma<span>Fonte da verdade</span></div>
+      <div class="band-v">
+        <p>Uma equipe constrói a fundação — sistema de design, arquitetura de tokens, infraestrutura e repositórios de componentes. As outras consomem.</p>
+        <div class="outcome">Consistência garantida na raiz; o desenvolvedor foca na lógica de negócio porque a interface já está resolvida em nível de primitivas.</div>
+      </div>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 250" role="img" aria-label="Comparação entre equipes funcionais, cross-funcionais e modelo de plataforma">
+        <text class="t-k" x="0" y="18">SILOS</text>
+        <rect class="bx" x="0" y="34" width="74" height="46" rx="3"></rect><text class="t-s" x="37" y="62" text-anchor="middle">produto</text>
+        <rect class="bx" x="88" y="34" width="74" height="46" rx="3"></rect><text class="t-s" x="125" y="62" text-anchor="middle">design</text>
+        <rect class="bx" x="196" y="34" width="74" height="46" rx="3"></rect><text class="t-s" x="233" y="62" text-anchor="middle">código</text>
+        <path class="ln" d="M74 57 L84 57" marker-end="url(#ah)"></path>
+        <path class="bad-s" d="M178 26 L178 88" stroke-width="2" stroke-dasharray="5 4"></path>
+        <path class="ln" d="M162 57 L192 57" marker-end="url(#ah)"></path>
+        <text class="t-s bad" x="178" y="108" text-anchor="middle">muro</text>
+        <text class="t-s bad" x="135" y="132">o usuário percebe a emenda</text>
+
+        <text class="t-k" x="330" y="18">CROSS-FUNCIONAL</text>
+        <rect class="bx ok-s" x="330" y="34" width="240" height="74" rx="3"></rect>
+        <rect class="bxf" x="330" y="34" width="240" height="74" rx="3"></rect>
+        <text class="t-s" x="376" y="62" text-anchor="middle">produto</text>
+        <text class="t-s" x="450" y="62" text-anchor="middle">design</text>
+        <text class="t-s" x="524" y="62" text-anchor="middle">código</text>
+        <text class="t-s ok" x="450" y="94" text-anchor="middle">um fluxo de valor inteiro</text>
+        <path class="ln ok-s" d="M450 108 L450 132" marker-end="url(#ah-ok)"></path>
+        <text class="t-s" x="450" y="150" text-anchor="middle">usuário</text>
+
+        <text class="t-k" x="630" y="18">PLATAFORMA</text>
+        <rect class="bx" x="630" y="34" width="120" height="48" rx="3"></rect><text class="t-s" x="690" y="62" text-anchor="middle">fluxo A</text>
+        <rect class="bx" x="764" y="34" width="120" height="48" rx="3"></rect><text class="t-s" x="824" y="62" text-anchor="middle">fluxo B</text>
+        <path class="ln" d="M690 108 L690 86" marker-end="url(#ah)"></path>
+        <path class="ln" d="M824 108 L824 86" marker-end="url(#ah)"></path>
+        <rect class="bx ok-s" x="630" y="110" width="254" height="52" rx="3"></rect>
+        <rect class="bxf" x="630" y="110" width="254" height="52" rx="3"></rect>
+        <text class="t-s ok" x="757" y="141" text-anchor="middle">fundação consumida, não solicitada</text>
+
+        <path class="ln-d" d="M300 10 L300 175"></path>
+        <path class="ln-d" d="M600 10 L600 175"></path>
+        <text class="t-s" x="135" y="205" text-anchor="middle">cascata</text>
+        <text class="t-s" x="450" y="205" text-anchor="middle">autonomia ponta a ponta</text>
+        <text class="t-s" x="757" y="205" text-anchor="middle">consistência na raiz</text>
+      </svg>
+      <figcaption>As três formas não são estágios de maturidade: coexistem. Plataforma só faz sentido quando há mais de um fluxo para servir.</figcaption>
+    </figure>
+
+    <div class="note warn">
+      <h4>Sobre o vocabulário de squads</h4>
+      <p>O modelo que popularizou os termos <em>squad</em>, <em>tribe</em> e <em>chapter</em> nunca foi implementado como o documento original de 2012 descrevia, e a própria empresa que o originou registrou publicamente que ele falhou internamente — autonomia sem coordenação gerou desperdício e conhecimento não compartilhado. <span class="chip myth">folclore</span></p>
+      <p>O que sobreviveu com lastro é a ideia de equipe cross-funcional e de comunidade de prática. A terminologia, não. Frameworks de escala como SAFe e LeSS resolvem outro problema: existem para coordenar acima de aproximadamente 150 pessoas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO IV ========== -->
+<section class="stratum core" id="ato-4" data-t="Modelo maduro">
+  <div class="wrap">
+    <span class="actno">ATO IV</span>
+    <h2>Organizar por carga cognitiva, não por departamento</h2>
+    <p class="lead">O modelo mais maduro hoje divide as equipes não pelo que fazem, mas pelo valor que entregam e pela carga que conseguem sustentar.</p>
+
+    <div class="band">
+      <div class="band-k">Alinhada ao fluxo<span>Stream-aligned</span></div>
+      <div class="band-v"><p>Dona de um fluxo completo de valor. Cross-funcional de verdade: engenharia, produto, design e papéis como qualidade e dados embutidos no dia a dia. Autonomia para conceber, construir, testar e colocar em produção sem depender de terceiros.</p></div>
+    </div>
+    <div class="band">
+      <div class="band-k">Plataforma<span>Platform</span></div>
+      <div class="band-v"><p>Constrói o produto para os desenvolvedores internos, não para o usuário final. Estradas pavimentadas: APIs internas, pipelines, ambientes, observabilidade. Sucesso é a equipe de fluxo subir código sem pedir licença.</p></div>
+    </div>
+    <div class="band">
+      <div class="band-k">Capacitadora<span>Enabling</span></div>
+      <div class="band-v"><p>Não constrói funcionalidade: resolve gargalo de conhecimento. Senta junto por algumas semanas, ensina, e sai. A métrica de sucesso é conseguir ir embora.</p></div>
+    </div>
+    <div class="band">
+      <div class="band-k">Subsistema complicado<span>Complicated subsystem</span></div>
+      <div class="band-v"><p>Parte do software que exige conhecimento matemático ou técnico profundo demais para uma equipe de fluxo absorver sem parar o resto. Entrega o subsistema como interface de alto desempenho que as outras apenas consomem.</p></div>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 400" role="img" aria-label="As quatro topologias e os modos de interação entre elas">
+        <rect class="bx ok-s" x="300" y="140" width="300" height="110" rx="4" stroke-width="2"></rect>
+        <rect class="bxf" x="300" y="140" width="300" height="110" rx="4"></rect>
+        <text class="t ok" x="450" y="184" text-anchor="middle">Alinhada ao fluxo</text>
+        <text class="t-s" x="450" y="208" text-anchor="middle">dona do valor ponta a ponta</text>
+        <text class="t-s" x="450" y="230" text-anchor="middle">a única que entrega ao usuário</text>
+
+        <rect class="bx" x="300" y="318" width="300" height="66" rx="3"></rect>
+        <text class="t" x="450" y="348" text-anchor="middle">Plataforma</text>
+        <text class="t-s" x="450" y="370" text-anchor="middle">serviço, consumido sem pedir licença</text>
+        <path class="ln" d="M450 318 L450 254" marker-end="url(#ah)"></path>
+        <text class="t-k" x="462" y="290">PUXADA</text>
+
+        <rect class="bx" x="20" y="150" width="230" height="90" rx="3" stroke-dasharray="6 5"></rect>
+        <text class="t" x="135" y="186" text-anchor="middle">Capacitadora</text>
+        <text class="t-s" x="135" y="208" text-anchor="middle">entra, ensina e sai</text>
+        <path class="ln-d" d="M250 195 L294 195" marker-end="url(#ah)"></path>
+        <text class="t-k" x="252" y="176">TEMPORÁRIA</text>
+
+        <rect class="bx inf-s" x="650" y="150" width="230" height="90" rx="3"></rect>
+        <text class="t inf" x="765" y="180" text-anchor="middle">Subsistema complicado</text>
+        <text class="t-s" x="765" y="202" text-anchor="middle">entrega interface tipada,</text>
+        <text class="t-s" x="765" y="222" text-anchor="middle">nunca uma tela</text>
+        <path class="ln inf-s" d="M650 195 L606 195" marker-end="url(#ah)"></path>
+        <text class="t-k" x="612" y="176">CONTRATO</text>
+
+        <path class="ln-d ok-s" d="M450 140 L450 96" marker-end="url(#ah-ok)"></path>
+        <text class="t-s ok" x="450" y="84" text-anchor="middle">usuário</text>
+
+        <text class="t-k" x="20" y="30">CARGA COGNITIVA GOVERNA A DIVISÃO — NÃO O ORGANOGRAMA</text>
+      </svg>
+      <figcaption>As setas apontam para dentro: plataforma, capacitadora e subsistema existem para servir o fluxo, não para autorizá-lo. Inverter essas setas é o modo mais comum de transformar apoio em governança.</figcaption>
+    </figure>
+
+    <h3>O que a evidência diz sobre tamanho</h3>
+    <table class="grid">
+      <tbody>
+        <tr><td>4 a 8</td><td colspan="3">Faixa em que a evidência converge. Pesquisa sobre eficácia de times aponta ótimo perto de cinco pessoas; a regra das duas pizzas opera entre cinco e oito. <span class="chip ok">consolidado</span></td></tr>
+        <tr><td>36 → 52</td><td colspan="3">Minutos para a mesma tarefa de montagem: times de duas pessoas levaram 36 minutos, times de quatro levaram 52. Os times maiores foram quase duas vezes mais otimistas sobre o próprio prazo. <span class="chip ok">Staats, Milkman &amp; Fox, 2012</span></td></tr>
+        <tr><td>15 → 66</td><td colspan="3">Canais de comunicação em times de 6 e de 12 pessoas. O crescimento não é linear, e é essa curva que a Lei de Brooks descreve quando diz que adicionar gente a um projeto atrasado o atrasa ainda mais.</td></tr>
+        <tr><td>30–40%</td><td colspan="3">Parcela do esforço dedicada a verificação e teste em contextos de alta confiabilidade. Em software de negócio comum, a faixa praticada é bem menor.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========== ATO V ========== -->
+<section class="stratum" id="ato-5" data-t="Agentes">
+  <div class="wrap">
+    <span class="actno">ATO V</span>
+    <h2>O que mudou quando os agentes entraram no fluxo</h2>
+    <p class="lead">Quando a transição entre decisão de design e código em produção passa a ser mediada por agentes, o peso das disciplinas muda — e a composição da equipe muda com ele.</p>
+
+    <div class="prose">
+      <p>Tratados como ferramentas ativas capazes de ler e escrever diretamente no arquivo de design e no repositório, e não como assistentes de conversa, os agentes dissolvem a fronteira tradicional do repasse entre design e engenharia. O arquivo de design deixa de ser prancheta e passa a funcionar como banco de dados estruturado do front-end.</p>
+    </div>
+
+    <h3>O que já opera hoje <span class="chip ok">em produção</span></h3>
+    <div class="prose">
+      <p>Um agente conectado por protocolo de contexto lê a árvore do arquivo de design e gera a estrutura dos componentes já mapeada às convenções do projeto. A engenharia deixa de gastar ciclos conferindo margens e convertendo propriedades visuais, e recebe a fundação da interface pronta para receber o trabalho de alto valor: gerenciamento de estado, regra de negócio e integração.</p>
+      <p>Na mesma categoria: propagação de estilo por dezenas de telas, governança de variáveis e tokens, e auditoria automatizada de consistência.</p>
+    </div>
+
+    <h3>O que ainda está se firmando <span class="chip trend">tendência</span></h3>
+    <div class="prose">
+      <p>Sincronização plenamente bidirecional — em que uma mudança de token no código faz o agente atualizar o arquivo de design de forma autônoma — é direção real, mas ainda não é prática estabelecida de mercado. O mesmo vale para a ideia de uma equipe dedicada de orquestração de agentes: aparece como formação de vanguarda, sem lastro consolidado para ser apresentada como padrão.</p>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 290" role="img" aria-label="Repasse manual comparado com compilação contínua mediada por agente">
+        <text class="t-k" x="0" y="18">ANTES — REPASSE MANUAL</text>
+        <rect class="bx" x="0" y="34" width="180" height="58" rx="3"></rect><text class="t-s" x="90" y="68" text-anchor="middle">arquivo de design</text>
+        <rect class="bx" x="330" y="34" width="180" height="58" rx="3"></rect><text class="t-s" x="420" y="68" text-anchor="middle">código</text>
+        <path class="ln" d="M180 63 L326 63" marker-end="url(#ah)"></path>
+        <path class="bad-s" d="M255 26 L255 100" stroke-width="2" stroke-dasharray="5 4"></path>
+        <text class="t-s bad" x="255" y="118" text-anchor="middle">tradução manual, sujeita a interpretação</text>
+        <text class="t-s" x="620" y="68">engenharia gasta ciclos conferindo medidas</text>
+
+        <path class="ln-d" d="M0 150 L900 150"></path>
+
+        <text class="t-k" x="0" y="184">AGORA — COMPILAÇÃO CONTÍNUA</text>
+        <rect class="bx" x="0" y="200" width="180" height="58" rx="3"></rect><text class="t-s" x="90" y="234" text-anchor="middle">arquivo de design</text>
+        <rect class="bx ok-s" x="240" y="196" width="180" height="66" rx="3" stroke-width="2"></rect>
+        <rect class="bxf" x="240" y="196" width="180" height="66" rx="3"></rect>
+        <text class="t ok" x="330" y="224" text-anchor="middle">agente</text>
+        <text class="t-s" x="330" y="246" text-anchor="middle">lê a árvore, gera estrutura</text>
+        <rect class="bx" x="480" y="200" width="180" height="58" rx="3"></rect><text class="t-s" x="570" y="234" text-anchor="middle">código</text>
+        <path class="ln ok-s" d="M180 229 L236 229" marker-end="url(#ah-ok)"></path>
+        <path class="ln ok-s" d="M420 229 L476 229" marker-end="url(#ah-ok)"></path>
+        <path class="ln-d inf-s" d="M570 262 L570 278 L330 278 L330 266" marker-end="url(#ah)"></path>
+        <text class="t-s inf" x="700" y="282">retorno ainda em consolidação</text>
+        <text class="t-s" x="700" y="234">engenharia foca em estado e regra de negócio</text>
+      </svg>
+      <figcaption>O ganho não é velocidade de produção de tela. É a disciplina de design passar a operar como taxonomia e herança — a competência exigida no Ato IX.</figcaption>
+    </figure>
+
+    <table class="grid">
+      <thead><tr><th>Perfil</th><th>Atuação tradicional</th><th>Atuação com agentes</th></tr></thead>
+      <tbody>
+        <tr><td>Designer de produto</td><td>Desenhar fluxos e prototipar telas finais.</td><td>Arquitetar sistemas de variáveis, definir regras de herança e auditar o resultado gerado pelo agente.</td></tr>
+        <tr><td>Engenheiro front-end</td><td>Traduzir telas para código e integrar interfaces de dados.</td><td>Arquitetura de estado, segurança e performance; conectar a interface gerada ao backend.</td></tr>
+        <tr><td>Engenheiro de design</td><td>Papel raro, focado em criar componentes.</td><td>Papel central: orquestra o contexto que alimenta os agentes e responde pela fidelidade entre sistema e código.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <h4>Por que isso importa aqui</h4>
+      <p>O efeito relevante para este projeto não é velocidade. É que a disciplina de design passa a operar como arquitetura de sistemas — taxonomia, herança, semântica —, que é exatamente a competência exigida no Ato IX para governar a tradução entre probabilidade e interface.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO VI ========== -->
+<section class="stratum deep" id="ato-6" data-t="Domínio crítico">
+  <div class="wrap">
+    <span class="actno">ATO VI</span>
+    <h2>Quando quebrar custa bilhões e vidas</h2>
+    <p class="lead">O setor inverte o mantra da indústria de software. Não se move rápido quebrando coisas: move-se com precisão, porque o ciclo é o da engenharia pesada e da conformidade regulatória.</p>
+
+    <div class="prose">
+      <p>Isso não é apenas uma questão de ritmo. Três famílias de norma incidem diretamente sobre a composição da equipe, e nenhuma delas é opcional por decisão de projeto.</p>
+    </div>
+
+    <div class="band">
+      <div class="band-k">IEC 61508<span>e IEC 61511 para indústria de processo</span></div>
+      <div class="band-v">
+        <p>Segurança funcional. Exige independência entre quem desenvolve e quem avalia, e gradua essa independência conforme o nível de integridade de segurança adotado: em nível mais baixo, um avaliador independente dentro da mesma organização; em nível mais alto, avaliador de organização independente. O piso, em qualquer caso, é um profissional sênior competente que não participou do projeto.</p>
+        <div class="outcome">Consequência estrutural: a verificação e validação independente não pode estar dentro da equipe que desenvolve.</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">IEC 62443<span>Cibersegurança industrial</span></div>
+      <div class="band-v">
+        <p>Define responsabilidades por papel — operadora do ativo, fornecedor do produto, integrador e prestador de serviço — e estabelece níveis de segurança, além de exigir ciclo de desenvolvimento seguro desde o design, e não como camada adicionada ao final.</p>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">ISA-101<span>Interface humano-máquina</span></div>
+      <div class="band-v">
+        <p>Ciclo de vida para projetar e manter interfaces de automação de processo, com foco explícito em reduzir erro do operador e sustentar consciência situacional. É a norma que governa a tela que este projeto entrega à sala de controle.</p>
+      </div>
+    </div>
+
+    <h3>A pergunta que define o regime inteiro</h3>
+    <div class="prose">
+      <p>O nível de integridade de segurança não é uma nota atribuída a software. Ele qualifica uma <em>função instrumentada de segurança</em>: uma malha fechada em que sensores detectam a condição perigosa, um resolvedor lógico processa e um elemento final leva o processo ao estado seguro. O que recebe classificação é a função que atua — não o programa que observa.</p>
+      <p>A Plataforma informa uma decisão humana no centro de suporte à decisão. Nessa configuração ela não é uma função instrumentada de segurança e, em rigor, não carrega essa classificação. Uma única pergunta muda isso.</p>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 450" role="img" aria-label="Árvore de decisão sobre o regime normativo aplicável à Plataforma">
+        <rect class="bx" x="330" y="6" width="240" height="54" rx="3"></rect>
+        <rect class="bxf" x="330" y="6" width="240" height="54" rx="3"></rect>
+        <text class="t" x="450" y="38" text-anchor="middle">A Plataforma</text>
+        <path class="ln" d="M450 60 L450 104" marker-end="url(#ah)"></path>
+
+        <rect class="bx" x="255" y="106" width="390" height="76" rx="3" stroke-dasharray="6 5"></rect>
+        <text class="t" x="450" y="136" text-anchor="middle">Atua no processo, ou é creditada como</text>
+        <text class="t" x="450" y="158" text-anchor="middle">camada de proteção na análise de risco?</text>
+
+        <path class="ln" d="M450 182 L450 208 M210 208 L690 208 M210 208 L210 236" marker-end="url(#ah)"></path>
+        <path class="ln" d="M690 208 L690 236" marker-end="url(#ah)"></path>
+        <text class="t-k" x="238" y="203">NÃO</text>
+        <text class="t-k" x="655" y="203">SIM</text>
+
+        <rect class="bx ok-s" x="60" y="238" width="300" height="62" rx="3"></rect>
+        <text class="t ok" x="210" y="266" text-anchor="middle">Apoio à decisão</text>
+        <text class="t-s" x="210" y="287" text-anchor="middle">humano na malha, sem atuação</text>
+        <path class="ln" d="M210 300 L210 332" marker-end="url(#ah)"></path>
+        <rect class="bx" x="60" y="334" width="300" height="104" rx="3"></rect>
+        <text class="t-s" x="210" y="362" text-anchor="middle">Fora do escopo estrito da 61511</text>
+        <text class="t-s" x="210" y="384" text-anchor="middle">ISA-101 rege a interface</text>
+        <text class="t-s" x="210" y="406" text-anchor="middle">confiabilidade e auditabilidade</text>
+        <text class="t-s" x="210" y="428" text-anchor="middle">conforme exigir a operadora</text>
+
+        <rect class="bx bad-s" x="540" y="238" width="300" height="62" rx="3"></rect>
+        <text class="t bad" x="690" y="266" text-anchor="middle">Função instrumentada de segurança</text>
+        <text class="t-s" x="690" y="287" text-anchor="middle">sensor, lógica e elemento final</text>
+        <path class="ln" d="M690 300 L690 332" marker-end="url(#ah)"></path>
+        <rect class="bx" x="540" y="334" width="300" height="104" rx="3"></rect>
+        <text class="t-s" x="690" y="362" text-anchor="middle">Classificação definida por</text>
+        <text class="t-s" x="690" y="384" text-anchor="middle">análise de risco, não por escolha</text>
+        <text class="t-s" x="690" y="406" text-anchor="middle">Ciclo completo 61508 e 61511</text>
+        <text class="t-s" x="690" y="428" text-anchor="middle">independência graduada</text>
+      </svg>
+      <figcaption>O caminho da esquerda e o da direita produzem projetos diferentes, com equipes diferentes. Decidir cedo é barato; descobrir tarde, não.</figcaption>
+    </figure>
+
+    <div class="note warn">
+      <h4>A pergunta a resolver antes de dimensionar</h4>
+      <p>Não é qual nível adotar, e sim de que lado da árvore a Plataforma está. Enquanto isso não estiver decidido, qualquer dimensionamento de equipe é chute — porque o ramo da direita exige funções que o da esquerda não exige.</p>
+      <p>Duas referências ajudam a calibrar a conversa. Na prática da indústria de processo, a maioria das funções instrumentadas é projetada para os dois níveis mais baixos; exigência do terceiro nível é rara, e qualquer resultado apontando o quarto costuma indicar problema na definição de risco tolerável ou no próprio projeto do processo. E para atividades de petróleo na plataforma continental existe diretriz setorial específica sobre como aplicar 61508 e 61511 — a NOG-070, antiga OLF-070.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO VII ========== -->
+<section class="stratum core" id="ato-7" data-t="O caso">
+  <div class="wrap">
+    <span class="actno">ATO VII</span>
+    <h2>As quatro topologias aplicadas à Plataforma</h2>
+    <p class="lead">Aqui o raciocínio abstrato encontra o sistema concreto: dados de sensores das sondas, rede bayesiana, estado funcional de risco, interface acionável.</p>
+
+    <div class="band">
+      <div class="band-k">Motor bayesiano<span>Subsistema complicado</span></div>
+      <div class="band-v">
+        <p>Opera isolada da interface final. Objetivo puramente matemático e científico: recebe dado bruto e entrega probabilidade limpa. Composição típica: cientistas de dados, engenheiros de aprendizado de máquina e — de forma não negociável — especialistas em perfuração que definem as variáveis de pressão, temperatura, densidade de fluido e fluxo.</p>
+        <div class="outcome">Entrega uma interface de dados estritamente tipada. Não é dona de nenhuma tela.</div>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">O duto<span>Plataforma</span></div>
+      <div class="band-v">
+        <p>Sondas operam no mar, com latência alta e conectividade intermitente, o que impede depender de servidor remoto lento. Composição: engenharia de dados, arquitetura de nuvem e borda, especialistas em instrumentação. Constrói a ingestão em tempo real e o processamento local que alimenta o motor sem atraso.</p>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">HSEQ e validação<span>Capacitadora</span></div>
+      <div class="band-v">
+        <p>Não escreve código. Garante que os parâmetros do modelo e os alertas da interface estejam em conformidade com as normas e com a tolerância a risco da operadora — sentando junto às outras equipes, e não auditando ao final.</p>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="band-k">Interface acionável<span>Fluxo de valor</span></div>
+      <div class="band-v">
+        <p>Absorve a complexidade matemática e a transforma em decisão possível para um operador exausto, às três da manhã, sob tempestade. Composição: design de produto com domínio de visualização de dados e ergonomia cognitiva, engenharia front-end e produto.</p>
+        <div class="outcome">A pergunta que esta equipe responde: quando a probabilidade muda, o que muda na tela?</div>
+      </div>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 400" role="img" aria-label="As quatro equipes aplicadas ao caminho do dado, do sensor ao operador">
+        <text class="t-k" x="0" y="20">SONDA</text>
+        <rect class="bx" x="0" y="150" width="118" height="72" rx="3"></rect>
+        <text class="t-s" x="59" y="180" text-anchor="middle">sensores</text>
+        <text class="t-s" x="59" y="200" text-anchor="middle">da sonda</text>
+
+        <rect class="bx" x="150" y="142" width="170" height="88" rx="3"></rect>
+        <text class="t" x="235" y="176" text-anchor="middle">O duto</text>
+        <text class="t-s" x="235" y="198" text-anchor="middle">ingestão e borda</text>
+        <text class="t-k" x="235" y="220" text-anchor="middle">PLATAFORMA</text>
+
+        <rect class="bx inf-s" x="352" y="142" width="176" height="88" rx="3"></rect>
+        <text class="t inf" x="440" y="176" text-anchor="middle">Motor bayesiano</text>
+        <text class="t-s" x="440" y="198" text-anchor="middle">probabilidade limpa</text>
+        <text class="t-k" x="440" y="220" text-anchor="middle">SUBSISTEMA</text>
+
+        <rect class="bx ok-s" x="646" y="142" width="176" height="88" rx="3" stroke-width="2"></rect>
+        <rect class="bxf" x="646" y="142" width="176" height="88" rx="3"></rect>
+        <text class="t ok" x="734" y="176" text-anchor="middle">Interface acionável</text>
+        <text class="t-s" x="734" y="198" text-anchor="middle">decisão possível às 3h</text>
+        <text class="t-k" x="734" y="220" text-anchor="middle">FLUXO DE VALOR</text>
+
+        <path class="ln" d="M118 186 L146 186" marker-end="url(#ah)"></path>
+        <path class="ln" d="M320 186 L348 186" marker-end="url(#ah)"></path>
+        <path class="ln bad-s" d="M528 186 L642 186" marker-end="url(#ah-bad)"></path>
+
+        <rect class="bx bad-s" x="536" y="258" width="220" height="76" rx="3" stroke-dasharray="6 5"></rect>
+        <text class="t bad" x="646" y="286" text-anchor="middle">a função sem dono</text>
+        <text class="t-s" x="646" y="308" text-anchor="middle">do modelo correto</text>
+        <text class="t-s" x="646" y="326" text-anchor="middle">ao modelo operável</text>
+        <path class="ln-d bad-s" d="M600 258 L585 200" marker-end="url(#ah-bad)"></path>
+
+        <rect class="bx" x="300" y="30" width="330" height="70" rx="3" stroke-dasharray="6 5"></rect>
+        <text class="t" x="465" y="60" text-anchor="middle">HSEQ e validação regulatória</text>
+        <text class="t-s" x="465" y="82" text-anchor="middle">senta junto, não audita ao final</text>
+        <path class="ln-d" d="M400 100 L430 138" marker-end="url(#ah)"></path>
+        <path class="ln-d" d="M560 100 L700 138" marker-end="url(#ah)"></path>
+        <text class="t-k" x="640" y="118">CAPACITADORA</text>
+
+        <path class="ln ok-s" d="M734 230 L734 262" marker-end="url(#ah-ok)"></path>
+        <text class="t ok" x="800" y="256">operador</text>
+      </svg>
+      <figcaption>Três das quatro equipes têm dono evidente. A transferência marcada em vermelho é a única sem dono natural — e é onde o projeto falha quando falha.</figcaption>
+    </figure>
+
+    <div class="note">
+      <h4>A função que costuma ficar sem dono</h4>
+      <p>Entre o subsistema e o fluxo existe um trabalho que nenhum dos dois reivindica naturalmente: transformar um modelo correto em um modelo operável. Versionar modelo, dados e código juntos para auditoria; definir o comportamento quando falta leitura de sensor; manter o contrato de interface estável quando o modelo é refinado; detectar deriva.</p>
+      <p>Pesquisa sobre sistemas de aprendizado de máquina em produção mostra que o código do modelo representa uma fração pequena do sistema real — a maior parte do esforço está justamente nessa camada de operação. É uma função, não necessariamente uma pessoa; o que ela não pode ser é responsabilidade difusa.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO VIII — CLÍMAX ========== -->
+<section class="stratum" id="ato-8" data-t="Zona de tradução">
+  <div class="wrap">
+    <span class="actno">ATO VIII</span>
+    <h2>O ponto de falha não é o cálculo nem o código</h2>
+    <p class="lead">O maior risco deste projeto está na zona de transferência entre a matemática e a interface. Acompanhe a mesma leitura atravessando as quatro camadas.</p>
+
+    <div class="chain">
+      <div class="chain-track" role="tablist" aria-label="Estágios da tradução">
+        <button class="chain-btn" role="tab" aria-selected="true" aria-controls="chain-panel" data-i="0"><b>Camada 1</b>Dado bruto do sensor</button>
+        <button class="chain-btn" role="tab" aria-selected="false" aria-controls="chain-panel" data-i="1"><b>Camada 2</b>Probabilidade</button>
+        <button class="chain-btn" role="tab" aria-selected="false" aria-controls="chain-panel" data-i="2"><b>Camada 3</b>Estado funcional</button>
+        <button class="chain-btn" role="tab" aria-selected="false" aria-controls="chain-panel" data-i="3"><b>Camada 4</b>Interface</button>
+      </div>
+      <div class="chain-panel" id="chain-panel" role="tabpanel">
+        <div>
+          <div class="chain-lab" id="c-lab">O QUE TRAFEGA</div>
+          <p class="chain-val" id="c-val"></p>
+        </div>
+        <div class="chain-desc">
+          <div id="c-desc"></div>
+          <div class="chain-owner" id="c-own"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <h3>A regra de ouro</h3>
+      <p>A interface não deve tentar interpretar a rede bayesiana. O front-end é deliberadamente cego para a matemática: se ele estiver calculando se um valor de pressão é perigoso, a governança já falhou. O dado que chega à tela precisa vir com o estado funcional resolvido.</p>
+      <p>A razão é de responsabilidade, não de elegância técnica. A decisão sobre o que é perigoso pertence a quem responde por segurança operacional — não a quem escreve o componente visual.</p>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 250" role="img" aria-label="Front-end que interpreta a matemática comparado com front-end que apenas reage ao estado">
+        <text class="t-k bad" x="0" y="18">GOVERNANÇA FALHOU</text>
+        <rect class="bx" x="0" y="34" width="150" height="56" rx="3"></rect><text class="t-s" x="75" y="67" text-anchor="middle">probabilidade</text>
+        <path class="ln bad-s" d="M150 62 L196 62" marker-end="url(#ah-bad)"></path>
+        <rect class="bx bad-s" x="200" y="30" width="200" height="64" rx="3" stroke-width="2"></rect>
+        <text class="t bad" x="300" y="56" text-anchor="middle">front-end decide</text>
+        <text class="t-s" x="300" y="78" text-anchor="middle">“0,8 é perigoso?”</text>
+        <text class="t-s bad" x="420" y="67">quem não responde por segurança arbitra o limite</text>
+
+        <path class="ln-d" d="M0 130 L900 130"></path>
+
+        <text class="t-k ok" x="0" y="164">GOVERNANÇA FUNCIONANDO</text>
+        <rect class="bx" x="0" y="180" width="150" height="56" rx="3"></rect><text class="t-s" x="75" y="213" text-anchor="middle">probabilidade</text>
+        <path class="ln" d="M150 208 L196 208" marker-end="url(#ah)"></path>
+        <rect class="bx" x="200" y="180" width="180" height="56" rx="3"></rect>
+        <text class="t-s" x="290" y="205" text-anchor="middle">domínio define</text>
+        <text class="t-s" x="290" y="225" text-anchor="middle">o estado funcional</text>
+        <path class="ln ok-s" d="M380 208 L426 208" marker-end="url(#ah-ok)"></path>
+        <rect class="bx ok-s" x="430" y="180" width="180" height="56" rx="3" stroke-width="2"></rect>
+        <rect class="bxf" x="430" y="180" width="180" height="56" rx="3"></rect>
+        <text class="t ok" x="520" y="213" text-anchor="middle">front-end reage</text>
+        <text class="t-s" x="630" y="213">o componente visual não pensa</text>
+      </svg>
+      <figcaption>A diferença não é técnica, é de autoridade: decidir o que é perigoso pertence a quem responde por segurança operacional.</figcaption>
+    </figure>
+
+    <div class="note warn">
+      <h4>O modo de falha silencioso</h4>
+      <p>Quando ninguém é dono explícito da semântica, ela se rompe sem sinal: o sistema continua entregando números plausíveis, bem formatados, na tela — e errados. Ausência de alarme é indistinguível de normalidade. É uma falha pior que indisponibilidade, porque indisponibilidade se percebe.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO IX ========== -->
+<section class="stratum mid" id="ato-9" data-t="Governança">
+  <div class="wrap">
+    <span class="actno">ATO IX</span>
+    <h2>A governança não mora numa pessoa</h2>
+    <p class="lead">Em sistema de missão crítica, um falso positivo interrompe uma operação milionária e um falso negativo resulta em blowout. Depender de um tradutor humano é criar o ponto de falha mais perigoso do software.</p>
+
+    <h3>A tríade de contrato</h3>
+    <div class="band">
+      <div class="band-k">Modelagem<span>Dados e backend</span></div>
+      <div class="band-v"><p>Responde pela precisão do que sai da rede bayesiana.</p></div>
+    </div>
+    <div class="band">
+      <div class="band-k">Especialista de domínio<span>HSEQ e perfuração</span></div>
+      <div class="band-v"><p>Árbitro final. Define a regra rigorosa que transforma probabilidade em estado operacional — e é quem tem autoridade para dizer onde fica cada limite.</p></div>
+    </div>
+    <div class="band">
+      <div class="band-k">Arquitetura de interface<span>Design e front-end</span></div>
+      <div class="band-v"><p>Garante que cada estado do contrato tenha tratamento visual inequívoco no sistema de design e no código.</p></div>
+    </div>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 330" role="img" aria-label="A tríade convergindo num contrato tipado que barra estados não aprovados">
+        <rect class="bx" x="0" y="20" width="210" height="70" rx="3"></rect>
+        <text class="t" x="105" y="48" text-anchor="middle">Modelagem</text>
+        <text class="t-s" x="105" y="70" text-anchor="middle">precisão do que sai</text>
+
+        <rect class="bx ok-s" x="345" y="14" width="210" height="82" rx="3" stroke-width="2"></rect>
+        <rect class="bxf" x="345" y="14" width="210" height="82" rx="3"></rect>
+        <text class="t ok" x="450" y="44" text-anchor="middle">Domínio e HSEQ</text>
+        <text class="t-s" x="450" y="66" text-anchor="middle">árbitro final</text>
+        <text class="t-s" x="450" y="86" text-anchor="middle">define onde ficam os limites</text>
+
+        <rect class="bx" x="690" y="20" width="210" height="70" rx="3"></rect>
+        <text class="t" x="795" y="48" text-anchor="middle">Arquitetura de interface</text>
+        <text class="t-s" x="795" y="70" text-anchor="middle">tratamento inequívoco</text>
+
+        <path class="ln" d="M105 90 L105 122 L450 122" marker-end="url(#ah)"></path>
+        <path class="ln" d="M795 90 L795 122 L450 122"></path>
+        <path class="ln ok-s" d="M450 96 L450 152" marker-end="url(#ah-ok)"></path>
+
+        <rect class="bx" x="285" y="154" width="330" height="56" rx="3" stroke-width="2"></rect>
+        <text class="t" x="450" y="188" text-anchor="middle">Contrato tipado e versionado</text>
+
+        <path class="ln ok-s" d="M370 210 L280 256" marker-end="url(#ah-ok)"></path>
+        <path class="ln bad-s" d="M530 210 L620 256" marker-end="url(#ah-bad)"></path>
+
+        <rect class="bx ok-s" x="80" y="258" width="300" height="56" rx="3"></rect>
+        <text class="t ok" x="230" y="292" text-anchor="middle">estado aprovado, chega à sonda</text>
+
+        <rect class="bx bad-s" x="520" y="258" width="300" height="56" rx="3"></rect>
+        <text class="t bad" x="670" y="292" text-anchor="middle">estado não previsto, quebra antes</text>
+      </svg>
+      <figcaption>O contrato não descreve a regra: ele a torna impossível de violar. Um estado que ninguém com autoridade de segurança aprovou não compila.</figcaption>
+    </figure>
+
+    <h3>O contrato é código, não documento</h3>
+    <div class="prose">
+      <p>A governança acontece na criação de um contrato tipado e versionado, e não em planilha ou ata. O comitê define o conjunto fechado de estados que o sistema pode assumir. Selecione um estado para ver o que o contrato determina — e o que acontece quando alguém tenta emitir um estado que não foi aprovado.</p>
+    </div>
+
+    <div class="enum-row" id="enums">
+      <button class="enum-btn" data-k="NORMAL" aria-pressed="true">NORMAL</button>
+      <button class="enum-btn" data-k="WARNING_DEVIATION" aria-pressed="false">WARNING_DEVIATION</button>
+      <button class="enum-btn" data-k="CRITICAL_BLOWOUT_RISK" aria-pressed="false">CRITICAL_BLOWOUT_RISK</button>
+      <button class="enum-btn" data-k="WARNING_HIGH" aria-pressed="false">WARNING_HIGH</button>
+    </div>
+
+    <div class="enum-out">
+      <div class="enum-bar" id="e-bar"></div>
+      <div class="enum-body">
+        <code id="e-code"></code>
+        <p class="enum-ui" id="e-ui"></p>
+        <p id="e-txt"></p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <h3>O que essa governança compra</h3>
+      <p>Um estado fora do contrato quebra na compilação, antes de chegar à sonda. A troca de operadora ou de identidade visual muda apenas a camada de variáveis do sistema de design, deixando motor e contrato intactos. E uma taxonomia rigorosamente definida é o pré-requisito exato para que agentes consigam manipular a interface com precisão — máquinas entendem contrato tipado muito melhor que descrição subjetiva.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO X ========== -->
+<section class="stratum core" id="ato-10" data-t="Limiares">
+  <div class="wrap">
+    <span class="actno">ATO X</span>
+    <h2>Cada função tem um piso, e abaixo dele falha de um jeito conhecido</h2>
+    <p class="lead">Equipe não se dimensiona por contagem de cabeças, e sim por limiar. A pergunta útil não é quantas pessoas, mas onde está o piso de cada função e o que acontece quando ele é rompido.</p>
+
+    <div class="thr" id="thr">
+
+      <div class="thr-item">
+        <div>
+          <div class="thr-kind">NATUREZA BINÁRIA</div>
+          <h4>Independência de verificação e validação</h4>
+          <p>Não admite gradiente: ou quem verifica é independente de quem desenvolveu, ou não é. O regime normativo adotado define o grau dessa independência — nunca a sua existência.</p>
+          <button class="thr-toggle" aria-expanded="false">Ver o que acontece abaixo do piso</button>
+          <p class="thr-fail" hidden>A verificação passa a validar as próprias premissas. O sistema fica conforme no papel, sem que ninguém externo tenha testado a hipótese que o sustenta.</p>
+        </div>
+        <div class="thr-viz">
+          <svg viewBox="0 0 340 150" role="img" aria-label="Duas funções separadas contra duas funções fundidas numa só">
+            <g class="st-ok">
+              <rect class="bx" x="4" y="30" width="140" height="62" rx="3"></rect>
+              <text class="lab-b" x="74" y="58" text-anchor="middle">desenvolve</text>
+              <text class="lab" x="74" y="78" text-anchor="middle">constrói o sistema</text>
+              <rect class="bx" x="196" y="30" width="140" height="62" rx="3" stroke="#10B981" stroke-width="2"></rect>
+              <text class="lab-b" x="266" y="58" text-anchor="middle" fill="#10B981">verifica</text>
+              <text class="lab" x="266" y="78" text-anchor="middle">não participou</text>
+              <path class="ln" d="M170 22 L170 100" stroke-dasharray="5 4"></path>
+              <text class="lab" x="170" y="122" text-anchor="middle">separação existe</text>
+            </g>
+            <g class="st-under">
+              <rect class="bx" x="70" y="30" width="200" height="62" rx="3" stroke="#ED3D3D" stroke-width="2"></rect>
+              <text class="lab-b" x="170" y="58" text-anchor="middle" fill="#ED3D3D">desenvolve e verifica</text>
+              <text class="lab" x="170" y="78" text-anchor="middle">a mesma origem</text>
+              <text class="lab" x="170" y="122" text-anchor="middle" fill="#ED3D3D">não há estado intermediário</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="thr-item">
+        <div>
+          <div class="thr-kind">NATUREZA ESCALAR</div>
+          <h4>Esforço de verificação e teste</h4>
+          <p>Escala contínua com piso conhecido. Em contextos de alta confiabilidade a faixa praticada fica entre 30% e 40% do esforço total, contra parcelas bem menores em software de negócio.</p>
+          <button class="thr-toggle" aria-expanded="false">Ver o que acontece abaixo do piso</button>
+          <p class="thr-fail" hidden>A cobertura passa a se concentrar no caminho feliz. Os modos de falha que importam num sistema de risco são justamente os de borda, e eles deixam de ser exercitados.</p>
+        </div>
+        <div class="thr-viz">
+          <svg viewBox="0 0 340 150" role="img" aria-label="Escala de esforço de teste com faixa recomendada entre trinta e quarenta por cento">
+            <line class="ln" x1="4" y1="86" x2="336" y2="86"></line>
+            <rect x="103" y="56" width="34" height="60" fill="#10B981" opacity=".16"></rect>
+            <line x1="103" y1="56" x2="103" y2="116" stroke="#10B981" stroke-width="1.5"></line>
+            <line x1="137" y1="56" x2="137" y2="116" stroke="#10B981" stroke-width="1.5"></line>
+            <text class="lab" x="120" y="46" text-anchor="middle" fill="#10B981">30 a 40%</text>
+            <text class="lab" x="4" y="136">0%</text>
+            <text class="lab" x="336" y="136" text-anchor="end">100%</text>
+            <g class="st-ok">
+              <circle cx="120" cy="86" r="8" fill="#10B981"></circle>
+              <text class="lab-b" x="120" y="112" text-anchor="middle" fill="#10B981">dentro da faixa</text>
+            </g>
+            <g class="st-under">
+              <circle cx="44" cy="86" r="8" fill="#ED3D3D"></circle>
+              <path d="M52 86 L95 86" stroke="#ED3D3D" stroke-width="1.5" stroke-dasharray="4 4"></path>
+              <text class="lab-b" x="44" y="112" text-anchor="middle" fill="#ED3D3D">abaixo do piso</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="thr-item">
+        <div>
+          <div class="thr-kind">NATUREZA ACUMULÁVEL</div>
+          <h4>Papéis que podem dividir a mesma cabeça</h4>
+          <p>Vários papéis podem coexistir numa pessoa, desde que o custo seja declarado. Produto e design juntos custam a tensão entre qual problema resolver e qual experiência entregar; liderança técnica e execução juntas custam disponibilidade.</p>
+          <button class="thr-toggle" aria-expanded="false">Ver o que acontece abaixo do piso</button>
+          <p class="thr-fail" hidden>O acúmulo deixa de ser escolha e vira acidente. Sem o custo declarado, ninguém percebe qual das duas funções está sendo silenciosamente sacrificada sob pressão de prazo.</p>
+        </div>
+        <div class="thr-viz">
+          <svg viewBox="0 0 340 150" role="img" aria-label="Dois papéis sobrepostos numa pessoa, com o custo declarado ou oculto">
+            <g class="st-ok">
+              <circle class="bx" cx="130" cy="74" r="52"></circle>
+              <circle class="bx" cx="210" cy="74" r="52" stroke="#10B981" stroke-width="1.8"></circle>
+              <text class="lab-b" x="96" y="78" text-anchor="middle">produto</text>
+              <text class="lab-b" x="244" y="78" text-anchor="middle">design</text>
+              <path class="ln" d="M170 126 L170 140" stroke="#10B981"></path>
+              <text class="lab-b" x="170" y="150" text-anchor="middle" fill="#10B981">custo declarado</text>
+            </g>
+            <g class="st-under">
+              <circle cx="130" cy="74" r="52" fill="none" stroke="#ED3D3D" stroke-width="1.8" stroke-dasharray="6 5"></circle>
+              <circle cx="210" cy="74" r="52" fill="none" stroke="#ED3D3D" stroke-width="1.8" stroke-dasharray="6 5"></circle>
+              <rect x="140" y="46" width="60" height="56" fill="#ED3D3D" opacity=".18"></rect>
+              <text class="lab" x="96" y="78" text-anchor="middle">produto</text>
+              <text class="lab" x="244" y="78" text-anchor="middle">design</text>
+              <text class="lab-b" x="170" y="150" text-anchor="middle" fill="#ED3D3D">custo oculto</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="thr-item">
+        <div>
+          <div class="thr-kind">NATUREZA EPISÓDICA</div>
+          <h4>Presença consultiva com contrato</h4>
+          <p>Especialista de domínio e equipes capacitadoras podem ser intermitentes sem perda — desde que cada decisão semântica esteja escrita e assinada antes, e não descoberta no momento da implementação.</p>
+          <button class="thr-toggle" aria-expanded="false">Ver o que acontece abaixo do piso</button>
+          <p class="thr-fail" hidden>A decisão semântica passa a ser tomada por quem está implementando, sob prazo, sem autoridade para tomá-la. É exatamente o mecanismo do modo de falha silencioso do Ato VIII.</p>
+        </div>
+        <div class="thr-viz">
+          <svg viewBox="0 0 340 150" role="img" aria-label="Linha do tempo com presença intermitente, com ou sem decisão registrada antes">
+            <line class="ln" x1="4" y1="80" x2="336" y2="80"></line>
+            <text class="lab" x="4" y="132">início</text>
+            <text class="lab" x="336" y="132" text-anchor="end">entrega</text>
+            <g class="st-ok">
+              <rect x="20" y="44" width="4" height="36" fill="#10B981"></rect>
+              <text class="lab" x="22" y="36" text-anchor="middle" fill="#10B981">decisão</text>
+              <text class="lab" x="22" y="22" text-anchor="middle" fill="#10B981">registrada</text>
+              <circle cx="110" cy="80" r="7" fill="#10B981"></circle>
+              <circle cx="200" cy="80" r="7" fill="#10B981"></circle>
+              <circle cx="290" cy="80" r="7" fill="#10B981"></circle>
+              <text class="lab" x="200" y="108" text-anchor="middle">presença intermitente, sem perda</text>
+            </g>
+            <g class="st-under">
+              <circle cx="110" cy="80" r="7" fill="none" stroke="#ED3D3D" stroke-dasharray="3 3"></circle>
+              <circle cx="290" cy="80" r="7" fill="none" stroke="#ED3D3D" stroke-dasharray="3 3"></circle>
+              <rect x="198" y="44" width="4" height="36" fill="#ED3D3D"></rect>
+              <text class="lab" x="200" y="36" text-anchor="middle" fill="#ED3D3D">decidido na hora</text>
+              <text class="lab" x="200" y="22" text-anchor="middle" fill="#ED3D3D">por quem implementa</text>
+              <text class="lab" x="200" y="108" text-anchor="middle" fill="#ED3D3D">sem autoridade para decidir</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="note">
+      <h4>Por que limiar e não organograma</h4>
+      <p>Organograma responde quem se reporta a quem. Limiar responde o que precisa existir para o sistema ser seguro — e permite dimensionar com honestidade, mostrando o que se perde em cada compressão em vez de esconder a perda numa caixa a menos.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ATO XI ========== -->
+<section class="stratum mid" id="ato-11" data-t="A composição">
+  <div class="wrap">
+    <span class="actno">ATO XI</span>
+    <h2>A primeira composição, desenhada a partir do que ficou estabelecido</h2>
+    <p class="lead">Rascunho inicial. Não é organograma nem contagem de pessoas: é o conjunto de funções que precisa existir, cada uma com o que possui, o que não pode possuir, e o limiar que a rege.</p>
+
+    <figure class="dg">
+      <svg viewBox="0 0 900 660" role="img" aria-label="Quatro verticais atravessadas por coordenação sistêmica, domínio e verificação, com os assentos de cada vertical">
+        <text class="t-k" x="0" y="16">FORA DA LINHA DE ENTREGA</text>
+        <rect class="bx" x="0" y="28" width="430" height="62" rx="3"></rect>
+        <text class="t" x="215" y="54" text-anchor="middle">Patrocínio</text>
+        <text class="t-s" x="215" y="76" text-anchor="middle">mandato, recurso e relação institucional</text>
+        <rect class="bx bad-s" x="470" y="28" width="430" height="62" rx="3" stroke-width="2"></rect>
+        <text class="t bad" x="685" y="54" text-anchor="middle">Verificação e validação independente</text>
+        <text class="t-s" x="685" y="76" text-anchor="middle">não participou da construção</text>
+
+        <path class="ln-d" d="M0 112 L900 112"></path>
+        <text class="t-k" x="0" y="140">ATRAVESSA AS VERTICAIS</text>
+
+        <rect class="bx ok-s" x="0" y="152" width="900" height="58" rx="3"></rect>
+        <rect class="ok" x="12" y="164" width="9" height="9"></rect>
+        <text class="t" x="450" y="176" text-anchor="middle">Domínio e HSEQ</text>
+        <text class="t-s" x="450" y="196" text-anchor="middle">assina a regra que converte probabilidade em estado operacional</text>
+
+        <rect class="bx" x="0" y="222" width="900" height="58" rx="3"></rect>
+        <text class="t" x="450" y="246" text-anchor="middle">Coordenação sistêmica</text>
+        <text class="t-s" x="450" y="266" text-anchor="middle">taxonomia ponta a ponta · mantém a tríade e o contrato vivos</text>
+
+        <text class="t-k" x="0" y="302">VERTICAIS · CAMINHO DO DADO</text>
+        <rect class="bx" x="0" y="312" width="210" height="214" rx="4"></rect><text class="t" x="105" y="342" text-anchor="middle">O duto</text><rect class="bx" x="10" y="358" width="190" height="46" rx="3"></rect><circle cx="26" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M19.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="50" y="378">Ingestão e borda</text><text class="t-s" x="50" y="395">tempo real, sinal bruto</text><rect class="bx" x="10" y="412" width="190" height="46" rx="3"></rect><circle cx="26" cy="433" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M19.5 443.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="50" y="432">Infraestrutura</text><text class="t-s" x="50" y="449">ambientes e pipeline</text><rect class="bx" x="230" y="312" width="210" height="214" rx="4"></rect><rect class="bxf" x="230" y="312" width="210" height="214" rx="4"></rect><rect class="ok" x="242" y="324" width="9" height="9"></rect><text class="t" x="335" y="342" text-anchor="middle">Modelagem</text><rect class="bx" x="240" y="358" width="190" height="46" rx="3"></rect><circle cx="256" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M249.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="280" y="378">Rede bayesiana</text><text class="t-s" x="280" y="395">topologia e calibração</text><rect class="bx" x="240" y="412" width="190" height="46" rx="3"></rect><circle cx="256" cy="433" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M249.5 443.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="280" y="432">Domínio de poço</text><text class="t-s" x="280" y="449">variáveis e limites</text><rect class="bx" x="460" y="312" width="210" height="214" rx="4"></rect><text class="t" x="565" y="342" text-anchor="middle">Operabilidade</text><rect class="bx" x="470" y="358" width="190" height="46" rx="3"></rect><circle cx="486" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M479.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="510" y="378">Modelo em produção</text><text class="t-s" x="510" y="395">versão, deriva, contrato</text><rect class="bx" x="690" y="312" width="210" height="214" rx="4"></rect><rect class="bxf" x="690" y="312" width="210" height="214" rx="4"></rect><rect class="ok" x="702" y="324" width="9" height="9"></rect><text class="t" x="795" y="342" text-anchor="middle">Interface acionável</text><rect class="bx" x="700" y="358" width="190" height="46" rx="3"></rect><circle cx="716" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M709.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="740" y="378">Design de produto</text><text class="t-s" x="740" y="395">visualização e ergonomia</text><rect class="bx" x="700" y="412" width="190" height="46" rx="3"></rect><circle cx="716" cy="433" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M709.5 443.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="740" y="432">Front-end e estado</text><text class="t-s" x="740" y="449">tempo real e degradação</text><rect class="bx" x="700" y="466" width="190" height="46" rx="3"></rect><circle cx="716" cy="487" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M709.5 497.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="740" y="486">Pesquisa e requisitos</text><text class="t-s" x="740" y="503">operadores do CSD</text>
+
+        <path class="ln" d="M210 436 L226 436" marker-end="url(#ah)"></path>
+        <path class="ln" d="M440 436 L456 436" marker-end="url(#ah)"></path>
+        <path class="ln" d="M670 436 L686 436" marker-end="url(#ah)"></path>
+
+        <rect class="bx" x="0" y="552" width="900" height="58" rx="3"></rect>
+        <text class="t" x="450" y="576" text-anchor="middle">Verificação e teste</text>
+        <text class="t-s" x="450" y="596" text-anchor="middle">atravessa as quatro verticais</text>
+
+        <rect class="ok" x="0" y="636" width="9" height="9"></rect>
+        <text class="t-s" x="18" y="644">vértices da tríade do contrato</text>
+        <g transform="translate(292,630)"><circle cx="8" cy="8" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M1.5 18.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path></g>
+        <text class="t-s" x="314" y="644">cada glifo indica um assento a ser ocupado, não uma pessoa designada</text>
+      </svg>
+      <figcaption>As quatro verticais seguem o caminho do dado. O que as atravessa — domínio, coordenação e verificação — não pode pertencer a nenhuma delas, sob pena de verificar apenas a própria vertical.</figcaption>
+    </figure>
+
+    <h3>As funções, e a fronteira de cada uma</h3>
+    <table class="grid">
+      <thead><tr><th>Função</th><th>Possui</th><th>Não pode possuir</th><th>Presença</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Modelagem</td>
+          <td>Topologia da rede, calibração e correção teórica do modelo.</td>
+          <td class="risk">A definição do que é perigoso, e qualquer decisão sobre a tela.</td>
+          <td>Episódica, com contrato</td>
+        </tr>
+        <tr>
+          <td>Especialista de poço</td>
+          <td>Variáveis do domínio: pressão, temperatura, densidade, vazão.</td>
+          <td class="risk">A implementação do que especifica.</td>
+          <td>Episódica, com contrato</td>
+        </tr>
+        <tr>
+          <td>Operabilidade do modelo</td>
+          <td>Versionamento conjunto de modelo, dados e código; comportamento sob leitura ausente; estabilidade do contrato; detecção de deriva.</td>
+          <td class="risk">A semântica do modelo — que recebe pronta e assinada.</td>
+          <td>Integral</td>
+        </tr>
+        <tr>
+          <td>Ingestão e borda</td>
+          <td>Aquisição em tempo real, normalização de sinal, processamento local, ambientes e implantação.</td>
+          <td class="risk">Interpretação do dado que transporta.</td>
+          <td>Integral</td>
+        </tr>
+        <tr>
+          <td>HSEQ e domínio</td>
+          <td>A regra que transforma probabilidade em estado funcional. Autoridade final sobre onde ficam os limites.</td>
+          <td class="risk">Prazo de entrega — para não ser pressionada a ceder no limite.</td>
+          <td>Recorrente, consultiva</td>
+        </tr>
+        <tr>
+          <td>Arquitetura de interface</td>
+          <td>Taxonomia semântica, sistema de design, tratamento inequívoco de cada estado do contrato.</td>
+          <td class="risk">Cálculo de severidade a partir de probabilidade.</td>
+          <td>Integral</td>
+        </tr>
+        <tr>
+          <td>Engenharia de interface</td>
+          <td>Estado, desempenho, acessibilidade e implementação da interface acionável.</td>
+          <td class="risk">Qualquer lógica que decida o que é perigoso.</td>
+          <td>Integral</td>
+        </tr>
+        <tr>
+          <td>Pesquisa e requisitos</td>
+          <td>Contato direto com os operadores do CSD, rastreabilidade de requisito a evidência e validação de que a interface reduz erro.</td>
+          <td class="risk">Autoridade sobre a regra de risco — que pertence ao domínio.</td>
+          <td>Recorrente</td>
+        </tr>
+        <tr>
+          <td>Verificação e teste</td>
+          <td>Estratégia de teste, automação e critério de aceite ao longo de toda a linha.</td>
+          <td class="risk">Ser a mesma origem que a verificação independente exigida fora da linha.</td>
+          <td>Integral</td>
+        </tr>
+        <tr>
+          <td>Coordenação sistêmica</td>
+          <td>A taxonomia ponta a ponta. Traduz matriz de probabilidade em lógica de estado e variável semântica; mantém a tríade funcionando.</td>
+          <td class="risk">Ser o tradutor humano de quem tudo depende — o papel existe para que o contrato substitua essa dependência.</td>
+          <td>Integral</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <h4>Sobre presença e número de pessoas</h4>
+      <p>A tabela lista funções, não vagas. Várias podem coexistir na mesma pessoa quando o limiar acumulável do Ato X permite — desde que o custo esteja declarado. Duas combinações não são admissíveis em nenhuma configuração: quem desenvolve não verifica de forma independente, e quem implementa não decide a semântica.</p>
+    </div>
+
+    <h3>O que ainda depende da resposta do Ato VI</h3>
+    <table class="grid">
+      <thead><tr><th>Se a Plataforma for…</th><th>Verificação independente</th><th>Regime e evidência</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Apoio à decisão</td>
+          <td>Revisão independente da linha de desenvolvimento, com rastreabilidade de requisito a evidência de teste.</td>
+          <td>ISA-101 para a interface, mais os requisitos de confiabilidade e auditabilidade que a operadora definir.</td>
+        </tr>
+        <tr>
+          <td>Camada de proteção creditada</td>
+          <td>Avaliação de segurança funcional com independência graduada, podendo exigir organização externa.</td>
+          <td>Ciclo completo de 61508 e 61511, com a diretriz setorial para a plataforma continental, e evidência formal de conformidade.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Perguntas em aberto</h3>
+    <div class="prose">
+      <p>Três decisões precedem qualquer refinamento desta composição, e nenhuma delas é técnica.</p>
+      <p>De que lado da árvore do Ato VI a Plataforma está. Quem, com nome e autoridade formal, assina a regra que converte probabilidade em estado operacional. E onde reside a verificação independente — dentro da EnvironPact, do lado da operadora, ou em terceiro.</p>
+      <p>Respondidas essas três, o rascunho vira proposta.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FONTES ========== -->
+<section class="stratum" id="ato-12" data-t="Fontes e notas">
+  <div class="wrap">
+    <span class="actno">NOTAS</span>
+    <h2>Procedência e grau de confiança</h2>
+    <p class="lead">Cada afirmação deste documento vem marcada por grau de confiança. O critério é simples: prática consolidada, tendência em consolidação, ou repetição sem lastro.</p>
+
+    <dl class="src">
+      <dt>Lei de Conway <span class="chip ok">consolidado</span></dt>
+      <dd>Formulada por Melvin Conway. Base do raciocínio de arquitetura organizacional em engenharia de software.</dd>
+
+      <dt>Team Topologies <span class="chip ok">consolidado</span></dt>
+      <dd>Matthew Skelton e Manuel Pais. Origem dos quatro tipos de equipe e do conceito de organização por carga cognitiva.</dd>
+
+      <dt>Tamanho de equipe <span class="chip ok">consolidado</span></dt>
+      <dd>Pesquisa de Richard Hackman sobre eficácia de times; regra das duas pizzas; e o estudo de Staats, Milkman e Fox publicado em Organizational Behavior and Human Decision Processes, 2012, sobre tempo de execução e calibração de estimativa por tamanho de time.</dd>
+
+      <dt>Dívida técnica em sistemas de aprendizado de máquina <span class="chip ok">consolidado</span></dt>
+      <dd>Sculley e colegas, sobre a proporção entre código de modelo e sistema de produção.</dd>
+
+      <dt>IEC 61508 e IEC 61511 <span class="chip ok">norma</span></dt>
+      <dd>Segurança funcional e sua aplicação à indústria de processo. Independência de avaliação graduada por nível de integridade de segurança.</dd>
+
+      <dt>IEC 62443 <span class="chip ok">norma</span></dt>
+      <dd>Cibersegurança de sistemas de automação industrial. Responsabilidades por papel de stakeholder e ciclo de desenvolvimento seguro.</dd>
+
+      <dt>ISA-101 <span class="chip ok">norma</span></dt>
+      <dd>Ciclo de vida de interfaces humano-máquina em automação de processo.</dd>
+
+      <dt>Agentes em fluxo de design e código <span class="chip trend">tendência</span></dt>
+      <dd>Geração de estrutura a partir do arquivo de design e governança de tokens já operam. Sincronização plenamente bidirecional e equipes dedicadas de orquestração ainda não são prática estabelecida.</dd>
+
+      <dt>Vocabulário de squads e tribes <span class="chip myth">folclore</span></dt>
+      <dd>Nunca implementado como descrito na publicação original de 2012; falha documentada publicamente por quem participou da organização que o originou.</dd>
+    </dl>
+  </div>
+</section>
+
+
+<section class="stratum deep" aria-label="Assinatura">
+  <div class="wrap">
+    <div class="sig" style="border-top:0; margin-top:0; padding-top:0">
+      <svg class="logo" role="img" aria-label="EnvironPact" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 153 53" fill="none"><path d="M49.5838 42.164V51.061C49.5838 51.6601 49.5229 52.029 49.2665 52.401C48.9171 52.6847 48.5997 52.6564 47.0322 52.6847C47.061 51.1462 47.0899 49.3207 47.0899 47.1264V42.2806C47.0899 41.3663 46.9424 40.7105 46.7405 40.1399C46.8847 39.9696 47.2598 39.7679 47.9009 39.4841C47.9874 39.4557 48.074 39.4557 48.1029 39.4557C48.6254 39.4557 48.885 39.8278 49.0036 40.3101C49.6992 39.7426 50.366 39.399 51.0039 39.2004C51.613 39.0017 52.1644 38.8882 52.8023 38.8882C56.2515 38.8882 56.9183 40.6853 56.9183 43.9074V48.2709C56.9183 49.8378 56.9471 51.2092 56.976 52.3474C56.6843 52.6059 56.2515 52.691 54.5974 52.691C54.4243 52.3789 54.3666 51.9785 54.3666 51.5245V43.9673C54.3666 41.773 53.8152 40.9722 52.0746 40.9722C51.0328 40.9722 50.1897 41.5145 49.5838 42.1703V42.164Z" fill="currentColor"></path><path d="M101.072 42.164V51.061C101.072 51.6601 101.011 52.029 100.755 52.401C100.406 52.6847 100.088 52.6564 98.5207 52.6847C98.5495 51.1462 98.5784 49.3207 98.5784 47.1264V42.2806C98.5784 41.3663 98.4309 40.7105 98.229 40.1399C98.3732 39.9696 98.7483 39.7679 99.3894 39.4841C99.4759 39.4557 99.5625 39.4557 99.5913 39.4557C100.114 39.4557 100.374 39.8278 100.492 40.3101C101.188 39.7426 101.855 39.399 102.492 39.2004C103.101 39.0017 103.653 38.8882 104.291 38.8882C107.74 38.8882 108.407 40.6853 108.407 43.9074V48.2709C108.407 49.8378 108.436 51.2092 108.464 52.3474C108.173 52.6059 107.74 52.691 106.086 52.691C105.913 52.3789 105.855 51.9785 105.855 51.5245V43.9673C105.855 41.773 105.304 40.9722 103.563 40.9722C102.521 40.9722 101.678 41.5145 101.072 42.1703V42.164Z" fill="currentColor"></path><path d="M111.625 34.5185C111.625 34.2915 111.596 33.9762 111.596 33.6925C111.741 33.6074 112.003 33.5222 112.35 33.4939H112.436C113.334 33.4371 114.379 33.4087 115.421 33.4087C119.306 33.4087 121.656 35.0608 121.656 39.2823C121.656 43.5039 118.844 44.7303 116.902 44.9573C116.264 44.9573 115.363 44.9006 115.363 43.7593C115.363 43.6174 115.568 43.4724 115.799 43.4724C117.19 43.4724 118.873 42.4477 118.873 39.1688C118.873 36.4039 117.395 35.4612 115.651 35.4612C114.985 35.4612 114.52 35.4612 114.203 35.5179V48.1227L114.231 51.2912C114.231 51.802 114.145 52.1172 113.94 52.401C113.622 52.7446 113.042 52.6847 111.619 52.6847C111.648 51.0327 111.676 49.1221 111.676 46.8395L111.619 34.5217L111.625 34.5185Z" fill="currentColor"></path><path d="M123.861 40.5371C123.861 40.4236 123.89 40.307 123.919 40.225C124.528 39.6544 126.268 38.9135 128.211 38.8536C128.673 38.8536 128.73 38.8536 129.224 38.8819C131.372 39.0238 132.067 40.4205 132.067 42.845V44.1281C132.067 46.0986 132.01 48.3781 132.01 49.8914C132.01 49.8914 131.894 51.3732 132.824 51.2029C132.795 51.6033 132.795 52.0857 132.795 52.256C132.564 52.5712 132.01 52.8833 131.26 52.9117C130.564 52.9117 129.811 52.2843 129.519 51.8871C129.346 52.0573 128.996 52.3726 128.679 52.5428C128.041 52.855 127.346 52.9117 126.563 52.9117C124.707 52.9117 122.938 51.7736 122.938 49.1473C122.938 45.6383 126.099 44.7555 127.839 44.5853C128.128 44.5569 128.391 44.5569 128.65 44.5569C129.028 44.5569 129.346 44.5853 129.609 44.642V43.0184C129.609 41.7352 129.464 41.0195 128.217 41.0195C127.201 41.0195 126.012 41.4199 125.172 41.7636C124.852 41.9054 124.563 41.9905 124.332 41.9905C124.069 41.7068 123.954 41.1929 123.896 40.8493C123.867 40.7641 123.867 40.6506 123.867 40.5371H123.861ZM129.602 48.2929V46.2688C129.429 46.2405 129.224 46.2405 129.022 46.2405C128.673 46.2405 128.355 46.2689 128.067 46.2972C126.676 46.5242 125.486 47.1232 125.486 48.9203C125.486 50.3737 126.124 50.8877 127.022 50.9444H127.227C128.096 50.9444 129.051 50.544 129.458 50.0616C129.487 50.0049 129.516 49.8315 129.545 49.6612C129.602 49.3207 129.602 48.892 129.602 48.2929Z" fill="currentColor"></path><path d="M143.434 41.3915H143.287C143.082 41.3915 142.793 41.3064 142.502 41.2213C141.982 40.9911 141.341 40.8493 140.761 40.8493C140.617 40.8493 140.501 40.8493 140.354 40.8776C138.527 41.0163 137.222 42.5896 137.222 46.0103C137.222 50.1184 139.052 50.9728 140.934 50.9728C141.893 50.9728 142.819 50.7174 143.431 50.4305C143.518 50.7174 143.604 51.0295 143.604 51.2281C143.576 51.6285 143.316 52.1109 142.966 52.3695C142.415 52.7415 141.46 52.9968 140.415 52.9968C137.286 52.9968 134.616 51.8555 134.616 46.1554C134.616 43.1319 135.603 41.278 136.735 40.2502C137.866 39.1941 139.315 38.8536 140.706 38.8536C142.415 38.8536 143.694 39.626 143.81 39.9949C143.81 40.3637 143.662 40.9911 143.434 41.3915Z" fill="currentColor"></path><path d="M152.827 51.0894C152.827 51.3448 152.827 51.6317 152.798 51.8871C152.74 52.1141 152.593 52.2875 152.362 52.4577C151.811 52.8014 150.827 53 149.926 53C147.227 53 146.736 50.5188 146.736 48.2078V41.1645C145.807 41.1645 145.342 41.051 144.996 40.8808C144.996 39.998 145.024 40.1084 145.255 39.8814C145.662 39.5377 146.56 39.4526 146.996 39.254L147.143 36.6876C147.345 36.117 147.954 35.6314 149.317 35.5463C149.288 36.8579 149.256 38.0559 149.256 39.2256H153C152.913 40.6538 152.737 40.9659 152.333 41.051C152.099 41.0794 151.868 41.1109 151.638 41.1109C150.884 41.1393 150.506 41.1393 149.259 41.1393C149.23 42.4509 149.201 43.7908 149.201 45.0172C149.201 46.2436 149.23 47.3818 149.23 48.3245C149.346 49.9198 149.608 51.0327 150.766 51.0327C151.202 51.0611 152.532 50.6607 152.766 50.462C152.795 50.6323 152.824 50.8624 152.824 51.0894H152.827Z" fill="currentColor"></path><path d="M90.84 38.8536C94.4111 38.8536 96.0492 41.4262 96.0492 45.7959C96.0492 50.1657 94.3053 52.9811 90.715 52.9811C87.1247 52.9811 85.5059 50.2855 85.5059 45.9567C85.5059 41.2812 87.394 38.8504 90.84 38.8504V38.8536ZM88.0575 46.0734C88.0575 49.409 89.202 51.0106 90.8144 51.0106C92.5134 51.0106 93.5359 49.409 93.5359 45.8874C93.5359 42.3657 92.3403 40.8745 90.7791 40.8745H90.7599C89.1475 40.8745 88.0544 42.4761 88.0544 46.0734H88.0575Z" fill="currentColor"></path><path d="M71.4365 40.1619V47.3755C71.4333 49.4216 71.4044 51.1619 71.3788 52.6847C72.77 52.6847 73.3374 52.7446 73.6483 52.401C73.8054 52.1771 73.8888 51.9312 73.9176 51.5907H73.9304V39.5661C72.3501 39.1184 71.4333 40.1651 71.4333 40.1651L71.4365 40.1619Z" fill="currentColor"></path><path d="M72.7027 35.849C73.5596 35.849 74.2542 35.0966 74.2542 34.1685C74.2542 33.2405 73.5596 32.4881 72.7027 32.4881C71.8458 32.4881 71.1512 33.2405 71.1512 34.1685C71.1512 35.0966 71.8458 35.849 72.7027 35.849Z" fill="currentColor"></path><path d="M83.6114 41.2181C83.6114 41.2181 83.8165 41.3852 83.9384 41.1645C84.0249 41.0163 84.1211 40.8303 84.1275 40.8114C84.2782 40.4394 84.3743 39.8814 84.1692 39.5125C83.9319 39.0806 83.3068 38.9135 82.8452 38.9008C82.2971 38.8851 81.7521 39.0301 81.2328 39.1909C80.5949 39.3927 79.9281 39.7332 79.2325 40.3007C79.1171 39.8183 78.8543 39.4463 78.3317 39.4463C78.3029 39.4463 78.2163 39.4463 78.1298 39.4746C77.4919 39.7584 77.1136 39.9602 76.9694 40.1304C77.1713 40.7011 77.3188 41.3568 77.3188 42.2711V47.1169C77.3188 49.3144 77.2899 51.1367 77.2611 52.6753C78.8286 52.6469 79.146 52.6753 79.4954 52.3915C79.755 52.0195 79.8127 51.6506 79.8127 51.0516V42.1545C80.4186 41.4987 81.2617 40.9564 82.3035 40.9564C82.8517 40.9564 83.2748 41.0416 83.605 41.2181V41.2118L83.6114 41.2181Z" fill="currentColor"></path><path d="M61.5311 39.2666C61.5311 39.2666 63.4 45.6698 64.3873 48.9298C65.4772 45.714 66.035 42.3815 67.1955 39.254C67.2147 39.2067 67.6346 39.1657 67.6987 39.1562C67.8718 39.1278 68.0449 39.1089 68.218 39.1058C68.5931 39.0995 69.1669 39.1405 69.356 39.5251C69.5291 39.875 69.3785 40.3322 69.2663 40.679L66.0767 50.9129C65.6119 52.401 64.8938 52.6658 63.1436 52.5302L61.8389 48.8194C61.8389 48.8194 59.3674 41.1866 59.3609 41.1677C59.2167 40.7263 59.0468 40.184 59.2071 39.7269C59.4379 39.0648 60.2874 39.0553 60.8708 39.1089C60.9702 39.1184 61.4061 39.2035 61.5311 39.2697V39.2666Z" fill="currentColor"></path><path d="M38.5181 50.7773V43.4061C39.9798 43.4061 41.7461 43.3967 42.2622 43.3778C42.493 43.3778 42.7238 43.3494 42.9578 43.3179C43.3618 43.2327 43.5381 42.9206 43.6246 41.4924H38.5181V35.5999C40.0504 35.5999 42.4898 35.5936 43.1117 35.5715C43.3425 35.5715 43.5733 35.5432 43.8073 35.5116C44.2112 35.4265 44.3875 35.1144 44.4741 33.6862H37.6942C36.6043 33.6956 35.9888 34.3955 35.9888 34.3955L36.0177 35.5621V47.3723C36.0145 49.4185 35.9856 51.1588 35.96 52.6816C36.2998 52.6816 42.5668 52.6847 43.3201 52.6563C43.5509 52.6563 43.7817 52.628 44.0157 52.5965C44.4196 52.5113 44.5959 52.1992 44.6825 50.771H38.5117L38.5181 50.7773Z" fill="currentColor"></path><path d="M4.1176 28.8005C3.98297 28.8036 3.9445 28.6145 4.06952 28.5672C13.8338 25.055 27.6885 26.8174 28.5796 26.9372C28.5636 26.8868 28.554 26.8332 28.5379 26.7827L23.3769 18.2482C22.4377 17.0218 20.5528 16.0633 18.9948 16.0633H9.81397C8.13103 16.0633 6.06341 17.1826 5.22354 18.5477L0.629902 26.0008C-0.209967 27.3691 -0.209967 29.6044 0.629902 30.9696L5.31971 38.2651C6.08264 39.4537 7.23987 40.3806 8.62148 40.7432C9.02539 40.8504 9.4293 40.9071 9.81397 40.9071H18.9948C20.6778 40.9071 22.7454 39.791 23.5885 38.4227L27.9417 31.3542C20.2482 28.5893 7.30398 28.7185 4.12081 28.7973L4.1176 28.8005Z" fill="currentColor"></path><path d="M47.1369 11.7598L43.1331 5.13585C42.4022 4.18372 40.9404 3.43966 39.7319 3.43966H32.6059C31.298 3.43966 29.6952 4.30667 29.0444 5.366L25.4798 11.1513C24.8258 12.2138 24.8258 13.9478 25.4798 15.0072L29.1182 20.6695C29.1182 20.6695 33.122 9.26282 39.9275 7.0212C40.0333 6.98652 40.1198 7.11579 40.0429 7.19776C38.751 8.60074 33.4137 14.8243 32.6059 22.7188H39.7319C41.0366 22.7188 42.6426 21.8518 43.2966 20.7925L46.858 15.0072C47.3965 14.1307 47.4895 12.7939 47.1369 11.7567V11.7598Z" fill="currentColor"></path><path d="M15.4558 4.16165C15.3949 4.0513 15.5424 3.94411 15.6322 4.03554L22.7871 11.4698L24.7521 8.28231C25.1368 7.65491 25.2041 6.69962 24.9509 5.95557L22.085 1.21381C21.5625 0.532816 20.5175 0 19.652 0H14.5519C13.6158 0 12.4682 0.621093 12.0034 1.38091L9.45174 5.52049C8.98372 6.2803 8.98372 7.52249 9.45174 8.28231L12.0355 12.3052C12.4874 13.0083 13.1767 13.5569 14.0005 13.7397C14.1864 13.7807 14.3723 13.8028 14.5519 13.8028H19.652C19.9758 13.8028 20.322 13.724 20.6618 13.5947L15.459 4.1648L15.4558 4.16165Z" fill="currentColor"></path></svg>
+      <p>Documento de arquitetura de equipe · Plataforma Inteligente para Avaliação Dinâmica de Riscos de Integridade de Poços</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- depth rail ---------- */
+  var secs = [].slice.call(document.querySelectorAll('.stratum[data-t]'));
+  var ticksEl = document.getElementById('ticks');
+  var depthEl = document.getElementById('depth');
+  var pctEl = document.getElementById('pct');
+  var ticks = [];
+
+  secs.forEach(function(s, i){
+    var a = document.createElement('a');
+    a.className = 'rail-tick';
+    a.href = '#' + s.id;
+    a.innerHTML = '<span>' + s.dataset.t + '</span>';
+    a.style.top = (i / secs.length * 100) + '%';
+    ticksEl.appendChild(a);
+    ticks.push(a);
+  });
+
+  function onScroll(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
+    depthEl.style.height = (p * 100) + '%';
+    pctEl.textContent = Math.round(p * 100) + '%';
+
+    var mid = window.scrollY + window.innerHeight * 0.35;
+    var cur = 0;
+    secs.forEach(function(s, i){ if (s.offsetTop <= mid) cur = i; });
+    ticks.forEach(function(t, i){ t.classList.toggle('on', i === cur); });
+  }
+  var raf = null;
+  window.addEventListener('scroll', function(){
+    if (raf) return;
+    raf = requestAnimationFrame(function(){ raf = null; onScroll(); });
+  }, {passive:true});
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  /* ---------- translation chain ---------- */
+  var STAGES = [
+    {
+      lab:'O QUE TRAFEGA',
+      val:'Pressão, temperatura, densidade, vazão',
+      desc:'<p>Leitura crua dos sensores da sonda, com ruído, oscilação e falhas de leitura. Nesse estágio nada significa risco ainda: é medição.</p><p>O processamento local na própria plataforma normaliza o sinal antes de injetá-lo na rede, porque latência e conectividade intermitente impedem depender de servidor remoto.</p>',
+      own:'Dono da tradução: equipe de plataforma → motor bayesiano'
+    },
+    {
+      lab:'O QUE TRAFEGA',
+      val:'Probabilidade de falha',
+      desc:'<p>A rede bayesiana combina as variáveis e devolve probabilidade. O número é matematicamente correto e operacionalmente mudo: sozinho, ele não diz a ninguém o que fazer.</p><p>Aqui mora a tentação mais perigosa do projeto — deixar que a camada seguinte decida o que aquele número significa.</p>',
+      own:'Dono da tradução: motor bayesiano → especialista de domínio'
+    },
+    {
+      lab:'O QUE TRAFEGA',
+      val:'Estado funcional de risco',
+      desc:'<p>O especialista de domínio define a regra que transforma probabilidade em estado operacional. É neste ponto que o dado funcional nasce, e é esta a decisão que exige autoridade de segurança, não competência técnica.</p><p>Onde ficam os limites, o que dispara mudança de estado e o que exige confirmação: tudo se decide aqui e vira contrato.</p>',
+      own:'Dono da tradução: especialista de domínio → arquitetura de interface'
+    },
+    {
+      lab:'O QUE TRAFEGA',
+      val:'Componente e token semântico',
+      desc:'<p>A interface recebe o estado já resolvido e apenas reage: instancia o componente correspondente e aplica as variáveis semânticas de severidade.</p><p>O componente visual não pensa. Essa é a garantia de que a leitura na sala de controle não depende de interpretação feita no front-end.</p>',
+      own:'Dono da tradução: equipe de fluxo de valor → operador'
+    }
+  ];
+
+  var cBtns = [].slice.call(document.querySelectorAll('.chain-btn'));
+  var cLab = document.getElementById('c-lab');
+  var cVal = document.getElementById('c-val');
+  var cDesc = document.getElementById('c-desc');
+  var cOwn = document.getElementById('c-own');
+
+  function setStage(i){
+    var s = STAGES[i];
+    cLab.textContent = s.lab;
+    cVal.textContent = s.val;
+    cDesc.innerHTML = s.desc;
+    cOwn.textContent = s.own;
+    cBtns.forEach(function(b, j){ b.setAttribute('aria-selected', j === i ? 'true' : 'false'); });
+  }
+  cBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setStage(parseInt(b.dataset.i, 10)); });
+    b.addEventListener('keydown', function(e){
+      var i = parseInt(b.dataset.i, 10);
+      if (e.key === 'ArrowRight' && i < cBtns.length - 1){ cBtns[i+1].focus(); setStage(i+1); }
+      if (e.key === 'ArrowLeft' && i > 0){ cBtns[i-1].focus(); setStage(i-1); }
+    });
+  });
+  setStage(0);
+
+  /* ---------- enum contract ---------- */
+  var ENUMS = {
+    NORMAL: {
+      color:'#10B981',
+      code:'WellStatus.<b>NORMAL</b>',
+      ui:'Monitoramento',
+      txt:'Estado aprovado no contrato. A interface aplica a variável semântica de operação normal. Nenhuma ação é exigida do operador.'
+    },
+    WARNING_DEVIATION: {
+      color:'#0EA5E9',
+      code:'WellStatus.<b>WARNING_DEVIATION</b>',
+      ui:'Desvio em observação',
+      txt:'Estado aprovado no contrato. A interface eleva a severidade visual e passa a exigir reconhecimento explícito do operador, sem bloquear a operação.'
+    },
+    CRITICAL_BLOWOUT_RISK: {
+      color:'#ED3D3D',
+      code:'WellStatus.<b>CRITICAL_BLOWOUT_RISK</b>',
+      ui:'Risco crítico',
+      txt:'Estado aprovado no contrato. A interface aplica a severidade máxima e exige confirmação em duas etapas para que o alerta seja dispensado.'
+    },
+    WARNING_HIGH: {
+      color:'#ED3D3D',
+      code:'WellStatus.<b>WARNING_HIGH</b> — não existe no contrato',
+      ui:'Erro de compilação',
+      txt:'O estado não foi aprovado pelo especialista de domínio. O código quebra na compilação, antes de chegar à sonda. Essa é a função do contrato: tornar impossível emitir uma severidade que ninguém com autoridade de segurança definiu.'
+    }
+  };
+
+  var eBtns = [].slice.call(document.querySelectorAll('.enum-btn'));
+  var eBar = document.getElementById('e-bar');
+  var eCode = document.getElementById('e-code');
+  var eUi = document.getElementById('e-ui');
+  var eTxt = document.getElementById('e-txt');
+
+  function setEnum(k){
+    var d = ENUMS[k];
+    eBar.style.background = d.color;
+    eCode.innerHTML = d.code;
+    eUi.textContent = d.ui;
+    eUi.style.color = d.color;
+    eTxt.textContent = d.txt;
+    eBtns.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.k === k ? 'true' : 'false'); });
+  }
+  eBtns.forEach(function(b){
+    b.addEventListener('click', function(){ setEnum(b.dataset.k); });
+  });
+  setEnum('NORMAL');
+
+  /* ---------- thresholds ---------- */
+  [].slice.call(document.querySelectorAll('.thr-item')).forEach(function(item){
+    var btn = item.querySelector('.thr-toggle');
+    var fail = item.querySelector('.thr-fail');
+    btn.addEventListener('click', function(){
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      fail.hidden = open;
+      item.classList.toggle('under', !open);
+      btn.textContent = open ? 'Ver o que acontece abaixo do piso' : 'Voltar ao estado conforme';
+    });
+  });
+})();
+</script>
+</body>
+</html>
