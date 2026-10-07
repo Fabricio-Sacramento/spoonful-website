@@ -48,8 +48,8 @@ Segue abaixo o novo index atualizado:
 16. A marca
 17. Look And Feel
 18. Aplicações
-18. Versões técnicas
-19. Slide de fechamento
+19. Versões técnicas
+20. Slide de fechamento
 
 ---
 
