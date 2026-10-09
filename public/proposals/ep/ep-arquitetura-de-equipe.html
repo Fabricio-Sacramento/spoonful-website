@@ -368,6 +368,132 @@ figure.dg figcaption{
   .grid tr{border-bottom:1px solid rgba(223,223,223,.2); padding-bottom:14px; margin-bottom:14px}
   .grid td{border:0; padding:4px 0}
 }
+
+/* ================= v06 ================= */
+:root{ --warn:#F59E0B; }
+
+/* ---------- confiança da âncora (badges, pontos) ---------- */
+[data-c="a"]{--c:#10B981; --c-soft:rgba(16,185,129,.15); --c-line:rgba(16,185,129,.55); --c-ink:#8BE5C3}
+[data-c="b"]{--c:#0EA5E9; --c-soft:rgba(14,165,233,.15); --c-line:rgba(14,165,233,.55); --c-ink:#9AD8F7}
+[data-c="c"]{--c:#F59E0B; --c-soft:rgba(245,158,11,.15); --c-line:rgba(245,158,11,.55); --c-ink:#FCD38A}
+[data-c="d"]{--c:#ED3D3D; --c-soft:rgba(237,61,61,.14); --c-line:rgba(237,61,61,.6); --c-ink:#F6A9A9}
+[data-c="n"]{--c:#8a8a8a; --c-soft:rgba(223,223,223,.06); --c-line:rgba(223,223,223,.3); --c-ink:rgba(223,223,223,.7)}
+
+/* ---------- organograma (Ato XI) ---------- */
+.org{margin:44px 0 18px; font-family:var(--cond)}
+.org-k{font-size:11.5px; font-weight:500; letter-spacing:.12em; color:rgba(223,223,223,.45); margin:0 0 10px}
+.org-row{display:grid; gap:14px; margin-bottom:26px}
+.org-row.two{grid-template-columns:1fr 1fr}
+.org-row.stack{grid-template-columns:1fr; gap:10px}
+.org-row.four{grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px}
+.org-box{border:1px solid rgba(223,223,223,.32); border-radius:3px; padding:14px 16px; position:relative}
+.org-box.fill{background:rgba(223,223,223,.045)}
+.org-box.ok{border-color:rgba(16,185,129,.6)}
+.org-box.vv{border-color:rgba(237,61,61,.7); border-width:1.5px}
+.org-head{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px}
+.org-t{font-size:16px; font-weight:500; line-height:1.25}
+.org-s{font-size:13px; color:rgba(223,223,223,.58); line-height:1.4; margin-top:2px}
+.org-tri{display:inline-block; width:9px; height:9px; background:var(--success); margin-right:8px; vertical-align:1px}
+.vert{border:1px solid rgba(223,223,223,.3); border-radius:4px; padding:14px 12px 12px; display:flex; flex-direction:column; gap:10px; position:relative}
+.vert.fill{background:rgba(223,223,223,.045)}
+.vert-t{font-size:16px; font-weight:500; text-align:center; padding:2px 0 4px}
+.vert:not(:last-child)::after{
+  content:''; position:absolute; right:-17px; top:50%; width:12px; height:1px; background:rgba(223,223,223,.5);
+}
+.vert:not(:last-child)::before{
+  content:''; position:absolute; right:-18px; top:calc(50% - 4px); width:7px; height:7px;
+  border-top:1.4px solid rgba(223,223,223,.55); border-right:1.4px solid rgba(223,223,223,.55); transform:rotate(45deg);
+}
+.seat{border:1px solid rgba(223,223,223,.2); border-radius:3px; padding:11px 11px 12px; background:rgba(32,32,32,.35)}
+.seat-h{display:flex; gap:9px; align-items:flex-start}
+.seat-h svg{flex:none; margin-top:2px; opacity:.72}
+.seat-t{font-size:15px; font-weight:500; line-height:1.2}
+.seat-s{font-size:12.5px; color:rgba(223,223,223,.55); line-height:1.35}
+.bdgs{display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-top:10px}
+.bdgs.row{flex-direction:row; flex-wrap:wrap; align-items:center}
+.bdg{
+  font-family:var(--cond); font-size:12.5px; line-height:1.25; letter-spacing:.02em;
+  padding:3px 9px 3px 8px; border-radius:2px; display:inline-flex; align-items:center; gap:6px; max-width:100%;
+}
+.bdg.role{background:var(--c-soft); color:var(--c-ink); border:1px solid var(--c-line); font-weight:500}
+.bdg.role::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--c); flex:none}
+.bdg.val{background:var(--c); color:#121614; font-weight:600; font-variant-numeric:tabular-nums}
+.bdg.val[data-c="d"]{background:transparent; color:var(--c-ink); border:1px dashed var(--c)}
+.bdg.val[data-c="n"]{background:transparent; color:var(--c-ink); border:1px solid var(--c-line); font-weight:500}
+.org-legend{display:flex; flex-wrap:wrap; gap:10px 26px; margin:6px 0 0; padding-top:18px; border-top:1px solid rgba(223,223,223,.18); font-size:13.5px; color:rgba(223,223,223,.72); font-family:var(--cond)}
+.org-legend span{display:inline-flex; align-items:center; gap:8px}
+.org-legend i{width:11px; height:11px; border-radius:2px; background:var(--c); display:inline-block}
+.org-legend i.org-tri{background:var(--success); width:9px; height:9px; border-radius:0}
+.org-legend i[data-c="d"]{background:transparent; border:1px dashed var(--c)}.org-cap{font-family:var(--cond); font-size:14px; letter-spacing:.03em; line-height:1.5; color:rgba(223,223,223,.52); margin:16px 0 34px; max-width:62ch; border-left:2px solid rgba(223,223,223,.28); padding-left:14px}
+@media(max-width:1024px){
+  .org-row.four{grid-template-columns:1fr 1fr; gap:14px}
+  .vert::after,.vert::before{display:none}
+}
+@media(max-width:640px){
+  .org-row.two,.org-row.four{grid-template-columns:1fr}
+}
+
+/* ---------- cargos listados nas tabelas ---------- */
+.cargos{display:block; margin-top:8px}
+.cargo{
+  display:block; font-family:var(--cond); font-weight:400; font-size:13.5px; line-height:1.35;
+  color:rgba(223,223,223,.66); padding-left:13px; position:relative; margin-top:3px;
+}
+.cargo::before{content:''; position:absolute; left:0; top:.5em; width:6px; height:6px; border-radius:50%; background:var(--c)}
+.cargo[data-c="d"]::before{background:transparent; border:1px dashed var(--c); width:5px; height:5px}
+
+/* ---------- Ato VI: as duas perguntas ---------- */
+.qpair{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin:30px 0 8px}
+.q{border:1px dashed rgba(223,223,223,.4); padding:20px 22px}
+.q .actno{margin-bottom:10px; font-size:12px}
+.q h4{font-size:20px}
+.q p{font-size:15.5px; margin:0 0 10px}
+.q p:last-child{margin:0}
+@media(max-width:820px){.qpair{grid-template-columns:1fr}}
+
+
+/* ---------- drawer da pesquisa ---------- */
+.drawer-open{
+  appearance:none; background:transparent; color:var(--white); cursor:pointer;
+  border:1px solid rgba(223,223,223,.35); padding:11px 18px; margin:0 0 34px;
+  font-family:var(--cond); font-size:14px; font-weight:500; letter-spacing:.05em;
+}
+.drawer-open:hover{border-color:var(--white)}
+.drawer-open:focus-visible{outline:2px solid var(--info); outline-offset:2px}
+.drawer-scrim{position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:90; opacity:0; pointer-events:none; transition:opacity .2s}
+.drawer{
+  position:fixed; top:0; right:0; bottom:0; width:min(720px,100vw); z-index:91;
+  background:var(--black); border-left:1px solid rgba(223,223,223,.2);
+  display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s ease; visibility:hidden;
+}
+body.drawer-on .drawer{transform:none; visibility:visible}
+body.drawer-on .drawer-scrim{opacity:1; pointer-events:auto}
+body.drawer-on{overflow:hidden}
+.drawer-head{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 24px; border-bottom:1px solid rgba(223,223,223,.18); font-family:var(--cond)}
+.drawer-head span{font-size:13px; letter-spacing:.12em; color:rgba(223,223,223,.6)}
+.drawer-close{appearance:none; background:transparent; border:1px solid rgba(223,223,223,.3); color:var(--white); font-family:var(--cond); font-size:13px; padding:7px 12px; cursor:pointer}
+.drawer-close:focus-visible{outline:2px solid var(--info); outline-offset:2px}
+.drawer-body{overflow-y:auto; overscroll-behavior:contain; padding:24px 28px 60px; font-size:15px; line-height:1.6}
+.drawer-body h1{font-size:24px; line-height:1.2; margin:0 0 16px}
+.drawer-body h2{font-size:20px; margin:32px 0 10px; max-width:none}
+.drawer-body h3{font-size:17px; margin:26px 0 8px}
+.drawer-body p,.drawer-body li{color:rgba(223,223,223,.85)}
+.drawer-body ul,.drawer-body ol{padding-left:20px; margin:0 0 14px}
+.drawer-body table{border-collapse:collapse; width:100%; font-size:13px; margin:14px 0 18px; display:block; overflow-x:auto}
+.drawer-body th,.drawer-body td{border-bottom:1px solid rgba(223,223,223,.15); padding:6px 10px 6px 0; text-align:left; vertical-align:top}
+.drawer-body th{font-family:var(--cond); font-weight:600; color:rgba(223,223,223,.6)}
+.drawer-body a{color:var(--white); word-break:break-word}
+@media(prefers-reduced-motion:reduce){.drawer,.drawer-scrim{transition:none}}
+
+
+/* coluna de remuneração */
+.grid td.rem{min-width:210px}
+.rem-item+.rem-item{margin-top:14px}
+.rem-item .cargo{margin:0 0 6px}
+.rem-b{display:flex; flex-direction:column; align-items:flex-start; gap:5px}
+.bdg.pj{background:transparent; color:var(--c-ink); border:1px solid var(--c-line); font-weight:500; font-variant-numeric:tabular-nums}
+.bdg.pj[data-c="d"]{border-style:dashed}
+.rem-note{font-family:var(--cond); font-size:13.5px; color:rgba(223,223,223,.55); margin:-18px 0 28px; max-width:80ch}
 </style>
 </head>
 <body>
@@ -767,54 +893,99 @@ figure.dg figcaption{
       </div>
     </div>
 
-    <h3>A pergunta que define o regime inteiro</h3>
+    <h3>Duas perguntas definem o regime, e nenhuma está respondida</h3>
     <div class="prose">
       <p>O nível de integridade de segurança não é uma nota atribuída a software. Ele qualifica uma <em>função instrumentada de segurança</em>: uma malha fechada em que sensores detectam a condição perigosa, um resolvedor lógico processa e um elemento final leva o processo ao estado seguro. O que recebe classificação é a função que atua — não o programa que observa.</p>
-      <p>A Plataforma informa uma decisão humana no centro de suporte à decisão. Nessa configuração ela não é uma função instrumentada de segurança e, em rigor, não carrega essa classificação. Uma única pergunta muda isso.</p>
+      <p>A descrição atual da Plataforma — informar uma decisão humana no centro de suporte à decisão — não basta para dizer em que regime ela cai. Isso depende de duas perguntas independentes. Uma não implica a outra, e responder uma não responde a outra.</p>
+    </div>
+
+    <div class="qpair">
+      <div class="q">
+        <span class="actno">PERGUNTA 1 · ATUAÇÃO</span>
+        <h4>A Plataforma atua sobre o processo?</h4>
+        <p>Ou seja: algum resultado dela comanda, sem passar pelo operador, um elemento que leva o poço ao estado seguro.</p>
+        <p>É uma pergunta de arquitetura do sistema, e quem responde é o projeto.</p>
+      </div>
+      <div class="q">
+        <span class="actno">PERGUNTA 2 · CRÉDITO</span>
+        <h4>A análise de risco conta com ela como barreira?</h4>
+        <p>Ou seja: o alarme que ela emite, somado à resposta do operador, entra na análise de camadas de proteção da operadora como redução de risco.</p>
+        <p>É uma pergunta da análise de risco, e quem responde é a operadora — não o fornecedor do software.</p>
+      </div>
     </div>
 
     <figure class="dg">
-      <svg viewBox="0 0 900 450" role="img" aria-label="Árvore de decisão sobre o regime normativo aplicável à Plataforma">
-        <rect class="bx" x="330" y="6" width="240" height="54" rx="3"></rect>
-        <rect class="bxf" x="330" y="6" width="240" height="54" rx="3"></rect>
-        <text class="t" x="450" y="38" text-anchor="middle">A Plataforma</text>
-        <path class="ln" d="M450 60 L450 104" marker-end="url(#ah)"></path>
+      <svg viewBox="0 0 900 560" role="img" aria-label="Árvore com duas perguntas sucessivas e três ramos possíveis, nenhum marcado como resposta">
+        <rect class="bx" x="330" y="6" width="240" height="48" rx="3"></rect>
+        <rect class="bxf" x="330" y="6" width="240" height="48" rx="3"></rect>
+        <text class="t" x="450" y="35" text-anchor="middle">A Plataforma</text>
+        <path class="ln" d="M450 54 L450 84" marker-end="url(#ah)"></path>
 
-        <rect class="bx" x="255" y="106" width="390" height="76" rx="3" stroke-dasharray="6 5"></rect>
-        <text class="t" x="450" y="136" text-anchor="middle">Atua no processo, ou é creditada como</text>
-        <text class="t" x="450" y="158" text-anchor="middle">camada de proteção na análise de risco?</text>
+        <rect class="bx" x="250" y="86" width="400" height="74" rx="3" stroke-dasharray="6 5"></rect>
+        <text class="t-k" x="450" y="108" text-anchor="middle">PERGUNTA 1 · ATUAÇÃO</text>
+        <text class="t" x="450" y="132" text-anchor="middle">Atua sobre o processo,</text>
+        <text class="t" x="450" y="151" text-anchor="middle">sem passar pelo operador?</text>
 
-        <path class="ln" d="M450 182 L450 208 M210 208 L690 208 M210 208 L210 236" marker-end="url(#ah)"></path>
-        <path class="ln" d="M690 208 L690 236" marker-end="url(#ah)"></path>
-        <text class="t-k" x="238" y="203">NÃO</text>
-        <text class="t-k" x="655" y="203">SIM</text>
+        <path class="ln" d="M650 123 L750 123 L750 336" marker-end="url(#ah)"></path>
+        <text class="t-k" x="700" y="114" text-anchor="middle">SIM</text>
 
-        <rect class="bx ok-s" x="60" y="238" width="300" height="62" rx="3"></rect>
-        <text class="t ok" x="210" y="266" text-anchor="middle">Apoio à decisão</text>
-        <text class="t-s" x="210" y="287" text-anchor="middle">humano na malha, sem atuação</text>
-        <path class="ln" d="M210 300 L210 332" marker-end="url(#ah)"></path>
-        <rect class="bx" x="60" y="334" width="300" height="104" rx="3"></rect>
-        <text class="t-s" x="210" y="362" text-anchor="middle">Fora do escopo estrito da 61511</text>
-        <text class="t-s" x="210" y="384" text-anchor="middle">ISA-101 rege a interface</text>
-        <text class="t-s" x="210" y="406" text-anchor="middle">confiabilidade e auditabilidade</text>
-        <text class="t-s" x="210" y="428" text-anchor="middle">conforme exigir a operadora</text>
+        <path class="ln" d="M450 160 L450 190 L300 190 L300 210" marker-end="url(#ah)"></path>
+        <text class="t-k" x="462" y="182">NÃO</text>
 
-        <rect class="bx bad-s" x="540" y="238" width="300" height="62" rx="3"></rect>
-        <text class="t bad" x="690" y="266" text-anchor="middle">Função instrumentada de segurança</text>
-        <text class="t-s" x="690" y="287" text-anchor="middle">sensor, lógica e elemento final</text>
-        <path class="ln" d="M690 300 L690 332" marker-end="url(#ah)"></path>
-        <rect class="bx" x="540" y="334" width="300" height="104" rx="3"></rect>
-        <text class="t-s" x="690" y="362" text-anchor="middle">Classificação definida por</text>
-        <text class="t-s" x="690" y="384" text-anchor="middle">análise de risco, não por escolha</text>
-        <text class="t-s" x="690" y="406" text-anchor="middle">Ciclo completo 61508 e 61511</text>
-        <text class="t-s" x="690" y="428" text-anchor="middle">independência graduada</text>
+        <rect class="bx" x="80" y="212" width="440" height="74" rx="3" stroke-dasharray="6 5"></rect>
+        <text class="t-k" x="300" y="234" text-anchor="middle">PERGUNTA 2 · CRÉDITO</text>
+        <text class="t" x="300" y="258" text-anchor="middle">A análise de risco da operadora conta</text>
+        <text class="t" x="300" y="277" text-anchor="middle">com o alarme e o operador como barreira?</text>
+
+        <path class="ln" d="M300 286 L300 308 M150 308 L450 308 M150 308 L150 336" marker-end="url(#ah)"></path>
+        <path class="ln" d="M450 308 L450 336" marker-end="url(#ah)"></path>
+        <text class="t-k" x="172" y="302">NÃO</text>
+        <text class="t-k" x="414" y="302">SIM</text>
+
+        <rect class="bx" x="15" y="338" width="270" height="64" rx="3"></rect>
+        <text class="t-k" x="150" y="358" text-anchor="middle">RAMO A</text>
+        <text class="t" x="150" y="380" text-anchor="middle">Apoio à decisão</text>
+        <text class="t-s" x="150" y="396" text-anchor="middle">humano na malha, sem crédito</text>
+
+        <rect class="bx" x="315" y="338" width="270" height="64" rx="3"></rect>
+        <text class="t-k" x="450" y="358" text-anchor="middle">RAMO B</text>
+        <text class="t" x="450" y="380" text-anchor="middle">Barreira com resposta humana</text>
+        <text class="t-s" x="450" y="396" text-anchor="middle">alarme creditado, sem atuação</text>
+
+        <rect class="bx" x="615" y="338" width="270" height="64" rx="3"></rect>
+        <text class="t-k" x="750" y="358" text-anchor="middle">RAMO C</text>
+        <text class="t" x="750" y="380" text-anchor="middle">Função instrumentada de segurança</text>
+        <text class="t-s" x="750" y="396" text-anchor="middle">sensor, lógica e elemento final</text>
+
+        <path class="ln" d="M150 402 L150 424" marker-end="url(#ah)"></path>
+        <path class="ln" d="M450 402 L450 424" marker-end="url(#ah)"></path>
+        <path class="ln" d="M750 402 L750 424" marker-end="url(#ah)"></path>
+
+        <rect class="bx" x="15" y="426" width="270" height="118" rx="3"></rect>
+        <text class="t-s" x="150" y="454" text-anchor="middle">Fora do escopo estrito da 61511</text>
+        <text class="t-s" x="150" y="476" text-anchor="middle">ISA-101 rege a interface</text>
+        <text class="t-s" x="150" y="498" text-anchor="middle">confiabilidade e auditabilidade</text>
+        <text class="t-s" x="150" y="520" text-anchor="middle">conforme exigir a operadora</text>
+
+        <rect class="bx" x="315" y="426" width="270" height="118" rx="3"></rect>
+        <text class="t-s" x="450" y="454" text-anchor="middle">ISA-18.2 rege o alarme</text>
+        <text class="t-s" x="450" y="476" text-anchor="middle">crédito limitado pela 61511 e pela LOPA</text>
+        <text class="t-s" x="450" y="498" text-anchor="middle">independência da causa iniciadora</text>
+        <text class="t-s" x="450" y="520" text-anchor="middle">resposta do operador vira evidência</text>
+
+        <rect class="bx" x="615" y="426" width="270" height="118" rx="3"></rect>
+        <text class="t-s" x="750" y="454" text-anchor="middle">Classificação definida por</text>
+        <text class="t-s" x="750" y="476" text-anchor="middle">análise de risco, não por escolha</text>
+        <text class="t-s" x="750" y="498" text-anchor="middle">ciclo completo 61508 e 61511</text>
+        <text class="t-s" x="750" y="520" text-anchor="middle">independência graduada</text>
       </svg>
-      <figcaption>O caminho da esquerda e o da direita produzem projetos diferentes, com equipes diferentes. Decidir cedo é barato; descobrir tarde, não.</figcaption>
+      <figcaption>Nenhum ramo está marcado porque nenhuma das duas perguntas foi respondida. Os três produzem projetos diferentes, com equipes diferentes. Decidir cedo é barato; descobrir tarde, não.</figcaption>
     </figure>
 
     <div class="note warn">
-      <h4>A pergunta a resolver antes de dimensionar</h4>
-      <p>Não é qual nível adotar, e sim de que lado da árvore a Plataforma está. Enquanto isso não estiver decidido, qualquer dimensionamento de equipe é chute — porque o ramo da direita exige funções que o da esquerda não exige.</p>
+      <h4>As perguntas a resolver antes de dimensionar</h4>
+      <p>Não é qual nível adotar, e sim em qual dos três ramos a Plataforma está — o que exige responder as duas perguntas separadamente. Enquanto isso não estiver decidido, qualquer dimensionamento de equipe é chute, porque cada ramo exige funções que os outros não exigem.</p>
+      <p>O ramo B é o que costuma passar despercebido. A Plataforma não atua, ninguém a chama de função de segurança, e mesmo assim a análise de risco da operadora pode contar com ela como barreira. Quando isso acontece sem estar declarado, o projeto é dimensionado para o ramo A e cobrado pelo ramo B.</p>
       <p>Duas referências ajudam a calibrar a conversa. Na prática da indústria de processo, a maioria das funções instrumentadas é projetada para os dois níveis mais baixos; exigência do terceiro nível é rara, e qualquer resultado apontando o quarto costuma indicar problema na definição de risco tolerável ou no próprio projeto do processo. E para atividades de petróleo na plataforma continental existe diretriz setorial específica sobre como aplicar 61508 e 61511 — a NOG-070, antiga OLF-070.</p>
     </div>
   </div>
@@ -1210,130 +1381,185 @@ figure.dg figcaption{
     <h2>A primeira composição, desenhada a partir do que ficou estabelecido</h2>
     <p class="lead">Rascunho inicial. Não é organograma nem contagem de pessoas: é o conjunto de funções que precisa existir, cada uma com o que possui, o que não pode possuir, e o limiar que a rege.</p>
 
-    <figure class="dg">
-      <svg viewBox="0 0 900 660" role="img" aria-label="Quatro verticais atravessadas por coordenação sistêmica, domínio e verificação, com os assentos de cada vertical">
-        <text class="t-k" x="0" y="16">FORA DA LINHA DE ENTREGA</text>
-        <rect class="bx" x="0" y="28" width="430" height="62" rx="3"></rect>
-        <text class="t" x="215" y="54" text-anchor="middle">Patrocínio</text>
-        <text class="t-s" x="215" y="76" text-anchor="middle">mandato, recurso e relação institucional</text>
-        <rect class="bx bad-s" x="470" y="28" width="430" height="62" rx="3" stroke-width="2"></rect>
-        <text class="t bad" x="685" y="54" text-anchor="middle">Verificação e validação independente</text>
-        <text class="t-s" x="685" y="76" text-anchor="middle">não participou da construção</text>
+    <div class="org" role="figure" aria-label="Organograma: funções fora da linha, funções transversais, quatro verticais no caminho do dado e verificação, com o cargo de referência e a faixa salarial de cada assento">
+      <div class="org-k">FORA DA LINHA DE ENTREGA</div>
+      <div class="org-row two">
+        <div class="org-box">
+          <div class="org-t">Patrocínio</div>
+          <div class="org-s">mandato, recurso e relação institucional</div>
+          <div class="bdgs row"><span class="bdg role" data-c="n">Liderança da EnvironPact</span></div>
+        </div>
+        <div class="org-box vv">
+          <div class="org-t" style="color:#F6A9A9">Verificação e validação independente</div>
+          <div class="org-s">não participou da construção</div>
+          <div class="bdgs row"><span class="bdg role" data-c="d">Avaliador de segurança funcional · FSEng/CFSE</span></div>
+        </div>
+      </div>
 
-        <path class="ln-d" d="M0 112 L900 112"></path>
-        <text class="t-k" x="0" y="140">ATRAVESSA AS VERTICAIS</text>
+      <div class="org-k">ATRAVESSA AS VERTICAIS</div>
+      <div class="org-row stack">
+        <div class="org-box ok">
+          <div class="org-head"><div><div class="org-t"><i class="org-tri" aria-hidden="true"></i>Domínio e HSEQ</div>
+          <div class="org-s">assina a regra que converte probabilidade em estado operacional</div></div><div class="bdgs row"><span class="bdg role" data-c="c">Engenheiro de segurança de processo · HSEQ</span></div></div>
+        </div>
+        <div class="org-box">
+          <div class="org-head"><div><div class="org-t">Coordenação sistêmica</div>
+          <div class="org-s">taxonomia ponta a ponta · mantém a tríade e o contrato vivos</div></div><div class="bdgs row"><span class="bdg role" data-c="a">Arquiteto de sistemas · TPM</span></div></div>
+        </div>
+      </div>
 
-        <rect class="bx ok-s" x="0" y="152" width="900" height="58" rx="3"></rect>
-        <rect class="ok" x="12" y="164" width="9" height="9"></rect>
-        <text class="t" x="450" y="176" text-anchor="middle">Domínio e HSEQ</text>
-        <text class="t-s" x="450" y="196" text-anchor="middle">assina a regra que converte probabilidade em estado operacional</text>
+      <div class="org-k">VERTICAIS · CAMINHO DO DADO</div>
+      <div class="org-row four">
+        <div class="vert">
+          <div class="vert-t">O duto</div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Ingestão e borda</div><div class="seat-s">tempo real, sinal bruto</div></div></div><div class="bdgs"><span class="bdg role" data-c="a">Engenheiro de dados e borda · OPC UA</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Infraestrutura</div><div class="seat-s">ambientes e pipeline</div></div></div><div class="bdgs"><span class="bdg role" data-c="b">Engenheiro DevOps/SRE · IEC 62443-4-1</span></div></div>
+        </div>
+        <div class="vert fill">
+          <div class="vert-t"><i class="org-tri" aria-hidden="true"></i>Modelagem</div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Rede bayesiana</div><div class="seat-s">topologia e calibração</div></div></div><div class="bdgs"><span class="bdg role" data-c="a">Modelador probabilístico · redes bayesianas</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Domínio de poço</div><div class="seat-s">variáveis e limites</div></div></div><div class="bdgs"><span class="bdg role" data-c="d">Engenheiro de petróleo · poço</span></div></div>
+        </div>
+        <div class="vert">
+          <div class="vert-t">Operabilidade</div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Liderança técnica</div><div class="seat-s">implementação, runtime e produção</div></div></div><div class="bdgs"><span class="bdg role" data-c="a">Líder Técnico de Operabilidade</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Modelo em produção</div><div class="seat-s">versão, deriva, contrato</div></div></div><div class="bdgs"><span class="bdg role" data-c="b">Engenheiro de ML · MLOps</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Serviços e contrato</div><div class="seat-s">API tipada entre motor e interface</div></div></div><div class="bdgs"><span class="bdg role" data-c="a">Desenvolvedor back-end sênior · serviços e API</span></div></div>
+        </div>
+        <div class="vert fill">
+          <div class="vert-t"><i class="org-tri" aria-hidden="true"></i>Interface acionável</div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Sistema de design</div><div class="seat-s">style guide e toolkit ISA-101, codificação dos estados</div></div></div><div class="bdgs"><span class="bdg role" data-c="d">Lead Product Designer</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Design de produto</div><div class="seat-s">fluxos, interface e visualização de dados</div></div></div><div class="bdgs"><span class="bdg role" data-c="b">Designer de Produto Sênior</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Front-end e estado</div><div class="seat-s">engenharia de interface, tempo real e degradação</div></div></div><div class="bdgs"><span class="bdg role" data-c="a">Desenvolvedor front-end sênior · React/TS</span></div></div>
+          <div class="seat"><div class="seat-h"><svg width="16" height="20" viewBox="0 0 16 20" aria-hidden="true"><circle cx="8" cy="5.5" r="3.6" fill="currentColor"/><path d="M1.5 17.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><div><div class="seat-t">Pesquisa e requisitos</div><div class="seat-s">operadores do CSD</div></div></div><div class="bdgs"><span class="bdg role" data-c="a">Pesquisador de UX e fatores humanos</span></div></div>
+        </div>
+      </div>
 
-        <rect class="bx" x="0" y="222" width="900" height="58" rx="3"></rect>
-        <text class="t" x="450" y="246" text-anchor="middle">Coordenação sistêmica</text>
-        <text class="t-s" x="450" y="266" text-anchor="middle">taxonomia ponta a ponta · mantém a tríade e o contrato vivos</text>
+      <div class="org-row stack">
+        <div class="org-box">
+          <div class="org-head"><div><div class="org-t">Verificação e teste</div>
+          <div class="org-s">atravessa as quatro verticais</div></div><div class="bdgs row"><span class="bdg role" data-c="a">Analista de verificação e teste</span></div></div>
+        </div>
+      </div>
 
-        <text class="t-k" x="0" y="302">VERTICAIS · CAMINHO DO DADO</text>
-        <rect class="bx" x="0" y="312" width="210" height="214" rx="4"></rect><text class="t" x="105" y="342" text-anchor="middle">O duto</text><rect class="bx" x="10" y="358" width="190" height="46" rx="3"></rect><circle cx="26" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M19.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="50" y="378">Ingestão e borda</text><text class="t-s" x="50" y="395">tempo real, sinal bruto</text><rect class="bx" x="10" y="412" width="190" height="46" rx="3"></rect><circle cx="26" cy="433" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M19.5 443.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="50" y="432">Infraestrutura</text><text class="t-s" x="50" y="449">ambientes e pipeline</text><rect class="bx" x="230" y="312" width="210" height="214" rx="4"></rect><rect class="bxf" x="230" y="312" width="210" height="214" rx="4"></rect><rect class="ok" x="242" y="324" width="9" height="9"></rect><text class="t" x="335" y="342" text-anchor="middle">Modelagem</text><rect class="bx" x="240" y="358" width="190" height="46" rx="3"></rect><circle cx="256" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M249.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="280" y="378">Rede bayesiana</text><text class="t-s" x="280" y="395">topologia e calibração</text><rect class="bx" x="240" y="412" width="190" height="46" rx="3"></rect><circle cx="256" cy="433" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M249.5 443.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="280" y="432">Domínio de poço</text><text class="t-s" x="280" y="449">variáveis e limites</text><rect class="bx" x="460" y="312" width="210" height="214" rx="4"></rect><text class="t" x="565" y="342" text-anchor="middle">Operabilidade</text><rect class="bx" x="470" y="358" width="190" height="46" rx="3"></rect><circle cx="486" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M479.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="510" y="378">Modelo em produção</text><text class="t-s" x="510" y="395">versão, deriva, contrato</text><rect class="bx" x="690" y="312" width="210" height="214" rx="4"></rect><rect class="bxf" x="690" y="312" width="210" height="214" rx="4"></rect><rect class="ok" x="702" y="324" width="9" height="9"></rect><text class="t" x="795" y="342" text-anchor="middle">Interface acionável</text><rect class="bx" x="700" y="358" width="190" height="46" rx="3"></rect><circle cx="716" cy="379" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M709.5 389.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="740" y="378">Design de produto</text><text class="t-s" x="740" y="395">visualização e ergonomia</text><rect class="bx" x="700" y="412" width="190" height="46" rx="3"></rect><circle cx="716" cy="433" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M709.5 443.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="740" y="432">Front-end e estado</text><text class="t-s" x="740" y="449">tempo real e degradação</text><rect class="bx" x="700" y="466" width="190" height="46" rx="3"></rect><circle cx="716" cy="487" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M709.5 497.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path><text class="t" x="740" y="486">Pesquisa e requisitos</text><text class="t-s" x="740" y="503">operadores do CSD</text>
+      <div class="org-legend" aria-label="Legenda">
+        <span><i data-c="a"></i>Âncora oficial com amostra robusta</span>
+        <span><i data-c="b"></i>Âncora oficial com amostra frágil ou por proxy</span>
+        <span><i data-c="c"></i>Piso legal, teto estimado</span>
+        <span><i data-c="d"></i>Sem dado primário do nível</span>
+        <span><i class="org-tri" style="margin:0" aria-hidden="true"></i>Vértice da tríade do contrato</span>
+      </div>
+    </div>
+    <p class="org-cap">As quatro verticais seguem o caminho do dado. O que as atravessa — domínio, coordenação e verificação — não pode pertencer a nenhuma delas, sob pena de verificar apenas a própria vertical. Cada badge nomeia o cargo de referência e a faixa CLT do assento, não uma pessoa designada; a cor indica a solidez da âncora do valor.</p>
 
-        <path class="ln" d="M210 436 L226 436" marker-end="url(#ah)"></path>
-        <path class="ln" d="M440 436 L456 436" marker-end="url(#ah)"></path>
-        <path class="ln" d="M670 436 L686 436" marker-end="url(#ah)"></path>
-
-        <rect class="bx" x="0" y="552" width="900" height="58" rx="3"></rect>
-        <text class="t" x="450" y="576" text-anchor="middle">Verificação e teste</text>
-        <text class="t-s" x="450" y="596" text-anchor="middle">atravessa as quatro verticais</text>
-
-        <rect class="ok" x="0" y="636" width="9" height="9"></rect>
-        <text class="t-s" x="18" y="644">vértices da tríade do contrato</text>
-        <g transform="translate(292,630)"><circle cx="8" cy="8" r="3.6" fill="currentColor" opacity=".72"></circle><path d="M1.5 18.5 a 6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".72"></path></g>
-        <text class="t-s" x="314" y="644">cada glifo indica um assento a ser ocupado, não uma pessoa designada</text>
-      </svg>
-      <figcaption>As quatro verticais seguem o caminho do dado. O que as atravessa — domínio, coordenação e verificação — não pode pertencer a nenhuma delas, sob pena de verificar apenas a própria vertical.</figcaption>
-    </figure>
+    <button type="button" class="drawer-open" id="drawer-btn" aria-controls="drawer" aria-expanded="false">Ler a pesquisa de precificação</button>
 
     <h3>As funções, e a fronteira de cada uma</h3>
     <table class="grid">
-      <thead><tr><th>Função</th><th>Possui</th><th>Não pode possuir</th><th>Presença</th></tr></thead>
+      <thead><tr><th>Função</th><th>Possui</th><th>Não pode possuir</th><th>Presença</th><th>Cargo e remuneração</th></tr></thead>
       <tbody>
         <tr>
           <td>Modelagem</td>
           <td>Topologia da rede, calibração e correção teórica do modelo.</td>
           <td class="risk">A definição do que é perigoso, e qualquer decisão sobre a tela.</td>
           <td>Episódica, com contrato</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Modelador probabilístico · redes bayesianas</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 19,5–25,4 mil</span><span class="bdg pj" data-c="a">PJ R$ 25,4–35,6 mil</span></span></div></td>
         </tr>
         <tr>
           <td>Especialista de poço</td>
           <td>Variáveis do domínio: pressão, temperatura, densidade, vazão.</td>
           <td class="risk">A implementação do que especifica.</td>
           <td>Episódica, com contrato</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="d">Engenheiro de petróleo · poço</span><span class="rem-b"><span class="bdg val" data-c="d">CLT R$ 18,0–30,0 mil</span><span class="bdg pj" data-c="d">PJ R$ 23,4–42,0 mil</span></span></div></td>
         </tr>
         <tr>
           <td>Operabilidade do modelo</td>
           <td>Versionamento conjunto de modelo, dados e código; comportamento sob leitura ausente; estabilidade do contrato; detecção de deriva.</td>
           <td class="risk">A semântica do modelo — que recebe pronta e assinada.</td>
           <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="b">Engenheiro de ML · MLOps</span><span class="rem-b"><span class="bdg val" data-c="b">CLT R$ 17,0–22,1 mil</span><span class="bdg pj" data-c="b">PJ R$ 22,1–30,9 mil</span></span></div></td>
+        </tr>
+        <tr>
+          <td>Liderança técnica de operabilidade</td>
+          <td>Decisões de implementação e arquitetura de runtime — serviços, persistência, implantação —, níveis de serviço, resposta a incidentes e revisão de código da vertical.</td>
+          <td class="risk">A taxonomia e o contrato, que pertencem à coordenação sistêmica; em conflito técnico, decide a coordenação.</td>
+          <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Líder Técnico de Operabilidade</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 19,1–24,8 mil</span><span class="bdg pj" data-c="a">PJ R$ 24,8–34,7 mil</span></span></div></td>
+        </tr>
+        <tr>
+          <td>Serviços e contrato</td>
+          <td>Implementação do contrato tipado e dos serviços que levam o estado do motor à interface; APIs, persistência e integração.</td>
+          <td class="risk">A definição dos estados — implementa o contrato, não o escreve.</td>
+          <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Desenvolvedor back-end sênior · serviços e API</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 16,2–21,1 mil</span><span class="bdg pj" data-c="a">PJ R$ 21,1–29,5 mil</span></span></div></td>
         </tr>
         <tr>
           <td>Ingestão e borda</td>
           <td>Aquisição em tempo real, normalização de sinal, processamento local, ambientes e implantação.</td>
           <td class="risk">Interpretação do dado que transporta.</td>
           <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Engenheiro de dados e borda · OPC UA</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 16,2–21,1 mil</span><span class="bdg pj" data-c="a">PJ R$ 21,1–29,5 mil</span></span></div><div class="rem-item"><span class="cargo" data-c="b">Engenheiro DevOps/SRE · IEC 62443-4-1</span><span class="rem-b"><span class="bdg val" data-c="b">CLT R$ 16,2–21,1 mil</span><span class="bdg pj" data-c="b">PJ R$ 21,1–29,5 mil</span></span></div></td>
         </tr>
         <tr>
           <td>HSEQ e domínio</td>
           <td>A regra que transforma probabilidade em estado funcional. Autoridade final sobre onde ficam os limites.</td>
           <td class="risk">Prazo de entrega — para não ser pressionada a ceder no limite.</td>
           <td>Recorrente, consultiva</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="c">Engenheiro de segurança de processo · HSEQ</span><span class="rem-b"><span class="bdg val" data-c="c">CLT R$ 13,8–20,0 mil</span><span class="bdg pj" data-c="c">PJ R$ 17,9–28,0 mil</span></span></div></td>
         </tr>
         <tr>
-          <td>Arquitetura de interface</td>
-          <td>Taxonomia semântica, sistema de design, tratamento inequívoco de cada estado do contrato.</td>
-          <td class="risk">Cálculo de severidade a partir de probabilidade.</td>
+          <td>Interface acionável</td>
+          <td>Taxonomia semântica, sistema de design e tratamento inequívoco de cada estado do contrato; estado, desempenho, acessibilidade e implementação da interface.</td>
+          <td class="risk">Cálculo de severidade a partir de probabilidade, ou qualquer lógica que decida o que é perigoso.</td>
           <td>Integral</td>
-        </tr>
-        <tr>
-          <td>Engenharia de interface</td>
-          <td>Estado, desempenho, acessibilidade e implementação da interface acionável.</td>
-          <td class="risk">Qualquer lógica que decida o que é perigoso.</td>
-          <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="d">Lead Product Designer</span><span class="rem-b"><span class="bdg val" data-c="d">CLT R$ 15,2–19,7 mil</span><span class="bdg pj" data-c="d">PJ R$ 19,7–27,6 mil</span></span></div><div class="rem-item"><span class="cargo" data-c="b">Designer de Produto Sênior</span><span class="rem-b"><span class="bdg val" data-c="b">CLT R$ 12,9–16,7 mil</span><span class="bdg pj" data-c="b">PJ R$ 16,8–23,4 mil</span></span></div><div class="rem-item"><span class="cargo" data-c="a">Desenvolvedor front-end sênior · React/TS</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 16,2–21,1 mil</span><span class="bdg pj" data-c="a">PJ R$ 21,1–29,5 mil</span></span></div></td>
         </tr>
         <tr>
           <td>Pesquisa e requisitos</td>
           <td>Contato direto com os operadores do CSD, rastreabilidade de requisito a evidência e validação de que a interface reduz erro.</td>
           <td class="risk">Autoridade sobre a regra de risco — que pertence ao domínio.</td>
           <td>Recorrente</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Pesquisador de UX e fatores humanos</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 12,2–15,9 mil</span><span class="bdg pj" data-c="a">PJ R$ 15,9–22,3 mil</span></span></div></td>
         </tr>
         <tr>
           <td>Verificação e teste</td>
           <td>Estratégia de teste, automação e critério de aceite ao longo de toda a linha.</td>
           <td class="risk">Ser a mesma origem que a verificação independente exigida fora da linha.</td>
           <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Analista de verificação e teste</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 13,9–18,0 mil</span><span class="bdg pj" data-c="a">PJ R$ 18,1–25,2 mil</span></span></div></td>
         </tr>
         <tr>
           <td>Coordenação sistêmica</td>
           <td>A taxonomia ponta a ponta. Traduz matriz de probabilidade em lógica de estado e variável semântica; mantém a tríade funcionando.</td>
           <td class="risk">Ser o tradutor humano de quem tudo depende — o papel existe para que o contrato substitua essa dependência.</td>
           <td>Integral</td>
+          <td class="rem"><div class="rem-item"><span class="cargo" data-c="a">Arquiteto de sistemas · TPM</span><span class="rem-b"><span class="bdg val" data-c="a">CLT R$ 19,1–24,8 mil</span><span class="bdg pj" data-c="a">PJ R$ 24,8–34,7 mil</span></span></div></td>
         </tr>
       </tbody>
     </table>
+    <p class="rem-note">CLT: salário-base de referência, do piso da âncora ao teto com o prêmio de 30%. PJ: projeção por conversão (CLT × 1,30 a 1,40), não valor de mercado medido. A cor segue a legenda do organograma.</p>
 
     <div class="note">
       <h4>Sobre presença e número de pessoas</h4>
       <p>A tabela lista funções, não vagas. Várias podem coexistir na mesma pessoa quando o limiar acumulável do Ato X permite — desde que o custo esteja declarado. Duas combinações não são admissíveis em nenhuma configuração: quem desenvolve não verifica de forma independente, e quem implementa não decide a semântica.</p>
     </div>
 
-    <h3>O que ainda depende da resposta do Ato VI</h3>
+    <h3>O que ainda depende das respostas do Ato VI</h3>
     <table class="grid">
-      <thead><tr><th>Se a Plataforma for…</th><th>Verificação independente</th><th>Regime e evidência</th></tr></thead>
+      <thead><tr><th>Ramo</th><th>Verificação independente</th><th>Regime e evidência</th></tr></thead>
       <tbody>
         <tr>
-          <td>Apoio à decisão</td>
+          <td>A · Apoio à decisão</td>
           <td>Revisão independente da linha de desenvolvimento, com rastreabilidade de requisito a evidência de teste.</td>
           <td>ISA-101 para a interface, mais os requisitos de confiabilidade e auditabilidade que a operadora definir.</td>
         </tr>
         <tr>
-          <td>Camada de proteção creditada</td>
+          <td>B · Barreira com resposta humana</td>
+          <td>Revisão independente, mais validação do desempenho do alarme e do tempo de resposta do operador.</td>
+          <td>ISA-18.2 para a gestão de alarmes; crédito limitado conforme a 61511 e a análise de camadas de proteção da operadora; ISA-101 para a interface.</td>
+        </tr>
+        <tr>
+          <td>C · Função instrumentada</td>
           <td>Avaliação de segurança funcional com independência graduada, podendo exigir organização externa.</td>
           <td>Ciclo completo de 61508 e 61511, com a diretriz setorial para a plataforma continental, e evidência formal de conformidade.</td>
         </tr>
@@ -1342,9 +1568,9 @@ figure.dg figcaption{
 
     <h3>Perguntas em aberto</h3>
     <div class="prose">
-      <p>Três decisões precedem qualquer refinamento desta composição, e nenhuma delas é técnica.</p>
-      <p>De que lado da árvore do Ato VI a Plataforma está. Quem, com nome e autoridade formal, assina a regra que converte probabilidade em estado operacional. E onde reside a verificação independente — dentro da EnvironPact, do lado da operadora, ou em terceiro.</p>
-      <p>Respondidas essas três, o rascunho vira proposta.</p>
+      <p>Quatro decisões precedem qualquer refinamento desta composição, e nenhuma delas é técnica.</p>
+      <p>Se a Plataforma atua sobre o processo. Se a análise de risco da operadora conta com ela como barreira — pergunta separada da anterior, e de outro dono. Quem, com nome e autoridade formal, assina a regra que converte probabilidade em estado operacional. E onde reside a verificação independente — dentro da EnvironPact, do lado da operadora, ou em terceiro.</p>
+      <p>Respondidas essas quatro, o rascunho vira proposta.</p>
     </div>
   </div>
 </section>
@@ -1398,6 +1624,638 @@ figure.dg figcaption{
 </section>
 </main>
 
+<div class="drawer-scrim" id="drawer-scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Pesquisa de precificação" aria-hidden="true">
+  <div class="drawer-head"><span>PESQUISA DE PRECIFICAÇÃO</span><button type="button" class="drawer-close" id="drawer-close">Fechar</button></div>
+  <div class="drawer-body">
+<h1>Precificação de equipe de software de segurança crítica para O&amp;G (Petrobras/CENPES/CSD Macaé): remuneração CLT, PJ e hora-homem com fontes primárias, 2025–2026</h1>
+<p>A fonte oficial mais sólida e defensável para precificar 9 das 12 posições é o Mapa de Pesquisa Salarial da Secretaria de Governo Digital (SGD/MGI). Sua versão 2026 (Nota Técnica SEI nº 15960/2026/MGI, Portaria SGD/MGI nº 4.777/2026) foi montada com CAGED, PNAD Contínua, contratos públicos do PNCP e guias salariais.[1] Ela põe perfis sêniores de TI entre R$ 12,2 mil e R$ 19,5 mil de salário-base CLT, e o fator-K de referência (≈1,98–2,15) leva esse salário a um preço de venda de ≈R$ 140 a R$ 220 por hora-homem.[1] Para as três posições de engenharia (poço, HSEQ e V&amp;V em segurança funcional), o piso é legal: Lei 4.950-A/66, R$ 13.778,50 para 8 h em 2026.[2] O teto não tem âncora oficial pública; a melhor referência indireta é a tabela da Petrobras (ACT 2025-2027), cujo ingresso de nível superior é R$ 15.200,52 de RMNR.[3][4]</p>
+<h2>TL;DR</h2>
+<ul>
+<li><strong>Faixa da equipe (12 pessoas, nível sênior, estimativa do autor ancorada em fontes oficiais):</strong> salário-base CLT somado de ≈R$ 192 mil a R$ 262 mil/mês. Em PJ, ≈R$ 250 mil a R$ 367 mil/mês. Preço de venda à Petrobras com fator-K ≈1,98 entre ≈R$ 381 mil e R$ 519 mil/mês, ou ≈R$ 4,6 a R$ 6,2 milhões/ano. Nesse volume, a EnvironPact sai do Simples e, no Lucro Presumido, passa a sofrer o acréscimo de presunção da LC 224/2025.</li>
+<li><strong>Conversão CLT→PJ:</strong> pela minha decomposição explícita (13º, 1/3 de férias, FGTS e tributação do PJ no Simples Anexo III/V ou no Lucro Presumido), o multiplicador defensável fica entre 1,30× e 1,40× o salário-base CLT para manter a renda bruta anual do profissional. Do lado do contratante, porém, o fator-K oficial (~2,0) foi calculado para estrutura CLT. Pagar PJ a 1,3–1,4× e vender a fator-K ~2,0 deixa só ≈13–18% da receita para overhead, risco e margem.</li>
+<li><strong>Lacunas reais:</strong> não encontrei tabela pública de HH da Petrobras, valores de ponto de função no Painel de Preços, estudos de remuneração do IBP/ABESPetro/ONIP/Firjan nem dado algum de prêmio salarial ou oferta de profissionais com certificação TÜV FSEng/CFSE no Brasil. Os números dessas linhas são estimativas do autor e estão marcados como tal.</li>
+</ul>
+<h2>Key Findings</h2>
+<ol>
+<li><strong>A "tabela de referência salarial" de contratações federais de TI existe e é oficial, mas o número citado não é de "engenheiro de dados".</strong> No Anexo II da Portaria SGD/MGI nº 750/2023, na redação da Portaria SGD/MGI nº 6.040/2025 (DOU de 13/08/2025, vigência a partir de 01/09/2025), os valores R$ 13.590,00 (pleno) e R$ 18.000,00 (sênior) são do perfil <strong>Arquiteto de Dados</strong> (ARQDADOS-02/03).[5] Não há perfil "engenheiro de dados" no mapa do modelo de desenvolvimento de software. A atualização de 2026 (Nota Técnica 15960/2026, vinculada à Portaria SGD/MGI nº 4.777, de 16/06/2026, vigência a partir de 01/07/2026) leva esses valores a R$ 13.982,75 e R$ 18.520,20.[1][6]</li>
+<li><strong>Rio de Janeiro não tem prêmio salarial em TI; o prêmio do RJ é de engenharia de petróleo e regime offshore.</strong> Pelo Relatório de Regionalização das Ocupações de TI 2025 da Brasscom (942.879 vínculos CLT de TIC, base RAIS/CAGED), o salário médio de TIC no RJ é R$ 6.153, contra R$ 7.321 em SP e R$ 5.888 na média nacional (dez/2025).[7][8][9] Para perfis de software, portanto, não se justifica aplicar "prêmio Macaé" sobre a referência nacional. O prêmio aparece nos adicionais de regime da indústria (ACT Petrobras): sobreaviso de 40%, periculosidade de 30% e confinamento de 10/15/30%.[10]</li>
+<li><strong>O piso legal do engenheiro em 2026 tem duas leituras.</strong> Com o salário mínimo de R$ 1.621 (jan/2026), o SENGE-RJ e o SEESP publicam R$ 9.726 para 6 h, 8,5 SM = R$ 13.778,50 para 8 h e a variante de 9 SM = R$ 14.589.[2][11] Há também jurisprudência que congela a base no salário mínimo de março/2022 (R$ 1.212, decisão do STF nas ADPFs 53/149/171), o que dá 8,5 × R$ 1.212 = R$ 10.302.[12] O piso só vincula contratação CLT em função de engenharia.[13][14]</li>
+<li><strong>O fator-K oficial já é o "multiplicador sobre custo direto" que se procurava.</strong> A SGD define custo do perfil = salário × fator-K.[5][15] O fator-K de referência vai de 1,94 a 2,10 (2025) e de 1,98 a 2,15 (2026).[1][5][15] Admitem-se valores até 3 com memória de cálculo, e acima de 3 a proposta deve passar por diligência.[5][15]</li>
+<li><strong>Petrobras:</strong> o ACT 2025-2027 reajustou as tabelas em 5,66% em 01/09/2025 e prevê correção pelo IPCA em 01/09/2026.[10] Segundo o Canal Fornecedor da Petrobras, com base no art. 29, § 3º, da Lei 13.303/2016, o limite de dispensa de licitação por valor praticado pela companhia é de R$ 170 mil para obras e serviços de engenharia e de R$ 85 mil para outros serviços e compras. Não existe tabela pública de HH.</li>
+</ol>
+<h2>Details</h2>
+<h3>1. Classificação de confiabilidade usada</h3>
+<ul>
+<li><strong>(1) Dado administrativo oficial:</strong> RAIS, CAGED, PNAD/IBGE e contratos públicos. Inclui o Mapa Salarial SGD, que é uma composição oficial dessas fontes com guias salariais.</li>
+<li><strong>(2) Instrumento coletivo ou norma legal:</strong> ACT, CCT, leis, súmulas e portarias.</li>
+<li><strong>(3) Pesquisa com metodologia declarada:</strong> State of Data e Brasscom.</li>
+<li><strong>(4) Consultoria de recrutamento:</strong> só aparece aqui de forma indireta, por estar dentro da cesta da SGD.</li>
+<li><strong>(5) Agregador ou autodeclarado:</strong> frágil, e marcado como tal sempre que usado.</li>
+</ul>
+<h3>2. Mapa Salarial SGD/MGI: a referência federal (classe 1/2)</h3>
+<p><strong>Metodologia, segundo a Nota Técnica SEI nº 15960/2026/MGI, Processo 19974.102700/2021-91, assinada em 19/06/2026:</strong>
+- Cesta de quatro fontes:
+  - Novo CAGED de ago/2025 a jan/2026, excluída a CNAE Administração Pública;[1]
+  - PNAD Contínua do 3º e 4º trimestres de 2025, só setor privado;[1]
+  - 16 contratações públicas no PNCP entre abr/2025 e abr/2026;[1]
+  - 5 guias salariais de 2026: Robert Half, Michael Page, Hays, Adecco e LHH.[1]
+- No CAGED e na PNAD, o percentil 25 representa o júnior, a mediana o pleno e o percentil 75 o sênior.[1]
+- Valores discrepantes foram removidos por Escore Z até o coeficiente de variação ficar abaixo de 25%, e o valor final é a mediana saneada.[1]
+- Para perfis que caíram em relação a 2025, aplicou-se o ICTI/IPEA. A nota explica que o número de guias caiu de 8 para 5 e que os contratos de 2025 ainda usavam o mapa de 2024.[1]
+- Senioridade mínima: júnior com 1 ano de experiência, pleno com 3 anos e sênior com 5 anos.[5]</p>
+<p><strong>Tamanho de amostra declarado (CAGED):</strong>
+- Desenvolvedor: 132.987, mais 696 da PNAD;[1]
+- Gerente de projetos de TI: 12.082;[1]
+- Líder técnico: 5.510;[1]
+- Administrador de dados: 5.166;[1]
+- Testes/qualidade: 3.995;[1]
+- Arquiteto de software: 1.830;[1]
+- Analista de requisitos: 1.255;[1]
+- Cientista de dados: 1.077.[1]</p>
+<p>UX/UI, arquiteto de dados e engenharia de IA não têm amostra de CAGED nem de PNAD. Dependem só de guias salariais e de poucos contratos (0 a 2),[1] e por isso são os valores mais frágeis do mapa.[1]</p>
+<table>
+<thead>
+<tr>
+<th>Perfil SGD (sênior, salvo indicação)</th>
+<th>2025, Portaria 6.040/2025 (salário / fator-K)</th>
+<th>2026, NT 15960/2026 (salário / fator-K)</th>
+<th>Preço/HH 2026 (salário × K ÷ 176 h)*</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arquiteto de Software Sênior</td>
+<td>R$ 18.542,27 / 1,94</td>
+<td>R$ 19.078,14 / 1,98</td>
+<td>R$ 214,6</td>
+</tr>
+<tr>
+<td>Líder Técnico de Desenvolvimento</td>
+<td>R$ 16.966,67 / 1,94</td>
+<td>R$ 19.065,28 / 1,98</td>
+<td>R$ 214,5</td>
+</tr>
+<tr>
+<td>Gerente de Projetos de TI</td>
+<td>R$ 15.048,00 / 1,95</td>
+<td>R$ 17.138,03 / 1,99</td>
+<td>R$ 193,8</td>
+</tr>
+<tr>
+<td>Desenvolvedor de Software Sênior</td>
+<td>R$ 15.750,00 / 1,95</td>
+<td>R$ 16.205,18 / 1,99</td>
+<td>R$ 183,2</td>
+</tr>
+<tr>
+<td>Desenvolvedor de Software Pleno</td>
+<td>R$ 10.713,73 / 1,98</td>
+<td>R$ 11.023,35 / 2,03</td>
+<td>R$ 127,1</td>
+</tr>
+<tr>
+<td>Cientista de Dados Sênior</td>
+<td>R$ 19.000,00 / 1,94</td>
+<td>R$ 19.549,10 / 1,98</td>
+<td>R$ 219,9</td>
+</tr>
+<tr>
+<td>Arquiteto de Dados Sênior</td>
+<td>R$ 18.000,00 / 1,94</td>
+<td>R$ 18.520,20 / 1,98</td>
+<td>R$ 208,4</td>
+</tr>
+<tr>
+<td>Arquiteto de Dados Pleno</td>
+<td>R$ 13.590,00 / 1,96</td>
+<td>R$ 13.982,75 / 2,00</td>
+<td>R$ 158,9</td>
+</tr>
+<tr>
+<td>Engenharia de IA Sênior</td>
+<td>R$ 16.500,00 / 1,94</td>
+<td>R$ 16.976,85 / 1,99</td>
+<td>R$ 192,0</td>
+</tr>
+<tr>
+<td>Analista de Testes/Qualidade Sênior</td>
+<td>R$ 11.081,16 / 1,98</td>
+<td>R$ 13.883,33 / 2,00</td>
+<td>R$ 157,8</td>
+</tr>
+<tr>
+<td>Analista de Negócios/Requisitos Sênior</td>
+<td>R$ 11.227,93 / 1,98</td>
+<td>R$ 12.193,99 / 2,02</td>
+<td>R$ 140,0</td>
+</tr>
+<tr>
+<td>Analista de UX/UI Sênior</td>
+<td>R$ 12.516,67 / 1,97</td>
+<td>R$ 12.878,40 / 2,01</td>
+<td>R$ 147,1</td>
+</tr>
+</tbody>
+</table>
+<p>*A conversão para hora é cálculo do autor e usa 176 h/mês, o mesmo divisor do exemplo de memória de cálculo SGD reproduzido no fórum GestGov (salário R$ 11.400 → custo R$ 24.459,16 → R$ 138,97/h, fator-K 2,1455, Brasília).[16] A SGD não publica valor/hora.</p>
+<p><strong>Limites dessa fonte para o projeto:</strong>
+- (a) Os valores são nacionais, não regionais, e não incluem prêmio de O&amp;G nem de segurança crítica.
+- (b) O mapa vincula apenas órgãos do SISP. A Petrobras, sob a Lei 13.303/2016 e o RLCP, não é obrigada a usá-lo, mas ele é um parâmetro público de "preço de mercado" difícil de contestar.
+- (c) A Portaria SGD/MGI de 2025 dispensou a exigência de vínculo celetista do profissional alocado, segundo a cobertura da Convergência Digital.[17][18] O modelo, portanto, já convive com PJ.
+- (d) O modelo de infraestrutura (Portaria SGD/MGI nº 1.070/2023, alterada pela Portaria 6.055/2025) traz perfis de operação e infraestrutura,[19] mas não extraí os valores.[19] Por isso, para DevOps/SRE uso o desenvolvedor sênior como proxy.</p>
+<p><strong>Fundamento TCU:</strong> o modelo responde aos Acórdãos 2.037/2019 e 1.508/2020 do TCU-Plenário.[1][20] A cesta ampla de preços se apoia nos Acórdãos 2.637/2015 e 2.352/2016, e a métrica de remuneração precisa ser verificável (Súmula TCU 269).[1][21] O próprio TCU, na avaliação do modelo de contratação de desenvolvimento de software, alerta que preços muito abaixo do mercado indicam risco de execução inadequada.[22] Isso é relevante para não subprecificar o V&amp;V.</p>
+<h3>3. Dados por CBO (RAIS/CAGED): o que foi possível obter</h3>
+<p>Não consegui extrair estatística oficial do MTE (painel PDET/RAIS 2024 ou microdados do Novo CAGED) por CBO com recorte para RJ ou Macaé. O que há abaixo vem do agregador salario.com.br, que declara processar o CAGED dos últimos 12 meses (CLT, jornada integral, salário contratual sem adicionais, admitidos e desligados).[23][24] É <strong>classe 5 (secundário, frágil)</strong>: as páginas mudam todo mês e há inconsistências entre elas.</p>
+<table>
+<thead>
+<tr>
+<th>CBO</th>
+<th>Ocupação</th>
+<th>n (movimentações CAGED)</th>
+<th>Média</th>
+<th>Mediana</th>
+<th>Q1–Q3 / teto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2124-05</td>
+<td>Analista de desenvolvimento de sistemas (Brasil)</td>
+<td>136.804</td>
+<td>R$ 8.432,01</td>
+<td>R$ 7.500</td>
+<td>R$ 4.473–11.219 / teto R$ 15.232</td>
+</tr>
+<tr>
+<td>2124-05</td>
+<td>Idem, município do Rio de Janeiro</td>
+<td>n não exibido</td>
+<td>R$ 8.296,21</td>
+<td>R$ 7.744,50</td>
+<td>teto R$ 16.144,58</td>
+</tr>
+<tr>
+<td>2021-10</td>
+<td>Engenheiro de controle e automação</td>
+<td>1.416 (set/2026)</td>
+<td>R$ 12.304,29</td>
+<td>R$ 12.500</td>
+<td>teto R$ 17.352,07</td>
+</tr>
+<tr>
+<td>2149-15</td>
+<td>Engenheiro de segurança do trabalho</td>
+<td>6.915 (set/2026)</td>
+<td>R$ 11.522,18</td>
+<td>R$ 11.660</td>
+<td>R$ 8.744–13.778 / teto R$ 16.917</td>
+</tr>
+<tr>
+<td>2112-05</td>
+<td>Estatístico</td>
+<td>1.683</td>
+<td>R$ 8.258,63</td>
+<td>n/d</td>
+<td>teto R$ 15.304</td>
+</tr>
+<tr>
+<td>2131-05</td>
+<td>Físico</td>
+<td>55</td>
+<td>R$ 6.871</td>
+<td>R$ 4.399</td>
+<td>amostra pequena</td>
+</tr>
+<tr>
+<td>2031-15</td>
+<td>Pesquisador em física</td>
+<td>24</td>
+<td>R$ 6.868,17</td>
+<td>n/d</td>
+<td>amostra irrisória; outra página do mesmo site mostra valor diferente</td>
+</tr>
+<tr>
+<td>2145-25</td>
+<td>Engenheiro químico (petróleo e petroquímica)</td>
+<td>405</td>
+<td>R$ 14.329,75</td>
+<td>n/d</td>
+<td>n/d</td>
+</tr>
+<tr>
+<td>2147-05</td>
+<td>Engenheiro de mineração</td>
+<td>1.333</td>
+<td>R$ 13.897,51</td>
+<td>n/d</td>
+<td>n/d</td>
+</tr>
+<tr>
+<td>2147-45</td>
+<td>Tecnólogo em petróleo e gás</td>
+<td>59</td>
+<td>R$ 12.048–14.204 (varia entre páginas)</td>
+<td>≈R$ 10.022</td>
+<td>n/d</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Leitura crítica:</strong>
+- (i) O CAGED registra fluxos (admissões e desligamentos), não estoque. Isso puxa os valores para perfis mais juniores e subestima sêniores. A RAIS (estoque em 31/12) seria a fonte certa, e a RAIS 2024 já foi divulgada: remuneração média nacional de R$ 4.290,24 e mediana de R$ 2.647,10, segundo o Sumário Executivo do MTE.[25][26]
+- (ii) O salário contratual exclui periculosidade, sobreaviso e PLR, que em O&amp;G são grandes.
+- (iii) <strong>CBO do engenheiro de petróleo:</strong> nas tabelas consultadas não há título "engenheiro de petróleo". A família 2147 (engenheiros de minas e afins) e o 2145-25 são os enquadramentos usuais.[27][28][29] A busca no portal oficial da CBO/MTE não foi feita e deve ser feita antes de usar o código em proposta.
+- (iv) Em Macaé, a CNAE 0910-6/00 (apoio à extração de petróleo e gás) teve 6.937 movimentações entre 07/2025 e 06/2026, com salário médio de R$ 7.186 somando todos os cargos (mesmo agregador).[30] Isso mostra que o "prêmio Macaé" médio vale para o setor como um todo, e não para engenheiros sêniores.</p>
+<p><strong>Brasscom (classe 3):</strong> o Relatório de Regionalização das Ocupações de TI 2025 (dez/2025) se baseia exclusivamente em vínculos CLT identificados por CBO e <strong>exclui PJ e MEI</strong>.[9] Achados: 942.879 profissionais; o analista de desenvolvimento de sistemas é a maior ocupação (252.903 vínculos, média R$ 8.337); média nacional de TIC de R$ 5.888; RJ R$ 6.153; SP R$ 7.321; DF R$ 6.622.[8][9][31] Como exclui PJ num setor muito "pejotizado", subestima a remuneração de sêniores.</p>
+<p><strong>State of Data Brazil 2024-2025 (Data Hackers/Bain, classe 3):</strong> a remuneração dos profissionais de dados subiu em média 11,8% entre 2023 e 2024. Recebem acima de R$ 12 mil/mês 41,5% dos cientistas de dados e 42,3% dos engenheiros de dados e de ML.[32] A pesquisa foi feita entre 14/10 e 18/12/2024 com 5.217 respondentes brasileiros, segundo o dataset oficial Data Hackers/Bain no Kaggle (a 6ª edição, 2025-2026, já saiu, com 3.495 respondentes), e os dados misturam CLT e PJ. Servem de triangulação: são coerentes com o CDADOS-03 da SGD (R$ 19,5 mil) ser um valor de quartil superior.</p>
+<p><strong>PNAD Contínua:</strong> só a usei de forma indireta, através da cesta SGD (696 observações de desenvolvedores no 3º e 4º trimestres de 2025). A própria SGD registra que, na PNAD, só quatro ocupações de TI de nível superior chegam a cerca de 30 observações.[1] Ela não serve para os perfis especializados deste projeto.</p>
+<h3>4. Instrumentos coletivos e normas (classe 2)</h3>
+<p><strong>ACT Petrobras 2025-2027</strong> (minuta final publicada pela Petrobras; encerramento do dissídio de greve homologado no TST após aprovação em 30/12/2025):[33]
+- <strong>Tabelas salariais:</strong> vigem de 01/09/2025 a 31/08/2026 e serão reajustadas em 01/09/2026 pelo IPCA acumulado de 01/09/2025 a 31/08/2026, sem retroatividade.[10] RMNR e benefícios foram reajustados em 5,66% em 01/09/2025.[10][34]
+- <strong>Adicionais (cláusula 4):</strong>
+  - periculosidade de 30% do salário básico;[10]
+  - AHRA de 30% (39% com periculosidade) para turno ininterrupto;[10]
+  - <strong>sobreaviso (ASA) de 40%</strong> sobre o salário básico mais periculosidade;[10]
+  - Adicional Regional de Confinamento (offshore ou embarcado) de 10%, 15% ou 30%;[10]
+  - trabalho noturno de 20% (26%);[10]
+  - regime especial de campo de 20% (26%).[10]
+- <strong>Outras condições:</strong>
+  - sobreaviso parcial pago a 1/3 da hora normal, limitado a 144 h/mês;[10]
+  - gratificação de férias de 3/3 da remuneração (cláusula 6);[10]
+  - horas extras com acréscimo de 100%.[10]
+- <strong>Valores absolutos:</strong> o ingresso de nível superior (nível 806) tem RMNR de R$ 15.200,52 no regime administrativo. Esse valor está em portais de concurso que reproduzem a tabela do ACT.[3][4] Não extraí o anexo I diretamente, então trate como classe 2 de fonte secundária.
+- <strong>Valores só em blogs (classe 5):</strong> PLR de R$ 73.506,90 para nível superior e remuneração de R$ 24.502,30 para superior embarcado em sobreaviso.[35] Sêniores entre R$ 30 mil e R$ 35 mil aparecem só em blogs de concursos, frágeis.[36][37]</p>
+<p>Esses adicionais valem para empregados Petrobras. Para empregados de contratadas em regime de sobreaviso ou turno, a referência legal é a Lei 5.811/1972, citada no próprio ACT.[10] Para PJ não há adicional: o embarque deve ser precificado como diária ou HH diferenciado.</p>
+<p><strong>SINDPD-RJ, CCT 2025/2027 (MR058505/2025):</strong> reajuste de 5,10% (INPC) a partir de 01/09/2025, data-base em 1º de setembro.[38] <strong>SINDPD-SP, CCT 2026/2027:</strong> reajuste de 4% em 2026 e INPC em 2027; os salários normativos tiveram ganho real de 2,15% a 2,48%.[39] Os pisos de TI são de nível operacional (por exemplo, digitador a R$ 2.250 por 30 h) e <strong>irrelevantes</strong> como piso para estes perfis.[39] Servem apenas como índice de reajuste.</p>
+<p><strong>Lei 4.950-A/66 e Súmula 370 do TST:</strong>
+- A lei fixa 6 SM para 6 h. A 7ª e a 8ª horas são pagas com acréscimo de 25%, o que dá 7,25 SM para 7 h e 8,5 SM para 8 h.[40][41][42]
+- A Súmula 370 afirma que a lei <strong>não</strong> cria jornada reduzida: não há horas extras até a 8ª hora, desde que respeitado o salário-mínimo/hora da categoria.[43] A recepção constitucional está na OJ 71 da SDI-2.[12]
+- A FNE e o SEESP defendem 9 SM para 8 h, mas a jurisprudência majoritária do TST aplica 8,5.[14][44]
+- Há uma tese minoritária de 7,66 SM para 44 h semanais (Conjur, 2019).[45]</p>
+<table>
+<thead>
+<tr>
+<th>Jornada</th>
+<th>Múltiplo</th>
+<th>SM vigente 2026 (R$ 1.621)</th>
+<th>Leitura "congelada" STF 2022 (R$ 1.212)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6 h</td>
+<td>6 SM</td>
+<td>R$ 9.726,00</td>
+<td>R$ 7.272,00</td>
+</tr>
+<tr>
+<td>7 h</td>
+<td>7,25 SM</td>
+<td>R$ 11.752,25</td>
+<td>R$ 8.787,00</td>
+</tr>
+<tr>
+<td>8 h</td>
+<td>8,5 SM</td>
+<td>R$ 13.778,50</td>
+<td>R$ 10.302,00</td>
+</tr>
+<tr>
+<td>8 h (tese FNE/SEESP)</td>
+<td>9 SM</td>
+<td>R$ 14.589,00</td>
+<td>R$ 10.908,00</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Divergência:</strong> o SEESP e o SENGE-RJ aplicam o SM vigente na contratação, sem indexação posterior.[2][11][14] Decisões trabalhistas citadas no Jusbrasil aplicam o SM de março/2022 por força das ADPFs 53, 149 e 171.[12] Para proposta a uma estatal, recomendo usar R$ 13.778,50 (8 h) como piso conservador.</p>
+<h3>5. CONFEA/CREA, IBAPE e hora técnica (classe 2, com ressalvas)</h3>
+<p>Não encontrei resolução do CONFEA que fixe hora técnica nacional, nem tabela de honorários do SENGE-RJ ou do CREA-RJ para 2025/2026. As tabelas regionais existentes são de <strong>perícia e avaliação</strong>, ou de entidades de classe, e não refletem consultoria de O&amp;G:
+- <strong>IBAPE-SP:</strong> hora técnica básica de R$ 570,00 (Regulamento de Honorários 2024, aprovado em 09/04/2024), sem despesas diretas.[46]
+- <strong>IBAPE-MG:</strong> hora técnica mínima de R$ 480,00 mais impostos (2025/2026).[47]
+- <strong>IBAPE-PR:</strong> R$ 453,94/h (jan/2017, desatualizada).[48]
+- <strong>ABENC-TO 2023 (CREA-TO):</strong> consultoria entre R$ 120,60 e R$ 241,18/h conforme o volume de horas.[49]
+- <strong>ABEE/CREA-SE:</strong> Hora Padrão Técnica de R$ 65,09 e R$ 84,65/h à disposição do cliente.[50]</p>
+<p>Interpretação: a faixa de R$ 450 a R$ 570/h do IBAPE é preço de profissional autônomo para laudo pontual, com custos indiretos embutidos. Não é parâmetro de alocação contínua, mas pode sustentar HH de <strong>especialista</strong> em atividades pontuais (revisão de LOPA, parecer de V&amp;V).</p>
+<h3>6. Composição do preço da hora e tributação do PJ</h3>
+<p><strong>Encargos CLT (cálculo do autor a partir de alíquotas legais; não é tabela oficial):</strong>
+- 13º salário e 1/3 de férias somam +11,1% sobre 12 salários (13,33 salários por ano).
+- Sobre essa base incidem INSS patronal de 20%, RAT de 1–3% e terceiros de ≈5,8%, num total de ≈27–29%, mais FGTS de 8%.
+- Resultado: ≈1,50–1,55× o salário antes de benefícios e provisões rescisórias, e ≈1,6–1,8× com benefícios.
+- O fator-K da SGD (~2,0) acrescenta a isso custos indiretos, tributos sobre faturamento e lucro.[18]
+- Empresas de TI que ainda usam a CPRB estão em reoneração gradual da folha pela Lei 14.973/2024: em 2026 recolhem 60% da alíquota-base da CPRB mais 10% sobre a folha (que não incide no 13º), passando a 15% sobre a folha em 2027 e à alíquota integral de 20% a partir de 2028 (Senado Notícias, 17/09/2024).</p>
+<p><strong>Simples Nacional (LC 123/2006; Resolução CGSN 140/2018):</strong>
+- Atividades do Anexo V (engenharia, consultoria, desenvolvimento intelectual) migram para o Anexo III se o <strong>fator R</strong> (folha e pró-labore de 12 meses ÷ receita de 12 meses) for de pelo menos 28%.[51][52][53]
+- O Anexo III começa em 6% e o Anexo V em 15,5%.[54][55] A alíquota efetiva é (RBT12 × alíquota nominal − parcela a deduzir) ÷ RBT12.
+- Exemplos do autor:</p>
+<table>
+<thead>
+<tr>
+<th>Faturamento PJ mensal</th>
+<th>RBT12</th>
+<th>Anexo III (efetiva)</th>
+<th>Anexo V (efetiva)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R$ 25.000</td>
+<td>R$ 300 mil (2ª faixa)</td>
+<td>(300.000 × 11,2% − 9.360) ÷ 300.000 = <strong>8,08%</strong></td>
+<td>(300.000 × 18% − 4.500) ÷ 300.000 = <strong>16,5%</strong></td>
+</tr>
+<tr>
+<td>R$ 40.000</td>
+<td>R$ 480 mil (3ª faixa)</td>
+<td>(480.000 × 13,5% − 17.640) ÷ 480.000 = <strong>9,83%</strong></td>
+<td>(480.000 × 19,5% − 9.900) ÷ 480.000 = <strong>17,44%</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Para chegar ao Anexo III, o pró-labore precisa ser de pelo menos 28% da receita (por exemplo, R$ 7.000 sobre R$ 25.000), e sobre ele incidem INSS e IRPF.</li>
+</ul>
+<p><strong>Lucro Presumido para serviços (Lei 9.249/95 e Lei 9.430/96):</strong>
+- Presunção de 32% para IRPJ (15%, mais adicional de 10% sobre o lucro presumido acima de R$ 20 mil/mês) e para CSLL (9%).
+- PIS de 0,65% e COFINS de 3% cumulativos, mais ISS municipal de 2% a 5%.
+- Carga típica: ≈11,3% + ISS, ou seja, ≈13,3% a 16,3% da receita.
+- <strong>LC 224/2025:</strong> desde 2026, o percentual de presunção aumenta 10% (32% passa a 35,2%) <strong>sobre a parcela da receita anual acima de R$ 5 milhões</strong>. A regulamentação está nas IN RFB 2.305/2025 e 2.306/2026, e a CSLL só foi atingida a partir do 2º trimestre de 2026. Há liminar contra a regra (1ª Vara Federal de Resende/RJ, Processo 5000259-79.2026.4.02.5116).[56][57][58][59]
+- Consequência: não afeta o PJ individual, mas <strong>afeta a EnvironPact</strong> se o contrato passar de R$ 5 milhões/ano.</p>
+<p><strong>Dividendos (Lei 15.270/2025):</strong>
+- Desde jan/2026 há IRRF de 10% sobre o total de lucros pagos por uma mesma PJ a uma mesma pessoa física acima de R$ 50 mil/mês.[60][61]
+- Rendas acima de R$ 600 mil/ano pagam o IRPF mínimo (até 10% a partir de R$ 1,2 milhão).[62]
+- <strong>Divergência sobre o Simples:</strong> o "Perguntas e Respostas" da Receita Federal afirma que a retenção também vale para optantes do Simples. A doutrina (Conjur, dez/2025) sustenta que o art. 14 da LC 123 afasta essa regra.[63][64]
+- Para esta equipe, só o PJ do topo de faixa (≈R$ 42 mil/mês) se aproxima desses limites.</p>
+<p><strong>Equivalência CLT→PJ (cálculo do autor, com premissas explícitas):</strong>
+- (a) O que o CLT recebe por ano, sem benefícios: 13,33 salários + FGTS de 8% ≈ <strong>14,4 salários</strong>. Dividido por 12, dá 1,20× o salário mensal.
+- (b) Para manter essa renda bruta, o PJ precisa faturar 1,20 ÷ (1 − t), onde t é o tributo mais contabilidade. Com t ≈ 8–10% (Anexo III), o multiplicador é <strong>≈1,30–1,33×</strong>. Com t ≈ 14–17% (Anexo V ou Presumido), é <strong>≈1,40–1,45×</strong>.
+- (c) Na comparação líquido-com-líquido, o CLT de alta renda paga IRPF de 27,5% na margem, e o PJ que distribui lucro isento abaixo de R$ 50 mil/mês paga menos. A paridade líquida exige multiplicador menor (≈1,05–1,20×), mas sem benefícios, estabilidade nem FGTS para o profissional.
+- <strong>Recomendação:</strong> use <strong>1,30× (piso) a 1,40× (teto)</strong> sobre o salário-base CLT de referência, e documente essa memória de cálculo na proposta.</p>
+<h3>7. Prêmio de especialização</h3>
+<ul>
+<li><strong>Certificação em segurança funcional (TÜV/exida):</strong></li>
+<li>Não encontrei dado público de salário nem contagem de certificados no Brasil.</li>
+<li>O que existe: segundo a página oficial da TÜV Rheinland (tuv.com), mais de 30.000 engenheiros participaram dos cursos do programa FS &amp; CySec desde 2004, no mundo todo, e o programa é apoiado por mais de 30 empresas internacionais. O número soma participantes de segurança funcional e de cibersegurança (FS Engineer, FS Technician, CySec Specialist e CySec Technician), não é contagem de certificados ativos de segurança funcional e não tem recorte por país. Para o FS Engineer, a TÜV Rheinland exige 3 anos de experiência em segurança funcional e diploma de engenharia.</li>
+<li>O TÜV SÜD mantém uma lista pública de certificados FSCP, com Engineer, Professional (6 anos de experiência em segurança funcional, que podem cair para 2 conforme a formação, e 2 projetos) e Expert.[65][66] Não extraí a lista para contar brasileiros.</li>
+<li><strong>Não há base para afirmar um prêmio percentual.</strong> A faixa da posição 12 é estimativa do autor.</li>
+<li><strong>Offshore/embarcado:</strong> o único dado quantificado e primário é o ACT Petrobras: sobreaviso de 40%, periculosidade de 30%, ARC de até 30% e férias pagas a 3/3.[10]</li>
+<li><strong>O&amp;G contra outros setores (mesmo cargo):</strong> não encontrei estudo do IBP, ABESPetro, ONIP ou Firjan com remuneração. Na comparação de agregador (classe 5), engenheiros de química/petróleo e de mineração (≈R$ 13,9–14,3 mil) ficam ≈15% acima do engenheiro de controle e automação (≈R$ 12,3 mil).[23][67][68] É indício, não prova.</li>
+</ul>
+<h3>8. Tabela consolidada por posição (nível sênior, valores mensais em R$)</h3>
+<p><strong>Premissas da tabela:</strong>
+- O CLT inferior é a referência oficial (SGD 2026 sênior, piso legal ou âncora ACT).
+- O CLT superior é a referência × 1,3, um prêmio estimado pelo autor para segurança crítica e O&amp;G que não foi medido por fonte primária.
+- PJ = CLT inferior × 1,30 até CLT superior × 1,40.
+- Anual CLT = mensal × 13,33 (sem FGTS e benefícios). Anual PJ = mensal × 12.
+- HH = preço de venda da empresa (salário × fator-K ÷ 176 h). Para engenharia, usa-se K = 1,98 por analogia, o que não é referência oficial.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Posição</th>
+<th>CLT mensal</th>
+<th>PJ mensal</th>
+<th>Anual CLT</th>
+<th>Anual PJ</th>
+<th>HH de venda</th>
+<th>Fonte de melhor qualidade (classe)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Coordenação sistêmica (arquiteto/TPM)</td>
+<td>19.100–24.800</td>
+<td>24.800–34.700</td>
+<td>254.600–330.600</td>
+<td>297.600–416.400</td>
+<td>215–279</td>
+<td>SGD ARQSOF-02 R$ 19.078,14 / LDESENV R$ 19.065,28 (1)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Ingestão e borda (dados/edge/OPC UA)</td>
+<td>16.200–21.100</td>
+<td>21.100–29.500</td>
+<td>215.900–281.300</td>
+<td>253.200–354.000</td>
+<td>183–239</td>
+<td>SGD DESENV-03 R$ 16.205,18; ARQDADOS-03 R$ 18.520,20 (1)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Infraestrutura DevOps/SRE + IEC 62443-4-1</td>
+<td>16.200–21.100</td>
+<td>21.100–29.500</td>
+<td>215.900–281.300</td>
+<td>253.200–354.000</td>
+<td>183–239</td>
+<td>Proxy SGD DESENV-03 (1); sem perfil DevOps extraído</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Rede bayesiana (modelador probabilístico)</td>
+<td>19.500–25.400</td>
+<td>25.400–35.600</td>
+<td>259.900–338.600</td>
+<td>304.800–427.200</td>
+<td>219–286</td>
+<td>SGD CDADOS-03 R$ 19.549,10, CAGED n=1.077 (1); State of Data (3)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Domínio de poço (eng. petróleo)</td>
+<td>18.000–30.000</td>
+<td>23.400–42.000</td>
+<td>239.900–399.900</td>
+<td>280.800–504.000</td>
+<td>203–338</td>
+<td>Âncora: RMNR Petrobras R$ 15.200,52 de ingresso (2, via fonte secundária); teto estimado. <strong>Sem dado primário de sênior</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Operabilidade do modelo (ML/MLOps)</td>
+<td>17.000–22.100</td>
+<td>22.100–30.900</td>
+<td>226.600–294.600</td>
+<td>265.200–370.800</td>
+<td>192–250</td>
+<td>SGD IA-ENG-03 R$ 16.976,85 (1; amostra só de guias)</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Design de produto (ISA-101)</td>
+<td>12.900–16.700</td>
+<td>16.800–23.400</td>
+<td>172.000–222.600</td>
+<td>201.600–280.800</td>
+<td>147–191</td>
+<td>SGD AUX/UI-02 R$ 12.878,40 (1; amostra só de guias)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Front-end e estado (React/TS)</td>
+<td>16.200–21.100</td>
+<td>21.100–29.500</td>
+<td>215.900–281.300</td>
+<td>253.200–354.000</td>
+<td>183–239</td>
+<td>SGD DESENV-03 R$ 16.205,18, CAGED n=132.987 (1)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Pesquisa e requisitos (fatores humanos)</td>
+<td>12.200–15.900</td>
+<td>15.900–22.300</td>
+<td>162.600–211.900</td>
+<td>190.800–267.600</td>
+<td>140–183</td>
+<td>SGD ANR-03 R$ 12.193,99 (1); fatores humanos sem fonte específica</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Verificação e teste (QA/evidência)</td>
+<td>13.900–18.000</td>
+<td>18.100–25.200</td>
+<td>185.300–239.900</td>
+<td>217.200–302.400</td>
+<td>158–205</td>
+<td>SGD ATQ-03 R$ 13.883,33, CAGED n=3.995 (1)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Domínio e HSEQ (LOPA/HAZOP/ISA-18.2)</td>
+<td>13.800–20.000</td>
+<td>17.900–28.000</td>
+<td>184.000–266.600</td>
+<td>214.800–336.000</td>
+<td>155–225</td>
+<td>Piso Lei 4.950-A R$ 13.778,50 (2); CBO 2149-15 mediana R$ 11.660 (5)</td>
+</tr>
+<tr>
+<td>12</td>
+<td>V&amp;V independente (FSEng/CFSE, IEC 61508)</td>
+<td>17.400–26.000</td>
+<td>22.600–36.400</td>
+<td>231.900–346.600</td>
+<td>271.200–436.800</td>
+<td>196–293</td>
+<td>CBO 2021-10 teto R$ 17.352 (5) + piso legal (2); <strong>prêmio de certificação não medido</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Total da equipe</strong></td>
+<td><strong>≈192.400–262.200</strong></td>
+<td><strong>≈250.100–367.100</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Preço de venda com K≈1,98: ≈R$ 381–519 mil/mês</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Onde as fontes divergem e por quê:</strong>
+- <strong>(a) Agregadores do CAGED contra SGD.</strong> O agregador mostra o analista de desenvolvimento com mediana de R$ 7.500. A SGD põe o desenvolvedor sênior em R$ 16.205.[1][69] O CAGED mede fluxo, mistura senioridades e inclui todo o país; a SGD usa o percentil 75 e acrescenta guias e contratos públicos.[1]
+- <strong>(b) Engenheiro de segurança.</strong> A mediana do CAGED (R$ 11.660) fica abaixo do piso legal de 8 h (R$ 13.778,50).[2][70] Provavelmente reflete contratos de 6 h, leitura do piso "congelado" em 2022 ou descumprimento. Para proposta, vale o piso legal.
+- <strong>(c) Brasscom contra SGD.</strong> A Brasscom mostra média de TIC de R$ 5.888 porque inclui suporte e helpdesk e exclui PJ.[9]</p>
+<h2>Recommendations</h2>
+<ol>
+<li><strong>Ancore a proposta no Mapa SGD 2026 e anexe a memória de cálculo.</strong> Use salário × fator-K por perfil, como faz a Nota Técnica 15960/2026.[1] Isso dá rastreabilidade oficial a 9 das 12 linhas e protege a proposta contra questionamento de sobrepreço.</li>
+<li><strong>Justifique explicitamente o prêmio de segurança crítica (+30% no teto)</strong> com os requisitos de competência da IEC 61508-1 (gestão de competência), da IEC 62443-4-1 e da exigência de independência do V&amp;V. Não há dado salarial primário para esse prêmio. Apresente-o como premissa, não como dado de mercado.</li>
+<li><strong>Reveja a margem se a equipe for PJ.</strong> Com PJ a 1,3–1,4× o salário e venda a K≈1,98, a margem bruta para overhead, seguros (RC profissional), ferramentas qualificadas e lucro fica em ≈13–18% da receita, depois de ≈16% de tributos no Presumido. O fator-K da SGD admite até 3 com memória de cálculo, e a referência defensável para segurança crítica fica em K entre 2,2 e 2,5, justificado.[5][15]</li>
+<li><strong>Para a posição 12 (V&amp;V independente), cote também a terceirização da avaliação de segurança funcional</strong> com um organismo (TÜV, exida ou similar), porque a oferta de FSEng no Brasil não pôde ser medida. Contratar um CLT ou PJ certificado é risco de prazo, não só de custo.</li>
+<li><strong>Precifique o embarque à parte.</strong> Para PJ, use diária ou HH de embarque. Para CLT, aplique os regimes da Lei 5.811/72. Use os adicionais do ACT Petrobras como teto de referência: sobreaviso de 40% e periculosidade de 30%.[10]</li>
+<li><strong>Planejamento tributário da EnvironPact:</strong> com faturamento acima de R$ 4,8 milhões, a empresa sai do Simples. Acima de R$ 5 milhões no Presumido, entra o acréscimo da LC 224/2025, que está sob contestação judicial. Simule Lucro Real contra Presumido antes de fechar o preço.[56][71]</li>
+<li><strong>Antes da submissão, feche as lacunas oficiais:</strong>
+   - extrair a RAIS 2024 por CBO, com filtro para RJ e Macaé (código IBGE 3302403), via PDET ou Base dos Dados;
+   - consultar o PNCP e o Painel de Preços pelos 16 IDs de contratação listados na Nota Técnica 15960/2026;[1]
+   - pedir à Petrobras, na fase de esclarecimentos, o critério de medição (HH, ponto de função ou entrega).</li>
+</ol>
+<h2>Caveats</h2>
+<ul>
+<li><strong>Estimativas do autor estão marcadas:</strong> o teto ×1,3, os multiplicadores PJ, a conversão para hora (176 h) e as faixas das posições 5, 11 e 12. Não as apresente como "dado de mercado".</li>
+<li><strong>Os valores do mapa SGD 2026</strong> são os da Nota Técnica 15960/2026. Confirme no Anexo II consolidado da Portaria 750/2023 (redação da Portaria 4.777/2026) que foram publicados sem alteração.</li>
+<li><strong>Os dados por CBO</strong> vêm de agregador (classe 5). Não substituem a extração oficial da RAIS ou do CAGED.</li>
+<li><strong>Valores Petrobras além do ACT</strong> (salário de sênior, PLR, embarcado) vêm de blogs de concurso e são frágeis.</li>
+<li><strong>Risco jurídico da pejotização:</strong> a contratação PJ de pessoal com subordinação e habitualidade está no Tema 1389 de repercussão geral do STF (ARE 1.532.603, relator Gilmar Mendes), que suspendeu nacionalmente os processos em 14/04/2025; em 18/06/2026 a suspensão foi retirada em parte, e os processos voltaram a andar nas Varas e nos TRTs mas seguem suspensos no TST até a tese final. Valide o modelo contratual com jurídico trabalhista, sobretudo para quem vai trabalhar em sala de controle ou embarcado.</li>
+<li><strong>Não foram encontrados:</strong> tabela de HH da Petrobras ou da ANP; valores de ponto de função contratados; estudos do IBP, ABESPetro, ONIP, Firjan, ABES, Softex ou Assespro com remuneração; recorte Brasil do Stack Overflow; pesquisa salarial de UX; e qualquer contagem de profissionais com certificação em segurança funcional no Brasil.</li>
+</ul>
+<h2>Fontes</h2>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.gov.br/governodigital/pt-br/contratacoes-de-tic/legislacao/modelo-de-contratacao-de-servicos-de-desenvolvimento-manutencao-e-sustentacao-de-software/documentos-relacionados/sei_60048130_nota_tecnica_15960.pdf">https://www.gov.br/governodigital/pt-br/contratacoes-de-tic/legislacao/modelo-de-contratacao-de-servicos-de-desenvolvimento-manutencao-e-sustentacao-de-software/documentos-relacionados/sei_60048130_nota_tecnica_15960.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://sengerj.org.br/salario-minimo-profissional-da-engenharia/">SALÁRIO MÍNIMO PROFISSIONAL DA ENGENHARIA</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.estrategiaconcursos.com.br/blog/concurso-petrobras-cargos-vagas/">Concurso Petrobras 2026: cargos e vagas previstas!</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.estrategiaconcursos.com.br/blog/quanto-ganha-engenheiro-petrobras/">Quanto ganha um engenheiro na Petrobras?</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ordemjuridica.com.br/news/portaria-sgd-mgi-no-6-040-de-11-de-agosto-de-2025">PORTARIA SGD/MGI Nº 6.040, DE 11 DE AGOSTO DE 2025. Altera a Portaria SGD/MGI nº 750, de 20 de março de 2023, que estabelece modelo para a contratação de serviços de desenvolvimento, manutenção e sustentação de software</a></li>
+<li><a target="_blank" rel="noopener" href="https://atlaspublico.com.br/noticias/portaria-sgd-mgi-n-4-777-2026-altera-regras-de-contratacao-59373">Portaria SGD/MGI nº 4.777/2026 altera regras de contratação ...</a></li>
+<li><a target="_blank" rel="noopener" href="https://telesintese.com.br/empregos-de-tic-crescem-mais-fora-do-sul-sudeste-aponta-brasscom/">Empregos de TIC crescem mais fora do Sul-Sudeste, aponta Brasscom</a></li>
+<li><a target="_blank" rel="noopener" href="https://newblogs.correiobraziliense.com.br/blog-da-rosana-hessel/brasilia-tem-a-maior-media-salarial-do-setor-de-ti-do-pais-segundo-brasscom/">Brasília tem a maior média salarial do setor de TIC do país, segundo Brasscom - Blog da Rosana Hessel</a></li>
+<li><a target="_blank" rel="noopener" href="https://consecti.org.br/empregos-de-tecnologia-crescem-mais-no-norte-e-nordeste-aponta-brasscom/">Empregos de tecnologia crescem mais no Norte e Nordeste, aponta Brasscom - Consecti</a></li>
+<li><a target="_blank" rel="noopener" href="https://petrobras.com.br/documents/d/f3a44542-113e-11ee-be56-0242ac120002/minuta-act-2025-2027ajustada-final-limpa?download=true">1/164 INTERNA ACORDO COLETIVO DE TRABALHO 2025-2027 CAPÍTULO I</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.seesp.org.br/site/comunicacao/noticias/item/23666-reajuste-do-salario-minimo-eleva-piso-para-contratacao-de-engenheiros">Reajuste do salário mínimo eleva piso para contratação de engenheiros</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jusbrasil.com.br/jurisprudencia/busca?q=piso+salarial+profissional+dos+engenheiros">Piso Salarial Profissional dos Engenheiros - Jurisprudência</a></li>
+<li><a target="_blank" rel="noopener" href="https://senge.org.br/honorarios/">Honorários - SENGE-RS</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.fne.org.br/index.php/lutas/salario-minimo-profissional">FNE - Salário Mínimo Profissional</a></li>
+<li><a target="_blank" rel="noopener" href="https://bibliotecadigital.gestao.gov.br/bitstream/123456789/533982/1/Portaria%20SGD_MGI%20N%C2%BA%206.040,%20DE%2011%20DE%20AGOSTO%20DE%202025%20-%20Portaria%20SGD_MGI%20N%C2%BA%206.040,%20DE%2011%20DE%20AGOSTO%20DE%202025%20-%20DOU%20-%20Imprensa%20Nacional.pdf">Portaria SGD/MGI Nº 6.040, DE 11 DE AGOSTO ... - Biblioteca Digital</a></li>
+<li><a target="_blank" rel="noopener" href="https://gestgov.discourse.group/t/novos-modelos-para-contratacao-de-servicos-de-tic/8223">Novos modelos para contratação de serviços de TIC - TIC, Nuvem, Dados, Portais... - GestGov</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.contadores.cnt.br/noticias/tecnicas/2025/08/15/governo-muda-regras-de-contratacao-de-servicos-de-ti-e-deixa-de-exigir-fiscalizacao-trabalhista-e-clt.html">Governo muda regras de contratação de serviços de TI e deixa de exigir fiscalização trabalhista e CLT</a></li>
+<li><a target="_blank" rel="noopener" href="https://convergenciadigital.com.br/governo/depois-do-software-governo-muda-compras-de-servicos-de-ti-dispensa-clt-e-atualiza-salarios/">Depois do software, governo muda compras de serviços de TI, dispensa CLT e atualiza salários</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gov.br/governodigital/pt-br/contratacoes-de-tic/legislacao/modelo-de-contracao-de-servicos-de-operacao-de-infraestrutura-e-de-atendimento-a-usuarios-de-tic/portaria-sgd-mgi-no-1-070-de-1o-de-junho-de-2023">Portaria SGD/MGI nº 1.070, de 1º de junho de 2023 — Governo Digital</a></li>
+<li><a target="_blank" rel="noopener" href="https://zenite.com.br/2023/03/23/portaria-define-modelo-de-contratacao-de-servicos-de-software-no-executivo-federal-adequado-a-nova-lei-de-licitacoes/">Portaria define modelo de contratação de serviços de software no Executivo Federal adequado à Nova Lei de Licitações - Portal Zênite</a></li>
+<li><a target="_blank" rel="noopener" href="https://telesintese.com.br/gestao-altera-portaria-de-contratacao-de-infraestrutura-de-tic/">Gestão altera portaria de contratação de infraestrutura de TIC</a></li>
+<li><a target="_blank" rel="noopener" href="https://portal.tcu.gov.br/data/files/C7/75/CF/1A/D3CC9510EBCCDB952A2818A8/Avalia__o%20do%20modelo%20de%20contrata__o%20de%20desenvolvimento%20de%20software.pdf">Avaliação do modelo de contratação de desenvolvimento ...</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/profissao/engenheiro-quimico-petroleo-e-petroquimica-cbo-214525/">Engenheiro Químico (petróleo e Petroquímica) - Salário 2026, Piso Salarial</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/profissao/engenheiro-de-seguranca-do-trabalho-cbo-214915/camacari-ba/">Engenheiro de Segurança do Trabalho: Piso Salarial 2025 - Camaçari, BA</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho/rais/rais-2024/rais-2024-1/sumario-executivo_rais-2024-1.pdf">SUMÁRIO EXECUTIVO Relação Anual de Informações Sociais - RAIS Ano-base 2024</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2025/dezembro/rais-de-2024-aponta-crescimento-de-3-3-no-numero-de-empregos-formais-no-pais">RAIS de 2024 aponta crescimento de 3,3% no número de empregos formais no país — Ministério do Trabalho e Emprego</a></li>
+<li><a target="_blank" rel="noopener" href="https://codigocbo.com.br/cbo-214525-engenheiro-quimico-petroleo-e-borracha">CBO 214525 - Engenheiro químico (petróleo e borracha)</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gov.br/ibama/pt-br/servicos/cadastros/ctf/ctf-aida/20250701_Tabela_de_ocupacoes_e_sinonimos.pdf">INSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVÁVEIS</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ocupacoes.com.br/cbo-mte/2147-engenheiros-de-minas-e-afins">CBO 2147 - Engenheiros de minas e afins - Classificação Brasileira de Ocupações</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/empresas/atividades-de-apoio-a-extracao-de-petroleo-e-gas-natural/macae-rj-910600/">Apoio à Extração de Petróleo</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.datacenterdynamics.com/br/not%C3%ADcias/brasscom-divulga-relat%C3%B3rio-que-mostra-o-avan%C3%A7o-de-polos-de-empregos-em-tic-fora-do-sudeste/">Brasscom divulga relatório que mostra o avanço de polos de empregos em TIC fora do Sudeste - DCD</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bain.com/contentassets/1c5b651fcdad45a794863d1d6df480b4/bain--company-e-data-hackers---state-of-data-2024.pdf">State of Data 2024 - 2025 Um raio-x dos profissionais de dados do Brasil</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.tst.jus.br/en/-/acordo-que-encerrou-greve-nacional-dos-petroleiros-e-assinado-no-tst">Após acordo, TST encerra dissídio coletivo de greve dos petroleiros - TST</a></li>
+<li><a target="_blank" rel="noopener" href="https://transpetro.com.br/data/files/7B/92/52/B9/EBB7C910A14EB999D8098204/ACT_Terra2025-2027.pdf">0 ACORDO COLETIVO DE TRABALHO 2025-2027 CAPÍTULO I</a></li>
+<li><a target="_blank" rel="noopener" href="https://concurseirozero1.com.br/blog/salario-petrobras-2026-quanto-voce-vai-ganhar-de-verdade-segundo-o-act-2025-2027/">Salário Petrobras 2026: Quanto Você Vai Ganhar de Verdade Segundo o ACT 2025-2027?</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.novaconcursos.com.br/portal/concursos/concurso-petrobras/">Concurso Petrobras 2026: Cesgranrio confirma edital!</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.grancursosonline.com.br/concurso-petrobras/">Concurso Petrobras: Cesgranrio é a banca. Entenda!</a></li>
+<li><a target="_blank" rel="noopener" href="https://sindpdrj.org.br/wp-content/uploads/2025/09/CCT-Particulares-2025-2027.pdf">CONVENÇÃO COLETIVA DE TRABALHO 2025/2027 NÚMERO DA SOLICITAÇÃO: MR058505/2025</a></li>
+<li><a target="_blank" rel="noopener" href="https://sindpd.org.br/convencao-coletiva-de-trabalho/">Convenção Coletiva de Trabalho - SINDPD</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.senge-pr.org.br/juridico/salario-minimo-profissional/">salário mínimo profissional (smp)</a></li>
+<li><a target="_blank" rel="noopener" href="https://engenharia360.com/os-salarios-dos-engenheiros-em-2026/">Engenheiros em 2026: Guia Completo de Pisos e Médias Salariais</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jusbrasil.com.br/jurisprudencia/busca?q=piso+salarial+de+engenheiros">Piso Salarial de Engenheiros - Jurisprudência</a></li>
+<li><a target="_blank" rel="noopener" href="https://jurisprudencia-backend2.tst.jus.br/rest/documentos/25f608f83ed85e773cce1d2b12935753">Tst</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jusbrasil.com.br/jurisprudencia/busca?q=piso+salarial+de+8%2C5+sal%C3%A1rios+m%C3%ADnimos">Piso Salarial de 8,5 Salários Mínimos - Jurisprudência</a></li>
+<li><a target="_blank" rel="noopener" href="https://conjur.com.br/2019-fev-13/teodoro-campis-lei-495066-salario-minimo-profissional/">Teodoro Campis: A Lei 4.950/66 e o salário mínimo profissional - Consultor Jurídico</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibape-sp.org.br/adm/upload/uploads/1714051158-Regulamento%20de%20Honorarios%202024_Aprovado%20em%2009.04.2024.pdf">regulamento de honorários para avaliações e perícias de ...</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ibapemg.com.br/2018/wp-content/uploads/2025/04/regulamento-de-honorarios-ibape-2025-2026.pdf">PROCEDIMENTOS E HONORÁRIOS SUGERIDOS PELO IBAPE-MG 2025/2026</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.crea-pr.org.br/ws/wp-content/uploads/2021/04/Tabela-IBAPE.pdf">Tabela-IBAPE.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://crea-to.org.br/novo_site/wp-content/uploads/2023/04/Tabela-de-honorarios-ENGENHARIA-CIVIL.pdf">Tabela-de-honorarios-ENGENHARIA-CIVIL.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.crea-se.org.br/wp-content/uploads/2024/05/tabela-honorarios-abee.pdf">tabela-honorarios-abee.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.e-auditoria.com.br/blog/anexo-iii-ou-anexo-v-simples-nacional/">Anexo III ou Anexo V Simples Nacional: Fator R decide imposto</a></li>
+<li><a target="_blank" rel="noopener" href="https://treeunfe.com.br/blog/fator-r-no-simples-nacional-como-calcular-corretamente">Fator R no Simples Nacional: como calcular corretamente</a></li>
+<li><a target="_blank" rel="noopener" href="https://contabilidade.com/blog/fator-r-o-que-e-e-como-calcular-nos-anexos-iii-e-v-do-simples-nacional/">Fator R: o que é e como calcular nos anexos III e V do Simples Nacional</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.contabilizei.com.br/contabilidade-online/fator-r-simples-nacional/">Fator R: o que é e como calcular nos anexos III e V do Simples Nacional</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.serasaexperian.com.br/conteudos/anexo-v-do-simples-nacional/">Anexo V do Simples Nacional: regras, alíquotas e Fator R</a></li>
+<li><a target="_blank" rel="noopener" href="https://reformatributaria360.com.br/bruna-kanning/mudancas-na-tributacao-do-lucro-presumido-em-2026/">Mudanças na tributação do lucro presumido em 2026 - Reforma Tributária 360: Entenda as Mudanças no Consumo, Renda e Folha de Pagamento.</a></li>
+<li><a target="_blank" rel="noopener" href="https://suporte.dominioatendimento.com/central/faces/solucao.html?codigo=12320">Como configurar a majoração do IRPJ e CSLL no Lucro ...</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.barbieriadvogados.com/lucro-presumido-liminar/">Lucro Presumido: liminar suspende alta de 10% da LC 224/2025</a></li>
+<li><a target="_blank" rel="noopener" href="https://o-tributo.com/lc-224-2025-adicional-lucro-presumido-irpj-csll">Adicional de 10% no lucro presumido: o que muda com a LC 224/2025</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.tafelliritz.com.br/blog/tributacao-de-dividendos-no-lucro-real-e-presumido-como-questionar-a-retencao-de-10-da-lei-15-270-2025/">Tributação de dividendos no lucro real e presumido: como questionar a retenção de 10% da Lei 15.270/2025 - Tafelli Ritz Advogados</a></li>
+<li><a target="_blank" rel="noopener" href="https://o-tributo.com/tributacao-dividendos-brasil-lei-15270">Tributação de dividendos no Brasil: o que muda com a Lei 15.270/2025</a></li>
+<li><a target="_blank" rel="noopener" href="https://makrosystem.com.br/blog/lei-15270/">Lei 15.270: tributação de dividendos em 2026</a></li>
+<li><a target="_blank" rel="noopener" href="https://conjur.com.br/2025-dez-04/lei-15-270-2025-dividendos-e-simples-nacional/">Lei 15.270/2025, dividendos e Simples Nacional</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gov.br/receitafederal/pt-br/assuntos/noticias/2025/dezembro/receita-federal-lanca-perguntas-e-respostas-sobre-tributacao-de-altas-rendas-consideracoes-sobre-lucros-e-dividendos/manual_padrao_rfb_per_tributacao_sutri_v2.pdf">Perguntas e respostas sobre lucros e dividendos - Portal Gov.br</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.tuvsud.com/en/services/training/functional-safety-training">Functional safety training for IEC 61508 and EN 50126</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.tuvsud.com/en-sg/services/training/functional-safety-iec-61508-training">Functional Safety IEC 61508 Training</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/profissao/engenheiro-de-mineracao-cbo-214705/">Engenheiro de Mineração - Salário Brasil</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/profissao/engenheiro-de-controle-e-automacao-cbo-202110/">Engenheiro de Controle e Automação - Salário 2026, Piso Salarial</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/profissao/analista-de-desenvolvimento-de-sistemas-cbo-212405/">Analista de Desenvolvimento de Sistemas - Salário 2026, Piso Salarial</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.salario.com.br/profissao/engenheiro-de-seguranca-do-trabalho-cbo-214915/">Engenheiro de Segurança do Trabalho - Salário 2026, Piso Salarial</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.contabilidadescalabrini.com.br/lucro-presumido-2026/">Lei Complementar 224/2025: Aumento da Carga Tributária no Lucro Presumido e a Redução dos Benefícios Fiscais em 2026 - Contabilidade em BH</a></li>
+</ol>
+  </div>
+</aside>
 <script>
 (function(){
   'use strict';
@@ -1550,6 +2408,33 @@ figure.dg figcaption{
       btn.textContent = open ? 'Ver o que acontece abaixo do piso' : 'Voltar ao estado conforme';
     });
   });
+
+  /* ---------- drawer da pesquisa ---------- */
+  (function(){
+    var btn = document.getElementById('drawer-btn');
+    var dr = document.getElementById('drawer');
+    var scrim = document.getElementById('drawer-scrim');
+    var close = document.getElementById('drawer-close');
+    if (!btn || !dr) return;
+    function open(){
+      document.body.classList.add('drawer-on');
+      btn.setAttribute('aria-expanded', 'true');
+      dr.setAttribute('aria-hidden', 'false');
+      close.focus();
+    }
+    function shut(){
+      document.body.classList.remove('drawer-on');
+      btn.setAttribute('aria-expanded', 'false');
+      dr.setAttribute('aria-hidden', 'true');
+      btn.focus();
+    }
+    btn.addEventListener('click', open);
+    close.addEventListener('click', shut);
+    scrim.addEventListener('click', shut);
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && document.body.classList.contains('drawer-on')) shut();
+    });
+  })();
 })();
 </script>
 </body>
