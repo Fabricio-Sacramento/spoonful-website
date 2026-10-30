@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Itaway Ops — Proposta de Product Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: apresentação rolável. Cada <section> é uma página, com régua lateral e navegação por teclado.
+   Tema derivado do Design System Itaway: primary #038C73 e secondary #FF8C52 como âncoras; IBM Plex Sans (títulos), Inter (texto). */
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F3F6F5;--surface:#FFFFFF;--ink:#0F1E1C;--muted:#4C5F5B;--line:#D2DDDA;
+  --accent:#038C73;--accent-soft:#D3EDE7;--accent-ink:#026B58;
+  --sec:#C9601F;--sec-soft:#FFE7D8;--sec-anchor:#FF8C52;
+  --bad:#B23A2B;--bad-soft:#F7DFDA;--warn:#A86A06;--warn-soft:#FBEED3;
+  --sev4:#B23A2B;--sev3:#D9752E;--sev2:#C9A227;--sev1:#9AA9A6;
+  --f-display:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-body:"Inter","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --s-1:.8125rem;--s0:1rem;--s1:1.1875rem;--s2:1.5rem;--s3:2.125rem;--s4:2.875rem;--s5:4rem;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1614;--surface:#12211F;--ink:#E3EEEB;--muted:#93ABA6;--line:#24403B;
+  --accent:#2FB396;--accent-soft:#12372F;--accent-ink:#5FD0B6;--sec:#FF9E6B;--sec-soft:#3A2416;
+  --bad:#EE7B66;--bad-soft:#3B1D17;--warn:#E8B44A;--warn-soft:#3A2D10;color-scheme:dark}}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--s0);line-height:1.55;padding-inline:16px}
+img{max-width:100%}
+[hidden]{display:none!important}
+.deck{max-width:1180px;margin-inline:auto}
+section.slide{position:relative;min-height:min(100svh,900px);padding-block:clamp(56px,8vh,96px);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;gap:28px;padding-left:clamp(0px,5vw,72px)}
+section.slide::before{content:attr(data-coord);position:absolute;left:0;top:clamp(56px,8vh,96px);font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg);opacity:.85}
+@media (max-width:760px){section.slide{padding-left:0;min-height:auto}section.slide::before{display:none}}
+.eyebrow{font-family:var(--f-mono);font-size:var(--s-1);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.eyebrow b{color:var(--muted);font-weight:500}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.012em}
+h1{font-size:clamp(2.5rem,6.4vw,var(--s5));line-height:1.02;font-weight:700}
+h2{font-size:clamp(1.8rem,4vw,var(--s4));line-height:1.08;font-weight:700;max-width:24ch}
+h3{font-size:var(--s1);font-weight:600;line-height:1.25}
+h4{font-size:var(--s0);font-weight:600}
+p{margin:0;max-width:70ch}
+.lead{font-size:clamp(1.05rem,1.7vw,var(--s1));color:var(--muted);max-width:64ch}
+.lead strong,.ink{color:var(--ink)}
+.note{font-size:var(--s-1);color:var(--muted);max-width:86ch}
+.mono{font-family:var(--f-mono)}
+.num{font-variant-numeric:tabular-nums}
+ul.clean{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+ul.clean li{padding-left:22px;position:relative;max-width:72ch}
+ul.clean li::before{content:"";position:absolute;left:0;top:.66em;width:10px;height:2px;background:var(--accent)}
+.grid{display:grid;gap:20px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:980px){.g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
+.grid>*{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.panel p{color:var(--muted)}
+.panel .k{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.stat .big{font-family:var(--f-display);font-weight:700;font-size:clamp(2rem,4vw,2.75rem);line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .big.warn{color:var(--sec)}
+.stat p{font-size:.9375rem}
+.stat .src{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted);letter-spacing:.04em}
+/* Capa */
+.cover{gap:36px}
+.cover .brandline{display:flex;flex-wrap:wrap;gap:10px 28px;font-family:var(--f-mono);font-size:var(--s-1);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.cover h1 span{color:var(--accent)}
+.cover-wrap{position:relative;isolation:isolate}
+.contours{position:absolute;inset:0;pointer-events:none;opacity:.6;z-index:-1}
+.cover-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.cover-meta>div{padding:16px 18px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.cover-meta>div:last-child{border-right:0}
+.cover-meta .k{font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cover-meta .v{font-family:var(--f-display);font-weight:600;font-size:1.0625rem}
+@media (max-width:760px){.cover-meta{grid-template-columns:1fr 1fr}.cover-meta>div:nth-child(2){border-right:0}.cover-meta>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+/* Tabelas */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:.9375rem}
+th,td{text-align:left;vertical-align:top;padding:12px 16px;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--bg);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td strong{font-weight:600}
+tr.total td{background:var(--accent-soft);font-weight:600}
+tr.us td{background:var(--accent-soft)}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.pill.s4{background:var(--bad-soft);color:var(--bad)}
+.pill.s3{background:var(--sec-soft);color:var(--sec)}
+.pill.s2{background:var(--warn-soft);color:var(--warn)}
+.pill.s1{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.pill.good{background:var(--accent-soft);color:var(--accent-ink)}
+.pill.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.tag{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted);letter-spacing:.04em}
+.scroll-y{max-height:min(68vh,640px);overflow:auto}
+/* Prints */
+.shot{margin:0;display:flex;flex-direction:column;gap:10px}
+.shot button{all:unset;cursor:zoom-in;border-radius:12px;overflow:hidden;border:1px solid var(--line);display:block;background:#0b1513;position:relative}
+.shot button:focus-visible{outline:3px solid var(--sec-anchor);outline-offset:3px}
+.shot img{display:block;width:100%;height:auto;aspect-ratio:1519/784;object-fit:cover;object-position:top}
+.shot.tall img{aspect-ratio:auto}
+.shot figcaption{font-size:var(--s-1);color:var(--muted)}
+.shot figcaption b{color:var(--ink);font-weight:600;font-family:var(--f-mono);font-size:.75rem;letter-spacing:.04em}
+.mark{position:absolute;width:26px;height:26px;border-radius:50%;background:var(--sec-anchor);color:#1b0f06;font:600 .8125rem/26px var(--f-mono);text-align:center;box-shadow:0 0 0 3px rgba(255,255,255,.85);transform:translate(-50%,-50%)}
+.verdict{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border-radius:12px;background:var(--bad-soft);color:var(--ink);font-size:.9375rem;max-width:90ch}
+.verdict.good{background:var(--accent-soft)}
+.verdict.neutral{background:var(--surface);border:1px solid var(--line)}
+.verdict::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;margin-top:.5em;background:var(--bad)}
+.verdict.good::before{background:var(--accent)}
+.verdict.neutral::before{background:var(--muted)}
+.callouts{counter-reset:c;margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.callouts li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;font-size:.9375rem}
+.callouts li .n{width:26px;height:26px;border-radius:50%;background:var(--sec-anchor);color:#1b0f06;font:600 .8125rem/26px var(--f-mono);text-align:center}
+.callouts li p{color:var(--muted)}
+.callouts li b{color:var(--ink);font-weight:600}
+.split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:28px;align-items:start}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+/* Ciclo operacional */
+.cycle{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.cycle>div{padding:16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:8px;min-width:0}
+.cycle>div:last-child{border-right:0}
+.cycle .when{font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.cycle h3{font-size:1rem}
+.cycle p{font-size:.8125rem;color:var(--muted)}
+.cycle .mods{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:8px;border-top:1px dashed var(--line)}
+.chip{font-family:var(--f-mono);font-size:.65625rem;letter-spacing:.03em;padding:2px 7px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--ink);white-space:nowrap}
+.chip.hot{background:var(--sec-soft);border-color:transparent;color:var(--sec)}
+.cycle-foot{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;margin-top:-14px}
+.cycle-foot div{grid-column:1/-1;border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:10px 16px;font-size:.8125rem;color:var(--muted);background:var(--surface);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:900px){.cycle{grid-template-columns:1fr 1fr}.cycle>div{border-bottom:1px solid var(--line)}}
+@media (max-width:560px){.cycle{grid-template-columns:1fr}}
+/* Matriz entidade x módulo */
+.matrix td,.matrix th{text-align:center}
+.matrix td:first-child,.matrix th:first-child{text-align:left}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.dot.alt{background:var(--sec-anchor)}
+.dot.no{background:transparent;border:1px solid var(--line)}
+/* Severidade */
+.sevchart{display:grid;gap:10px}
+.sevrow{display:grid;grid-template-columns:150px minmax(0,1fr) 40px;gap:12px;align-items:center;font-size:.875rem}
+.sevrow .lbl{font-family:var(--f-display);font-weight:600}
+.sevbar{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.sevbar i{display:block;height:100%}
+.sevrow .tot{font-family:var(--f-mono);text-align:right;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8125rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 .8125rem var(--f-body);padding:6px 12px;border-radius:999px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.filters button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* Princípios */
+.principles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.principles>div{padding:22px 18px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.principles>div:last-child{border-right:0}
+.principles .n{font-family:var(--f-mono);font-size:.75rem;color:var(--accent)}
+.principles h3{font-size:1.0625rem}
+.principles p{font-size:.875rem;color:var(--muted)}
+.principles .ev{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:auto}
+@media (max-width:980px){.principles{grid-template-columns:1fr 1fr}.principles>div{border-bottom:1px solid var(--line)}}
+@media (max-width:560px){.principles{grid-template-columns:1fr}}
+/* Wireframe */
+.wf{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow-x:auto}
+.wf-inner{min-width:980px;display:grid;grid-template-columns:220px minmax(0,1fr) 300px;grid-template-rows:auto 1fr auto;font-size:.8125rem}
+.wf-top{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.wf-top .title{font-family:var(--f-display);font-weight:600;font-size:1rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg span{padding:4px 10px;font-size:.75rem;color:var(--muted)}
+.seg span.on{background:var(--ink);color:var(--surface)}
+.ready{margin-left:auto;display:flex;gap:8px;align-items:center;font-family:var(--f-mono);font-size:.71875rem;color:var(--muted)}
+.wf-left{border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.dep{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);display:flex;flex-direction:column;gap:4px}
+.dep.on{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.dep .t{font-weight:600;font-family:var(--f-display)}
+.dep .s{display:flex;justify-content:space-between;color:var(--muted);font-family:var(--f-mono);font-size:.6875rem}
+.wf-main{padding:14px;display:flex;flex-direction:column;gap:10px}
+.ai-bar{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:var(--ink)}
+.ai-bar b{font-weight:600}
+.ai-bar .act{margin-left:auto;display:flex;gap:6px}
+.btn{font:600 .75rem var(--f-body);padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);white-space:nowrap}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.groups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.grp{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--surface)}
+.grp.diff{border-style:dashed;border-color:var(--sec)}
+.grp .h{display:flex;justify-content:space-between;align-items:center;font-weight:600;font-family:var(--f-display)}
+.cap{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.cap i{display:block;height:100%;background:var(--accent)}
+.grp .meta{color:var(--muted);font-size:.71875rem;font-family:var(--f-mono)}
+.stop{display:grid;grid-template-columns:38px minmax(0,1fr) 20px;gap:6px;align-items:center;padding:4px 0;border-top:1px dashed var(--line)}
+.stop .tm{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--line)}
+.flag{width:14px;height:14px;border-radius:50%;background:var(--warn-soft);border:1px solid var(--warn)}
+.wf-right{border-left:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.wf-right h4{font-size:.875rem}
+.check{display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;align-items:start}
+.check i{width:14px;height:14px;border-radius:4px;margin-top:2px;background:var(--accent)}
+.check i.w{background:var(--warn)}
+.preview{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.wf-bottom{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:12px 16px;border-top:1px solid var(--line);background:var(--surface)}
+.wf-bottom .sum{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.wf-bottom .btn.pri{margin-left:auto;font-size:.8125rem;padding:8px 14px}
+.wf-note{display:flex;gap:16px;flex-wrap:wrap;font-size:.8125rem;color:var(--muted)}
+.wf-note b{color:var(--ink)}
+/* Calendário conceito */
+.cal{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow-x:auto}
+.cal-inner{min-width:900px;display:grid;grid-template-columns:minmax(0,1fr) 280px}
+.cal-grid{padding:12px;display:grid;grid-template-columns:52px repeat(7,minmax(0,1fr));gap:6px;font-size:.71875rem}
+.cal-grid .hd{font-family:var(--f-mono);color:var(--muted);text-align:center;padding-bottom:4px}
+.cal-grid .tm{font-family:var(--f-mono);color:var(--muted);padding-top:6px}
+.slot{border-radius:8px;border:1px solid var(--line);padding:6px;display:flex;flex-direction:column;gap:4px;min-height:52px}
+.slot .r{display:flex;justify-content:space-between;font-family:var(--f-mono)}
+.slot.ok{background:var(--accent-soft);border-color:transparent}
+.slot.risk{background:var(--warn-soft);border-color:transparent}
+.slot.full{background:var(--bad-soft);border-color:transparent}
+.slot.sel{outline:2px solid var(--ink)}
+.cal-drawer{border-left:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px;font-size:.8125rem;background:var(--bg)}
+.cal-drawer .row{display:flex;justify-content:space-between;color:var(--muted)}
+.cal-drawer .row b{color:var(--ink)}
+/* Navegação proposta */
+.nav-compare{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:16px;align-items:start}
+.navcol{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:6px}
+.navcol .grp-t{font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.navcol .it{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:8px;background:var(--bg);font-size:.875rem}
+.navcol .it small{color:var(--muted);font-family:var(--f-mono);font-size:.6875rem;text-align:right}
+.navcol .it.new{background:var(--accent-soft)}
+.arrow{align-self:center;justify-self:center;font-family:var(--f-display);font-size:1.75rem;color:var(--accent)}
+@media (max-width:820px){.nav-compare{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+/* Plans matrix */
+.yes{color:var(--accent);font-weight:700}
+.opt{color:var(--sec);font-weight:600}
+.no{color:var(--muted)}
+/* Timeline */
+.tl{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow-x:auto}
+.tl-inner{min-width:900px;padding:20px 22px;display:grid;gap:12px}
+.weeks,.lane{display:grid;grid-template-columns:170px repeat(26,minmax(0,1fr));align-items:center}
+.weeks span{font-family:var(--f-mono);font-size:.625rem;color:var(--muted);border-left:1px dashed var(--line);padding-left:3px;height:16px}
+.weeks span.m{color:var(--ink);font-weight:500}
+.weeks span.pause{color:var(--sec)}
+.lane b{font-family:var(--f-display);font-size:.9375rem;font-weight:600}
+.lane b small{display:block;font-family:var(--f-mono);font-size:.6875rem;color:var(--muted);font-weight:400}
+.pbar{height:34px;border-radius:8px;display:flex;align-items:center;padding:0 12px;font-size:.78125rem;font-weight:600;white-space:nowrap;overflow:hidden;color:#fff}
+.p0{background:#0F3A33}.p1{background:#026B58}.p2{background:var(--accent)}.p3{background:#3BA88F}.p4{background:#C9601F}.pc{background:transparent;border:1px dashed var(--muted);color:var(--muted)}
+.hol{height:34px;border-radius:8px;background:repeating-linear-gradient(135deg,var(--sec-soft) 0 6px,transparent 6px 12px);border:1px solid var(--sec-soft)}
+.gate{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted)}
+.phase-cards .panel{gap:12px}
+.phase-cards .ph{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.phase-cards ul.clean{font-size:.875rem;gap:7px}
+.kpi{font-size:.8125rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.kpi b{color:var(--ink);font-weight:600}
+/* Calculadora */
+.calc{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.calc .in{padding:22px;display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.calc label{display:flex;flex-direction:column;gap:6px;font-size:.8125rem;color:var(--muted)}
+.calc input{font:500 1.0625rem/1.2 var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;font-variant-numeric:tabular-nums}
+.calc input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.calc .out{padding:22px;background:var(--accent-soft);display:flex;flex-direction:column;justify-content:center;gap:8px}
+.calc .out .big{font-family:var(--f-display);font-weight:700;font-size:clamp(2rem,4.2vw,3rem);line-height:1;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.calc .out .formula{font-family:var(--f-mono);font-size:.75rem;color:var(--muted)}
+.calc h3{grid-column:1/-1}
+@media (max-width:760px){.calc{grid-template-columns:1fr}.calc .in{grid-template-columns:1fr}}
+.example-tag{font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;background:var(--sec-soft);color:var(--sec);padding:3px 8px;border-radius:999px;align-self:flex-start}
+/* Preço */
+.price{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.price .l{padding:26px;background:var(--ink);color:var(--surface);display:flex;flex-direction:column;gap:12px;justify-content:center}
+.price .l .k{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.price .l .big{font-family:var(--f-display);font-weight:700;font-size:clamp(2.4rem,5vw,3.5rem);line-height:1}
+.price .l p{color:inherit;opacity:.82;font-size:.9375rem}
+.price .r{padding:22px;display:grid;gap:12px;align-content:center}
+@media (max-width:860px){.price{grid-template-columns:1fr}}
+/* Escala de mercado */
+.scale{position:relative;padding:34px 0 8px}
+.scale .track{position:relative;height:64px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.scale .band{position:absolute;top:9px;height:20px;border-radius:5px}
+.scale .band.b2{top:35px}
+.scale .ticks{position:relative;height:18px;margin-top:6px}
+.scale .ticks span{position:absolute;transform:translateX(-50%);font-family:var(--f-mono);font-size:.6875rem;color:var(--muted)}
+.scale .me{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--ink)}
+.scale .me span{position:absolute;top:-24px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:var(--f-mono);font-size:.71875rem;font-weight:500;color:var(--ink)}
+.scale-legend{display:grid;gap:6px;font-size:.8125rem;color:var(--muted)}
+.scale-legend div{display:flex;gap:8px;align-items:center}
+.scale-legend i{width:22px;height:10px;border-radius:3px;display:inline-block;flex:0 0 22px}
+/* Perguntas */
+.qs{counter-reset:q;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 28px;margin:0;padding:0;list-style:none}
+.qs li{counter-increment:q;display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;padding-block:10px;border-bottom:1px solid var(--line);font-size:.9375rem}
+.qs li::before{content:counter(q,decimal-leading-zero);font-family:var(--f-mono);font-size:.75rem;color:var(--accent);padding-top:.2em}
+@media (max-width:700px){.qs{grid-template-columns:1fr}}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+.steps .panel .n{font-family:var(--f-display);font-weight:700;font-size:var(--s3);color:var(--accent);line-height:1}
+.sources{font-size:.8125rem;color:var(--muted);columns:2;column-gap:28px;margin:0;padding-left:18px}
+.sources li{break-inside:avoid;margin-bottom:4px}
+.sources a{color:var(--muted)}
+@media (max-width:700px){.sources{columns:1}}
+a{color:var(--accent)}
+details summary{cursor:pointer}
+/* Navegação do deck */
+.progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:20}
+.progress i{display:block;height:3px;width:0;background:var(--accent);transition:width .25s}
+.nav{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 14px;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.nav .count{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:56px}
+.nav button{appearance:none;border:0;background:var(--bg);color:var(--ink);width:34px;height:34px;border-radius:50%;cursor:pointer;font:600 1rem/1 var(--f-body)}
+.nav button:hover{background:var(--accent-soft)}
+.nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+dialog.lb{border:0;padding:0;background:transparent;max-width:min(96vw,1600px);max-height:94vh}
+dialog.lb::backdrop{background:rgba(5,14,12,.88)}
+dialog.lb img{display:block;max-width:100%;max-height:86vh;border-radius:10px}
+dialog.lb p{color:#E3EEEB;font-size:.875rem;margin:10px auto 0;text-align:center;max-width:none}
+dialog.lb button{position:absolute;top:8px;right:8px;appearance:none;border:0;background:rgba(0,0,0,.6);color:#fff;border-radius:999px;padding:8px 14px;font:600 .875rem var(--f-body);cursor:pointer}
+
+section.slide{padding-right:clamp(0px,2.5vw,32px)}
+body{padding-bottom:0}
+.zooms{display:grid;gap:14px}
+.zoom{margin:0;display:flex;flex-direction:column;gap:8px}
+.zoom .frame{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#0b1513}
+.zoom img{display:block;width:100%;height:auto}
+.zoom figcaption{font-size:var(--s-1);color:var(--muted);display:flex;gap:8px;align-items:flex-start}
+.zoom figcaption .n,.callouts li .n{flex:0 0 26px}
+.zoom figcaption .n{width:22px;height:22px;border-radius:50%;background:var(--sec-anchor);color:#1b0f06;font:600 .75rem/22px var(--f-mono);text-align:center;flex:0 0 22px}
+.weeks,.lane{grid-template-columns:170px repeat(28,minmax(0,1fr))!important}
+.resp td:first-child{white-space:nowrap}
+.cond{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.cond>div{padding:18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.cond>div:nth-child(3n){border-right:0}
+.cond>div:nth-last-child(-n+3){border-bottom:0}
+.cond h4{font-size:.9375rem}
+.cond p{font-size:.875rem;color:var(--muted)}
+@media (max-width:820px){.cond{grid-template-columns:1fr}.cond>div{border-right:0!important;border-bottom:1px solid var(--line)!important}}
+.pre{font-family:var(--f-mono);font-size:.625rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sec);margin-left:6px}
+
+.shifts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.shifts>div{padding:22px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.shifts>div:last-child{border-right:0}
+.shifts .from{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);}
+.shifts .to{font-family:var(--f-display);font-weight:600;font-size:var(--s1);line-height:1.25}
+.shifts p{color:var(--muted);font-size:.9375rem}
+@media (max-width:820px){.shifts{grid-template-columns:1fr}.shifts>div{border-right:0;border-bottom:1px solid var(--line)}}
+.fronts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.fronts a{display:flex;flex-direction:column;gap:8px;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);text-decoration:none}
+.fronts a:hover{border-color:var(--accent)}
+.fronts a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fronts .n{font-family:var(--f-mono);font-size:.75rem;color:var(--accent)}
+.fronts p{color:var(--muted);font-size:.9375rem}
+.fronts .ph{margin-top:auto;font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:900px){.fronts{grid-template-columns:1fr 1fr}}@media (max-width:560px){.fronts{grid-template-columns:1fr}}
+.front{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:32px;align-items:start}
+@media (max-width:900px){.front{grid-template-columns:1fr}}
+.fcol{display:flex;flex-direction:column;gap:20px}
+.fblock{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.fblock .k{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.fblock p,.fblock li{font-size:.9375rem}
+.fblock p{color:var(--ink)}
+.premises{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.premises>div{padding:22px 18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.premises>div:nth-child(4n){border-right:0}
+.premises>div:nth-last-child(-n+4){border-bottom:0}
+.premises .n{font-family:var(--f-mono);font-size:.75rem;color:var(--accent)}
+.premises h3{font-size:1.0625rem}
+.premises p{font-size:.875rem;color:var(--muted)}
+@media (max-width:900px){.premises{grid-template-columns:1fr 1fr}.premises>div{border-right:0!important;border-bottom:1px solid var(--line)!important}}
+.qs .pre{grid-column:2;margin:0}
+
+.layers{display:flex;flex-direction:column;gap:8px}
+.layer{display:grid;grid-template-columns:200px minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:center;padding:16px 20px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.layer .k{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.layer h3{font-size:1rem}
+.layer p{font-size:.875rem;color:var(--muted)}
+.layer.l4{box-shadow:inset 4px 0 0 var(--accent);border-color:var(--accent)}
+.layer.l3{margin-left:24px;box-shadow:inset 4px 0 0 var(--sec-anchor)}
+.layer.l2{margin-left:48px;box-shadow:inset 4px 0 0 #3BA88F}
+.layer.l1{margin-left:72px;background:var(--bg);box-shadow:inset 4px 0 0 var(--muted)}
+@media (max-width:860px){.layer{grid-template-columns:1fr;gap:6px}.layer.l3,.layer.l2,.layer.l1{margin-left:0}}
+.closing h1{font-size:clamp(2.2rem,5.4vw,3.4rem)}
+
+/* v6 · ciclo por módulo, sequência e tabela de esforço */
+.pcycle{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.pcycle>div{padding:20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:8px;position:relative}
+.pcycle>div:last-child{border-right:0}
+.pcycle .st{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.pcycle p{font-size:.875rem;color:var(--muted)}
+.pcycle h3{font-size:1rem}
+.pcycle .out{margin-top:auto;font-size:.8125rem;color:var(--ink);border-top:1px dashed var(--line);padding-top:8px}
+.pcycle>div:not(:last-child)::after{content:"→";position:absolute;right:-9px;top:20px;background:var(--surface);color:var(--accent);font-weight:700;line-height:1;padding:2px 0}
+@media (max-width:860px){.pcycle{grid-template-columns:1fr 1fr}.pcycle>div{border-bottom:1px solid var(--line)}.pcycle>div::after{display:none}}
+.seq{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;counter-reset:s}
+.seq>div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface);display:flex;flex-direction:column;gap:4px}
+.seq>div.tv{background:var(--accent-soft,#E6F4F1);border-color:transparent}
+.seq .o{font-family:var(--f-mono);font-size:.6875rem;color:var(--accent)}
+.seq h4{font-size:.9375rem}
+.seq small{font-size:.75rem;color:var(--muted);line-height:1.35}
+@media (max-width:860px){.seq{grid-template-columns:repeat(2,minmax(0,1fr))}}
+table tr.subrow td{font-size:.84375rem;color:var(--accent-ink);padding-top:9px;padding-bottom:9px;background:var(--surface)}
+table td.sub{padding-left:34px;position:relative}
+table td.sub::before{content:"";position:absolute;left:18px;top:50%;width:8px;height:1px;background:var(--accent)}
+
+/* v7 · cronograma e investimento */
+.gantt{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:14px 18px;display:grid;gap:6px;overflow-x:auto}
+.gr{display:grid;grid-template-columns:220px minmax(560px,1fr);align-items:center;gap:14px}
+.gl b{display:block;font-size:.875rem;font-weight:600}
+.gl small{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted)}
+.gt{position:relative;height:26px}
+.gh .gt{height:20px;border-bottom:1px solid var(--line)}
+.gt i{position:absolute;top:0;bottom:0;display:block}
+.gt .wk{width:0;border-left:1px dashed var(--line)}
+.gt .gp{background:repeating-linear-gradient(135deg,var(--sec-soft) 0 5px,transparent 5px 10px)}
+.gt .gb{top:4px;bottom:4px;border-radius:6px;background:var(--accent)}
+.gt .gb.tv{background:#0F3A33}
+.gt .gb.dev{background:transparent;border:1px dashed var(--muted)}
+.gh .mo{position:absolute;top:0;font-family:var(--f-mono);font-size:.6875rem;color:var(--ink);font-weight:500;padding-left:4px;border-left:1px solid var(--muted);height:20px}
+.gh .pz{position:absolute;top:0;font-family:var(--f-mono);font-size:.625rem;color:var(--sec);text-align:center}
+.invest{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.invest .l{background:var(--ink);color:var(--surface);padding:32px;display:flex;flex-direction:column;gap:16px;justify-content:center}
+.invest .l .k{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--surface);opacity:.8}
+.invest .l .what{font-size:1rem;line-height:1.45;color:var(--surface)}
+.pstack{display:grid;gap:6px;border-top:1px solid rgba(255,255,255,.2);padding-top:16px}
+.pstack .net{display:flex;align-items:baseline;gap:10px}
+.pstack .net span{font-size:.875rem;color:var(--surface);opacity:.85}
+.pstack .net b{font-family:var(--f-display);font-size:1.625rem;font-weight:600;font-variant-numeric:tabular-nums}
+.pstack .tax{display:flex;align-items:baseline;gap:10px;color:#FF8A80;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.2)}
+.pstack .tax b{font-size:1.125rem;font-weight:600;font-variant-numeric:tabular-nums}
+.pstack .tax span{font-size:.875rem}
+.pstack .tot{display:flex;flex-direction:column;gap:6px;padding-top:8px}
+.pstack .tot span{font-family:var(--f-mono);font-size:.71875rem;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.pstack .tot b{font-family:var(--f-display);font-weight:700;font-size:clamp(2.4rem,5vw,3.4rem);line-height:1;font-variant-numeric:tabular-nums}
+.ppay{background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;color:var(--accent-ink);font-size:1.0625rem;font-weight:600}
+.ppay span{display:block;font-weight:500;font-size:.9375rem;color:var(--accent-ink);margin-top:2px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pstack .tax{color:#C62828}}
+:root[data-theme="dark"] .pstack .tax{color:#C62828}
+.invest .r tr.tax td{color:#C62828;font-weight:500}
+html[data-theme="dark"] .invest .r tr.tax td{color:#FF8A80}
+
+/* seção 02 · ciclo operacional em 2 linhas de 3 */
+.cycle{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cycle>div{padding:20px;border-right:1px solid var(--line);position:relative}
+.cycle>div:nth-child(3n){border-right:0}
+.cycle>div:nth-child(-n+3){border-bottom:1px solid var(--line)}
+.cycle>div:not(:nth-child(3n))::after{content:"→";position:absolute;right:-9px;top:20px;background:var(--surface);color:var(--accent);font-weight:700;line-height:1;padding:2px 0}
+@media (max-width:860px){.cycle{grid-template-columns:1fr}.cycle>div{border-right:0;border-bottom:1px solid var(--line)}.cycle>div::after{display:none}}
+.invest .r table{min-width:0}
+.invest .r tr.grand td{background:var(--ink);color:var(--surface);font-weight:700}
+@media (max-width:860px){.invest{grid-template-columns:1fr}}
+
+/* ===== Índice lateral (padrão Lady Roots) ===== */
+:root{--rail:268px;--paper:#F7FAF9;--faint:#7C918E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0E1C1A;--faint:#6E8A86}}
+:root[data-theme="dark"]{
+  --bg:#0B1614;--surface:#12211F;--ink:#E3EEEB;--muted:#93ABA6;--line:#24403B;
+  --accent:#2FB396;--accent-soft:#12372F;--accent-ink:#5FD0B6;--sec:#FF9E6B;--sec-soft:#3A2416;
+  --bad:#EE7B66;--bad-soft:#3B1D17;--warn:#E8B44A;--warn-soft:#3A2D10;--paper:#0E1C1A;--faint:#6E8A86;color-scheme:dark}
+.rail{position:fixed;inset:0 auto 0 0;width:var(--rail);padding:28px 22px 22px;display:flex;flex-direction:column;gap:22px;border-right:1px solid var(--line);background:var(--paper);z-index:30}
+.rail .brand{display:flex;flex-direction:column;gap:6px}
+.rail .brand b{font-family:var(--f-display);font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+.rail .brand span{font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px;overflow-y:auto;flex:1;scrollbar-width:thin}
+.toc a{display:grid;grid-template-columns:30px 1fr;align-items:baseline;gap:4px;padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:.9rem;line-height:1.3;transition:background .2s,color .2s}
+.toc a i{font-style:normal;font-family:var(--f-mono);font-size:.6875rem;color:var(--faint)}
+.toc a:hover{background:var(--bg);color:var(--ink)}
+.toc a.on{background:var(--accent-soft);color:var(--ink);font-weight:600}
+.toc a.on i{color:var(--accent)}
+.rail-foot{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:16px}
+.meter-read{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted);display:flex;justify-content:space-between;letter-spacing:.06em;text-transform:uppercase}
+.meter-bar{height:3px;border-radius:9px;background:var(--line);overflow:hidden}
+.meter-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.btnrow{display:flex;gap:8px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 .8125rem/1 var(--f-body);padding:10px 12px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:border-color .2s,background .2s,transform .2s}
+.btn:hover{border-color:var(--accent)}
+.btn:active{transform:translateY(1px)}
+.btn.grow{flex:1}
+.btn svg{width:15px;height:15px}
+.topbar{display:none}
+@media (min-width:1101px){body{padding-left:calc(var(--rail) + 16px)}}
+@media (max-width:1100px){
+  .rail{transform:translateX(-102%);transition:transform .3s ease;box-shadow:0 12px 40px rgba(0,0,0,.18);width:min(86vw,320px)}
+  .rail.open{transform:none}
+  .topbar{display:flex;position:sticky;top:0;z-index:25;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;margin-inline:-16px;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar b{font-family:var(--f-display);font-weight:700;font-size:.95rem}
+  .topbar span{font-family:var(--f-mono);font-size:.6875rem;color:var(--muted)}
+  .scrim{position:fixed;inset:0;background:rgba(5,15,16,.45);z-index:29;opacity:0;pointer-events:none;transition:opacity .3s}
+  .scrim.on{opacity:1;pointer-events:auto}
+  section.slide{scroll-margin-top:64px}
+}
+
+/* índice recolhível (desktop) */
+.brand-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.btn.icon{padding:8px;flex:0 0 auto}
+.railshow{display:none}
+.rail,body{transition:transform .3s ease,padding-left .3s ease}
+@media (min-width:1101px){
+  html.rail-off .rail{transform:translateX(-102%)}
+  html.rail-off body{padding-left:16px}
+  html.rail-off .railshow{display:inline-flex;position:fixed;top:14px;left:14px;z-index:31;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+}
+@media (max-width:1100px){#railHide{display:none}}
+
+/* ===== Capa full screen com motion (padrão Lady Roots) ===== */
+:root{--rail-eff:0px}
+@media (min-width:1101px){:root{--rail-eff:var(--rail)}html.rail-off{--rail-eff:0px}}
+body{overflow-x:clip}
+section.hero{width:calc(100vw - var(--rail-eff));margin-left:calc((100% - 100vw + var(--rail-eff)) / 2);min-height:100svh;padding:clamp(28px,5vw,48px) 0 clamp(32px,5vw,56px);display:flex;flex-direction:column;justify-content:space-between;gap:0;position:relative;isolation:isolate;overflow:hidden;background:#071C19;color:#E3EEEB;border-bottom:0;transition:width .3s ease,margin-left .3s ease}
+section.hero::before{display:none}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.hero .sheet{width:100%;max-width:1180px;margin-inline:auto;padding-inline:clamp(16px,4vw,56px)}
+.hero .eyebrow{color:#5FD0B6}
+.hero .eyebrow b{color:#93ABA6}
+.hero h1{font-size:clamp(2.6rem,6.4vw,5.25rem);line-height:.98;font-weight:700;letter-spacing:-.02em;max-width:16ch;color:#F2F7F5;margin-top:clamp(40px,8vh,96px)}
+.hero h1 span{color:#5FD0B6}
+.hero .lead{color:#B5C9C4;max-width:58ch;margin-top:24px;font-size:clamp(1.05rem,1.7vw,1.25rem)}
+.hero .brandline{display:flex;flex-wrap:wrap;gap:10px 28px;font-family:var(--f-mono);font-size:var(--s-1);letter-spacing:.06em;text-transform:uppercase;color:#93ABA6;border-top:1px solid rgba(227,238,235,.18);padding-top:16px;margin-top:clamp(36px,6vh,72px)}
+.hero .coord{position:absolute;right:clamp(16px,4vw,48px);bottom:clamp(110px,18vh,190px);font-family:var(--f-mono);font-size:.6875rem;letter-spacing:.1em;color:#5E7C77;writing-mode:vertical-rl;transform:rotate(180deg)}
+.hero .eyebrow,.hero h1,.hero .lead,.hero .brandline{animation:heroIn .9s cubic-bezier(.2,.7,.2,1) both}
+.hero h1{animation-delay:.12s}.hero .lead{animation-delay:.28s}.hero .brandline{animation-delay:.42s}
+@keyframes heroIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media (max-width:1100px){section.hero{min-height:calc(100svh - 58px)}}
+@media (max-width:760px){.hero .coord{display:none}section.hero{padding-left:0}}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<!-- ===== Índice lateral ===== -->
+<div class="scrim" id="scrim"></div>
+<aside class="rail" id="rail" aria-label="Índice da proposta">
+  <div class="brand-row">
+    <div class="brand">
+      <b>Itaway × Spoonful</b>
+      <span>Proposta de Product Design</span>
+    </div>
+    <button class="btn icon" type="button" id="railHide" aria-label="Recolher índice" title="Recolher índice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+  </div>
+  <ol class="toc" id="toc">
+    <li><a href="#capa"><i>00</i>Capa</a></li>
+    <li><a href="#ponto-de-partida"><i>01</i>Ponto de partida</a></li>
+    <li><a href="#visao-de-produto"><i>02</i>Visão de produto</a></li>
+    <li><a href="#a-oportunidade"><i>03</i>A oportunidade</a></li>
+    <li><a href="#frentes-de-trabalho"><i>04</i>Frentes de trabalho</a></li>
+    <li><a href="#frente-1-despacho"><i>05</i>Frente 1 · Despacho</a></li>
+    <li><a href="#frente-2-calendario"><i>06</i>Frente 2 · Calendário</a></li>
+    <li><a href="#frente-3-indicadores"><i>07</i>Frente 3 · Indicadores</a></li>
+    <li><a href="#frente-4-catalogo"><i>08</i>Frente 4 · Catálogo</a></li>
+    <li><a href="#frente-5-comunicacao"><i>09</i>Frente 5 · Comunicação</a></li>
+    <li><a href="#frente-6-linguagem"><i>10</i>Frente 6 · Linguagem</a></li>
+    <li><a href="#design-system-de-produto"><i>11</i>Design System de produto</a></li>
+    <li><a href="#preparacao-para-saas"><i>12</i>Preparação para SaaS</a></li>
+    <li><a href="#premissas-de-trabalho"><i>13</i>Premissas de trabalho</a></li>
+    <li><a href="#maturidade-e-governanca"><i>14</i>Maturidade e governança</a></li>
+    <li><a href="#o-plano"><i>15</i>O plano</a></li>
+    <li><a href="#esforco-estimado"><i>16</i>Esforço estimado</a></li>
+    <li><a href="#proposta-comercial"><i>17</i>Proposta comercial</a></li>
+    <li><a href="#encerramento"><i></i>Encerramento</a></li>
+  </ol>
+  <div class="rail-foot">
+    <div class="meter-read"><span>Leitura</span><span id="readPct">0%</span></div>
+    <div class="meter-bar"><i id="readBar"></i></div>
+    <div class="btnrow">
+      <button class="btn grow" type="button" id="themeBtn" aria-label="Alternar tema claro ou escuro" title="Tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>Tema</button>
+    </div>
+  </div>
+</aside>
+<button class="btn railshow" type="button" id="railShow" aria-label="Mostrar índice" aria-controls="rail" aria-expanded="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Índice</button>
+<div class="topbar">
+  <button class="btn" type="button" id="menuBtn" aria-controls="rail" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Índice</button>
+  <div style="text-align:right"><b>Itaway × Spoonful</b><br><span id="topSec">Capa</span></div>
+</div>
+<main class="deck" id="deck">
+
+<!-- 00 CAPA -->
+<section class="slide cover hero" id="capa" data-title="Capa" data-coord="22°57′S · 43°17′W · Floresta da Tijuca">
+  <canvas id="topo" aria-hidden="true"></canvas>
+  <div class="sheet hero-top"><div class="eyebrow">Spoonful Design <b>para</b> Itaway Ecotours</div></div>
+  <div class="sheet hero-mid">
+    <h1>Do sistema interno ao produto de operação: <span>redesign de UX/UI do CRM Itaway.</span></h1>
+    <p class="lead">Leitura do sistema em produção, frentes de trabalho e plano de design em cinco fases. O objetivo é tornar o sistema operável por qualquer equipe e prepará-lo para ser oferecido a outras operadoras como SaaS.</p>
+  </div>
+  <div class="sheet hero-foot"><div class="brandline"><span>Outubro de 2026</span><span>Fabricio Sacramento</span><span>spoonful.com.br</span></div></div>
+  <div class="coord" aria-hidden="true">22°57′S · 43°17′W · FLORESTA DA TIJUCA</div>
+</section>
+
+<!-- 01 PONTO DE PARTIDA -->
+<section class="slide" id="ponto-de-partida" data-title="Ponto de partida" data-coord="01 · Ponto de partida">
+  <div class="eyebrow">01 <b>/</b> Ponto de partida</div>
+  <h2>A engenharia está à frente da experiência. O trabalho é fechar essa distância.</h2>
+  <p class="lead">O sistema já resolve os problemas tecnicamente mais caros de uma operadora de passeios. O que ainda falta é um <strong>modelo de interface</strong>: cada tela resolve o próprio problema com o próprio padrão, e operar depende de conhecimento que ainda não está na interface.</p>
+  <div class="grid g2">
+    <div class="panel">
+      <span class="k">Ativos que o design preserva</span>
+      <ul class="clean">
+        <li><strong class="ink">Bókun como fonte da verdade</strong> das reservas, com webhook e sincronização a cada 2 h.</li>
+        <li><strong class="ink">API oficial da Meta</strong> com controle da janela de 24 h, templates aprovados e e-mail como canal paralelo.</li>
+        <li><strong class="ink">Cálculo automático de vagas</strong> a partir dos passageiros confirmados e da capacidade dos veículos escalados.</li>
+        <li><strong class="ink">Escala em lote</strong> de guias por período, turno e passeio.</li>
+        <li><strong class="ink">Rota de coleta otimizada</strong> com alternativas, ordem de serviço do guia gerada a partir do grupo e auditoria que reconcilia planilha, OTA, Bókun e o próprio sistema.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <span class="k">O que separa o sistema de um produto</span>
+      <ul class="clean">
+        <li><strong class="ink">Esforço:</strong> o fluxo de maior valor, montar grupos e enviar as ordens de serviço, ainda pede trabalho demais para virar rotina.</li>
+        <li><strong class="ink">Controle de erro:</strong> ações irreversíveis ficam ao lado das frequentes, sem hierarquia visual.</li>
+        <li><strong class="ink">Confiança no dado:</strong> indicadores sem definição explícita, que podem parecer contraditórios entre si.</li>
+        <li><strong class="ink">Linguagem e modelo:</strong> o mesmo objeto muda de nome, forma e cor de uma tela para outra.</li>
+        <li><strong class="ink">Escala:</strong> a interface ainda não supõe outra empresa, outros papéis ou outro idioma de equipe.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="note">Base deste documento: briefing de 23/10/2026 e navegação no sistema em produção (itaway.piloto.life) em 29/10/2026, somente leitura. Nenhuma ação de escrita, envio ou exclusão foi executada. Dados de clientes e valores financeiros aparecem borrados nas capturas.</p>
+</section>
+
+<!-- 02 VISÃO DE PRODUTO -->
+<section class="slide" id="visao-de-produto" data-title="Visão de produto" data-coord="02 · Visão de produto">
+  <div class="eyebrow">02 <b>/</b> Visão de produto</div>
+  <h2>De ferramenta interna a produto de operação.</h2>
+  <p class="lead">Mais do que um CRM, o sistema organiza a <strong>execução de serviços com hora marcada</strong>: quem conduz, em qual veículo, com quais passageiros, em que ordem de coleta e com qual comunicação. O redesign parte desse ciclo, e não da ordem em que os módulos foram construídos.</p>
+  <div>
+    <div class="cycle" role="list" aria-label="Ciclo operacional de uma saída">
+      <div role="listitem"><span class="when">Semanas antes</span><h3>Venda e entrada</h3><p>A reserva chega de GYG, Viator, site ou balcão, via Bókun.</p><div class="mods"><span class="chip">Reservas</span><span class="chip">Integrações</span></div></div>
+      <div role="listitem"><span class="when">Contínuo</span><h3>Capacidade e escala</h3><p>Guias e veículos alocados por turno; vagas devolvidas ao Bókun.</p><div class="mods"><span class="chip">Calendário</span><span class="chip">Configurações</span></div></div>
+      <div role="listitem"><span class="when">Véspera</span><h3>Planejamento e despacho</h3><p>Divisão em grupos, rota de coleta, horários e custo.</p><div class="mods"><span class="chip hot">Excursões</span></div></div>
+      <div role="listitem"><span class="when">Noite da véspera</span><h3>Comunicação</h3><p>Ordem de serviço ao guia; instruções ao cliente por WhatsApp e e-mail.</p><div class="mods"><span class="chip hot">Excursões</span><span class="chip">Inbox</span></div></div>
+      <div role="listitem"><span class="when">Dia do passeio</span><h3>Execução</h3><p>Coletas, atrasos e cancelamentos de última hora.</p><div class="mods"><span class="chip">Excursões</span><span class="chip">Calendário</span></div></div>
+      <div role="listitem"><span class="when">Dias seguintes</span><h3>Pós-serviço</h3><p>Avaliação e acompanhamento automatizados.</p><div class="mods"><span class="chip">Automações</span></div></div>
+    </div>
+    <div class="cycle-foot"><div><b class="ink">Transversal:</b> reconciliação e exceções (Auditoria) · indicadores (Dashboard)</div></div>
+  </div>
+  <div class="shifts">
+    <div><span class="from">De um sistema que depende de quem o construiu</span><span class="to">Para um produto que se explica sozinho</span><p>Qualquer pessoa da operação entende o que fazer, em que ordem e com que consequência, sem depender de memória ou de treinamento informal.</p></div>
+    <div><span class="from">De telas isoladas</span><span class="to">Para um fluxo operacional contínuo</span><p>Da reserva ao pós-passeio, cada etapa entrega à seguinte o que ela precisa, e os objetos (reserva, saída, grupo, guia) são os mesmos em todo o produto.</p></div>
+    <div><span class="from">De uso interno</span><span class="to">Para uma plataforma de várias operadoras</span><p>Estrutura, linguagem e configuração pensadas para a segunda empresa desde o primeiro desenho.</p></div>
+  </div>
+  <div class="verdict good">A Itaway é a primeira operadora e o laboratório. Validado na operação real, o produto vira um ativo próprio e uma forma de diversificar a receita além das experiências, no espaço de travel tech.</div>
+</section>
+
+<!-- 15 MERCADO -->
+<section class="slide" id="a-oportunidade" data-title="A oportunidade" data-coord="03 · A oportunidade">
+  <div class="eyebrow">03 <b>/</b> A oportunidade</div>
+  <h2>Há espaço de mercado para uma camada de operação sobre os sistemas de reserva.</h2>
+  <p class="lead">Analisamos a documentação pública de 16 sistemas: 12 de reservas para operadoras de passeios e 4 ferramentas de operação. Todos alocam guias e recursos. <strong>Nenhum dos sistemas de reserva documenta a combinação</strong> de rota de coleta otimizada, WhatsApp pela API oficial e reconciliação entre canais, que é o núcleo do que o sistema da Itaway já faz.</p>
+  <div class="tablewrap">
+    <table class="matrix">
+      <thead><tr><th>Sistema</th><th>Escala de recursos</th><th>Frota</th><th>Rota de coleta otimizada</th><th>Ordem de serviço / manifesto</th><th>WhatsApp oficial</th><th>Reconciliação entre canais</th><th style="text-align:left">Preço público</th></tr></thead>
+      <tbody>
+        <tr class="us"><td><strong>CRM Itaway</strong> <span class="tag">observado</span></td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td style="text-align:left">uso interno</td></tr>
+        <tr><td><strong>Bókun</strong></td><td class="yes">●</td><td class="yes">●</td><td class="opt">○</td><td class="yes">●</td><td class="opt">○</td><td class="no">—</td><td style="text-align:left">US$ 49–499/mês + 1–1,5%</td></tr>
+        <tr><td><strong>FareHarbor</strong></td><td class="yes">●</td><td class="yes">●</td><td class="no">—</td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">6–8% pagos pelo cliente final</td></tr>
+        <tr><td><strong>Rezdy</strong></td><td class="yes">●</td><td class="no">—</td><td class="opt">○</td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">49–249/mês + 3% (moeda não indicada)</td></tr>
+        <tr><td><strong>Peek Pro</strong></td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">sob cotação</td></tr>
+        <tr><td><strong>TrekkSoft</strong></td><td class="yes">●</td><td class="opt">○</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">€ 49–249/mês + 2–3%</td></tr>
+        <tr><td><strong>Orioly</strong></td><td class="yes">●</td><td class="yes">●</td><td class="no">—</td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">US$ 399–699 de implantação + 1–2,5%</td></tr>
+        <tr><td><strong>Zaui</strong></td><td class="yes">●</td><td class="yes">●</td><td class="opt">○</td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td style="text-align:left">US$ 0 + 6% pagos pelo cliente</td></tr>
+        <tr><td><strong>TourOperation</strong> <span class="tag">despacho</span></td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="opt">○</td><td class="yes">●</td><td class="opt">○</td><td style="text-align:left">€ 49/mês</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid g3">
+    <div class="panel"><span class="k">Posicionamento</span><h3>Camada de operação sobre o sistema de reservas</h3><p>O produto não compete com o Bókun; opera em cima dele. Isso reduz a barreira para a próxima operadora, que não precisa trocar de sistema de reservas para adotar o despacho.</p></div>
+    <div class="panel"><span class="k">Diferencial</span><h3>Rota, WhatsApp oficial e reconciliação</h3><p>Ferramentas de despacho existem, mas são regionais (Turquia, Japão) ou de nicho (ônibus turístico hop-on hop-off). Não há líder global, e nenhuma das encontradas atende a América Latina.</p></div>
+    <div class="panel"><span class="k">Implicação para o design</span><h3>A experiência sustenta o preço</h3><p>Recursos parecidos já são vendidos a partir de € 49/mês. O que sustenta preço e adoção é a qualidade do fluxo: fechar um turno em minutos, sem erro. É o objeto deste projeto.</p></div>
+  </div>
+  <p class="note">● documentado (no CRM Itaway: observado no sistema) · ○ parcial (ex.: lista de coleta sem otimização; WhatsApp por integração de terceiros) · — não encontrado na documentação pública. Levantamento em 29/10/2026 em páginas de preço e de produto; parte dos dados vem de diretórios (Capterra, GetApp) ou de concorrentes, como indicado nas fontes. A tabela mostra 8 dos 16 sistemas; os demais (Checkfront, Xola, Regiondo, Rezgo, Ventrata, Tourflows, NTMG Dispatch e Papershift) estão nas fontes. Moedas como publicadas.</p>
+</section>
+
+<!-- 03 FRENTES -->
+<section class="slide" id="frentes-de-trabalho" data-title="Frentes de trabalho" data-coord="04 · Frentes de trabalho">
+  <div class="eyebrow">04 <b>/</b> Frentes de trabalho</div>
+  <h2>Seis frentes de trabalho, do fluxo mais crítico à fundação do produto.</h2>
+  <p class="lead">As frentes saem da leitura do sistema em produção e do briefing. Cada uma tem um problema observado, o que vamos investigar e definir e o que será entregue. A auditoria detalhada, com todos os achados e sua severidade, é o primeiro entregável do projeto.</p>
+  <div class="fronts">
+    <a href="#f1"><span class="n">01</span><h3>Despacho das excursões</h3><p>Fechamento da véspera: grupos, rotas, horários e comunicação.</p><span class="ph">Módulo Excursões</span></a>
+    <a href="#f2"><span class="n">02</span><h3>Calendário e capacidade</h3><p>Escala, vagas e a leitura da semana.</p><span class="ph">Módulo Calendário</span></a>
+    <a href="#f3"><span class="n">03</span><h3>Indicadores e exceções</h3><p>O que pede decisão agora e como cada número é definido.</p><span class="ph">Dashboard e Auditoria</span></a>
+    <a href="#f4"><span class="n">04</span><h3>Catálogo e modelo de objetos</h3><p>Produto, variação, horário e canal de venda.</p><span class="ph">Configurações e Design System</span></a>
+    <a href="#f5"><span class="n">05</span><h3>Comunicação</h3><p>Templates, idiomas e a régua do cliente e do guia.</p><span class="ph">Módulo Inbox</span></a>
+    <a href="#f6"><span class="n">06</span><h3>Linguagem e padrões</h3><p>Cor, nomes, padrões de página e de ação.</p><span class="ph">Design System de produto</span></a>
+  </div>
+  <p class="note">Leitura feita em 29/10/2026, só de visualização, sem nenhuma ação no sistema. Dados de clientes aparecem borrados nas capturas.</p>
+</section>
+
+<!-- 04 FRENTE 1 -->
+<section class="slide" id="frente-1-despacho" data-title="Frente 1 · Despacho" data-coord="05 · Frente 1 · Despacho" id="f1">
+  <div class="eyebrow">05 <b>/</b> Frente 1 · Despacho das excursões</div>
+  <h2>O fechamento da véspera concentra o maior esforço e o maior risco da operação.</h2>
+  <div class="front">
+    <div class="fcol">
+      <div class="fblock"><span class="k">Problema observado</span><p>Montar grupos, definir rotas, horários e custos e comunicar clientes e guias é um único trabalho, apresentado como formulário. Não há etapas, estado intermediário nem um ponto único de revisão antes do envio, e existe mais de um caminho para falar com o cliente. O esforço necessário dificulta que o fluxo vire rotina.</p></div>
+      <div class="fblock"><span class="k">O que vamos investigar e definir</span><ul class="clean"><li>Como a montagem da operação acontece hoje, dentro e fora do sistema.</li><li>O que pode ser proposto automaticamente e o que exige julgamento humano.</li><li>Os estados de uma saída, do planejamento à realização.</li><li>Um ponto único de revisão e envio, com prévia do que será disparado.</li></ul></div>
+      <div class="fblock"><span class="k">Entregável</span><p>Fluxo completo da véspera e do dia do passeio em alta fidelidade, protótipo testado com a operação e specs para o desenvolvimento.</p></div>
+    </div>
+    <figure class="shot"><button type="button" data-src="img/modal1.jpg" data-cap="Excursões · Gerenciar grupo (dados de cliente borrados)"><img src="img/modal1.jpg" alt="Modal de gerenciamento de grupo de excursão" loading="lazy"></button><figcaption><b>EXCURSÕES</b> · gerenciamento de um grupo.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 05 FRENTE 2 -->
+<section class="slide" id="frente-2-calendario" data-title="Frente 2 · Calendário" data-coord="06 · Frente 2 · Calendário" id="f2">
+  <div class="eyebrow">06 <b>/</b> Frente 2 · Calendário e capacidade</div>
+  <h2>A leitura da semana já funciona; o desafio é aprofundar sem perdê-la.</h2>
+  <div class="front">
+    <div class="fcol">
+      <div class="fblock"><span class="k">Problema observado</span><p>A visão semanal dá uma boa leitura de escala e vagas. Para ver o detalhe de uma saída, porém, a tela inteira é substituída e o contexto da semana se perde. Não há controle de densidade, e ações que desfazem uma escala têm o mesmo peso visual da informação.</p></div>
+      <div class="fblock"><span class="k">O que vamos investigar e definir</span><ul class="clean"><li>Que perguntas o calendário responde no planejamento semanal e no ajuste do dia.</li><li>Níveis de densidade entre a leitura macro e a decisão.</li><li>Quais ações podem ser feitas sem sair do calendário, com segurança.</li><li>A ligação entre o calendário e o despacho.</li></ul></div>
+      <div class="fblock"><span class="k">Entregável</span><p>Calendário redesenhado, com detalhe lateral, níveis de densidade e escala em lote, e specs para o desenvolvimento.</p></div>
+    </div>
+    <figure class="shot"><button type="button" data-src="img/calendario.jpg" data-cap="Calendário · visão semana"><img src="img/calendario.jpg" alt="Calendário semanal com escala de guias e vagas" loading="lazy"></button><figcaption><b>CALENDÁRIO</b> · visão semanal.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 06 FRENTE 3 -->
+<section class="slide" id="frente-3-indicadores" data-title="Frente 3 · Indicadores" data-coord="07 · Frente 3 · Indicadores" id="f3">
+  <div class="eyebrow">07 <b>/</b> Frente 3 · Indicadores e exceções</div>
+  <h2>Cada número precisa de uma definição, e cada exceção, de um responsável.</h2>
+  <div class="front">
+    <div class="fcol">
+      <div class="fblock"><span class="k">Problema observado</span><p>Indicadores sem definição explícita convivem na mesma tela e podem parecer contraditórios. As exceções aparecem em vários lugares (alertas, Auditoria, avisos no calendário), e algumas relevantes só ficam visíveis dentro da Auditoria. A lógica da Auditoria, que transforma divergência em decisão, é um ponto forte a preservar.</p></div>
+      <div class="fblock"><span class="k">O que vamos investigar e definir</span><ul class="clean"><li>Quais decisões a direção e a operação tomam com base em dados.</li><li>Um dicionário de métricas, construído com o desenvolvimento.</li><li>Tipos de exceção, severidade, responsável e prazo.</li><li>A separação entre o que pede ação hoje e o que é análise de tendência.</li></ul></div>
+      <div class="fblock"><span class="k">Entregável</span><p>Painel do dia orientado a ação, fila única de exceções, área de análises e dicionário de métricas.</p></div>
+    </div>
+    <figure class="shot"><button type="button" data-src="img/auditoria.jpg" data-cap="Auditoria (dados de clientes borrados)"><img src="img/auditoria.jpg" alt="Tela de Auditoria com exceções e ações recomendadas" loading="lazy"></button><figcaption><b>AUDITORIA</b> · divergências com ação recomendada.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 07 FRENTE 4 -->
+<section class="slide" id="frente-4-catalogo" data-title="Frente 4 · Catálogo" data-coord="08 · Frente 4 · Catálogo" id="f4">
+  <div class="eyebrow">08 <b>/</b> Frente 4 · Catálogo e modelo de objetos</div>
+  <h2>Um modelo de objetos claro é a base de todas as outras frentes.</h2>
+  <div class="front">
+    <div class="fcol">
+      <div class="fblock"><span class="k">Problema observado</span><p>Passeio, variação (grupo, privativo, VIP) e horário de saída ficam no mesmo nível do cadastro. Isso aparece no calendário como linhas duplicadas do mesmo passeio e na nomenclatura de todo o sistema. A mesma reserva também é representada de formas diferentes em cada módulo.</p></div>
+      <div class="fblock"><span class="k">O que vamos investigar e definir</span><ul class="clean"><li>O modelo de objetos da operação: produto, variação, saída, grupo, ordem de serviço, reserva, guia e veículo.</li><li>O mapeamento desses objetos com o Bókun e os canais de venda.</li><li>Um painel de detalhe único para cada objeto, usado em qualquer tela.</li></ul></div>
+      <div class="fblock"><span class="k">Entregável</span><p>Modelo de objetos validado com o desenvolvimento e telas de cadastro de catálogo, equipe, frota e zonas de coleta.</p></div>
+    </div>
+    <figure class="shot"><button type="button" data-src="img/passeios.jpg" data-cap="Configurações · Passeios"><img src="img/passeios.jpg" alt="Cadastro de passeios" loading="lazy"></button><figcaption><b>CONFIGURAÇÕES</b> · cadastro de passeios.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 08 FRENTE 5 -->
+<section class="slide" id="frente-5-comunicacao" data-title="Frente 5 · Comunicação" data-coord="09 · Frente 5 · Comunicação" id="f5">
+  <div class="eyebrow">09 <b>/</b> Frente 5 · Comunicação</div>
+  <h2>A comunicação com clientes e guias precisa deixar claro o que é enviado, quando e em que idioma.</h2>
+  <div class="front">
+    <div class="fcol">
+      <div class="fblock"><span class="k">Problema observado</span><p>Os templates se multiplicam por evento e idioma, e não fica claro o que está coberto. Automações e templates vivem em interfaces técnicas, e parte da comunicação com os guias acontece fora do sistema, num segundo número de WhatsApp.</p></div>
+      <div class="fblock"><span class="k">O que vamos investigar e definir</span><ul class="clean"><li>A régua de comunicação do cliente e do guia: confirmação, véspera, dia e pós-passeio.</li><li>Canais e idiomas por momento, dentro das regras da API oficial da Meta.</li><li>O que pode ser automatizado com segurança e o que exige revisão humana.</li></ul></div>
+      <div class="fblock"><span class="k">Entregável</span><p>Modelo de template por evento com variantes de idioma, régua de comunicação configurável e inbox redesenhada.</p></div>
+    </div>
+    <figure class="shot"><button type="button" data-src="img/templates.jpg" data-cap="Inbox · Templates de comunicação"><img src="img/templates.jpg" alt="Tabela de templates de comunicação" loading="lazy"></button><figcaption><b>INBOX</b> · templates de comunicação.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 09 FRENTE 6 -->
+<section class="slide" id="frente-6-linguagem" data-title="Frente 6 · Linguagem" data-coord="10 · Frente 6 · Linguagem" id="f6">
+  <div class="eyebrow">10 <b>/</b> Frente 6 · Linguagem e padrões</div>
+  <h2>Uma gramática única de interface, ligada à marca e ao Design System.</h2>
+  <div class="front">
+    <div class="fcol">
+      <div class="fblock"><span class="k">Problema observado</span><p>Cada tela tem a própria gramática. Cores sem significado fixo, nomes que mudam entre o menu e a página e padrões de página diferentes de um módulo para outro. Ações destrutivas ficam ao lado das frequentes, sem hierarquia. A interface também não tem relação com a marca nem com o Design System do site.</p></div>
+      <div class="fblock"><span class="k">O que vamos investigar e definir</span><ul class="clean"><li>O inventário de padrões e componentes em uso.</li><li>A arquitetura de informação e a navegação, a partir do ciclo da operação.</li><li>O que herdar do Design System do site e o que é próprio de um produto operacional.</li></ul></div>
+      <div class="fblock"><span class="k">Entregável</span><p>Design System de produto publicado no Figma, com tokens, componentes, padrões de interação e specs.</p></div>
+    </div>
+    <figure class="shot"><button type="button" data-src="img/reservas.jpg" data-cap="Reservas · lista (dados de cliente borrados)"><img src="img/reservas.jpg" alt="Lista de reservas" loading="lazy"></button><figcaption><b>RESERVAS</b> · lista de reservas.</figcaption></figure>
+  </div>
+</section>
+
+<!-- 11 DESIGN SYSTEM -->
+<section class="slide" id="design-system-de-produto" data-title="Design System de produto" data-coord="11 · Design System de produto">
+  <div class="eyebrow">11 <b>/</b> Design System de produto</div>
+  <h2>Um Design System pronto para várias empresas desde o primeiro token.</h2>
+  <p class="lead">A fundação do site já garante as boas práticas: tokens em dois níveis, tipografia por variável, temas claro e escuro e governança Figma → código. O produto acrescenta a camada que um SaaS exige. Feito assim, <strong>o software já nasce estruturado para crescer</strong>, e cada nova operadora é uma configuração, não um projeto novo.</p>
+  <div class="layers" role="img" aria-label="Arquitetura de tokens em quatro camadas: fundação, semântica de produto, tema por empresa e componentes de domínio">
+    <div class="layer l4"><span class="k">Componentes de domínio</span><h3>Construídos sobre a semântica, nunca sobre valores fixos</h3><p>Saída, grupo, capacidade, rota de coleta, recurso, linha do tempo de status. Componentes que falam a língua da operação de passeios.</p></div>
+    <div class="layer l3"><span class="k">Tema por empresa</span><h3>A marca de cada operadora, sem tocar em componente</h3><p>Cor de marca, logotipo e preferências de cada conta aplicadas por modo. A Itaway é o primeiro tema.</p></div>
+    <div class="layer l2"><span class="k">Semântica de produto</span><h3>Significado fixo para estado, dado e ação</h3><p>Estados da operação, situação de vaga, canais de venda, severidade de exceção, densidade de informação e paleta de dados.</p></div>
+    <div class="layer l1"><span class="k">Fundação do site</span><h3>Primitivos, tipografia, espaçamento, claro e escuro</h3><p>Herdada do Design System do site da Itaway, com as âncoras de marca primary #038C73 e secondary #FF8C52.</p></div>
+  </div>
+  <div class="grid g4">
+    <div class="panel"><span class="k">Escala</span><h3>Nova operadora sem retrabalho</h3><p>Uma conta nova recebe o produto inteiro; muda só a camada de tema.</p></div>
+    <div class="panel"><span class="k">Consistência</span><h3>Um significado por cor e por padrão</h3><p>Um mesmo estado tem a mesma aparência em qualquer tela, para qualquer empresa.</p></div>
+    <div class="panel"><span class="k">Velocidade</span><h3>Telas novas a partir de peças prontas</h3><p>Funcionalidades futuras são compostas, não redesenhadas do zero.</p></div>
+    <div class="panel"><span class="k">Governança</span><h3>Mudanças rastreáveis</h3><p>Biblioteca versionada, regras documentadas e cada alteração refletida no código de forma controlada.</p></div>
+  </div>
+</section>
+
+<!-- 16 SAAS -->
+<section class="slide" id="preparacao-para-saas" data-title="Preparação para SaaS" data-coord="12 · Preparação para SaaS">
+  <div class="eyebrow">12 <b>/</b> Preparação para SaaS</div>
+  <h2>Desenhar para a segunda operadora custa pouco agora e evita refazer o produto depois.</h2>
+  <p class="lead">Preparar para SaaS, nesta etapa, não é definir modelo de negócio. É garantir que <strong>estrutura, linguagem e configuração</strong> não dependam de nada que só a Itaway tem. Cada decisão de design passa por uma pergunta: isso funciona para uma segunda operadora, com outra equipe, outro catálogo e outra marca?</p>
+  <div class="grid g3">
+    <div class="panel"><span class="k">Estrutura</span><h3>Conta por empresa</h3><p>Catálogo, equipe, frota, integrações e configurações isolados por operadora, com uma separação clara entre o que a operação usa e o que só a administração mantém.</p></div>
+    <div class="panel"><span class="k">Pessoas</span><h3>Papéis e permissões</h3><p>Quem vê e quem pode fazer o quê, previsto desde o desenho dos fluxos e das ações com consequência.</p></div>
+    <div class="panel"><span class="k">Entrada</span><h3>Primeiros passos</h3><p>Uma nova operadora chega sem dados: telas vazias que ensinam o próximo passo e uma sequência de configuração guiada.</p></div>
+    <div class="panel"><span class="k">Linguagem</span><h3>Vocabulário neutro</h3><p>Nomes e estados que fazem sentido para qualquer operadora de passeios, sem jargão interno.</p></div>
+    <div class="panel"><span class="k">Idioma</span><h3>Estrutura multilíngue</h3><p>Interface preparada para equipes que trabalham em português, inglês ou espanhol.</p></div>
+    <div class="panel"><span class="k">Marca</span><h3>Tema por empresa</h3><p>Tokens que permitem a cada operadora usar a própria cor de marca, sem tocar nos componentes.</p></div>
+  </div>
+  <p class="note">Planos, preço, cobrança e estratégia comercial do SaaS são decisões de negócio e ficam para depois. O design deixa a estrutura pronta para recebê-las.</p>
+</section>
+
+<!-- 10 PREMISSAS -->
+<section class="slide" id="premissas-de-trabalho" data-title="Premissas de trabalho" data-coord="13 · Premissas de trabalho">
+  <div class="eyebrow">13 <b>/</b> Premissas de trabalho</div>
+  <h2>Oito premissas que orientam cada decisão do projeto.</h2>
+  <div class="premises">
+    <div><span class="n">01</span><h3>Fluxos antes de telas</h3><p>O desenho parte das tarefas da operação, de ponta a ponta, e só depois se organiza em telas.</p></div>
+    <div><span class="n">02</span><h3>Sistema antes de composição</h3><p>Tokens e componentes são definidos antes das telas; nenhuma tela é montada com peça provisória.</p></div>
+    <div><span class="n">03</span><h3>Decisão validada com quem opera</h3><p>Observação, protótipo e teste com a equipe da Itaway antes de cada entrega.</p></div>
+    <div><span class="n">04</span><h3>Automação com supervisão humana</h3><p>O sistema propõe e prepara; uma pessoa revisa e aprova o que chega ao cliente.</p></div>
+    <div><span class="n">05</span><h3>Prevenção de erro e reversibilidade</h3><p>Ações com consequência são separadas, explicadas e, sempre que possível, reversíveis.</p></div>
+    <div><span class="n">06</span><h3>Várias empresas desde a concepção</h3><p>Estrutura, linguagem e configuração pensadas para a segunda operadora, não só para a Itaway.</p></div>
+    <div><span class="n">07</span><h3>Exceção em primeiro plano</h3><p>O que pede decisão aparece primeiro, com responsável e prazo; o restante fica disponível, sem disputar atenção.</p></div>
+    <div><span class="n">08</span><h3>Acessibilidade e idioma na origem</h3><p>Contraste, foco, leitura e estrutura multilíngue tratados desde o primeiro componente.</p></div>
+  </div>
+</section>
+
+<!-- 14 MATURIDADE -->
+<section class="slide" id="maturidade-e-governanca" data-title="Maturidade e governança" data-coord="14 · Maturidade e governança">
+  <div class="eyebrow">14 <b>/</b> Maturidade e governança</div>
+  <h2>Práticas de produto maduro, do discovery ao design QA.</h2>
+  <div class="grid g2">
+    <div class="panel"><span class="k">Discovery e decisões rastreáveis</span><h3>Evidência antes de interface</h3><p>Pesquisa contextual com a operação, hipóteses e critérios de sucesso explícitos por fluxo, testes de usabilidade com protótipo navegável e registro de decisões de design (o que foi decidido, por quê e com base em quê).</p></div>
+    <div class="panel"><span class="k">Arquitetura de tokens</span><h3>Theming multi-tenant e modos</h3><p>Tokens primitivos, semânticos e de tema, com modos de cor, densidade e marca. Componentes consomem apenas tokens semânticos, o que mantém o produto coerente entre empresas e temas.</p></div>
+    <div class="panel"><span class="k">Design ops</span><h3>Biblioteca como produto</h3><p>Figma como fonte única da verdade, biblioteca publicada com versionamento semântico e changelog, regras de contribuição e auditoria periódica de uso e de desvio de componentes.</p></div>
+    <div class="panel"><span class="k">Design to code</span><h3>Specs como contrato de componente</h3><p>Cada componente sai com anatomia, propriedades, variantes, estados, tokens aplicados, comportamento responsivo e requisitos de acessibilidade (WCAG 2.2 AA), validados contra um schema antes da entrega. Cada fluxo sai com critérios de aceite.</p></div>
+  </div>
+  <div class="verdict good">Design QA contínuo: acompanhamos e validamos a implementação junto ao desenvolvimento, comparando o que foi construído com a spec. Ajustes de design ao longo do projeto e um mês de acompanhamento após a entrega final estão incluídos.</div>
+</section>
+
+<!-- 15 PLANO -->
+<section class="slide" id="o-plano" data-title="O plano" data-coord="15 · O plano">
+  <div class="eyebrow">15 <b>/</b> O plano</div>
+  <h2>Cada módulo passa por um ciclo de produto completo.</h2>
+  <p class="lead">O projeto avança módulo a módulo e, dentro de cada um, segue o mesmo ciclo: da descoberta à validação da implementação. A profundidade de cada etapa acompanha o tamanho do módulo e o quanto ele <strong>reaproveita do que os anteriores já resolveram</strong>. Por isso o primeiro grande módulo concentra o esforço e os seguintes ficam progressivamente mais leves.</p>
+  <div class="pcycle" role="list" aria-label="Ciclo de produto aplicado a cada módulo">
+    <div role="listitem"><span class="st">1 · Discovery e pesquisa</span><h3>Entender antes de desenhar</h3><p>Fluxos principais e de exceção do módulo, regras de negócio, papéis envolvidos e pontos de atrito, levantados com quem opera.</p><div class="out"><b>Sai:</b> mapa de fluxos do módulo validado</div></div>
+    <div role="listitem"><span class="st">2 · Componentes</span><h3>As peças do domínio</h3><p>Componentes de domínio novos e o que vem pronto do Design System, com variantes, estados e tokens.</p><div class="out"><b>Sai:</b> componentes publicados na biblioteca</div></div>
+    <div role="listitem"><span class="st">3 · Funcionalidades</span><h3>Telas e comportamento</h3><p>Cada funcionalidade composta com os componentes, com seus estados (vazio, carregando, erro, exceção) e protótipo navegável.</p><div class="out"><b>Sai:</b> telas e protótipo revisados com a operação</div></div>
+    <div role="listitem"><span class="st">4 · Módulo</span><h3>Pronto para implementar</h3><p>Specs, critérios de aceite e acompanhamento do desenvolvimento, comparando o que foi construído com o que foi especificado.</p><div class="out"><b>Sai:</b> módulo especificado e validado na implementação</div></div>
+  </div>
+  <h3 style="margin-top:6px">Cronograma</h3>
+  <div class="gantt" role="img" aria-label="Cronograma de 09/11/2026 a 03/02/2027, módulo a módulo, com pausa de fim de ano">
+    <div class="gr gh"><div class="gl"></div><div class="gt"><i class="wk" style="left:0.00%"></i><i class="wk" style="left:7.87%"></i><i class="wk" style="left:15.73%"></i><i class="wk" style="left:23.60%"></i><i class="wk" style="left:31.46%"></i><i class="wk" style="left:39.33%"></i><i class="wk" style="left:47.19%"></i><i class="wk" style="left:55.06%"></i><i class="wk" style="left:62.92%"></i><i class="wk" style="left:70.79%"></i><i class="wk" style="left:78.65%"></i><i class="wk" style="left:86.52%"></i><i class="wk" style="left:94.38%"></i><span class="mo" style="left:0.00%">nov</span><span class="mo" style="left:24.72%">dez</span><span class="mo" style="left:59.55%">jan</span><span class="mo" style="left:94.38%">fev</span><span class="pz" style="left:47.19%;width:13.48%">pausa</span></div></div>
+      <div class="gr"><div class="gl"><b>Design System de produto</b><small>24 h · 09/11 a 18/11</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb tv" style="left:0.00%;width:11.24%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Excursões</b><small>36 h · 19/11 a 07/12</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:11.24%;width:21.35%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Calendário</b><small>14 h · 08/12 a 14/12</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:32.58%;width:7.87%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Reservas</b><small>8 h · 14/12 a 17/12</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:39.33%;width:4.49%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Inbox</b><small>20 h · 17/12 a 08/01</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:42.70%;width:25.84%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Configurações</b><small>19 h · 11/01 a 19/01</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:70.79%;width:10.11%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Auditoria</b><small>10 h · 19/01 a 25/01</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:79.78%;width:7.87%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Dashboard</b><small>8 h · 25/01 a 28/01</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb" style="left:86.52%;width:4.49%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Estrutura e preparação SaaS</b><small>12 h · 28/01 a 03/02</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb tv" style="left:89.89%;width:7.87%"></i></div></div>
+      <div class="gr"><div class="gl"><b>Desenvolvimento</b><small>implementa após cada entrega</small></div><div class="gt"><i class="gp" style="left:47.19%;width:13.48%"></i><i class="gb dev" style="left:11.24%;width:88.76%"></i></div></div>
+  </div>
+  <p class="note">3 horas de trabalho por dia útil, de segunda a sexta, a partir de 09/11/2026. Considera os feriados de 20/11, 25/12, 01/01 e 20/01 (São Sebastião) e pausa de 21/12/2026 a 01/01/2027. Entrega final em 03/02/2027, antes do Carnaval. O cronograma de design não depende do ritmo de implementação.</p>
+</section>
+
+<!-- 16 ESFORÇO -->
+<section class="slide" id="esforco-estimado" data-title="Esforço estimado" data-coord="16 · Esforço estimado">
+  <div class="eyebrow">16 <b>/</b> Esforço estimado</div>
+  <h2>151 horas, estimadas módulo a módulo a partir do inventário do sistema.</h2>
+  <p class="lead">O inventário foi levantado no sistema em produção: <strong>79 telas, 96 fluxos (69 principais e 27 de exceção) e 35 componentes de domínio</strong>. As horas de cada módulo consideram o que ele cria de novo e o que reaproveita; specs são feitas dentro de cada ciclo, não como etapa à parte.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Módulo</th><th>O que é novo</th><th class="num">Telas</th><th class="num">Fluxos</th><th class="num">Horas</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Design System de produto</strong></td><td>Semântica de produto e tema por empresa sobre a fundação do site; componentes base</td><td class="num">—</td><td class="num">—</td><td class="num">24</td></tr>
+        <tr><td><strong>Dashboard</strong></td><td>Indicadores acionáveis da tela Hoje e análises</td><td class="num">3</td><td class="num">5</td><td class="num">8</td></tr>
+        <tr><td><strong>Excursões</strong></td><td>Planejamento, operação do dia, grupos, rotas, ordem de serviço</td><td class="num">13</td><td class="num">18</td><td class="num">36</td></tr>
+        <tr><td><strong>Calendário</strong></td><td>Visões de semana, mês e agenda; escala de guias</td><td class="num">7</td><td class="num">11</td><td class="num">14</td></tr>
+        <tr><td><strong>Reservas</strong></td><td>Pipeline em quadro; detalhe e edição da reserva</td><td class="num">8</td><td class="num">10</td><td class="num">8</td></tr>
+        <tr><td><strong>Auditoria</strong></td><td>Fila de exceções, conferência e Monitoramento</td><td class="num">10</td><td class="num">11</td><td class="num">10</td></tr>
+        <tr><td><strong>Inbox</strong></td><td>Conversas, templates, automações e régua de comunicação</td><td class="num">10</td><td class="num">14</td><td class="num">20</td></tr>
+        <tr><td><strong>Configurações</strong></td><td>Oito abas; Passeios e Zonas de pickup concentram o trabalho novo</td><td class="num">20</td><td class="num">19</td><td class="num">19</td></tr>
+        <tr class="subrow"><td class="sub">Passeios</td><td class="sub2">Editor de passeio com horários e vínculo a canais</td><td class="num">3</td><td class="num">6</td><td class="num">6</td></tr>
+        <tr class="subrow"><td class="sub">Zonas de pickup</td><td class="sub2">Zonas ordenáveis e hotéis não reconhecidos</td><td class="num">3</td><td class="num">3</td><td class="num">4</td></tr>
+        <tr class="subrow"><td class="sub">Guias</td><td class="sub2">Disponibilidade do guia</td><td class="num">3</td><td class="num">2</td><td class="num">3</td></tr>
+        <tr class="subrow"><td class="sub">Usuários</td><td class="sub2">Matriz de permissões</td><td class="num">2</td><td class="num">2</td><td class="num">3</td></tr>
+        <tr class="subrow"><td class="sub">Veículos</td><td class="sub2">Reaproveita o padrão de Guias</td><td class="num">2</td><td class="num">1</td><td class="num">1</td></tr>
+        <tr class="subrow"><td class="sub">Integrações</td><td class="sub2">Alinhamento ao Design System</td><td class="num">4</td><td class="num">4</td><td class="num">1</td></tr>
+        <tr class="subrow"><td class="sub">Documentos</td><td class="sub2">Alinhamento ao Design System</td><td class="num">2</td><td class="num">0</td><td class="num">0,5</td></tr>
+        <tr class="subrow"><td class="sub">Testes</td><td class="sub2">Alinhamento ao Design System</td><td class="num">1</td><td class="num">1</td><td class="num">0,5</td></tr>
+        <tr><td><strong>Estrutura e preparação SaaS</strong></td><td>Navegação, acesso e perfil, notificações, entrada de nova empresa, marca e tema</td><td class="num">8</td><td class="num">8</td><td class="num">12</td></tr>
+        <tr class="total"><td>Total</td><td></td><td class="num">79</td><td class="num">96</td><td class="num">151</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Horas de trabalho de design. Reuniões semanais e acompanhamento da implementação estão incluídos no valor fechado. A distribuição entre módulos pode ser rebalanceada ao longo do projeto sem alterar o valor.</p>
+</section>
+
+<!-- 17 PROPOSTA COMERCIAL -->
+<section class="slide" id="proposta-comercial" data-title="Proposta comercial" data-coord="17 · Proposta comercial">
+  <div class="eyebrow">17 <b>/</b> Proposta comercial</div>
+  <h2>Investimento</h2>
+  <div class="invest">
+    <div class="l">
+      <span class="k">Incluso</span>
+      <p class="what">Design System de produto, os sete módulos do software redesenhados com ciclo completo, preparação para SaaS e um mês de acompanhamento da implementação.</p>
+      <div class="pstack">
+        <div class="net"><b>R$ 22.650</b><span>valor do projeto</span></div>
+        <div class="tax"><b>+ R$ 4.154,73</b><span>impostos (15,5%)</span></div>
+        <div class="tot"><span>Investimento total</span><b>R$ 26.804,73</b></div>
+      </div>
+      <p class="ppay">À vista ou em até 3x de R$ 8.934,91<span>Sem acréscimo no parcelamento.</span></p>
+    </div>
+    <div class="r">
+      <div class="tablewrap" style="border:0">
+        <table>
+          <thead><tr><th>Módulo</th><th class="num">Horas</th><th class="num">Valor</th></tr></thead>
+          <tbody>
+            <tr><td>Design System de produto</td><td class="num">24</td><td class="num">R$ 3.600</td></tr>
+            <tr><td>Dashboard</td><td class="num">8</td><td class="num">R$ 1.200</td></tr>
+            <tr><td>Excursões</td><td class="num">36</td><td class="num">R$ 5.400</td></tr>
+            <tr><td>Calendário</td><td class="num">14</td><td class="num">R$ 2.100</td></tr>
+            <tr><td>Reservas</td><td class="num">8</td><td class="num">R$ 1.200</td></tr>
+            <tr><td>Auditoria</td><td class="num">10</td><td class="num">R$ 1.500</td></tr>
+            <tr><td>Inbox</td><td class="num">20</td><td class="num">R$ 3.000</td></tr>
+            <tr><td>Configurações</td><td class="num">19</td><td class="num">R$ 2.850</td></tr>
+            <tr><td>Estrutura e preparação SaaS</td><td class="num">12</td><td class="num">R$ 1.800</td></tr>
+            <tr class="total"><td>Valor do projeto</td><td class="num">151</td><td class="num">R$ 22.650</td></tr>
+            <tr class="tax"><td>Impostos (15,5% sobre a nota)</td><td class="num"></td><td class="num">+ R$ 4.154,73</td></tr>
+            <tr class="grand"><td>Investimento total</td><td class="num"></td><td class="num">R$ 26.804,73</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="cond">
+    <div><h4>Incluído</h4><p>Design System de produto e todos os módulos do inventário no Figma, cada um com seu ciclo completo; até 2 rodadas de revisão por módulo; reuniões semanais; design QA e ajustes de design ao longo do projeto; um mês de acompanhamento da implementação após a entrega final, sem custo adicional.</p></div>
+    <div><h4>Fora do escopo</h4><p>Código de produção (front-end e back-end); app nativo do guia; tradução e revisão dos textos da interface (o design prevê a estrutura multilíngue); modelo de negócio, preço e cobrança do SaaS.</p></div>
+    <div><h4>Mudança de escopo</h4><p>Novas demandas são estimadas antes e cobradas por hora, sempre com aprovação prévia. Trocar a prioridade entre itens equivalentes não gera custo. Encerrado o mês de acompanhamento, redesenho de solução é cobrado por hora.</p></div>
+    <div><h4>Direitos</h4><p>Após a quitação, arquivos, bibliotecas e specs são cedidos à Itaway, inclusive para uso comercial do produto como SaaS.</p></div>
+    <div><h4>Prazos e confidencialidade</h4><p>Atrasos de retorno, acessos ou sessões do lado da Itaway deslocam o cronograma sem alterar o valor. Dados da operação e do sistema são tratados como confidenciais.</p></div>
+    <div><h4>Pagamento e rescisão</h4><p>À vista na assinatura, ou em até 3 parcelas de R$ 8.934,91: na assinatura, em 30 dias e no aceite da entrega final. Nota fiscal de serviço emitida pela Spoonful, com impostos inclusos; PIX ou boleto. Rescisão com 30 dias de aviso, sendo devidas as horas já executadas do módulo em curso.</p></div>
+  </div>
+  <p class="note">Proposta válida por 15 dias a partir de 30/10/2026.</p>
+</section>
+
+<!-- 18 ENCERRAMENTO -->
+<section class="slide cover closing" id="encerramento" data-title="Encerramento" data-coord="22°57′S · 43°17′W · Floresta da Tijuca">
+  <div class="cover-wrap">
+    <canvas class="contours" id="contours2" aria-hidden="true"></canvas>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div class="eyebrow">Spoonful Design <b>para</b> Itaway Ecotours</div>
+      <h1>Um software pronto para a Itaway. <span>Uma plataforma pronta para o mercado.</span></h1>
+      <p class="lead">Ao fim do projeto, a Itaway opera com um sistema desenhado para a sua rotina e, com ele, passa a ter um produto preparado para atender outras operadoras como SaaS. É uma nova fronteira: a Itaway deixa de ser apenas usuária de tecnologia e passa a criá-la para o turismo de experiência.</p>
+      <div class="cover-meta" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div><span class="k">Contato</span><span class="v">Fabricio Sacramento</span></div>
+        <div><span class="k">E-mail</span><span class="v" style="user-select:all">fabricio@spoonful.com.br</span></div>
+        <div><span class="k">Site</span><span class="v" style="user-select:all">spoonful.com.br</span></div>
+      </div>
+      <details>
+        <summary class="note">Fontes da análise de mercado</summary>
+        <ol class="sources" id="sources" style="margin-top:12px"></ol>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<dialog class="lb" id="lb"><button type="button" id="lbClose">Fechar</button><img id="lbImg" alt=""><p id="lbCap"></p></dialog>
+
+<script>
+(function(){
+  /* ---------- Fontes ---------- */
+  const S=[
+    ['Briefing CRM Itaway, reunião de 23/10/2026 (transcrição)',''],
+    ['CRM Itaway em produção, navegação só de leitura em 29/10/2026',''],
+    ['Nielsen Norman Group — How to conduct a heuristic evaluation','https://www.nngroup.com/articles/how-to-conduct-a-heuristic-evaluation/'],
+    ['Levels.fyi — Product Designer, Brasil','https://www.levels.fyi/t/product-designer/locations/brazil'],
+    ['Código Fonte TV — Pesquisa 2025, UX/UI','https://pesquisa.codigofonte.com.br/2025/area/ux-ui'],
+    ['Cora — PJ x CLT','https://www.cora.com.br/blog/desconto-pj/'],
+    ['Clutch — Agências de UI/UX no Brasil','https://clutch.co/br/agencies/ui-ux'],
+    ['Design Studio UI/UX — custo de UX para SaaS','https://www.designstudiouiux.com/blog/saas-ux-design-cost/'],
+    ['Boca Notícias — PTAX de 23/10/2026','https://boca.com.br/economia/dolar/cotacao-dolar-hoje-24-10-2026'],
+    ['Bókun — preços','https://www.bokun.io/pricing'],
+    ['Bókun — alocação de frota','https://www.bokun.io/?p=4758'],
+    ['Whippy AI — WhatsApp integrado ao Bókun','https://whippy.ai/integrations/bokun'],
+    ['CaptainBook — taxas do FareHarbor (concorrente)','https://captainbook.io/blog/fareharbor-pricing-fees-explained'],
+    ['Papershift — escala com FareHarbor','https://www.papershift.com/en/marketplace/fareharbor'],
+    ['Rezdy — preços','https://www.rezdy.com/pricing/'],
+    ['Peek Pro — gestão de equipe','https://www.peekpro.com/product/empower-staff'],
+    ['Checkfront — preços','https://www.checkfront.com/pricing'],
+    ['TrekkSoft — preços','https://www.trekksoft.com/en/pricing'],
+    ['Xola — gestão de equipe','https://www.xola.com/staff-management/'],
+    ['Regiondo — preços','https://pro.regiondo.com/pricing/'],
+    ['Orioly — preços','https://www.orioly.com/pricing/'],
+    ['Rezgo — preços','https://www.rezgo.com/pricing'],
+    ['Zaui — preços','https://www.zaui.com/pricing/'],
+    ['Ventrata — Capterra','https://www.capterra.ie/software/198239/ventrata'],
+    ['TourOperation — Capterra','https://www.capterra.com/p/10038450/TourOperation/'],
+    ['Tourflows — GetApp','https://www.getapp.co.uk/software/2097501/tourflows'],
+    ['NTMG — Dispatch','https://stg.ntmg.com/functions/single-function-dispatch.html']
+  ];
+  document.getElementById('sources').innerHTML=S.map(([t,u])=>u?`<li><a href="${u}">${t}</a></li>`:`<li>${t}</li>`).join('');
+
+  /* ---------- Navegação: índice lateral, leitura e tema ---------- */
+  const slides=[...document.querySelectorAll('section.slide')], total=slides.length;
+  const links=[...document.querySelectorAll('#toc a')];
+  function current(){const mid=window.innerHeight*0.4;let idx=0;slides.forEach((s,i)=>{if(s.getBoundingClientRect().top<=mid)idx=i;});return idx;}
+  function go(i){i=Math.max(0,Math.min(total-1,i));slides[i].scrollIntoView({block:'start'});}
+  function update(){const c=current();links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+slides[c].id));
+    document.getElementById('topSec').textContent=slides[c].dataset.title||'';
+    const max=document.documentElement.scrollHeight-innerHeight;const p=max>0?Math.min(100,Math.round(scrollY/max*100)):0;
+    document.getElementById('readBar').style.width=p+'%';document.getElementById('bar').style.width=(max>0?scrollY/max*100:0)+'%';document.getElementById('readPct').textContent=p+'%';}
+  addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
+  const rail=document.getElementById('rail'),scrim=document.getElementById('scrim'),mb=document.getElementById('menuBtn');
+  const closeRail=()=>{rail.classList.remove('open');scrim.classList.remove('on');mb.setAttribute('aria-expanded','false');};
+  mb.addEventListener('click',()=>{const o=rail.classList.toggle('open');scrim.classList.toggle('on',o);mb.setAttribute('aria-expanded',String(o));});
+  const railHide=document.getElementById('railHide'),railShow=document.getElementById('railShow');
+  function setRail(off){document.documentElement.classList.toggle('rail-off',off);railShow.setAttribute('aria-expanded',String(!off));try{localStorage.setItem('crm-rail',off?'off':'on');}catch(e){}setTimeout(()=>{try{draw();draw2();}catch(e){}},320);}
+  railHide.addEventListener('click',()=>setRail(true));railShow.addEventListener('click',()=>setRail(false));
+  try{if(localStorage.getItem('crm-rail')==='off')setRail(true);}catch(e){}
+  scrim.addEventListener('click',closeRail);links.forEach(a=>a.addEventListener('click',closeRail));
+  document.getElementById('themeBtn').addEventListener('click',()=>{const r=document.documentElement;
+    const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('crm-theme',r.dataset.theme);}catch(e){}
+    try{draw();draw2();}catch(e){}});
+  try{const s=localStorage.getItem('crm-theme');if(s)document.documentElement.dataset.theme=s;}catch(e){}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeRail();return;}
+    if(e.target.matches('input,textarea,button,a'))return;if(document.getElementById('lb').open)return;const cur=current();
+    if(['ArrowDown','PageDown','ArrowRight',' '].includes(e.key)){e.preventDefault();go(cur+1);}
+    if(['ArrowUp','PageUp','ArrowLeft'].includes(e.key)){e.preventDefault();go(cur-1);}
+    if(e.key==='Home'){e.preventDefault();go(0);}if(e.key==='End'){e.preventDefault();go(total-1);}});
+  const lb=document.getElementById('lb'),lbImg=document.getElementById('lbImg'),lbCap=document.getElementById('lbCap');
+  document.querySelectorAll('.shot button').forEach(b=>b.addEventListener('click',()=>{lbImg.src=b.dataset.src;lbImg.alt=b.dataset.cap;lbCap.textContent=b.dataset.cap;try{lb.showModal();}catch(err){lb.setAttribute('open','');}}));
+  document.getElementById('lbClose').addEventListener('click',()=>lb.close());
+  lb.addEventListener('click',e=>{if(e.target===lb)lb.close();});
+
+  /* ---------- Capa: curvas de nível animadas ---------- */
+  let topoResize=()=>{};
+  (function initTopo(){
+    const cv=document.getElementById('topo');if(!cv)return;const ctx=cv.getContext('2d');
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let W,H,dpr,t=0,visible=true,mx=0,my=0;
+    const seeds=[[2,.9,.13],[3,1.7,.09],[5,.4,.05],[7,2.3,.03],[11,1.1,.015]];
+    const shape=(a,k,tt)=>seeds.reduce((s,[f,ph,amp])=>s+amp*Math.sin(f*a+ph+tt*(.12+f*.004)+k*.07),1);
+    function size(){const r=cv.getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);}
+    function render(){
+      ctx.clearRect(0,0,W,H);
+      const cx=W*.74+mx*14,cy=H*.4+my*10,base=Math.min(W,H)*.09;
+      ctx.strokeStyle='rgba(147,171,166,.08)';ctx.lineWidth=1;
+      for(let x=(W%120)/2;x<W;x+=120){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(let y=(H%120)/2;y<H;y+=120){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+      for(let k=0;k<22;k++){
+        const R=base+k*k*1.9+k*20;ctx.beginPath();
+        for(let a=0;a<=Math.PI*2+.02;a+=.03){const r=R*shape(a,k,t);const x=cx+Math.cos(a)*r*1.35,y=cy+Math.sin(a)*r;a?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+        const alpha=k===0?.9:Math.max(.05,.42-k*.017);
+        ctx.strokeStyle=k===0?'rgba(95,208,182,.85)':`rgba(95,208,182,${alpha})`;ctx.lineWidth=k===0?1.6:1;
+        if(k===0){ctx.fillStyle='rgba(3,140,115,.28)';ctx.fill();}
+        ctx.setLineDash(k%5===4?[2,5]:[]);ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(147,171,166,.45)';ctx.font='500 10px "IBM Plex Mono", monospace';
+      [[.18,.22,'120'],[.32,.62,'340'],[.52,.16,'480'],[.9,.72,'610'],[.62,.82,'780'],[.12,.78,'860'],[.45,.42,'1021']].forEach(([x,y,n])=>ctx.fillText(n,x*W,y*H));
+      const bx=cx-base*2.6,by=cy+base*1.9,pulse=(Math.sin(t*2)+1)/2;
+      ctx.beginPath();ctx.arc(bx,by,4,0,Math.PI*2);ctx.fillStyle='#FF8C52';ctx.fill();
+      ctx.beginPath();ctx.arc(bx,by,8+pulse*10,0,Math.PI*2);ctx.strokeStyle=`rgba(255,140,82,${.5-pulse*.45})`;ctx.stroke();
+    }
+    function loop(){if(visible){t+=.006;render();}requestAnimationFrame(loop);}
+    topoResize=()=>{size();render();};
+    size();render();addEventListener('resize',topoResize);
+    new IntersectionObserver(es=>visible=es[0].isIntersecting).observe(cv);
+    if(!reduce){cv.parentElement.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect();mx=(e.clientX-r.left)/r.width-.5;my=(e.clientY-r.top)/r.height-.5;});loop();}
+  })();
+  function draw(){topoResize();}
+  function draw2(){const c2=document.getElementById('contours2');if(!c2)return;const r=c2.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c2.width=r.width*dpr;c2.height=r.height*dpr;c2.style.width=r.width+'px';c2.style.height=r.height+'px';const x=c2.getContext('2d');x.scale(dpr,dpr);x.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--line').trim()||'#D2DDDA';x.lineWidth=1;const cx=r.width*0.84,cy=r.height*0.42;for(let k=1;k<=12;k++){x.beginPath();const base=k*30;for(let a=0;a<=Math.PI*2+0.01;a+=0.04){const n=Math.sin(a*2+k*0.5)*10+Math.cos(a*4-k*0.8)*6+Math.sin(a*7+k)*2;const rr=base+n;const px=cx+Math.cos(a)*rr*1.25,py=cy+Math.sin(a)*rr*(a>Math.PI?1.15:0.8);a===0?x.moveTo(px,py):x.lineTo(px,py);}x.stroke();}}
+  draw();draw2();window.addEventListener('resize',()=>{draw();draw2();});matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',draw);
+})();
+</script>
+</body>
+</html>
