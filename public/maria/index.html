@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F5F7F7">
+<title>Maria · painel da família</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%232FA898'/><text x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='Helvetica,Arial'>M</text></svg>">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+  :root{
+    --teal-50:#EDF8F6; --teal-100:#D3EFEA; --teal-200:#A9E0D6; --teal-400:#4EBFAE; --teal-500:#2FA898; --teal-700:#1E6F66;
+    --ink:#22292B; --g-700:#495154; --g-500:#7C8588; --g-300:#C4CACC; --g-200:#E1E5E6; --g-100:#EEF1F1; --bg:#F5F7F7; --card:#FFFFFF;
+    --warn:#C8794A; --radius:18px; --shadow:0 1px 2px rgba(34,41,43,.04),0 8px 24px rgba(34,41,43,.05);
+    --font:'Neue Haas Grotesk Display Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45;letter-spacing:.01em;min-height:100vh}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none}
+  .wrap{max-width:1040px;margin:0 auto;padding:20px 18px 80px}
+
+  /* topo */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .brand{font-size:14px;color:var(--g-500);letter-spacing:.04em;text-transform:uppercase}
+  .brand b{color:var(--teal-700);font-weight:500}
+  .who{display:flex;gap:4px;background:var(--g-100);padding:4px;border-radius:999px}
+  .who button{padding:6px 14px;border-radius:999px;font-size:14px;color:var(--g-700)}
+  .who button[aria-pressed="true"]{background:var(--card);color:var(--teal-700);box-shadow:var(--shadow);font-weight:500}
+
+  /* hero */
+  .hero{background:linear-gradient(135deg,var(--teal-500),var(--teal-700));color:#fff;border-radius:28px;padding:28px 28px 24px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,0) 70%)}
+  .hero .eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+  .hero h1{font-weight:300;font-size:clamp(48px,9vw,84px);line-height:1;letter-spacing:-.02em;margin:6px 0 10px}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:16px;opacity:.95}
+  .hero .meta strong{font-weight:500}
+  .bar{margin-top:22px;height:10px;border-radius:99px;background:rgba(255,255,255,.22);position:relative}
+  .bar i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:#fff}
+  .bar-legend{display:flex;justify-content:space-between;font-size:12px;opacity:.75;margin-top:6px}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0 22px}
+  .stat{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+  .stat small{display:block;font-size:13px;color:var(--g-500)}
+  .stat b{font-size:26px;font-weight:400}
+  .stat b span{font-size:15px;color:var(--g-500)}
+  .mini{height:4px;border-radius:9px;background:var(--g-100);margin-top:8px;overflow:hidden}
+  .mini i{display:block;height:100%;background:var(--teal-400);border-radius:9px}
+
+  /* abas */
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;padding:9px 16px;border-radius:999px;background:var(--card);color:var(--g-700);font-size:15px;box-shadow:var(--shadow)}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+
+  .panel{display:none}
+  .panel.on{display:block}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+  .card h2{font-size:18px;font-weight:500;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+  .card h2 small{font-size:13px;color:var(--g-500);font-weight:400}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .muted{color:var(--g-500);font-size:14px}
+
+  /* linhas de tarefa / checklist */
+  .row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-top:1px solid var(--g-100)}
+  .row:first-of-type{border-top:0}
+  .check{flex:0 0 24px;width:24px;height:24px;border-radius:8px;border:1.5px solid var(--g-300);display:grid;place-items:center;transition:.15s;margin-top:1px}
+  .check svg{width:14px;height:14px;opacity:0}
+  .row.done .check{background:var(--teal-500);border-color:var(--teal-500)}
+  .row.done .check svg{opacity:1}
+  .row .txt{flex:1;min-width:0}
+  .row .t{display:block}
+  .row.done .t{color:var(--g-500);text-decoration:line-through;text-decoration-color:var(--g-300)}
+  .row .sub{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--g-500);margin-top:2px}
+  .tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--g-100);color:var(--g-700)}
+  .tag.teal{background:var(--teal-50);color:var(--teal-700)}
+  .tag.warn{background:#F8EDE6;color:var(--warn)}
+  .x{color:var(--g-300);font-size:20px;line-height:1;padding:0 4px}
+  .x:hover{color:var(--warn)}
+
+  /* enxoval */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .chips button{padding:6px 12px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-size:14px;color:var(--g-700)}
+  .chips button[aria-pressed="true"]{background:var(--teal-700);color:#fff}
+  .item{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--g-100)}
+  .item:first-of-type{border-top:0}
+  .item .name{min-width:0}
+  .item .name span{color:var(--g-500);font-size:13px;margin-left:6px}
+  .seg{display:flex;background:var(--g-100);border-radius:99px;padding:3px;gap:2px}
+  .seg button{font-size:12px;padding:5px 9px;border-radius:99px;color:var(--g-500);white-space:nowrap}
+  .seg button[aria-pressed="true"]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--ink)}
+  .seg button[data-s="ganhou"][aria-pressed="true"],.seg button[data-s="comprado"][aria-pressed="true"]{background:var(--teal-500);color:#fff}
+
+  /* formulários */
+  form.add{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--g-200)}
+  form.add input,form.add select,form.add textarea{flex:1 1 160px;border:1px solid var(--g-200);background:var(--bg);border-radius:12px;padding:10px 12px;outline:none;min-width:0}
+  form.add input:focus,form.add select:focus,form.add textarea:focus{border-color:var(--teal-400);background:#fff}
+  form.add textarea{flex-basis:100%;min-height:70px;resize:vertical}
+  .btn{background:var(--teal-500);color:#fff;border-radius:12px;padding:10px 16px;font-weight:500}
+  .btn:hover{background:var(--teal-700)}
+
+  .contact{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--g-100);font-size:15px}
+  .contact:first-of-type{border-top:0}
+  .contact span{color:var(--g-500)}
+  .note{padding:12px 0;border-top:1px solid var(--g-100)}
+  .note:first-of-type{border-top:0}
+  .note p{white-space:pre-wrap}
+  .log li{list-style:none;font-size:14px;padding:6px 0;border-top:1px solid var(--g-100);color:var(--g-700)}
+  .log li:first-child{border-top:0}
+  .log b{font-weight:500;color:var(--ink)}
+
+  /* PIN */
+  .gate{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:20;padding:20px}
+  .gate .box{width:min(360px,100%);text-align:center}
+  .gate h1{font-weight:300;font-size:56px;color:var(--teal-700);letter-spacing:-.02em}
+  .gate p{color:var(--g-500);margin:4px 0 22px}
+  .gate input{width:100%;text-align:center;font-size:26px;letter-spacing:.4em;padding:14px;border-radius:16px;border:1px solid var(--g-200);background:#fff;outline:none}
+  .gate input:focus{border-color:var(--teal-400)}
+  .gate .btn{width:100%;margin-top:10px;padding:14px}
+  .gate .err{color:var(--warn);font-size:14px;min-height:20px;margin-top:8px}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+
+  @media (max-width:720px){
+    .grid2{grid-template-columns:1fr}
+    .stats{gap:8px}
+    .stat{padding:12px}
+    .stat b{font-size:22px}
+    .hero{padding:22px 20px 20px;border-radius:24px}
+    .item{grid-template-columns:1fr}
+    .seg{justify-self:start}
+  }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <form class="box" id="gateForm">
+    <h1>Maria</h1>
+    <p>Painel da família · digite o PIN</p>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="current-password" aria-label="PIN" required>
+    <button class="btn" type="submit">Entrar</button>
+    <div class="err" id="gateErr"></div>
+  </form>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header class="top">
+    <div class="brand"><b>Maria</b> · painel</div>
+    <div class="who" id="who" role="group" aria-label="Quem está usando"></div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Chegada prevista</div>
+    <h1>Maria</h1>
+    <div class="meta" id="heroMeta"></div>
+    <div class="bar"><i id="heroBar"></i></div>
+    <div class="bar-legend"><span>1º tri</span><span>2º tri</span><span>3º tri</span><span>40 sem.</span></div>
+  </section>
+
+  <section class="stats" id="stats"></section>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="proximos" aria-selected="true">Próximos passos</button>
+    <button role="tab" data-tab="frentes">Frentes</button>
+    <button role="tab" data-tab="enxoval">Enxoval</button>
+    <button role="tab" data-tab="mala">Mala</button>
+    <button role="tab" data-tab="notas">Notas e contatos</button>
+  </nav>
+
+  <section class="panel on" id="p-proximos"></section>
+  <section class="panel" id="p-frentes"></section>
+  <section class="panel" id="p-enxoval"></section>
+  <section class="panel" id="p-mala"></section>
+  <section class="panel" id="p-notas"></section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const API = '/api/maria';
+  const ST = {pending: 'precisa', lista: 'lista', ganhou: 'ganhou', comprado: 'comprado'};
+  const ST_LABEL = {precisa: 'Precisamos', lista: 'Na lista', ganhou: 'Ganhamos', comprado: 'Comprado'};
+  const CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+
+  const store = {
+    get(k){ try { return localStorage.getItem('maria.'+k); } catch { return null; } },
+    set(k,v){ try { localStorage.setItem('maria.'+k, v); } catch {} },
+    del(k){ try { localStorage.removeItem('maria.'+k); } catch {} },
+  };
+
+  let pin = store.get('pin') || '';
+  let who = store.get('who') || '';
+  let data = null;
+  let tab = 'proximos';
+  let enxFilter = 'todos';
+
+  const $ = (s, el=document) => el.querySelector(s);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+  const parse = (iso) => { const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); };
+  const fmt = (iso, opts={day:'2-digit', month:'short'}) => iso ? parse(iso).toLocaleDateString('pt-BR', opts).replace('.', '') : '';
+  const ago = (iso) => { const m = Math.round((Date.now() - new Date(iso)) / 60000); if (m < 1) return 'agora'; if (m < 60) return m+' min'; const h = Math.round(m/60); if (h < 24) return h+' h'; return Math.round(h/24)+' d'; };
+
+  function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 1800); }
+
+  async function call(method, body){
+    const r = await fetch(API, { method, headers: {'Content-Type':'application/json','x-maria-pin': pin}, body: body ? JSON.stringify(body) : undefined });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 401) { store.del('pin'); pin=''; showGate('PIN incorreto'); throw new Error('pin'); }
+    if (!r.ok) throw new Error(j.error || 'Erro ao salvar');
+    return j;
+  }
+  async function act(body, ok='Salvo'){
+    try { data = await call('POST', {...body, by: who}); render(); toast(ok); }
+    catch(e){ if (e.message !== 'pin') toast(e.message); }
+  }
+
+  function showGate(err=''){ $('#gate').hidden = false; $('#app').hidden = true; $('#gateErr').textContent = err; setTimeout(() => $('#pin').focus(), 50); }
+  $('#gateForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); pin = $('#pin').value.trim();
+    try { data = await call('GET'); store.set('pin', pin); $('#gate').hidden = true; $('#app').hidden = false; render(); }
+    catch(err){ if (err.message !== 'pin') $('#gateErr').textContent = err.message; }
+  });
+
+  // ---------- render ----------
+  function render(){
+    if (!who || !data.people.includes(who)) { who = data.people[0]; }
+    renderWho(); renderHero(); renderStats();
+    renderProximos(); renderFrentes(); renderEnxoval(); renderMala(); renderNotas();
+  }
+
+  function renderWho(){
+    $('#who').innerHTML = data.people.map(p => `<button aria-pressed="${p===who}" data-who="${esc(p)}">${esc(p)}</button>`).join('');
+  }
+
+  function pregnancy(){
+    const dpp = parse(data.dpp), t = today();
+    const daysLeft = Math.round((dpp - t) / 864e5);
+    const daysIn = 280 - daysLeft;
+    return { daysLeft, week: Math.floor(daysIn/7), day: daysIn % 7, pct: Math.min(100, Math.max(0, daysIn/280*100)) };
+  }
+
+  function renderHero(){
+    const p = pregnancy();
+    $('#heroMeta').innerHTML = `<span><strong>Semana ${p.week}</strong>${p.day ? ' + '+p.day+'d' : ''} de 40</span>`
+      + `<span>${p.daysLeft > 0 ? '<strong>'+p.daysLeft+' dias</strong> para a data prevista' : 'Data prevista chegou'}</span>`
+      + `<span>DPP ${fmt(data.dpp, {day:'2-digit', month:'long', year:'numeric'})}</span>`;
+    $('#heroBar').style.width = p.pct + '%';
+  }
+
+  function renderStats(){
+    const tDone = data.tasks.filter(t => t.done).length;
+    const eDone = data.enxoval.filter(e => e.status === 'ganhou' || e.status === 'comprado').length;
+    const mDone = data.mala.filter(m => m.done).length;
+    const s = (label, a, b) => `<div class="stat"><small>${label}</small><b>${a}<span>/${b}</span></b><div class="mini"><i style="width:${b ? a/b*100 : 0}%"></i></div></div>`;
+    $('#stats').innerHTML = s('Tarefas', tDone, data.tasks.length) + s('Enxoval garantido', eDone, data.enxoval.length) + s('Mala', mDone, data.mala.length);
+  }
+
+  const frontName = (id) => (data.fronts.find(f => f.id === id) || {}).name || '';
+
+  function taskRow(t, showFront=true){
+    const t0 = today();
+    let dueTag = '';
+    if (t.due && !t.done) {
+      const d = Math.round((parse(t.due) - t0) / 864e5);
+      dueTag = d < 0 ? `<span class="tag warn">atrasada · ${fmt(t.due)}</span>` : d <= 7 ? `<span class="tag teal">esta semana · ${fmt(t.due)}</span>` : `<span>até ${fmt(t.due)}</span>`;
+    }
+    const doneBy = t.done && t.by ? `<span>feito por ${esc(t.by)} · ${ago(t.at)}</span>` : '';
+    return `<div class="row ${t.done ? 'done' : ''}">
+      <button class="check" data-task="${esc(t.id)}" aria-label="Marcar tarefa">${CHECK}</button>
+      <div class="txt"><span class="t">${esc(t.title)}</span>
+        <div class="sub">${showFront ? `<span class="tag">${esc(frontName(t.front))}</span>` : ''}${dueTag}${doneBy}</div></div>
+      ${t.custom ? `<button class="x" data-deltask="${esc(t.id)}" aria-label="Remover">×</button>` : ''}
+    </div>`;
+  }
+
+  const byDue = (a, b) => (a.due || '9999') .localeCompare(b.due || '9999');
+
+  function renderProximos(){
+    const open = data.tasks.filter(t => !t.done).sort(byDue);
+    const next = open.slice(0, 7);
+    const log = data.log.length
+      ? `<ul class="log">${data.log.slice(0,8).map(l => `<li><b>${esc(l.by)}</b> ${esc(l.desc)} <span class="muted">· ${ago(l.at)}</span></li>`).join('')}</ul>`
+      : '<p class="muted">Nada por aqui ainda. O que vocês marcarem aparece aqui.</p>';
+    $('#p-proximos').innerHTML = `<div class="grid2">
+      <div class="card"><h2>Próximas ações <small>${open.length} em aberto</small></h2>${next.map(t => taskRow(t)).join('') || '<p class="muted">Tudo em dia.</p>'}</div>
+      <div class="card"><h2>Atividade recente</h2>${log}</div>
+    </div>`;
+  }
+
+  function renderFrentes(){
+    const cards = data.fronts.map(f => {
+      const ts = data.tasks.filter(t => t.front === f.id).sort((a,b) => (a.done - b.done) || byDue(a,b));
+      const d = ts.filter(t => t.done).length;
+      return `<div class="card"><h2>${esc(f.name)} <small>${d}/${ts.length}</small></h2>
+        <div class="mini" style="margin:-4px 0 8px"><i style="width:${ts.length ? d/ts.length*100 : 0}%"></i></div>
+        ${ts.map(t => taskRow(t, false)).join('')}</div>`;
+    }).join('');
+    const opts = data.fronts.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
+    $('#p-frentes').innerHTML = `<div class="grid2">${cards}</div>
+      <div class="card"><h2>Nova tarefa</h2>
+        <form class="add" id="addTask" style="border:0;padding:0;margin:0">
+          <input name="title" placeholder="O que precisa ser feito?" required>
+          <select name="front">${opts}</select>
+          <input name="due" type="date" aria-label="Prazo">
+          <button class="btn">Adicionar</button>
+        </form></div>`;
+  }
+
+  function renderEnxoval(){
+    const counts = {todos: data.enxoval.length};
+    Object.keys(ST_LABEL).forEach(s => counts[s] = data.enxoval.filter(e => e.status === s).length);
+    const chips = ['todos', ...Object.keys(ST_LABEL)].map(s => `<button aria-pressed="${enxFilter===s}" data-filter="${s}">${s==='todos' ? 'Todos' : ST_LABEL[s]} · ${counts[s]}</button>`).join('');
+    const list = enxFilter === 'todos' ? data.enxoval : data.enxoval.filter(e => e.status === enxFilter);
+    const cats = data.enxovalCats.map(c => {
+      const items = list.filter(e => e.cat === c);
+      if (!items.length) return '';
+      return `<div class="card"><h2>${esc(c)} <small>${items.length}</small></h2>${items.map(e => `
+        <div class="item"><div class="name">${esc(e.item)}${e.qty ? `<span>${esc(e.qty)}</span>` : ''}${e.custom ? ` <button class="x" data-delitem="${esc(e.id)}" aria-label="Remover">×</button>` : ''}</div>
+          <div class="seg">${Object.keys(ST_LABEL).map(s => `<button data-item="${esc(e.id)}" data-s="${s}" aria-pressed="${e.status===s}">${ST_LABEL[s]}</button>`).join('')}</div></div>`).join('')}</div>`;
+    }).join('');
+    const opts = data.enxovalCats.map(c => `<option>${esc(c)}</option>`).join('');
+    $('#p-enxoval').innerHTML = `<div class="chips">${chips}</div>
+      <div class="grid2">${cats || '<p class="muted">Nenhum item com esse status.</p>'}</div>
+      <div class="card"><h2>Adicionar item</h2>
+        <form class="add" id="addItem" style="border:0;padding:0;margin:0">
+          <input name="item" placeholder="Item" required>
+          <select name="cat">${opts}</select>
+          <input name="qty" placeholder="Qtd." style="flex:0 1 90px">
+          <button class="btn">Adicionar</button>
+        </form></div>`;
+  }
+
+  function renderMala(){
+    const groups = [...new Set(data.mala.map(m => m.group))];
+    $('#p-mala').innerHTML = `<div class="grid2">${groups.map(g => {
+      const ms = data.mala.filter(m => m.group === g);
+      return `<div class="card"><h2>${esc(g)} <small>${ms.filter(m=>m.done).length}/${ms.length}</small></h2>${ms.map(m => `
+        <div class="row ${m.done ? 'done' : ''}"><button class="check" data-mala="${esc(m.id)}" aria-label="Marcar">${CHECK}</button>
+          <div class="txt"><span class="t">${esc(m.item)}</span></div></div>`).join('')}</div>`;
+    }).join('')}</div>`;
+  }
+
+  function renderNotas(){
+    $('#p-notas').innerHTML = `<div class="grid2">
+      <div class="card"><h2>Contatos e decisões</h2>${data.contacts.map(c => `<div class="contact"><span>${esc(c.label)}</span><div>${esc(c.value)}</div></div>`).join('')}</div>
+      <div class="card"><h2>Notas</h2>
+        ${data.notes.map(n => `<div class="note"><p>${esc(n.text)}</p><div class="sub muted" style="display:flex;justify-content:space-between;margin-top:4px"><span>${esc(n.by)} · ${ago(n.at)}</span><button class="x" data-delnote="${esc(n.id)}" aria-label="Remover">×</button></div></div>`).join('') || '<p class="muted">Anote aqui recados, dúvidas para a consulta, links…</p>'}
+        <form class="add" id="addNote"><textarea name="text" placeholder="Nova nota" required></textarea><button class="btn">Salvar nota</button></form>
+      </div></div>`;
+  }
+
+  // ---------- eventos ----------
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.tab) {
+      tab = b.dataset.tab;
+      document.querySelectorAll('#tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-'+tab));
+    } else if (b.dataset.who) {
+      who = b.dataset.who; store.set('who', who); renderWho(); toast('Usando como '+who);
+    } else if (b.dataset.task) {
+      const t = data.tasks.find(x => x.id === b.dataset.task);
+      act({op:'task.toggle', id:t.id, done:!t.done}, t.done ? 'Reaberta' : 'Concluída');
+    } else if (b.dataset.deltask) {
+      if (confirm('Remover esta tarefa?')) act({op:'task.remove', id:b.dataset.deltask}, 'Removida');
+    } else if (b.dataset.item) {
+      act({op:'enxoval.status', id:b.dataset.item, status:b.dataset.s}, ST_LABEL[b.dataset.s]);
+    } else if (b.dataset.delitem) {
+      if (confirm('Remover este item?')) act({op:'enxoval.remove', id:b.dataset.delitem}, 'Removido');
+    } else if (b.dataset.filter) {
+      enxFilter = b.dataset.filter; renderEnxoval();
+    } else if (b.dataset.mala) {
+      const m = data.mala.find(x => x.id === b.dataset.mala);
+      act({op:'mala.toggle', id:m.id, done:!m.done}, m.done ? 'Desmarcado' : 'Na mala');
+    } else if (b.dataset.delnote) {
+      if (confirm('Remover esta nota?')) act({op:'note.remove', id:b.dataset.delnote}, 'Removida');
+    }
+  });
+
+  document.addEventListener('submit', (e) => {
+    const f = e.target; const v = Object.fromEntries(new FormData(f));
+    if (f.id === 'addTask') { e.preventDefault(); act({op:'task.add', ...v}, 'Tarefa adicionada'); }
+    if (f.id === 'addItem') { e.preventDefault(); act({op:'enxoval.add', ...v}, 'Item adicionado'); }
+    if (f.id === 'addNote') { e.preventDefault(); act({op:'note.add', ...v}, 'Nota salva'); }
+  });
+
+  // atualiza quando volta para a aba (o outro pode ter mexido)
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && pin && data) { try { data = await call('GET'); render(); } catch {} }
+  });
+
+  // início
+  if (pin) {
+    call('GET').then(j => { data = j; $('#gate').hidden = true; $('#app').hidden = false; render(); }).catch(() => {});
+  } else showGate();
+})();
+</script>
+</body>
+</html>
