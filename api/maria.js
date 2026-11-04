@@ -142,6 +142,18 @@ export default async function handler(req, res) {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
 
   const pin = process.env.MARIA_PIN;
+
+  // Verificação de saúde sem dados: confirma PIN configurado e acesso ao armazenamento
+  if (req.method === 'GET' && req.query && req.query.health !== undefined) {
+    let storage = 'ok';
+    try {
+      await get(PATH, { access: 'private', useCache: false });
+    } catch (e) {
+      storage = 'erro: ' + (e.message || e);
+    }
+    return res.status(200).json({ pin: !!pin, storage });
+  }
+
   if (!pin) return res.status(500).json({ error: 'PIN não configurado' });
   if (req.headers['x-maria-pin'] !== pin) {
     await new Promise((r) => setTimeout(r, 800));
