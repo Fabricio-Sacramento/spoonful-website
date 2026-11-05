@@ -58,6 +58,7 @@ function merge(state) {
     dpp: base.dpp,
     people: base.people,
     contacts: base.contacts,
+    platform: base.platform,
     fronts: base.fronts,
     enxovalCats: base.enxovalCats,
     tasks,

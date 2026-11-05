@@ -125,7 +125,42 @@
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
   .toast.on{opacity:1;transform:translateX(-50%)}
 
+
+  /* plataforma */
+  .pick{background:linear-gradient(135deg,var(--teal-50),#fff);border:1px solid var(--teal-100)}
+  .pick .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal-700)}
+  .pick h2{font-size:26px;font-weight:400;margin:4px 0 8px;display:block}
+  .pick p{color:var(--g-700)}
+  .why{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:14px}
+  .why div{padding-left:14px;border-left:2px solid var(--teal-200)}
+  .why b{display:block;font-weight:500;margin-bottom:2px}
+  .why span{font-size:14px;color:var(--g-700)}
+  .tbl-wrap{overflow-x:auto;margin:0 -18px;padding:0 18px;-webkit-overflow-scrolling:touch}
+  table.cmp{border-collapse:separate;border-spacing:0;width:100%;min-width:860px;font-size:13.5px}
+  table.cmp th,table.cmp td{padding:10px 10px;text-align:left;vertical-align:top;border-top:1px solid var(--g-100)}
+  table.cmp thead th{border-top:0;font-weight:500;font-size:13px;color:var(--g-700);position:sticky;top:0;background:var(--card)}
+  table.cmp tbody th{font-weight:500;color:var(--ink);white-space:nowrap;position:sticky;left:0;background:var(--card);z-index:1;padding-right:14px}
+  table.cmp .best{background:var(--teal-50)}
+  table.cmp thead th.best{color:var(--teal-700);border-radius:12px 12px 0 0}
+  table.cmp td span{display:inline-flex;gap:6px;align-items:flex-start}
+  table.cmp td span::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;margin-top:5px;background:var(--g-300)}
+  table.cmp td.ok span::before,table.cmp td.pick span::before{background:var(--teal-500)}
+  table.cmp td.mid span::before{background:#E2B48F}
+  table.cmp td.no span::before{background:var(--warn)}
+  table.cmp td.na{color:var(--g-300)}
+  table.cmp td.na span::before{display:none}
+  table.cmp td.pick{font-weight:500;color:var(--teal-700)}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--g-500);margin-top:10px}
+  .legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:1px}
+  .steps .row .when{flex:0 0 86px;font-size:13px;color:var(--teal-700);font-weight:500;padding-top:1px}
+  .src a{color:var(--teal-700);text-decoration:none;font-size:14px}
+  .src a:hover{text-decoration:underline}
+  .src li{list-style:none;padding:5px 0;border-top:1px solid var(--g-100)}
+  .src li:first-child{border-top:0}
+
   @media (max-width:720px){
+    .why{grid-template-columns:1fr}
+    .pick h2{font-size:22px}
     .grid2{grid-template-columns:1fr}
     .stats{gap:8px}
     .stat{padding:12px}
@@ -168,6 +203,7 @@
     <button role="tab" data-tab="proximos" aria-selected="true">Próximos passos</button>
     <button role="tab" data-tab="frentes">Frentes</button>
     <button role="tab" data-tab="enxoval">Enxoval</button>
+    <button role="tab" data-tab="plataforma">Plataforma</button>
     <button role="tab" data-tab="mala">Mala</button>
     <button role="tab" data-tab="notas">Notas e contatos</button>
   </nav>
@@ -175,6 +211,7 @@
   <section class="panel on" id="p-proximos"></section>
   <section class="panel" id="p-frentes"></section>
   <section class="panel" id="p-enxoval"></section>
+  <section class="panel" id="p-plataforma"></section>
   <section class="panel" id="p-mala"></section>
   <section class="panel" id="p-notas"></section>
 </div>
@@ -232,7 +269,7 @@
   function render(){
     if (!who || !data.people.includes(who)) { who = data.people[0]; }
     renderWho(); renderHero(); renderStats();
-    renderProximos(); renderFrentes(); renderEnxoval(); renderMala(); renderNotas();
+    renderProximos(); renderFrentes(); renderEnxoval(); renderPlataforma(); renderMala(); renderNotas();
   }
 
   function renderWho(){
@@ -335,6 +372,35 @@
           <input name="qty" placeholder="Qtd." style="flex:0 1 90px">
           <button class="btn">Adicionar</button>
         </form></div>`;
+  }
+
+
+  function renderPlataforma(){
+    const P = data.platform; if (!P) { $('#p-plataforma').innerHTML = ''; return; }
+    const pickIdx = P.cols.indexOf(P.pick);
+    const head = `<tr><th></th>${P.cols.map((c,i) => `<th class="${i===pickIdx?'best':''}">${esc(c)}</th>`).join('')}</tr>`;
+    const body = P.rows.map(r => `<tr><th>${esc(r[0])}</th>${r.slice(1).map(([k,v],i) => `<td class="${esc(k)} ${i===pickIdx?'best':''}"><span>${esc(v)}</span></td>`).join('')}</tr>`).join('');
+    const list = (arr) => arr.map(([a,b]) => `<div class="row"><div class="txt"><span class="t">${esc(a)}</span><div class="sub">${esc(b)}</div></div></div>`).join('');
+    $('#p-plataforma').innerHTML = `
+      <div class="card pick">
+        <div class="eyebrow">Nossa sugestão</div>
+        <h2>${esc(P.pick)}</h2>
+        <p>${esc(P.summary)}</p>
+        <div class="why">${P.why.map(([a,b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div>
+      </div>
+      <div class="card"><h2>Comparativo <small>pesquisa de ${fmt(P.updated,{day:'2-digit',month:'short',year:'numeric'})}</small></h2>
+        <div class="tbl-wrap"><table class="cmp"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+        <div class="legend"><span><i style="background:var(--teal-500)"></i>bom</span><span><i style="background:#E2B48F"></i>com ressalvas</span><span><i style="background:var(--warn)"></i>ruim para nós</span><span>— não se aplica</span></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h2>Como usar a lista</h2><p class="muted" style="margin-bottom:6px">O prazo de troca não chega a março. Por isso, o enxoval fica em dois grupos.</p>${list(P.groups)}</div>
+        <div class="card steps"><h2>Calendário</h2>${P.calendar.map(([w,t]) => `<div class="row"><span class="when">${esc(w)}</span><div class="txt"><span class="t">${esc(t)}</span></div></div>`).join('')}</div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h2>Pegadinhas e como evitar <small>${P.traps.length}</small></h2>${list(P.traps)}</div>
+        <div class="card"><h2>Descartadas logo de cara</h2>${list(P.dropped)}
+          <h2 style="margin-top:18px">Fontes</h2><ul class="src">${P.sources.map(([t,u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)} ↗</a></li>`).join('')}</ul></div>
+      </div>`;
   }
 
   function renderMala(){
