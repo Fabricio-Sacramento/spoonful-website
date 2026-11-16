@@ -138,6 +138,24 @@ export default {
       "due": "2026-12-16"
     },
     {
+      "id": "t-curva-glicemica",
+      "front": "saude",
+      "title": "Exame de sangue: curva glicêmica — 25/11 às 7:30",
+      "due": "2026-11-25"
+    },
+    {
+      "id": "t-consulta-heloisa",
+      "front": "saude",
+      "title": "Consulta com Heloisa — 26/11 às 9:00",
+      "due": "2026-11-26"
+    },
+    {
+      "id": "t-eco-fetal",
+      "front": "saude",
+      "title": "Ecocardiograma fetal — 03/12 às 9:20",
+      "due": "2026-12-03"
+    },
+    {
       "id": "t-plano-cobertura",
       "front": "saude",
       "title": "Confirmar com o plano a cobertura do parto na São José e o que a equipe cobra à parte",
